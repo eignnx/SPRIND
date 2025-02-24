@@ -8,7 +8,7 @@ arr_sum: ; subr(arr_addr: *i16, len: u16) -> i16
 
 	; alias arr_addr => x
 	; alias len => y
-	; alias sum => z
+	; alias sum => s0
 
 	b .cond
 
