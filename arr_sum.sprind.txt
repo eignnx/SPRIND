@@ -1,0 +1,47 @@
+# outp | addr | data (base 16)
+
+#   0:0 |    0 
+# arr_sum:
+     
+#   0:0 |    0 
+# subi sp, 2
+0x0a 0x97
+#   2:0 |    2 
+# sw [sp][0], s0
+0xa0 0x1a
+#   4:0 |    4 
+# b .cond
+0x40 0x04
+#   6:0 |    6 
+# .loop:
+     
+#   6:0 |    6 
+# decr y
+0x0a 0x8d
+#   8:0 |    8 
+# lw z, [x][y]
+0x11 0xa5
+#   a:0 |    a 
+# add s0, z
+0x05 0x16
+#   c:0 |    c 
+# .cond:
+     
+#   c:0 |    c 
+# cmpi y, 0
+0x08 0x05
+#   e:0 |    e 
+# bg .loop
+0x5f 0xfc
+#  10:0 |   10 
+# mov x, s0
+0x05 0xe2
+#  12:0 |   12 
+# lw s0, [sp][0]
+0x80 0x1a
+#  14:0 |   14 
+# addi sp, 2
+0x0a 0x17
+#  16:0 |   16 
+# ret
+0x04 0x48
