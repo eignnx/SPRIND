@@ -1,4 +1,4 @@
-#include "./sprind.customasm"
+#include "../sprind.customasm"
 #bank rom
 
 #align 4
