@@ -6,7 +6,11 @@
 :- op(20, fx, #).
 :- op(50, xfx, ..=).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% USER EDITABLE SECTION %%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% USER EDITABLE SECTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Instructions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 :- det(fmt_operands/2).
 
@@ -33,15 +37,12 @@ genericfmt_description(r(_),  'Register').
 genericfmt_description(o,     'Opcode').
 genericfmt_description(ext,   'Reserved for Extension').
 
-fmt_description(Fmt, Descr) :-
-    Fmt =.. [_Functor],
-    !,
-    genericfmt_description(Fmt, Descr).
-fmt_description(Fmt, Descr) :-
-    Fmt =.. [_Functor, Arg],
-    genericfmt_description(Fmt, Descr0),
-    format(atom(Descr), '~w #~d', [Descr0, Arg]).
-
+% A cons-cell based tree representation of the encoding space. The program uses
+% this tree to construct prefix codes for the different instruction formats.
+%
+% The tree `(a + ((b + c) + d))` would be represented as `[a | [[b | c] | d]]`.
+%
+% See: https://en.wikipedia.org/wiki/Huffman_coding
 huffman_enc([
     [
         lsd
@@ -57,6 +58,7 @@ huffman_enc([
         ]
     ]
 |
+    % Note: `[a | [b | [c | d]]] == [a, b, c | d]`
     [
         li,
         ri(1),
@@ -82,7 +84,33 @@ fmt_opcodesizeconstraint(lsd, Bits) :- 2 ^ #Bits #>= 4.
 fmt_opcodesizeconstraint(b, Bits) :- #Bits #>= 1, 2 ^ #Bits #=< 16.
 fmt_opcodesizeconstraint(subr, Bits) :- 2 ^ #Bits #= 1.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Registers %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+register_size(16).
+gpr_count_bits(3).
+addr_reg_count_bits(2).
+
+regid_name_uses(0, sp, [stack_ptr, addr]).
+regid_name_uses(1, x,  [temp, arg(1), addr]).
+regid_name_uses(2, y,  [temp, arg(2), addr]).
+regid_name_uses(3, z,  [temp, arg(3), addr]).
+regid_name_uses(4, w,  [temp, arg(4)]).
+regid_name_uses(5, v,  [temp, retval]).
+regid_name_uses(6, a,  [saved]).
+regid_name_uses(7, b,  [saved]).
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+fmt_description(Fmt, Descr) :-
+    Fmt =.. [_Functor],
+    !,
+    genericfmt_description(Fmt, Descr).
+fmt_description(Fmt, Descr) :-
+    Fmt =.. [_Functor, Arg],
+    genericfmt_description(Fmt, Descr0),
+    format(atom(Descr), '~w #~d', [Descr0, Arg]).
 
 tree_leaf(Tree, Leaf) :-
     Tree = [Left | Right] ->
@@ -127,9 +155,9 @@ fmt_prefix(Fmt, Prefix) :-
     huffmantree_item_prefix(Tree, Fmt, Prefix).
 
 
-operand_size(r, 3).
-operand_size('R', 3).
-operand_size(a, 2).
+operand_size(r, Bits) :- gpr_count_bits(Bits).
+operand_size('R', Bits) :- gpr_count_bits(Bits).
+operand_size(a, Bits) :- addr_reg_count_bits(Bits).
 operand_size(i, Size) :- Size in 0 .. 16.
 
 
@@ -195,6 +223,9 @@ immbits_immdescription(Bits, Descr) :-
         format(atom(Descr), 'imm(~d) in ~q \\/ ~q', [Bits, SimmRange, ImmRange])
     ;
         Descr = ''.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 show_table :-
