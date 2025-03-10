@@ -20,18 +20,27 @@ fmt_operands(r(_), [r]).
 fmt_operands(o, []).
 fmt_operands(ext, []).
 
-:- det(fmt_description/2).
+:- det(genericfmt_description/2).
 
-fmt_description(lsd,  'Load-store with Displacement').
-fmt_description(subr,  'Subroutine Call').
-fmt_description(li,    'Load Immediate').
-fmt_description(b,     'Branch').
-fmt_description(lsx,   'Load-store with Index').
-fmt_description(rr(N), Descr) :- format(atom(Descr), 'Register-register ~d', [N]).
-fmt_description(ri(N), Descr) :- format(atom(Descr), 'Register-immediate ~d', [N]).
-fmt_description(r(N),  Descr) :- format(atom(Descr), 'Register ~d', [N]).
-fmt_description(o,     'Opcode').
-fmt_description(ext,   'Reserved for Extension').
+genericfmt_description(lsd,  'Load-store with Displacement').
+genericfmt_description(subr,  'Subroutine Call').
+genericfmt_description(li,    'Load Immediate').
+genericfmt_description(b,     'Branch').
+genericfmt_description(lsx,   'Load-store with Index').
+genericfmt_description(rr(_), 'Register-register').
+genericfmt_description(ri(_), 'Register-immediate').
+genericfmt_description(r(_),  'Register').
+genericfmt_description(o,     'Opcode').
+genericfmt_description(ext,   'Reserved for Extension').
+
+fmt_description(Fmt, Descr) :-
+    Fmt =.. [_Functor],
+    !,
+    genericfmt_description(Fmt, Descr).
+fmt_description(Fmt, Descr) :-
+    Fmt =.. [_Functor, Arg],
+    genericfmt_description(Fmt, Descr0),
+    format(atom(Descr), '~w #~d', [Descr0, Arg]).
 
 huffman_enc([
     [
@@ -109,9 +118,9 @@ addrsize_maxalignment(Bits, MaxAlign) :-
     2 ^ #Bits #>= 2^16 div #MaxAlign.
 
 huffmantree_item_prefix(Fmt, Fmt, []).
-huffmantree_item_prefix([Left | _Right], Fmt, ['1' | Prefix]) :-
+huffmantree_item_prefix([Left | _Right], Fmt, ['0' | Prefix]) :-
     huffmantree_item_prefix(Left, Fmt, Prefix).
-huffmantree_item_prefix([_Left | Right], Fmt, ['0' | Prefix]) :-
+huffmantree_item_prefix([_Left | Right], Fmt, ['1' | Prefix]) :-
     huffmantree_item_prefix(Right, Fmt, Prefix).
 
 fmt_prefix(Fmt, Prefix) :-
@@ -197,9 +206,9 @@ immbits_immdescription(Bits, Descr) :-
 
 show_table :-
     format('~n~n~`=t Instruction Counts by Format ~`=t~80|~n~n'),
-    format('|~`-t~20||~`-t~80||~n'),
-    format('|~t Generic Format ~t~20||~t Instr Count Possibilities  ~t~80||~n'),
-    format('|~`-t~20||~`-t~80||~n'),
+    format('|~`-t~20||~`-t~45||~`-t~80||~n'),
+    format('|~tGeneric Format~t~20||~tInstr. Count Opts.~t~45||~tDescription~t~80||~n'),
+    format('|~`-t~20||~`-t~45||~`-t~80||~n'),
     foreach(
         genericfmt(GFmt),
         display_genericfmt_instr_count(GFmt)
@@ -222,7 +231,11 @@ display_genericfmt_instr_count(GFmt) :-
     ), DescCounts),
     sort(DescCounts, Counts),
     phrase(sequence(integer, `, `, Counts), CountsList),
-    format('|~t~8|~k  ~`.t~20|~`.t  ~s~72|~t~80||~n', [GFmt, CountsList]).
+    genericfmt_description(GFmt, Descr),
+    format(
+        '|~t~5|~k  ~`.t~20|~`.t  ~s~40|~t~45||~t~48|~w~t~80||~n',
+        [GFmt, CountsList, Descr]
+    ).
 
 format_section(Fmt) :-
     fmt_description(Fmt, Descr),
@@ -249,6 +262,7 @@ bitformatchar_description(o, 'A bit in the instruction''s opcode.').
 bitformatchar_description(i, 'A bit in an immediate value.').
 bitformatchar_description(r, 'A bit in a register specifier.').
 bitformatchar_description('R', 'A bit in a second register specifier.').
+bitformatchar_description(a, 'A bit in an address register specifier.').
 
 display_bitformat_legend :-
     format('|~`-t~80||~n'),
