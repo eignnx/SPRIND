@@ -61,7 +61,6 @@ huffman_enc([
         li,
         ri(1),
         ri(2),
-        % ri(3),
         rr(1),
         rr(2),
         rr(3),
