@@ -133,8 +133,6 @@ operand_size(a, 2).
 operand_size(i, Size) :- Size in 0 .. 16.
 
 
-:- table fmt_opcodebits_immbits/3.
-
 fmt_opcodebits_immbits(Fmt, OpcodeBits, ImmBits) :-
     OpcodeBits in 0 .. 16,
     ImmBits in 0 .. 16,
@@ -150,8 +148,6 @@ fmt_opcodebits_immbits(Fmt, OpcodeBits, ImmBits) :-
     #PrefixLen + #OpcodeBits + #OperandsTotalSize #= 16.
 
 
-:- table fmt_layout/2.
-
 fmt_layout(Fmt, Layout) :-
     fmt_operands(Fmt, Operands),
     fmt_opcodebits_immbits(Fmt, OBits, IBits),
@@ -165,8 +161,6 @@ fmt_layout(Fmt, Layout) :-
     append([Prefix, Opcode | OperandBits], Layout),
     true.
 
-
-:- table genericfmt_opcodes/2.
 
 genericfmt_opcodes(GFmt, Opcodes) :-
     bagof(OBits, GFmt^fmt_opcodebits_immbits(GFmt, OBits, _), OBitRows),
