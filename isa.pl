@@ -239,12 +239,12 @@ display_genericfmt_instr_count(GFmt) :-
 format_section(Fmt) :-
     fmt_description(Fmt, Descr),
     format('|~`-t ~w ~`-t|~80|~n', [Descr]),
-    format('|~80|~n'),
+    format('|~t|~80|~n'),
     foreach(
         fmt_layout(Fmt, Layout),
         format_layout_row(Fmt, Layout)
     ),
-    format('|~80|~n').
+    format('|~t|~80|~n').
 
 format_layout_row(Fmt, Layout) :-
     list_item_occurrances(Layout, o, OBits),
