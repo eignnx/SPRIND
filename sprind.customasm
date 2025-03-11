@@ -1,21 +1,21 @@
 #once
 
+#const ISA_VERSION = "0.7"
+
 #ruledef Reg {
-      zero => 0b000
-      ra   => 0b001
-      s0   => 0b010
-      s1   => 0b011
-      x    => 0b100
-      y    => 0b101
-      z    => 0b110
-      sp   => 0b111
+      sp => 0b000
+      w  => 0b001
+      x  => 0b010
+      y  => 0b011
+      z  => 0b100
+      a  => 0b101
+      b  => 0b110
+      c  => 0b111
 }
 
 #ruledef AdrReg {
-      x    => 0b00
-      y    => 0b01
-      z    => 0b10
-      sp   => 0b11
+      sp => 0b0
+      w  => 0b1
 }
 
 
@@ -23,7 +23,7 @@
 #ruledef Instruction {
       call {addr: u16} => {
             assert(addr != 0xFFFF, "address 0xFFFF may not store the start of a subroutine")
-            0b11 @ (addr >> 2)`14
+            0b11 @ (addr << 3)`14
       }
 
       ; RRI
