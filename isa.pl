@@ -65,6 +65,7 @@ huffman_enc([
         li,
         ri(1),
         ri(2),
+        ri(3),
         rr(1),
         rr(2),
         rr(3),
@@ -76,31 +77,17 @@ huffman_enc([
     ]
 ]).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Constraints %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 fmt_immsizeconstraint(lsd, Bits) :- #Bits #>= 6.
 fmt_immsizeconstraint(subr, Bits) :- addrsize_maxalignment(Bits, 32).
 fmt_immsizeconstraint(b, Bits) :- #Bits #>= 6.
 fmt_immsizeconstraint(li, Bits) :- #Bits #>= 8.
-fmt_immsizeconstraint(ri(_), Bits) :- #Bits #= 5. % #Bits #>= 4. %
+fmt_immsizeconstraint(ri(_), Bits) :- #Bits #= 6. % #Bits #>= 4. %
 
 fmt_opcodesizeconstraint(lsd, Bits) :- 2 ^ #Bits #>= 4.
 fmt_opcodesizeconstraint(b, Bits) :- #Bits #>= 1, 2 ^ #Bits #=< 16.
 fmt_opcodesizeconstraint(subr, Bits) :- 2 ^ #Bits #= 1.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Registers %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-register_size(16).
-gpr_count_bits(3).
-addr_reg_count_bits(2).
-
-regid_name_uses(0, sp, [stack_ptr, addr]).
-regid_name_uses(1, x,  [temp, arg(1), addr]).
-regid_name_uses(2, y,  [temp, arg(2), addr]).
-regid_name_uses(3, z,  [temp, arg(3), addr]).
-regid_name_uses(4, w,  [temp, arg(4)]).
-regid_name_uses(5, v,  [temp, retval]).
-regid_name_uses(6, a,  [saved]).
-regid_name_uses(7, b,  [saved]).
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% Instruction Assignments %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -109,14 +96,18 @@ fmt_instr(lsd, lw).
 fmt_instr(lsd, sb).
 fmt_instr(lsd, sw).
 
+
 fmt_instr(subr, call).
+
 
 fmt_instr(b, b).
 fmt_instr(b, bt).
 fmt_instr(b, bf).
 
+
 fmt_instr(li, li).
 fmt_instr(li, szi).
+
 
 fmt_instr(ri(1), lgb).
 fmt_instr(ri(1), lgw).
@@ -134,10 +125,12 @@ fmt_instr(ri(1), teqi).
 fmt_instr(ri(1), addi).
 fmt_instr(ri(1), andi).
 fmt_instr(ri(1), ori).
-fmt_instr(ri(1), xori).
-fmt_instr(ri(1), lsri).
-fmt_instr(ri(1), lsli).
-fmt_instr(ri(1), asri).
+
+fmt_instr(ri(2), xori).
+fmt_instr(ri(2), lsri).
+fmt_instr(ri(2), lsli).
+fmt_instr(ri(2), asri).
+
 
 fmt_instr(rr(1), add).
 fmt_instr(rr(1), sub).
@@ -155,17 +148,84 @@ fmt_instr(rr(1), tne).
 fmt_instr(rr(1), teq).
 
 
+fmt_instr(r(1), pushb).
+fmt_instr(r(1), pushw).
+fmt_instr(r(1), popb).
+fmt_instr(r(1), popw).
+fmt_instr(r(1), callr).
+fmt_instr(r(1), jr).
+fmt_instr(r(1), neg).
+fmt_instr(r(1), seb).
+fmt_instr(r(1), 'r.hi').
+fmt_instr(r(1), 'r.gp').
+fmt_instr(r(1), 'w.gp').
+
+
+fmt_instr(o, 'NONEXE1').
+fmt_instr(o, 'BREAK').
+fmt_instr(o, 'HALT').
+fmt_instr(o, 'UNIMPL').
+fmt_instr(o, kret).
+fmt_instr(o, kcall).
+fmt_instr(o, ret).
+fmt_instr(o, tov).
+fmt_instr(o, tcy).
+fmt_instr(o, cy0).
+fmt_instr(o, cy1).
+fmt_instr(o, tpush0).
+fmt_instr(o, tpush1).
+fmt_instr(o, tnot).
+fmt_instr(o, tand).
+fmt_instr(o, tor).
+fmt_instr(o, tdup).
+fmt_instr(o, 'prsv.hi').
+fmt_instr(o, 'rstr.hi').
+fmt_instr(o, 'prsv.ts').
+fmt_instr(o, 'rstr.ts').
+fmt_instr(o, 'prsv.ra').
+fmt_instr(o, 'rstr.ra').
+fmt_instr(o, 'prsv.gp').
+fmt_instr(o, 'rstr.gp').
+fmt_instr(o, 'prsv.cc').
+fmt_instr(o, 'rstr.cc').
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Registers %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+register_size(16).
+gpr_count_bits(3).
+addr_reg_count_bits(2).
+
+regid_name_uses(0, sp, [stack_ptr, addr]).
+regid_name_uses(1, x,  [temp, arg(1), addr]).
+regid_name_uses(2, y,  [temp, arg(2), addr]).
+regid_name_uses(3, z,  [temp, arg(3), addr]).
+regid_name_uses(4, w,  [temp, arg(4)]).
+regid_name_uses(5, v,  [temp, retval]).
+regid_name_uses(6, a,  [saved]).
+regid_name_uses(7, b,  [saved]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 fmt_assignedinstrcount(Fmt, AssignedCount) :-
-    findall(Instr, fmt_instr(Fmt, Instr), Instrs),
-    length(Instrs, AssignedCount).
+    fmt_assignedinstrcount(Fmt, AssignedCount, _ReservedCount).
+fmt_assignedinstrcount(Fmt, AssignedCount, ReservedCount) :-
+    aggregate_all(count, (
+            fmt_instr(Fmt, Instr),
+            dif(Instr, ???) % For spacing out instructions in opcode space.
+        ),
+        AssignedCount
+    ),
+    aggregate_all(count, (
+            fmt_instr(Fmt, ???) % For spacing out instructions in opcode space.
+        ),
+        ReservedCount
+    ).
 
 validate_instr_assignments(Fmt, OpcodeCount) :-
-    fmt_assignedinstrcount(Fmt, AssignedCount),
-    #OpcodeCount #>= #AssignedCount.
+    fmt_assignedinstrcount(Fmt, AssignedCount, ReservedCount),
+    #OpcodeCount #>= #AssignedCount + #ReservedCount.
 
 fmt_description(Fmt, Descr) :-
     Fmt =.. [_Functor],
@@ -234,6 +294,12 @@ fmt_opcodebits_immbits(Fmt, OpcodeBits, ImmBits) :-
     #PrefixLen + #OpcodeBits + #OperandsTotalSize #= 16.
 
 
+fmt_maxopcodes(Fmt, MaxOpcodes) :-
+    fmt_opcodebits_immbits(Fmt, OpcodeBits, _),
+    #MaxOpcodes #= 2 ^ #OpcodeBits,
+    once(labeling([bisect, max(MaxOpcodes)], [MaxOpcodes])).
+
+
 fmt_layout(Fmt, Layout) :-
     fmt_operands(Fmt, Operands),
     fmt_opcodebits_immbits(Fmt, OBits, IBits),
@@ -282,7 +348,7 @@ immbits_immrange(Bits, (0 ..= High)) :-
 immbits_immdescription(Bits, Descr) :-
     immbits_simmrange(Bits, SimmRange),
     immbits_immrange(Bits, ImmRange) ->
-        format(atom(Descr), 'imm in ~q | ~q', [SimmRange, ImmRange])
+        format(atom(Descr), 'imm~d in ~q | ~q', [Bits, SimmRange, ImmRange])
     ;
         Descr = ''.
 
@@ -291,12 +357,16 @@ immbits_immdescription(Bits, Descr) :-
 
 
 show_table :-
-    display_heading('Instruction Counts by Format'),
-    display_instruction_counts_by_format,
+    warn_if_nondet(show_table_).
 
+show_table_ :-
     display_heading('Instruction Format Breakdown'),
     display_bitformat_legend,
     display_instr_format_breakdown,
+
+    display_heading('Instruction Counts by Format'),
+    display_instruction_counts_by_format,
+
     true.
 
 display_instruction_counts_by_format :-
@@ -319,9 +389,8 @@ display_instruction_counts_by_format :-
 display_genericfmt_instr_count(GFmt) :-
     bagof(Opcodes, GFmt^(
         genericfmt_opcodes(GFmt, Opcodes),
-        labeling([down], [Opcodes])
-    ), DescCounts),
-    sort(DescCounts, Counts),
+        labeling([up, bisect], [Opcodes])
+    ), Counts),
     phrase(sequence(integer, `, `, Counts), CountsList),
     genericfmt_description(GFmt, Descr),
     format(
@@ -340,8 +409,11 @@ display_instr_format_breakdown :-
 
 format_section(Fmt) :-
     fmt_description(Fmt, Descr),
-    fmt_assignedinstrcount(Fmt, AssignedInstrCount),
-    format('|~`-t[ ~w ]~`-t~40|~`-t[ ~d assigned ]~`-t~80||~n', [Descr, AssignedInstrCount]),
+    fmt_assignedinstrcount(Fmt, AssignedCount, ReservedCount),
+    fmt_maxopcodes(Fmt, MaxAvail),
+    % format('|~t~80||~n'),
+    format(atom(CountSummary), '[ ~d max avail., ~d assigned, ~d reserved ]', [MaxAvail, AssignedCount, ReservedCount]),
+    format('|~`-t[ ~w ]~`-t~35|~`-t~w~`-t~80||~n', [Descr, CountSummary]),
     format('|~t~80||~n'),
     foreach(
         fmt_layout(Fmt, Layout),
@@ -418,3 +490,7 @@ list_item_occurrances([X | Xs], Y, N) :-
     ;
         list_item_occurrances(Xs, Y, M),
         #N #= #M + 1.
+
+warn_if_nondet(Goal) :-
+    aggregate(count, Goal, Count),
+    Count > 1 -> throw(error(redundant_choicepoint_for_goal(Goal))) ; true.
