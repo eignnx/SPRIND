@@ -1,4 +1,6 @@
 :- set_prolog_flag(double_quotes, chars).
+:- encoding(utf8).
+
 :- use_module(library(clpfd)).
 :- use_module(library(dcg/basics)).
 :- use_module(library(dcg/high_order)).
@@ -51,9 +53,9 @@ huffman_enc([
             subr
         |
             [
-                ext
-            |
                 b
+            |
+                ext
             ]
         ]
     ]
@@ -100,8 +102,60 @@ regid_name_uses(6, a,  [saved]).
 regid_name_uses(7, b,  [saved]).
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%% Instruction Assignments %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+fmt_instr(lsd, lb).
+fmt_instr(lsd, lw).
+fmt_instr(lsd, sb).
+fmt_instr(lsd, sw).
+
+fmt_instr(subr, call).
+
+fmt_instr(b, b).
+fmt_instr(b, bt).
+fmt_instr(b, bf).
+
+fmt_instr(li, li).
+fmt_instr(li, szi).
+
+fmt_instr(ri(1), lgb).
+fmt_instr(ri(1), lgw).
+fmt_instr(ri(1), sgb).
+fmt_instr(ri(1), sgw).
+fmt_instr(ri(1), tbit).
+fmt_instr(ri(1), cbit).
+fmt_instr(ri(1), sbit).
+fmt_instr(ri(1), tli).
+fmt_instr(ri(1), tgei).
+fmt_instr(ri(1), tbi).
+fmt_instr(ri(1), taei).
+fmt_instr(ri(1), tnei).
+fmt_instr(ri(1), teqi).
+fmt_instr(ri(1), addi).
+fmt_instr(ri(1), andi).
+fmt_instr(ri(1), ori).
+fmt_instr(ri(1), xori).
+fmt_instr(ri(1), lsri).
+fmt_instr(ri(1), lsli).
+fmt_instr(ri(1), asri).
+
+fmt_instr(rr(1), add).
+fmt_instr(rr(1), sub).
+fmt_instr(rr(1), and).
+fmt_instr(rr(1), or).
+fmt_instr(rr(1), xor).
+fmt_instr(rr(1), mov).
+fmt_instr(rr(1), addcy).
+fmt_instr(rr(1), subcy).
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+validate_instr_assignments(Fmt, OpcodeCount) :-
+    findall(Instr, fmt_instr(Fmt, Instr), Instrs),
+    length(Instrs, AssignedCount),
+    #OpcodeCount #>= #AssignedCount.
 
 fmt_description(Fmt, Descr) :-
     Fmt =.. [_Functor],
@@ -143,12 +197,6 @@ tree_leaf(Tree, Leaf) :-
 
 addrsize_maxalignment(Bits, MaxAlign) :-
     2 ^ #Bits #>= 2^16 div #MaxAlign.
-
-huffmantree_item_prefix(Fmt, Fmt, []).
-huffmantree_item_prefix([Left | _Right], Fmt, ['0' | Prefix]) :-
-    huffmantree_item_prefix(Left, Fmt, Prefix).
-huffmantree_item_prefix([_Left | Right], Fmt, ['1' | Prefix]) :-
-    huffmantree_item_prefix(Right, Fmt, Prefix).
 
 fmt_prefix(Fmt, Prefix) :-
     huffman_enc(Tree),
@@ -196,17 +244,12 @@ genericfmt_opcodes(GFmt, Opcodes) :-
     sum(OpcodeCounts, #=, Opcodes).
 
 
-item_count_replication(Item, Count, Replication) :-
-    length(Replication, Count),
-    maplist(=(Item), Replication).
+total_opcode_count(Count) :-
+    bagof(GFmt, genericfmt(GFmt), GFmts),
+    exclude(=(ext), GFmts, GFmtsNoExt),
+    maplist([GFmt, Ops]>>genericfmt_opcodes(GFmt, Ops), GFmtsNoExt, TotalCounts),
+    sum(TotalCounts, #=, Count).
 
-list_item_occurrances([], _, 0).
-list_item_occurrances([X | Xs], Y, N) :-
-    dif(X, Y) ->
-        list_item_occurrances(Xs, Y, N)
-    ;
-        list_item_occurrances(Xs, Y, M),
-        #N #= #M + 1.
 
 immbits_simmrange(Bits, (Low ..= High)) :-
     #Bits #> 0,
@@ -229,7 +272,15 @@ immbits_immdescription(Bits, Descr) :-
 
 
 show_table :-
-    format('~n~n~`=t Instruction Counts by Format ~`=t~80|~n~n'),
+    display_heading('Instruction Counts by Format'),
+    display_instruction_counts_by_format,
+
+    display_heading('Instruction Format Breakdown'),
+    display_bitformat_legend,
+    display_instr_format_breakdown,
+    true.
+
+display_instruction_counts_by_format :-
     format('|~`-t~20||~`-t~45||~`-t~80||~n'),
     format('|~tGeneric Format~t~20||~tInstr. Count Opts.~t~45||~tDescription~t~80||~n'),
     format('|~`-t~20||~`-t~45||~`-t~80||~n'),
@@ -237,16 +288,8 @@ show_table :-
         genericfmt(GFmt),
         display_genericfmt_instr_count(GFmt)
     ),
-    format('|~`-t~80||~n'),
+    format('|~`-t~80||~n').
 
-    format('~n~n~`=t Instruction Format Breakdown ~`=t~80|~n~n'),
-    display_bitformat_legend,
-    foreach(
-        fmt(Fmt),
-        format_section(Fmt)
-    ),
-    format('~`-t~80|~n~n'),
-    true.
 
 display_genericfmt_instr_count(GFmt) :-
     bagof(Opcodes, GFmt^(
@@ -261,36 +304,44 @@ display_genericfmt_instr_count(GFmt) :-
         [GFmt, CountsList, Descr]
     ).
 
+
+display_instr_format_breakdown :-
+    display_table_header('Instruction Formats'),
+    foreach(
+        fmt(Fmt),
+        format_section(Fmt)
+    ),
+    format('|~`-t~80||~n').
+
 format_section(Fmt) :-
     fmt_description(Fmt, Descr),
-    format('|~`-t ~w ~`-t|~80|~n', [Descr]),
-    format('|~t|~80|~n'),
+    format('|~`-t ~w ~`-t~80||~n', [Descr]),
+    format('|~t~80||~n'),
     foreach(
         fmt_layout(Fmt, Layout),
         format_layout_row(Fmt, Layout)
     ),
-    format('|~t|~80|~n').
+    format('|~t~80||~n').
 
 format_layout_row(Fmt, Layout) :-
     list_item_occurrances(Layout, o, OBits),
-    #Ops #= 2 ^ OBits,
+    #Ops #= 2 ^ #OBits,
+    ( \+ validate_instr_assignments(Fmt, Ops) ->
+        AnsiStyle = [fg(red)]
+    ;
+        AnsiStyle = []
+    ),
     list_item_occurrances(Layout, i, IBits),
     immbits_immdescription(IBits, ImmDescr),
-    format(
-        '|~|~t~k~t~8|~s~+~t~d opcode(s)~16+~t~w~t|~40+~n',
+    ansi_format(
+        AnsiStyle,
+        '|~|~t~k~t~8|~s~+~t~d opcode(s)~16+~t~w~t~40+|~n',
         [Fmt, Layout, Ops, ImmDescr]
     ).
 
-bitformatchar_description('0, 1', 'A literal `0` or `1` embedded in the instruction.').
-bitformatchar_description(o, 'A bit in the instruction''s opcode.').
-bitformatchar_description(i, 'A bit in an immediate value.').
-bitformatchar_description(r, 'A bit in a register specifier.').
-bitformatchar_description('R', 'A bit in a second register specifier.').
-bitformatchar_description(a, 'A bit in an address register specifier.').
 
 display_bitformat_legend :-
-    format('|~`-t~80||~n'),
-    format('|~tLegend~t~80||~n'),
+    display_table_header('Legend'),
     format('|~`-t~15||~`-t~80||~n'),
     format('|~tBit Symbol~t~15||~tDescription~t~80||~n'),
     format('|~`-t~15||~`-t~80||~n'),
@@ -300,3 +351,44 @@ display_bitformat_legend :-
     ),
     format('|~`-t~80||~n'),
     format('~n').
+
+bitformatchar_description('0, 1', 'A literal `0` or `1` embedded in the instruction.').
+bitformatchar_description(o, 'A bit in the instruction''s opcode.').
+bitformatchar_description(i, 'A bit in an immediate value.').
+bitformatchar_description(r, 'A bit in a register specifier.').
+bitformatchar_description('R', 'A bit in a second register specifier.').
+bitformatchar_description(a, 'A bit in an address register specifier.').
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% UTILS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+huffmantree_item_prefix(Fmt, Fmt, []).
+huffmantree_item_prefix([Left | _Right], Fmt, ['0' | Prefix]) :-
+    huffmantree_item_prefix(Left, Fmt, Prefix).
+huffmantree_item_prefix([_Left | Right], Fmt, ['1' | Prefix]) :-
+    huffmantree_item_prefix(Right, Fmt, Prefix).
+
+
+display_heading(Content) :-
+    format('~n~n~`=t ~w ~`=t~80|~n~n', [Content]).
+
+display_table_header(Content) :-
+    format('|~`-t~80||~n'),
+    format('|~t~80||~n'),
+    format('|~t ~w ~t~80||~n', [Content]),
+    format('|~t~80||~n').
+
+
+item_count_replication(Item, Count, Replication) :-
+    length(Replication, Count),
+    maplist(=(Item), Replication).
+
+
+list_item_occurrances([], _, 0).
+list_item_occurrances([X | Xs], Y, N) :-
+    dif(X, Y) ->
+        list_item_occurrances(Xs, Y, N)
+    ;
+        list_item_occurrances(Xs, Y, M),
+        #N #= #M + 1.
