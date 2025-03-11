@@ -263,7 +263,7 @@ immbits_immrange(Bits, (0 ..= High)) :-
 immbits_immdescription(Bits, Descr) :-
     immbits_simmrange(Bits, SimmRange),
     immbits_immrange(Bits, ImmRange) ->
-        format(atom(Descr), 'imm(~d) in ~q \\/ ~q', [Bits, SimmRange, ImmRange])
+        format(atom(Descr), 'imm in ~q | ~q', [SimmRange, ImmRange])
     ;
         Descr = ''.
 
