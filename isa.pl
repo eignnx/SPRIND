@@ -245,10 +245,19 @@ genericfmt_opcodes(GFmt, Opcodes) :-
 
 
 total_opcode_count(Count) :-
-    bagof(GFmt, genericfmt(GFmt), GFmts),
-    exclude(=(ext), GFmts, GFmtsNoExt),
-    maplist([GFmt, Ops]>>genericfmt_opcodes(GFmt, Ops), GFmtsNoExt, TotalCounts),
+    total_opcode_count(Count, _Counts).
+total_opcode_count(Count, TotalCounts) :-
+    bagof(GFmt, (genericfmt(GFmt), dif(GFmt, ext)), GFmts),
+    maplist([GFmt, Ops]>>genericfmt_opcodes(GFmt, Ops), GFmts, TotalCounts),
     sum(TotalCounts, #=, Count).
+
+total_opcode_count_minmax(MinCount, MaxCount) :-
+    total_opcode_count_minmax(MinCount, MaxCount, bisect).
+total_opcode_count_minmax(MinCount, MaxCount, BranchingStrat) :-
+    total_opcode_count(MinCount, TotalCounts0),
+    once(labeling([BranchingStrat, min(MinCount)], TotalCounts0)),
+    total_opcode_count(MaxCount, TotalCounts1),
+    once(labeling([BranchingStrat, max(MaxCount)], TotalCounts1)).
 
 
 immbits_simmrange(Bits, (Low ..= High)) :-
@@ -288,7 +297,13 @@ display_instruction_counts_by_format :-
         genericfmt(GFmt),
         display_genericfmt_instr_count(GFmt)
     ),
-    format('|~`-t~80||~n').
+    format('|~`-t~45||~`-t~80||~n'),
+    total_opcode_count_minmax(TotalMin, TotalMax),
+    format(
+        '|~t~5|~w  ~`.t  ~d, ~d~40|~t~45||~t~48|~t~80||~n',
+        ['Total (excl. `ext`)', TotalMin, TotalMax]
+    ),
+    format('|~`-t~45||~`-t~80||~n').
 
 
 display_genericfmt_instr_count(GFmt) :-
