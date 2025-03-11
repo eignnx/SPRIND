@@ -147,14 +147,24 @@ fmt_instr(rr(1), xor).
 fmt_instr(rr(1), mov).
 fmt_instr(rr(1), addcy).
 fmt_instr(rr(1), subcy).
+fmt_instr(rr(1), tl).
+fmt_instr(rr(1), tge).
+fmt_instr(rr(1), tb).
+fmt_instr(rr(1), tae).
+fmt_instr(rr(1), tne).
+fmt_instr(rr(1), teq).
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+fmt_assignedinstrcount(Fmt, AssignedCount) :-
+    findall(Instr, fmt_instr(Fmt, Instr), Instrs),
+    length(Instrs, AssignedCount).
 
 validate_instr_assignments(Fmt, OpcodeCount) :-
-    findall(Instr, fmt_instr(Fmt, Instr), Instrs),
-    length(Instrs, AssignedCount),
+    fmt_assignedinstrcount(Fmt, AssignedCount),
     #OpcodeCount #>= #AssignedCount.
 
 fmt_description(Fmt, Descr) :-
@@ -330,7 +340,8 @@ display_instr_format_breakdown :-
 
 format_section(Fmt) :-
     fmt_description(Fmt, Descr),
-    format('|~`-t ~w ~`-t~80||~n', [Descr]),
+    fmt_assignedinstrcount(Fmt, AssignedInstrCount),
+    format('|~`-t[ ~w ]~`-t~40|~`-t[ ~d assigned ]~`-t~80||~n', [Descr, AssignedInstrCount]),
     format('|~t~80||~n'),
     foreach(
         fmt_layout(Fmt, Layout),
