@@ -93,6 +93,7 @@ Consequtive rows with the same format represent alternative
 
 #### `lb` - Load Byte
 
+Load a byte from memory into a register.
 
 ##### Layout
 
@@ -108,6 +109,7 @@ Consequtive rows with the same format represent alternative
 
 #### `lw` - Load Word
 
+Load a word from memory into a register.
 
 ##### Layout
 
@@ -123,6 +125,7 @@ Consequtive rows with the same format represent alternative
 
 #### `sb` - Store Byte
 
+Store a byte from a register into memory.
 
 ##### Layout
 
@@ -138,6 +141,7 @@ Consequtive rows with the same format represent alternative
 
 #### `sw` - Store Word
 
+Store a word from a register into memory.
 
 ##### Layout
 
@@ -153,6 +157,7 @@ Consequtive rows with the same format represent alternative
 
 #### `call` - Call Subroutine
 
+Call a subroutine at the specified address.
 
 ##### Layout
 
@@ -167,6 +172,7 @@ Consequtive rows with the same format represent alternative
 
 #### `b` - Branch
 
+Branch to the specified address by adding the immediate offset to `$PC`.
 
 ##### Layout
 
@@ -184,6 +190,7 @@ Consequtive rows with the same format represent alternative
 
 #### `bt` - Branch If True
 
+Branch to the specified address if the condition is true by adding the immediate offset to `$PC`.
 
 ##### Layout
 
@@ -201,6 +208,7 @@ Consequtive rows with the same format represent alternative
 
 #### `bf` - Branch If False
 
+Branch to the specified address if the condition is false by adding the immediate offset to `$PC`.
 
 ##### Layout
 
@@ -218,6 +226,7 @@ Consequtive rows with the same format represent alternative
 
 #### `li` - Load Immediate
 
+Load an immediate value into a register.
 
 ##### Layout
 
@@ -235,6 +244,7 @@ Consequtive rows with the same format represent alternative
 
 #### `szi` - Shift Zero-extended Immediate
 
+Left-shift a zero-extended immediate value into a register.
 
 ##### Layout
 
@@ -252,6 +262,7 @@ Consequtive rows with the same format represent alternative
 
 #### `lgb` - Load Global Byte
 
+Load a byte from a memory address offset from `$GP`.
 
 ##### Layout
 
@@ -266,6 +277,7 @@ Consequtive rows with the same format represent alternative
 
 #### `lgw` - Load Global Word
 
+Load a word from a memory address offset from `$GP`.
 
 ##### Layout
 
@@ -280,6 +292,7 @@ Consequtive rows with the same format represent alternative
 
 #### `sgb` - Store Global Byte
 
+Store a byte into memory address offset from `$GP`.
 
 ##### Layout
 
@@ -294,6 +307,7 @@ Consequtive rows with the same format represent alternative
 
 #### `sgw` - Store Global Word
 
+Store a word into memory address offset from `$GP`.
 
 ##### Layout
 
@@ -308,6 +322,7 @@ Consequtive rows with the same format represent alternative
 
 #### `tbit` - Test Bit
 
+Test a specific bit in a register, modifying `$TS`.
 
 ##### Layout
 
@@ -322,6 +337,7 @@ Consequtive rows with the same format represent alternative
 
 #### `cbit` - Clear Bit
 
+Clear a specific bit in a register.
 
 ##### Layout
 
@@ -336,6 +352,7 @@ Consequtive rows with the same format represent alternative
 
 #### `sbit` - Set Bit
 
+Set a specific bit in a register.
 
 ##### Layout
 
@@ -350,6 +367,7 @@ Consequtive rows with the same format represent alternative
 
 #### `tli` - Test Less-than Immediate
 
+Test if a register value is less than an immediate value.
 
 ##### Layout
 
@@ -364,6 +382,7 @@ Consequtive rows with the same format represent alternative
 
 #### `tgei` - Test Greater-than or Equal Immediate
 
+Test if a register value is greater than or equal to an immediate value.
 
 ##### Layout
 
@@ -378,6 +397,7 @@ Consequtive rows with the same format represent alternative
 
 #### `tbi` - Test Below Immediate
 
+Test if a register value is below an immediate value.
 
 ##### Layout
 
@@ -392,6 +412,7 @@ Consequtive rows with the same format represent alternative
 
 #### `taei` - Test Above or Equal
 
+Test if a register value is above or equal to an immediate value.
 
 ##### Layout
 
@@ -406,6 +427,7 @@ Consequtive rows with the same format represent alternative
 
 #### `tnei` - Test Not Equal Immediate
 
+Test if a register value is not equal to an immediate value.
 
 ##### Layout
 
@@ -420,6 +442,7 @@ Consequtive rows with the same format represent alternative
 
 #### `teqi` - Test Equal Immediate
 
+Test if a register value is equal to an immediate value.
 
 ##### Layout
 
@@ -434,6 +457,7 @@ Consequtive rows with the same format represent alternative
 
 #### `addi` - Add Immediate
 
+Add an immediate value to a register.
 
 ##### Layout
 
@@ -448,6 +472,7 @@ Consequtive rows with the same format represent alternative
 
 #### `andi` - AND Immediate
 
+Perform a bitwise AND between a register and an immediate value.
 
 ##### Layout
 
@@ -462,6 +487,7 @@ Consequtive rows with the same format represent alternative
 
 #### `ori` - OR Immediate
 
+Perform a bitwise OR between a register and an immediate value.
 
 ##### Layout
 
@@ -476,6 +502,7 @@ Consequtive rows with the same format represent alternative
 
 #### `xori` - XOR Immediate
 
+Perform a bitwise XOR between a register and an immediate value.
 
 ##### Layout
 
@@ -490,6 +517,7 @@ Consequtive rows with the same format represent alternative
 
 #### `lsri` - Logical Shift Right Immediate
 
+Perform a logical shift right on a register by an immediate value.
 
 ##### Layout
 
@@ -504,6 +532,7 @@ Consequtive rows with the same format represent alternative
 
 #### `lsli` - Logical Shift Left Immediate
 
+Perform a logical shift left on a register by an immediate value.
 
 ##### Layout
 
@@ -518,6 +547,7 @@ Consequtive rows with the same format represent alternative
 
 #### `asri` - Arithmetic Shift Right Immediate
 
+Perform an arithmetic shift right on a register by an immediate value.
 
 ##### Layout
 
@@ -532,6 +562,7 @@ Consequtive rows with the same format represent alternative
 
 #### `add` - Add
 
+Add the values of two registers.
 
 ##### Layout
 
@@ -546,6 +577,7 @@ Consequtive rows with the same format represent alternative
 
 #### `sub` - Subtract
 
+Subtract the value of one register from another.
 
 ##### Layout
 
@@ -560,6 +592,7 @@ Consequtive rows with the same format represent alternative
 
 #### `and` - AND
 
+Perform a bitwise AND between two registers.
 
 ##### Layout
 
@@ -574,6 +607,7 @@ Consequtive rows with the same format represent alternative
 
 #### `or` - OR
 
+Perform a bitwise OR between two registers.
 
 ##### Layout
 
@@ -588,6 +622,7 @@ Consequtive rows with the same format represent alternative
 
 #### `xor` - XOR
 
+Perform a bitwise XOR between two registers.
 
 ##### Layout
 
@@ -602,6 +637,7 @@ Consequtive rows with the same format represent alternative
 
 #### `mov` - Move
 
+Move the value from one register to another.
 
 ##### Layout
 
@@ -616,6 +652,7 @@ Consequtive rows with the same format represent alternative
 
 #### `addcy` - Add with Carry
 
+Add the values of two registers with carry.
 
 ##### Layout
 
@@ -630,6 +667,7 @@ Consequtive rows with the same format represent alternative
 
 #### `subcy` - Subtract with Carry
 
+Subtract the value of one register from another with carry.
 
 ##### Layout
 
@@ -644,6 +682,7 @@ Consequtive rows with the same format represent alternative
 
 #### `tl` - Test Less-than
 
+Test if the value of one register is less than another.
 
 ##### Layout
 
@@ -658,6 +697,7 @@ Consequtive rows with the same format represent alternative
 
 #### `tge` - Test Greater-than or Equal
 
+Test if the value of one register is greater than or equal to another.
 
 ##### Layout
 
@@ -672,6 +712,7 @@ Consequtive rows with the same format represent alternative
 
 #### `tb` - Test Below
 
+Test if the value of one register is below another.
 
 ##### Layout
 
@@ -686,6 +727,7 @@ Consequtive rows with the same format represent alternative
 
 #### `tae` - Test Above or Equal
 
+Test if the value of one register is above or equal to another.
 
 ##### Layout
 
@@ -700,6 +742,7 @@ Consequtive rows with the same format represent alternative
 
 #### `tne` - Test Not Equal
 
+Test if the value of one register is not equal to another.
 
 ##### Layout
 
@@ -714,6 +757,7 @@ Consequtive rows with the same format represent alternative
 
 #### `teq` - Test Equal
 
+Test if the value of one register is equal to another.
 
 ##### Layout
 
@@ -728,6 +772,7 @@ Consequtive rows with the same format represent alternative
 
 #### `pushb` - Push Byte
 
+Push a byte from a register onto the stack.
 
 ##### Layout
 
@@ -742,6 +787,7 @@ Consequtive rows with the same format represent alternative
 
 #### `pushw` - Push Word
 
+Push a word from a register onto the stack.
 
 ##### Layout
 
@@ -756,6 +802,7 @@ Consequtive rows with the same format represent alternative
 
 #### `popb` - Pop Byte
 
+Pop a byte from the stack into a register.
 
 ##### Layout
 
@@ -770,6 +817,7 @@ Consequtive rows with the same format represent alternative
 
 #### `popw` - Pop Word
 
+Pop a word from the stack into a register.
 
 ##### Layout
 
@@ -784,6 +832,7 @@ Consequtive rows with the same format represent alternative
 
 #### `callr` - Call Register
 
+Call a subroutine at the address in a register.
 
 ##### Layout
 
@@ -798,6 +847,7 @@ Consequtive rows with the same format represent alternative
 
 #### `jr` - Jump Register
 
+Jump to the address in a register.
 
 ##### Layout
 
@@ -812,6 +862,7 @@ Consequtive rows with the same format represent alternative
 
 #### `neg` - Negate
 
+Negate the value in a register.
 
 ##### Layout
 
@@ -826,6 +877,7 @@ Consequtive rows with the same format represent alternative
 
 #### `seb` - Sign Extend Byte
 
+Sign extend a byte in a register.
 
 ##### Layout
 
@@ -840,6 +892,7 @@ Consequtive rows with the same format represent alternative
 
 #### `r.hi` - Read $HI
 
+Read the value of the system `$HI` register into a general purpose register.
 
 ##### Layout
 
@@ -854,6 +907,7 @@ Consequtive rows with the same format represent alternative
 
 #### `r.gp` - Read $GP
 
+Read the value of the system `$GP` register into a general purpose register.
 
 ##### Layout
 
@@ -868,6 +922,7 @@ Consequtive rows with the same format represent alternative
 
 #### `w.gp` - Write $GP
 
+Write a value to the system `$GP` register from a general purpose register.
 
 ##### Layout
 
@@ -882,6 +937,7 @@ Consequtive rows with the same format represent alternative
 
 #### `NONEXE1` - Non-executable (1's Version)
 
+Non-executable instruction (1's version).
 
 ##### Layout
 
@@ -896,6 +952,7 @@ Consequtive rows with the same format represent alternative
 
 #### `BREAK` - Breakpoint
 
+Trigger a breakpoint.
 
 ##### Layout
 
@@ -910,6 +967,7 @@ Consequtive rows with the same format represent alternative
 
 #### `HALT` - Halt
 
+Halt the processor.
 
 ##### Layout
 
@@ -924,6 +982,7 @@ Consequtive rows with the same format represent alternative
 
 #### `UNIMPL` - Unimplemented
 
+Unimplemented instruction.
 
 ##### Layout
 
@@ -938,6 +997,7 @@ Consequtive rows with the same format represent alternative
 
 #### `kret` - Kernel Return
 
+Return from kernel mode.
 
 ##### Layout
 
@@ -952,6 +1012,7 @@ Consequtive rows with the same format represent alternative
 
 #### `kcall` - Kernel Call
 
+Call a kernel function.
 
 ##### Layout
 
@@ -966,6 +1027,7 @@ Consequtive rows with the same format represent alternative
 
 #### `ret` - Return
 
+Return from a subroutine.
 
 ##### Layout
 
@@ -980,6 +1042,7 @@ Consequtive rows with the same format represent alternative
 
 #### `tov` - Test Overflow
 
+Test for overflow.
 
 ##### Layout
 
@@ -994,6 +1057,7 @@ Consequtive rows with the same format represent alternative
 
 #### `tcy` - Test Carry
 
+Test for carry.
 
 ##### Layout
 
@@ -1008,6 +1072,7 @@ Consequtive rows with the same format represent alternative
 
 #### `cy0` - Clear Carry
 
+Clear the carry flag.
 
 ##### Layout
 
@@ -1022,6 +1087,7 @@ Consequtive rows with the same format represent alternative
 
 #### `cy1` - Set Carry
 
+Set the carry flag.
 
 ##### Layout
 
@@ -1036,6 +1102,7 @@ Consequtive rows with the same format represent alternative
 
 #### `tpush0` - Teststack Push 0
 
+Push 0 onto the test stack.
 
 ##### Layout
 
@@ -1050,6 +1117,7 @@ Consequtive rows with the same format represent alternative
 
 #### `tpush1` - Teststack Push 1
 
+Push 1 onto the test stack.
 
 ##### Layout
 
@@ -1064,6 +1132,7 @@ Consequtive rows with the same format represent alternative
 
 #### `tnot` - Teststack NOT
 
+Perform a NOT operation on the test stack.
 
 ##### Layout
 
@@ -1078,6 +1147,7 @@ Consequtive rows with the same format represent alternative
 
 #### `tand` - Teststack AND
 
+Perform an AND operation on the test stack.
 
 ##### Layout
 
@@ -1092,6 +1162,7 @@ Consequtive rows with the same format represent alternative
 
 #### `tor` - Teststack OR
 
+Perform an OR operation on the test stack.
 
 ##### Layout
 
@@ -1106,6 +1177,7 @@ Consequtive rows with the same format represent alternative
 
 #### `tdup` - Teststack Duplicate
 
+Duplicate the top value on the test stack.
 
 ##### Layout
 
@@ -1120,6 +1192,7 @@ Consequtive rows with the same format represent alternative
 
 #### `prsv.hi` - Preserve $HI
 
+Preserve the value of the `$HI` register onto the stack.
 
 ##### Layout
 
@@ -1134,6 +1207,7 @@ Consequtive rows with the same format represent alternative
 
 #### `rstr.hi` - Restore $HI
 
+Restore the value of the `$HI` register from the stack.
 
 ##### Layout
 
@@ -1148,6 +1222,7 @@ Consequtive rows with the same format represent alternative
 
 #### `prsv.ts` - Preserve $TS
 
+Preserve the value of the `$TS` register onto the stack.
 
 ##### Layout
 
@@ -1162,6 +1237,7 @@ Consequtive rows with the same format represent alternative
 
 #### `rstr.ts` - Restore $TS
 
+Restore the value of the `$TS` register from the stack.
 
 ##### Layout
 
@@ -1176,6 +1252,7 @@ Consequtive rows with the same format represent alternative
 
 #### `prsv.ra` - Preserve $RA
 
+Preserve the value of the `$RA` register onto the stack.
 
 ##### Layout
 
@@ -1190,6 +1267,7 @@ Consequtive rows with the same format represent alternative
 
 #### `rstr.ra` - Restore $RA
 
+Restore the value of the `$RA` register from the stack.
 
 ##### Layout
 
@@ -1204,6 +1282,7 @@ Consequtive rows with the same format represent alternative
 
 #### `prsv.gp` - Preserve $GP
 
+Preserve the value of the `$GP` register onto the stack.
 
 ##### Layout
 
@@ -1218,6 +1297,7 @@ Consequtive rows with the same format represent alternative
 
 #### `rstr.gp` - Restore $GP
 
+Restore the value of the `$GP` register from the stack.
 
 ##### Layout
 
@@ -1232,6 +1312,7 @@ Consequtive rows with the same format represent alternative
 
 #### `prsv.cc` - Preserve $CC
 
+Preserve the value of the `$CC` register onto the stack.
 
 ##### Layout
 
@@ -1246,6 +1327,7 @@ Consequtive rows with the same format represent alternative
 
 #### `rstr.cc` - Restore $CC
 
+Restore the value of the `$CC` register from the stack.
 
 ##### Layout
 

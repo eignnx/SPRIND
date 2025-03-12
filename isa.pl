@@ -92,103 +92,96 @@ fmt_opcodesizeconstraint(subr, Bits) :- 2 ^ #Bits #= 1.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% Instruction Assignments %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-fmt_instr_title(lsd, lb, 'Load Byte').
-fmt_instr_title(lsd, lw, 'Load Word').
-fmt_instr_title(lsd, sb, 'Store Byte').
-fmt_instr_title(lsd, sw, 'Store Word').
+fmt_instr_title_description(lsd, lb, 'Load Byte', 'Load a byte from memory into a register.').
+fmt_instr_title_description(lsd, lw, 'Load Word', 'Load a word from memory into a register.').
+fmt_instr_title_description(lsd, sb, 'Store Byte', 'Store a byte from a register into memory.').
+fmt_instr_title_description(lsd, sw, 'Store Word', 'Store a word from a register into memory.').
 
+fmt_instr_title_description(subr, call, 'Call Subroutine', 'Call a subroutine at the specified address.').
 
-fmt_instr_title(subr, call, 'Call Subroutine').
+fmt_instr_title_description(b, b, 'Branch', 'Branch to the specified address by adding the immediate offset to `$PC`.').
+fmt_instr_title_description(b, bt, 'Branch If True', 'Branch to the specified address if the condition is true by adding the immediate offset to `$PC`.').
+fmt_instr_title_description(b, bf, 'Branch If False', 'Branch to the specified address if the condition is false by adding the immediate offset to `$PC`.').
 
+fmt_instr_title_description(li, li, 'Load Immediate', 'Load an immediate value into a register.').
+fmt_instr_title_description(li, szi, 'Shift Zero-extended Immediate', 'Left-shift a zero-extended immediate value into a register.').
 
-fmt_instr_title(b, b, 'Branch').
-fmt_instr_title(b, bt, 'Branch If True').
-fmt_instr_title(b, bf, 'Branch If False').
+fmt_instr_title_description(ri(1), lgb, 'Load Global Byte', 'Load a byte from a memory address offset from `$GP`.').
+fmt_instr_title_description(ri(1), lgw, 'Load Global Word', 'Load a word from a memory address offset from `$GP`.').
+fmt_instr_title_description(ri(1), sgb, 'Store Global Byte', 'Store a byte into memory address offset from `$GP`.').
+fmt_instr_title_description(ri(1), sgw, 'Store Global Word', 'Store a word into memory address offset from `$GP`.').
+fmt_instr_title_description(ri(1), tbit, 'Test Bit', 'Test a specific bit in a register, modifying `$TS`.').
+fmt_instr_title_description(ri(1), cbit, 'Clear Bit', 'Clear a specific bit in a register.').
+fmt_instr_title_description(ri(1), sbit, 'Set Bit', 'Set a specific bit in a register.').
+fmt_instr_title_description(ri(1), tli, 'Test Less-than Immediate', 'Test if a register value is less than an immediate value.').
+fmt_instr_title_description(ri(1), tgei, 'Test Greater-than or Equal Immediate', 'Test if a register value is greater than or equal to an immediate value.').
+fmt_instr_title_description(ri(1), tbi, 'Test Below Immediate', 'Test if a register value is below an immediate value.').
+fmt_instr_title_description(ri(1), taei, 'Test Above or Equal', 'Test if a register value is above or equal to an immediate value.').
+fmt_instr_title_description(ri(1), tnei, 'Test Not Equal Immediate', 'Test if a register value is not equal to an immediate value.').
+fmt_instr_title_description(ri(1), teqi, 'Test Equal Immediate', 'Test if a register value is equal to an immediate value.').
+fmt_instr_title_description(ri(1), addi, 'Add Immediate', 'Add an immediate value to a register.').
+fmt_instr_title_description(ri(1), andi, 'AND Immediate', 'Perform a bitwise AND between a register and an immediate value.').
+fmt_instr_title_description(ri(1), ori, 'OR Immediate', 'Perform a bitwise OR between a register and an immediate value.').
 
+fmt_instr_title_description(ri(2), xori, 'XOR Immediate', 'Perform a bitwise XOR between a register and an immediate value.').
+fmt_instr_title_description(ri(2), lsri, 'Logical Shift Right Immediate', 'Perform a logical shift right on a register by an immediate value.').
+fmt_instr_title_description(ri(2), lsli, 'Logical Shift Left Immediate', 'Perform a logical shift left on a register by an immediate value.').
+fmt_instr_title_description(ri(2), asri, 'Arithmetic Shift Right Immediate', 'Perform an arithmetic shift right on a register by an immediate value.').
 
-fmt_instr_title(li, li, 'Load Immediate').
-fmt_instr_title(li, szi, 'Shift Zero-extended Immediate').
+fmt_instr_title_description(rr(1), add, 'Add', 'Add the values of two registers.').
+fmt_instr_title_description(rr(1), sub, 'Subtract', 'Subtract the value of one register from another.').
+fmt_instr_title_description(rr(1), and, 'AND', 'Perform a bitwise AND between two registers.').
+fmt_instr_title_description(rr(1), or, 'OR', 'Perform a bitwise OR between two registers.').
+fmt_instr_title_description(rr(1), xor, 'XOR', 'Perform a bitwise XOR between two registers.').
+fmt_instr_title_description(rr(1), mov, 'Move', 'Move the value from one register to another.').
+fmt_instr_title_description(rr(1), addcy, 'Add with Carry', 'Add the values of two registers with carry.').
+fmt_instr_title_description(rr(1), subcy, 'Subtract with Carry', 'Subtract the value of one register from another with carry.').
+fmt_instr_title_description(rr(1), tl, 'Test Less-than', 'Test if the value of one register is less than another.').
+fmt_instr_title_description(rr(1), tge, 'Test Greater-than or Equal', 'Test if the value of one register is greater than or equal to another.').
+fmt_instr_title_description(rr(1), tb, 'Test Below', 'Test if the value of one register is below another.').
+fmt_instr_title_description(rr(1), tae, 'Test Above or Equal', 'Test if the value of one register is above or equal to another.').
+fmt_instr_title_description(rr(1), tne, 'Test Not Equal', 'Test if the value of one register is not equal to another.').
+fmt_instr_title_description(rr(1), teq, 'Test Equal', 'Test if the value of one register is equal to another.').
 
+fmt_instr_title_description(r(1), pushb, 'Push Byte', 'Push a byte from a register onto the stack.').
+fmt_instr_title_description(r(1), pushw, 'Push Word', 'Push a word from a register onto the stack.').
+fmt_instr_title_description(r(1), popb, 'Pop Byte', 'Pop a byte from the stack into a register.').
+fmt_instr_title_description(r(1), popw, 'Pop Word', 'Pop a word from the stack into a register.').
+fmt_instr_title_description(r(1), callr, 'Call Register', 'Call a subroutine at the address in a register.').
+fmt_instr_title_description(r(1), jr, 'Jump Register', 'Jump to the address in a register.').
+fmt_instr_title_description(r(1), neg, 'Negate', 'Negate the value in a register.').
+fmt_instr_title_description(r(1), seb, 'Sign Extend Byte', 'Sign extend a byte in a register.').
+fmt_instr_title_description(r(1), 'r.hi', 'Read $HI', 'Read the value of the system `$HI` register into a general purpose register.').
+fmt_instr_title_description(r(1), 'r.gp', 'Read $GP', 'Read the value of the system `$GP` register into a general purpose register.').
+fmt_instr_title_description(r(1), 'w.gp', 'Write $GP', 'Write a value to the system `$GP` register from a general purpose register.').
 
-fmt_instr_title(ri(1), lgb, 'Load Global Byte').
-fmt_instr_title(ri(1), lgw, 'Load Global Word').
-fmt_instr_title(ri(1), sgb, 'Store Global Byte').
-fmt_instr_title(ri(1), sgw, 'Store Global Word').
-fmt_instr_title(ri(1), tbit, 'Test Bit').
-fmt_instr_title(ri(1), cbit, 'Clear Bit').
-fmt_instr_title(ri(1), sbit, 'Set Bit').
-fmt_instr_title(ri(1), tli, 'Test Less-than Immediate').
-fmt_instr_title(ri(1), tgei, 'Test Greater-than or Equal Immediate').
-fmt_instr_title(ri(1), tbi, 'Test Below Immediate').
-fmt_instr_title(ri(1), taei, 'Test Above or Equal').
-fmt_instr_title(ri(1), tnei, 'Test Not Equal Immediate').
-fmt_instr_title(ri(1), teqi, 'Test Equal Immediate').
-fmt_instr_title(ri(1), addi, 'Add Immediate').
-fmt_instr_title(ri(1), andi, 'AND Immediate').
-fmt_instr_title(ri(1), ori, 'OR Immediate').
-
-fmt_instr_title(ri(2), xori, 'XOR Immediate').
-fmt_instr_title(ri(2), lsri, 'Logical Shift Right Immediate').
-fmt_instr_title(ri(2), lsli, 'Logical Shift Left Immediate').
-fmt_instr_title(ri(2), asri, 'Arithmetic Shift Right Immediate').
-
-
-fmt_instr_title(rr(1), add, 'Add').
-fmt_instr_title(rr(1), sub, 'Subtract').
-fmt_instr_title(rr(1), and, 'AND').
-fmt_instr_title(rr(1), or, 'OR').
-fmt_instr_title(rr(1), xor, 'XOR').
-fmt_instr_title(rr(1), mov, 'Move').
-fmt_instr_title(rr(1), addcy, 'Add with Carry').
-fmt_instr_title(rr(1), subcy, 'Subtract with Carry').
-fmt_instr_title(rr(1), tl, 'Test Less-than').
-fmt_instr_title(rr(1), tge, 'Test Greater-than or Equal').
-fmt_instr_title(rr(1), tb, 'Test Below').
-fmt_instr_title(rr(1), tae, 'Test Above or Equal').
-fmt_instr_title(rr(1), tne, 'Test Not Equal').
-fmt_instr_title(rr(1), teq, 'Test Equal').
-
-
-fmt_instr_title(r(1), pushb, 'Push Byte').
-fmt_instr_title(r(1), pushw, 'Push Word').
-fmt_instr_title(r(1), popb, 'Pop Byte').
-fmt_instr_title(r(1), popw, 'Pop Word').
-fmt_instr_title(r(1), callr, 'Call Register').
-fmt_instr_title(r(1), jr, 'Jump Register').
-fmt_instr_title(r(1), neg, 'Negate').
-fmt_instr_title(r(1), seb, 'Sign Extend Byte').
-fmt_instr_title(r(1), 'r.hi', 'Read $HI').
-fmt_instr_title(r(1), 'r.gp', 'Read $GP').
-fmt_instr_title(r(1), 'w.gp', 'Write $GP').
-
-
-fmt_instr_title(o, 'NONEXE1', 'Non-executable (1''s Version)').
-fmt_instr_title(o, 'BREAK', 'Breakpoint').
-fmt_instr_title(o, 'HALT', 'Halt').
-fmt_instr_title(o, 'UNIMPL', 'Unimplemented').
-fmt_instr_title(o, kret, 'Kernel Return').
-fmt_instr_title(o, kcall, 'Kernel Call').
-fmt_instr_title(o, ret, 'Return').
-fmt_instr_title(o, tov, 'Test Overflow').
-fmt_instr_title(o, tcy, 'Test Carry').
-fmt_instr_title(o, cy0, 'Clear Carry').
-fmt_instr_title(o, cy1, 'Set Carry').
-fmt_instr_title(o, tpush0, 'Teststack Push 0').
-fmt_instr_title(o, tpush1, 'Teststack Push 1').
-fmt_instr_title(o, tnot, 'Teststack NOT').
-fmt_instr_title(o, tand, 'Teststack AND').
-fmt_instr_title(o, tor, 'Teststack OR').
-fmt_instr_title(o, tdup, 'Teststack Duplicate').
-fmt_instr_title(o, 'prsv.hi', 'Preserve $HI').
-fmt_instr_title(o, 'rstr.hi', 'Restore $HI').
-fmt_instr_title(o, 'prsv.ts', 'Preserve $TS').
-fmt_instr_title(o, 'rstr.ts', 'Restore $TS').
-fmt_instr_title(o, 'prsv.ra', 'Preserve $RA').
-fmt_instr_title(o, 'rstr.ra', 'Restore $RA').
-fmt_instr_title(o, 'prsv.gp', 'Preserve $GP').
-fmt_instr_title(o, 'rstr.gp', 'Restore $GP').
-fmt_instr_title(o, 'prsv.cc', 'Preserve $CC').
-fmt_instr_title(o, 'rstr.cc', 'Restore $CC').
+fmt_instr_title_description(o, 'NONEXE1', 'Non-executable (1''s Version)', 'Non-executable instruction (1''s version).').
+fmt_instr_title_description(o, 'BREAK', 'Breakpoint', 'Trigger a breakpoint.').
+fmt_instr_title_description(o, 'HALT', 'Halt', 'Halt the processor.').
+fmt_instr_title_description(o, 'UNIMPL', 'Unimplemented', 'Unimplemented instruction.').
+fmt_instr_title_description(o, kret, 'Kernel Return', 'Return from kernel mode.').
+fmt_instr_title_description(o, kcall, 'Kernel Call', 'Call a kernel function.').
+fmt_instr_title_description(o, ret, 'Return', 'Return from a subroutine.').
+fmt_instr_title_description(o, tov, 'Test Overflow', 'Test for overflow.').
+fmt_instr_title_description(o, tcy, 'Test Carry', 'Test for carry.').
+fmt_instr_title_description(o, cy0, 'Clear Carry', 'Clear the carry flag.').
+fmt_instr_title_description(o, cy1, 'Set Carry', 'Set the carry flag.').
+fmt_instr_title_description(o, tpush0, 'Teststack Push 0', 'Push 0 onto the test stack.').
+fmt_instr_title_description(o, tpush1, 'Teststack Push 1', 'Push 1 onto the test stack.').
+fmt_instr_title_description(o, tnot, 'Teststack NOT', 'Perform a NOT operation on the test stack.').
+fmt_instr_title_description(o, tand, 'Teststack AND', 'Perform an AND operation on the test stack.').
+fmt_instr_title_description(o, tor, 'Teststack OR', 'Perform an OR operation on the test stack.').
+fmt_instr_title_description(o, tdup, 'Teststack Duplicate', 'Duplicate the top value on the test stack.').
+fmt_instr_title_description(o, 'prsv.hi', 'Preserve $HI', 'Preserve the value of the `$HI` register onto the stack.').
+fmt_instr_title_description(o, 'rstr.hi', 'Restore $HI', 'Restore the value of the `$HI` register from the stack.').
+fmt_instr_title_description(o, 'prsv.ts', 'Preserve $TS', 'Preserve the value of the `$TS` register onto the stack.').
+fmt_instr_title_description(o, 'rstr.ts', 'Restore $TS', 'Restore the value of the `$TS` register from the stack.').
+fmt_instr_title_description(o, 'prsv.ra', 'Preserve $RA', 'Preserve the value of the `$RA` register onto the stack.').
+fmt_instr_title_description(o, 'rstr.ra', 'Restore $RA', 'Restore the value of the `$RA` register from the stack.').
+fmt_instr_title_description(o, 'prsv.gp', 'Preserve $GP', 'Preserve the value of the `$GP` register onto the stack.').
+fmt_instr_title_description(o, 'rstr.gp', 'Restore $GP', 'Restore the value of the `$GP` register from the stack.').
+fmt_instr_title_description(o, 'prsv.cc', 'Preserve $CC', 'Preserve the value of the `$CC` register onto the stack.').
+fmt_instr_title_description(o, 'rstr.cc', 'Restore $CC', 'Restore the value of the `$CC` register from the stack.').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Registers %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -209,6 +202,7 @@ regid_name_uses(b,  [saved]).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 fmt_instr(Fmt, Instr) :- fmt_instr_title(Fmt, Instr, _).
+fmt_instr_title(Fmt, Instr, Title) :- fmt_instr_title_description(Fmt, Instr, Title, _).
 
 fmt_assignedinstrcount(Fmt, AssignedCount) :-
     fmt_assignedinstrcount(Fmt, AssignedCount, _ReservedCount).
@@ -380,13 +374,13 @@ show_table_ :-
 
 display_instr_specifications :-
     forall(
-        fmt_instr_title(Fmt, Instr, Title),
-        display_instr_specification(Fmt, Instr, Title)
+        fmt_instr_title_description(Fmt, Instr, Title, Descr),
+        display_instr_specification(Fmt, Instr, Title, Descr)
     ).
 
-display_instr_specification(Fmt, Instr, Title) :-
+display_instr_specification(Fmt, Instr, Title, Descr) :-
     emit_heading(4, '`~w` - ~w', [Instr, Title]),
-    % format('Description of the instruction goes here. Expand on title to give more information.~n~n'),
+    format('~w~n', [Descr]),
 
     emit_heading(5, 'Layout'),
     once(fmt_prefix(Fmt, Prefix)),
