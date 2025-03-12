@@ -16,8 +16,12 @@
 | `1` | A literal `1` embedded in the instruction. |
 
 
-#### Instruction Formats
+#### Instruction Format Layouts
 
+Consequtive rows with the same format represent alternative 
+        representations. For example if format `xyz` has two rows in the table 
+        then the constraints are not strict enough find a unique layout for 
+        `xyz`.
 
 | Format | Bit Pattern | # Opcodes | Range of Immediate | Too Many Instr.s Assigned? |
 |:----|:---:|:---:|:---:|:---:|
