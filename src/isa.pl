@@ -8,7 +8,8 @@
     register_size/1,
     gpr_count_bits/1,
     addr_reg_count_bits/1,
-    regname_uses/2
+    regname_uses/2,
+    sysregname_name_description/3
 ]).
 
 :- set_prolog_flag(double_quotes, chars).
@@ -165,7 +166,7 @@ fmt_instr_title_description(r(1), 'r.hi', 'Read $HI', 'Read the value of the sys
 fmt_instr_title_description(r(1), 'r.gp', 'Read $GP', 'Read the value of the system `$GP` register into a general purpose register.').
 fmt_instr_title_description(r(1), 'w.gp', 'Write $GP', 'Write a value to the system `$GP` register from a general purpose register.').
 
-fmt_instr_title_description(o, 'NONEXE1', 'Non-executable (1''s Version)', 'Non-executable instruction (1''s version).').
+fmt_instr_title_description(o, 'NONEXE1', 'Non-executable (1''s Version)', 'Triggers a "non-executable instruction" exception. The entire instruction is 16 `1`s.').
 fmt_instr_title_description(o, 'BREAK', 'Breakpoint', 'Trigger a breakpoint.').
 fmt_instr_title_description(o, 'HALT', 'Halt', 'Halt the processor.').
 fmt_instr_title_description(o, 'UNIMPL', 'Unimplemented', 'Unimplemented instruction.').
@@ -208,6 +209,14 @@ regname_uses(w,  [temp, arg(4)]).
 regname_uses(v,  [temp, retval]).
 regname_uses(a,  [saved]).
 regname_uses(b,  [saved]).
+
+sysregname_name_description('PC', 'Program Counter', 'Keeps track of the currently executing instruction.').
+sysregname_name_description('RA', 'Return Address',  'Saves the program counter for subroutine return.').
+sysregname_name_description('TS', 'Test Stack',      'Stores boolean values in a stack which branch instructions can use.').
+sysregname_name_description('CC', 'Condition Codes', 'Stores carry and overflow flags.').
+sysregname_name_description('GP', 'Global Pointer',  'Points to a region of process memory reserved for global variables.').
+sysregname_name_description('KR', 'Kernel Return',   'Holds the value of the program counter during interrupts.').
+% sysregname_name_description('HI', 'High',            'Used in multiplication instructions.').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
