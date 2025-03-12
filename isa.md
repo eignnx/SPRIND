@@ -4,18 +4,18 @@
 
 | Generic format | Description | Instr. Count Options |
 |:---:|:----|----:|
-| `lsd` | Load-store with Displacement | 4, 8 |
+| `lsd` | Load-store with Displacement | 4 |
 | `subr` | Subroutine Call | 1 |
-| `b` | Branch | 2, 4, 8, 16 |
+| `b` | Branch | 4 |
 | `ext` | Reserved for Extension | 4096 |
-| `li` | Load Immediate | 1, 2, 4, 8 |
+| `li` | Load Immediate | 2 |
 | `ri(_)` | Register-immediate | 28 |
 | `rr(_)` | Register-register | 28 |
 | `r(_)` | Register | 28 |
 | `o` | Opcode | 32 |
 
 
-Total instructions available (excluding `ext`): 124 (min), 149 (max)
+Total instructions available (excluding `ext`): 127 (min), 127 (max)
 
 
 ### Format Assignment Availability
@@ -23,11 +23,11 @@ Total instructions available (excluding `ext`): 124 (min), 149 (max)
 
 | Format | Max Opcodes Available | Opcodes Assigned | Opcodes Reserved |
 |:---:|:---:|:---:|:---:|
-| `lsd` | 8 | 4 | 0 |
+| `lsd` | 4 | 4 | 0 |
 | `subr` | 1 | 1 | 0 |
-| `b` | 16 | 3 | 0 |
+| `b` | 4 | 3 | 0 |
 | `ext` | 4096 | 0 | 0 |
-| `li` | 8 | 2 | 0 |
+| `li` | 2 | 2 | 0 |
 | `ri(1)` | 16 | 16 | 0 |
 | `ri(2)` | 8 | 4 | 0 |
 | `ri(3)` | 4 | 0 | 0 |
@@ -66,17 +66,10 @@ Consequtive rows with the same format represent alternative
 | Format | Bit Pattern | # Opcodes | Range of Immediate | Too Many Instr.s Assigned? |
 |:----|:---:|:---:|:---:|:---:|
 | `lsd` | `00ooiiiiiiiaarrr` | 4 opcode(s) | imm7 in ..=(-64,63) or ..=(0,127) |  |
-| `lsd` | `00oooiiiiiiaarrr` | 8 opcode(s) | imm6 in ..=(-32,31) or ..=(0,63) |  |
 | `subr` | `010iiiiiiiiiiiii` | 1 opcode(s) | imm13 in ..=(-4096,4095) or ..=(0,8191) |  |
-| `b` | `0110oiiiiiiiiiii` | 2 opcode(s) | imm11 in ..=(-1024,1023) or ..=(0,2047) | X |
 | `b` | `0110ooiiiiiiiiii` | 4 opcode(s) | imm10 in ..=(-512,511) or ..=(0,1023) |  |
-| `b` | `0110oooiiiiiiiii` | 8 opcode(s) | imm9 in ..=(-256,255) or ..=(0,511) |  |
-| `b` | `0110ooooiiiiiiii` | 16 opcode(s) | imm8 in ..=(-128,127) or ..=(0,255) |  |
 | `ext` | `0111oooooooooooo` | 4096 opcode(s) |  |  |
-| `li` | `10iiiiiiiiiiirrr` | 1 opcode(s) | imm11 in ..=(-1024,1023) or ..=(0,2047) | X |
 | `li` | `10oiiiiiiiiiirrr` | 2 opcode(s) | imm10 in ..=(-512,511) or ..=(0,1023) |  |
-| `li` | `10ooiiiiiiiiirrr` | 4 opcode(s) | imm9 in ..=(-256,255) or ..=(0,511) |  |
-| `li` | `10oooiiiiiiiirrr` | 8 opcode(s) | imm8 in ..=(-128,127) or ..=(0,255) |  |
 | `ri(1)` | `110ooooiiiiiirrr` | 16 opcode(s) | imm6 in ..=(-32,31) or ..=(0,63) |  |
 | `ri(2)` | `1110oooiiiiiirrr` | 8 opcode(s) | imm6 in ..=(-32,31) or ..=(0,63) |  |
 | `ri(3)` | `11110ooiiiiiirrr` | 4 opcode(s) | imm6 in ..=(-32,31) or ..=(0,63) |  |
@@ -105,7 +98,6 @@ Load a byte from memory into a register.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `0000iiiiiiirrr` | 7 | imm7 in ..=(-64,63) or ..=(0,127) |
-| `00000iiiiiirrr` | 6 | imm6 in ..=(-32,31) or ..=(0,63) |
 
 #### `lw` - Load Word
 
@@ -121,7 +113,6 @@ Load a word from memory into a register.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `0001iiiiiiirrr` | 7 | imm7 in ..=(-64,63) or ..=(0,127) |
-| `00001iiiiiirrr` | 6 | imm6 in ..=(-32,31) or ..=(0,63) |
 
 #### `sb` - Store Byte
 
@@ -137,7 +128,6 @@ Store a byte from a register into memory.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `0010iiiiiiirrr` | 7 | imm7 in ..=(-64,63) or ..=(0,127) |
-| `00010iiiiiirrr` | 6 | imm6 in ..=(-32,31) or ..=(0,63) |
 
 #### `sw` - Store Word
 
@@ -153,7 +143,6 @@ Store a word from a register into memory.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `0011iiiiiiirrr` | 7 | imm7 in ..=(-64,63) or ..=(0,127) |
-| `00011iiiiiirrr` | 6 | imm6 in ..=(-32,31) or ..=(0,63) |
 
 #### `call` - Call Subroutine
 
@@ -183,10 +172,7 @@ Branch to the specified address by adding the immediate offset to `$PC`.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `01100iiiiiiiiiii` | 11 | imm11 in ..=(-1024,1023) or ..=(0,2047) |
 | `011000iiiiiiiiii` | 10 | imm10 in ..=(-512,511) or ..=(0,1023) |
-| `0110000iiiiiiiii` | 9 | imm9 in ..=(-256,255) or ..=(0,511) |
-| `01100000iiiiiiii` | 8 | imm8 in ..=(-128,127) or ..=(0,255) |
 
 #### `bt` - Branch If True
 
@@ -201,10 +187,7 @@ Branch to the specified address if the condition is true by adding the immediate
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `01101iiiiiiiiiii` | 11 | imm11 in ..=(-1024,1023) or ..=(0,2047) |
 | `011001iiiiiiiiii` | 10 | imm10 in ..=(-512,511) or ..=(0,1023) |
-| `0110001iiiiiiiii` | 9 | imm9 in ..=(-256,255) or ..=(0,511) |
-| `01100001iiiiiiii` | 8 | imm8 in ..=(-128,127) or ..=(0,255) |
 
 #### `bf` - Branch If False
 
@@ -219,10 +202,7 @@ Branch to the specified address if the condition is false by adding the immediat
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `011010iiiiiiiiiii` | 11 | imm11 in ..=(-1024,1023) or ..=(0,2047) |
 | `011010iiiiiiiiii` | 10 | imm10 in ..=(-512,511) or ..=(0,1023) |
-| `0110010iiiiiiiii` | 9 | imm9 in ..=(-256,255) or ..=(0,511) |
-| `01100010iiiiiiii` | 8 | imm8 in ..=(-128,127) or ..=(0,255) |
 
 #### `li` - Load Immediate
 
@@ -237,10 +217,7 @@ Load an immediate value into a register.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `10iiiiiiiiiiirrr` | 11 | imm11 in ..=(-1024,1023) or ..=(0,2047) |
 | `100iiiiiiiiiirrr` | 10 | imm10 in ..=(-512,511) or ..=(0,1023) |
-| `1000iiiiiiiiirrr` | 9 | imm9 in ..=(-256,255) or ..=(0,511) |
-| `10000iiiiiiiirrr` | 8 | imm8 in ..=(-128,127) or ..=(0,255) |
 
 #### `szi` - Shift Zero-extended Immediate
 
@@ -255,10 +232,7 @@ Left-shift a zero-extended immediate value into a register.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `10iiiiiiiiiiirrr` | 11 | imm11 in ..=(-1024,1023) or ..=(0,2047) |
 | `101iiiiiiiiiirrr` | 10 | imm10 in ..=(-512,511) or ..=(0,1023) |
-| `1001iiiiiiiiirrr` | 9 | imm9 in ..=(-256,255) or ..=(0,511) |
-| `10001iiiiiiiirrr` | 8 | imm8 in ..=(-128,127) or ..=(0,255) |
 
 #### `lgb` - Load Global Byte
 

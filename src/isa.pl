@@ -88,15 +88,29 @@ fmt_huffman_enc([
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Constraints %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-fmt_immsizeconstraint(lsd, Bits) :- #Bits #>= 6.
-fmt_immsizeconstraint(subr, Bits) :- addrsize_maxalignment(Bits, 32).
-fmt_immsizeconstraint(b, Bits) :- #Bits #>= 6.
-fmt_immsizeconstraint(li, Bits) :- #Bits #>= 8.
-fmt_immsizeconstraint(ri(_), Bits) :- #Bits #= 6. % #Bits #>= 4. %
+fmt_immsizeconstraint(lsd, Bits) :-
+    2 ^ (#Bits - 1) #>= 32. % I'd like to be able to in one load/store instruction index at least 32 bytes in a stackframe.
+fmt_immsizeconstraint(subr, Bits) :-
+    addrsize_maxalignment(Bits, 32). % Alignment of 32-bytes is definitely too much wasted space (16 instructions wasted in worst case, 8 in average case).
+fmt_immsizeconstraint(b, Bits) :-
+    #Bits #>= 7. % See `design.md` for RISC-V study. They found 77.5% of conditional jumps use only 7 bit immediates.
+fmt_immsizeconstraint(li, Bits) :-
+    #Bits #>= 8. % 8-bit immediates allow 16-bit immediates to be loaded in two instructions.
+fmt_immsizeconstraint(ri(_), Bits) :-
+    #Bits #>= 4, % Shift and individual bit manipulation instructions can refer to any of the 16 bits.
+    #Bits #= 6. % 6 Seems to be a sweet spot.
 
-fmt_opcodesizeconstraint(lsd, Bits) :- 2 ^ #Bits #>= 4.
-fmt_opcodesizeconstraint(b, Bits) :- #Bits #>= 1, 2 ^ #Bits #=< 16.
-fmt_opcodesizeconstraint(subr, Bits) :- 2 ^ #Bits #= 1.
+fmt_opcodesizeconstraint(lsd, Bits) :-
+    2 ^ #Bits #>= 4, % We need at least 4 = |{load,store}x{byte,word}|
+    2 ^ #Bits #= 4. % I can only think of 4 instructions for this category at this time.
+fmt_opcodesizeconstraint(li, Bits) :-
+    2 ^ #Bits #= 2. % I think we can get away with only two instructions here.
+fmt_opcodesizeconstraint(b, Bits) :-
+    2 ^ #Bits #>= 2, % Need at least 2 opcodes for conditional/unconditional branch instrs.
+    2 ^ #Bits #=< 16, % As an upper bound: |{<,>=}x{signed,unsigned} U {==,!=}| = 6, flag tests may mean we want a few more.
+    #Bits #= 2. % Let's do 4 opcodes for unconditional branch, branch if true/false, and one extra for expansion.
+fmt_opcodesizeconstraint(subr, Bits) :-
+    2 ^ #Bits #= 1. % We only need one call instruction (with embedded fn address). This allows for a larger immediate.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% Instruction Assignments %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
