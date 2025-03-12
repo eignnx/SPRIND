@@ -92,103 +92,103 @@ fmt_opcodesizeconstraint(subr, Bits) :- 2 ^ #Bits #= 1.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% Instruction Assignments %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-fmt_instr(lsd, lb).
-fmt_instr(lsd, lw).
-fmt_instr(lsd, sb).
-fmt_instr(lsd, sw).
+fmt_instr_title(lsd, lb, 'Load Byte').
+fmt_instr_title(lsd, lw, 'Load Word').
+fmt_instr_title(lsd, sb, 'Store Byte').
+fmt_instr_title(lsd, sw, 'Store Word').
 
 
-fmt_instr(subr, call).
+fmt_instr_title(subr, call, 'Call Subroutine').
 
 
-fmt_instr(b, b).
-fmt_instr(b, bt).
-fmt_instr(b, bf).
+fmt_instr_title(b, b, 'Branch').
+fmt_instr_title(b, bt, 'Branch If True').
+fmt_instr_title(b, bf, 'Branch If False').
 
 
-fmt_instr(li, li).
-fmt_instr(li, szi).
+fmt_instr_title(li, li, 'Load Immediate').
+fmt_instr_title(li, szi, 'Shift Zero-extended Immediate').
 
 
-fmt_instr(ri(1), lgb).
-fmt_instr(ri(1), lgw).
-fmt_instr(ri(1), sgb).
-fmt_instr(ri(1), sgw).
-fmt_instr(ri(1), tbit).
-fmt_instr(ri(1), cbit).
-fmt_instr(ri(1), sbit).
-fmt_instr(ri(1), tli).
-fmt_instr(ri(1), tgei).
-fmt_instr(ri(1), tbi).
-fmt_instr(ri(1), taei).
-fmt_instr(ri(1), tnei).
-fmt_instr(ri(1), teqi).
-fmt_instr(ri(1), addi).
-fmt_instr(ri(1), andi).
-fmt_instr(ri(1), ori).
+fmt_instr_title(ri(1), lgb, 'Load Global Byte').
+fmt_instr_title(ri(1), lgw, 'Load Global Word').
+fmt_instr_title(ri(1), sgb, 'Store Global Byte').
+fmt_instr_title(ri(1), sgw, 'Store Global Word').
+fmt_instr_title(ri(1), tbit, 'Test Bit').
+fmt_instr_title(ri(1), cbit, 'Clear Bit').
+fmt_instr_title(ri(1), sbit, 'Set Bit').
+fmt_instr_title(ri(1), tli, 'Test Less-than Immediate').
+fmt_instr_title(ri(1), tgei, 'Test Greater-than or Equal Immediate').
+fmt_instr_title(ri(1), tbi, 'Test Below Immediate').
+fmt_instr_title(ri(1), taei, 'Test Above or Equal').
+fmt_instr_title(ri(1), tnei, 'Test Not Equal Immediate').
+fmt_instr_title(ri(1), teqi, 'Test Equal Immediate').
+fmt_instr_title(ri(1), addi, 'Add Immediate').
+fmt_instr_title(ri(1), andi, 'AND Immediate').
+fmt_instr_title(ri(1), ori, 'OR Immediate').
 
-fmt_instr(ri(2), xori).
-fmt_instr(ri(2), lsri).
-fmt_instr(ri(2), lsli).
-fmt_instr(ri(2), asri).
-
-
-fmt_instr(rr(1), add).
-fmt_instr(rr(1), sub).
-fmt_instr(rr(1), and).
-fmt_instr(rr(1), or).
-fmt_instr(rr(1), xor).
-fmt_instr(rr(1), mov).
-fmt_instr(rr(1), addcy).
-fmt_instr(rr(1), subcy).
-fmt_instr(rr(1), tl).
-fmt_instr(rr(1), tge).
-fmt_instr(rr(1), tb).
-fmt_instr(rr(1), tae).
-fmt_instr(rr(1), tne).
-fmt_instr(rr(1), teq).
+fmt_instr_title(ri(2), xori, 'XOR Immediate').
+fmt_instr_title(ri(2), lsri, 'Logical Shift Right Immediate').
+fmt_instr_title(ri(2), lsli, 'Logical Shift Left Immediate').
+fmt_instr_title(ri(2), asri, 'Arithmetic Shift Right Immediate').
 
 
-fmt_instr(r(1), pushb).
-fmt_instr(r(1), pushw).
-fmt_instr(r(1), popb).
-fmt_instr(r(1), popw).
-fmt_instr(r(1), callr).
-fmt_instr(r(1), jr).
-fmt_instr(r(1), neg).
-fmt_instr(r(1), seb).
-fmt_instr(r(1), 'r.hi').
-fmt_instr(r(1), 'r.gp').
-fmt_instr(r(1), 'w.gp').
+fmt_instr_title(rr(1), add, 'Add').
+fmt_instr_title(rr(1), sub, 'Subtract').
+fmt_instr_title(rr(1), and, 'AND').
+fmt_instr_title(rr(1), or, 'OR').
+fmt_instr_title(rr(1), xor, 'XOR').
+fmt_instr_title(rr(1), mov, 'Move').
+fmt_instr_title(rr(1), addcy, 'Add with Carry').
+fmt_instr_title(rr(1), subcy, 'Subtract with Carry').
+fmt_instr_title(rr(1), tl, 'Test Less-than').
+fmt_instr_title(rr(1), tge, 'Test Greater-than or Equal').
+fmt_instr_title(rr(1), tb, 'Test Below').
+fmt_instr_title(rr(1), tae, 'Test Above or Equal').
+fmt_instr_title(rr(1), tne, 'Test Not Equal').
+fmt_instr_title(rr(1), teq, 'Test Equal').
 
 
-fmt_instr(o, 'NONEXE1').
-fmt_instr(o, 'BREAK').
-fmt_instr(o, 'HALT').
-fmt_instr(o, 'UNIMPL').
-fmt_instr(o, kret).
-fmt_instr(o, kcall).
-fmt_instr(o, ret).
-fmt_instr(o, tov).
-fmt_instr(o, tcy).
-fmt_instr(o, cy0).
-fmt_instr(o, cy1).
-fmt_instr(o, tpush0).
-fmt_instr(o, tpush1).
-fmt_instr(o, tnot).
-fmt_instr(o, tand).
-fmt_instr(o, tor).
-fmt_instr(o, tdup).
-fmt_instr(o, 'prsv.hi').
-fmt_instr(o, 'rstr.hi').
-fmt_instr(o, 'prsv.ts').
-fmt_instr(o, 'rstr.ts').
-fmt_instr(o, 'prsv.ra').
-fmt_instr(o, 'rstr.ra').
-fmt_instr(o, 'prsv.gp').
-fmt_instr(o, 'rstr.gp').
-fmt_instr(o, 'prsv.cc').
-fmt_instr(o, 'rstr.cc').
+fmt_instr_title(r(1), pushb, 'Push Byte').
+fmt_instr_title(r(1), pushw, 'Push Word').
+fmt_instr_title(r(1), popb, 'Pop Byte').
+fmt_instr_title(r(1), popw, 'Pop Word').
+fmt_instr_title(r(1), callr, 'Call Register').
+fmt_instr_title(r(1), jr, 'Jump Register').
+fmt_instr_title(r(1), neg, 'Negate').
+fmt_instr_title(r(1), seb, 'Sign Extend Byte').
+fmt_instr_title(r(1), 'r.hi', 'Read $HI').
+fmt_instr_title(r(1), 'r.gp', 'Read $GP').
+fmt_instr_title(r(1), 'w.gp', 'Write $GP').
+
+
+fmt_instr_title(o, 'NONEXE1', 'Non-executable (1''s Version)').
+fmt_instr_title(o, 'BREAK', 'Breakpoint').
+fmt_instr_title(o, 'HALT', 'Halt').
+fmt_instr_title(o, 'UNIMPL', 'Unimplemented').
+fmt_instr_title(o, kret, 'Kernel Return').
+fmt_instr_title(o, kcall, 'Kernel Call').
+fmt_instr_title(o, ret, 'Return').
+fmt_instr_title(o, tov, 'Test Overflow').
+fmt_instr_title(o, tcy, 'Test Carry').
+fmt_instr_title(o, cy0, 'Clear Carry').
+fmt_instr_title(o, cy1, 'Set Carry').
+fmt_instr_title(o, tpush0, 'Teststack Push 0').
+fmt_instr_title(o, tpush1, 'Teststack Push 1').
+fmt_instr_title(o, tnot, 'Teststack NOT').
+fmt_instr_title(o, tand, 'Teststack AND').
+fmt_instr_title(o, tor, 'Teststack OR').
+fmt_instr_title(o, tdup, 'Teststack Duplicate').
+fmt_instr_title(o, 'prsv.hi', 'Preserve $HI').
+fmt_instr_title(o, 'rstr.hi', 'Restore $HI').
+fmt_instr_title(o, 'prsv.ts', 'Preserve $TS').
+fmt_instr_title(o, 'rstr.ts', 'Restore $TS').
+fmt_instr_title(o, 'prsv.ra', 'Preserve $RA').
+fmt_instr_title(o, 'rstr.ra', 'Restore $RA').
+fmt_instr_title(o, 'prsv.gp', 'Preserve $GP').
+fmt_instr_title(o, 'rstr.gp', 'Restore $GP').
+fmt_instr_title(o, 'prsv.cc', 'Preserve $CC').
+fmt_instr_title(o, 'rstr.cc', 'Restore $CC').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Registers %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -196,18 +196,19 @@ register_size(16).
 gpr_count_bits(3).
 addr_reg_count_bits(2).
 
-regid_name_uses(0, sp, [stack_ptr, addr]).
-regid_name_uses(1, x,  [temp, arg(1), addr]).
-regid_name_uses(2, y,  [temp, arg(2), addr]).
-regid_name_uses(3, z,  [temp, arg(3), addr]).
-regid_name_uses(4, w,  [temp, arg(4)]).
-regid_name_uses(5, v,  [temp, retval]).
-regid_name_uses(6, a,  [saved]).
-regid_name_uses(7, b,  [saved]).
+regid_name_uses(sp, [stack_ptr, addr]).
+regid_name_uses(x,  [temp, arg(1), addr]).
+regid_name_uses(y,  [temp, arg(2), addr]).
+regid_name_uses(z,  [temp, arg(3), addr]).
+regid_name_uses(w,  [temp, arg(4)]).
+regid_name_uses(v,  [temp, retval]).
+regid_name_uses(a,  [saved]).
+regid_name_uses(b,  [saved]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+fmt_instr(Fmt, Instr) :- fmt_instr_title(Fmt, Instr, _).
 
 fmt_assignedinstrcount(Fmt, AssignedCount) :-
     fmt_assignedinstrcount(Fmt, AssignedCount, _ReservedCount).
@@ -361,18 +362,92 @@ show_table :-
     warn_if_nondet(show_table_).
 
 show_table_ :-
-    emit_heading(3, 'Instruction Format Breakdown'),
-    display_bitformat_legend,
-    display_instr_format_breakdown,
-
     emit_heading(3, 'Instruction Counts by Format'),
     display_instruction_counts_by_format,
 
     emit_heading(3, 'Format Assignment Availability'),
     display_opcode_availability_by_format,
 
+    emit_heading(3, 'Instruction Format Breakdown'),
+    display_bitformat_legend,
+    display_instr_format_breakdown,
+
+    emit_heading(3, 'Instruction Specifications'),
+    display_instr_specifications,
+
     true.
 
+
+display_instr_specifications :-
+    forall(
+        fmt_instr_title(Fmt, Instr, Title),
+        display_instr_specification(Fmt, Instr, Title)
+    ).
+
+display_instr_specification(Fmt, Instr, Title) :-
+    emit_heading(4, '`~w` - ~w', [Instr, Title]),
+    % format('Description of the instruction goes here. Expand on title to give more information.~n~n'),
+
+    emit_heading(5, 'Layout'),
+    once(fmt_prefix(Fmt, Prefix)),
+    bagof(I, Fmt^fmt_instr(Fmt, I), InstrsInFmt),
+    once(nth0(OpcodeIndex, InstrsInFmt, Instr)),
+
+    emit_table_header(['Format Prefix', 'Opcode']),
+    emit_table_row([fmt('`~q`', Fmt)++a(=)++fmt('0b~s', Prefix), fmt('0x~16R', OpcodeIndex)]),
+
+    ( fmt_operands(Fmt, Operands), member(i, Operands) ->
+        MaybeImmRange = ['Immediate Bits', 'Immediate Range']
+    ;
+        MaybeImmRange = []
+    ),
+
+    emit_table_header(['Bit Layout' | MaybeImmRange]),
+
+    foreach(
+        fmt_layout(Fmt, Layout),
+        display_detailed_instr_layout(Fmt, Prefix, OpcodeIndex, Layout)
+    ),
+
+    true.
+    % emit_heading(5, 'Operation'),
+    % Operation = "RD <- RD + RS;\c
+    %              RS <- RS + 1;",
+    % format('```~n'),
+    % format('~s~n', [Operation]),
+    % format('```~n').
+
+display_detailed_instr_layout(Fmt, Prefix, Opcode, Layout) :-
+    bitlayout_opcodebits(Layout, OBits),
+    bitlayout_immbits(Layout, IBits),
+    bitlayout_operands(Layout, OperandsBits),
+    ( #OBits #> 0 ->
+        format(atom(OpcodeBits), '~`0t~2r~*+', [Opcode, OBits])
+    ;
+        OpcodeBits = ''
+    ),
+    format(atom(RenderedLayout), '`~s~w~s`', [Prefix, OpcodeBits, OperandsBits]),
+
+    ( fmt_operands(Fmt, Operands), member(i, Operands) ->
+        immbits_immdescription(IBits, ImmRange),
+        MaybeImmRange = [d(IBits), a(ImmRange)]
+    ;
+        MaybeImmRange = []
+    ),
+
+    emit_table_row([fmt('~w', RenderedLayout) | MaybeImmRange]).
+
+
+bitlayout_operands(BitLayout, Operands) :-
+    partition([Bit]>>memberchk(Bit, [i, r, 'R']), BitLayout, Operands, _NonOperands).
+
+bitlayout_immbits(BitLayout, Count) :-
+    include(=(i), BitLayout, ImmBits),
+    length(ImmBits, Count).
+
+bitlayout_opcodebits(BitLayout, Count) :-
+    include(=(o), BitLayout, OpcodeBits),
+    length(OpcodeBits, Count).
 
 display_opcode_availability_by_format :-
     emit_table_header(['Format', 'Max Opcodes Available', 'Opcodes Assigned', 'Opcodes Reserved']),
@@ -494,7 +569,10 @@ warn_if_nondet(Goal) :-
     Count > 1 -> throw(error(redundant_choicepoint_for_goal(Goal))) ; true.
 
 emit_heading(Level, Content) :-
+    emit_heading(Level, '~w', [Content]).
+emit_heading(Level, FString, FParams) :-
     item_count_replication('#', Level, Hashes),
+    format(atom(Content), FString, FParams),
     format('~n~s ~w~n~n', [Hashes, Content]).
 
 emit_table_header(ColSpecs) :-
