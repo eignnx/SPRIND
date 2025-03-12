@@ -4,4 +4,4 @@
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 
 bash "$REPO_ROOT/build-docs.sh"
-git add "$REPO_ROOT/isa.html"
+git add "$REPO_ROOT/isa.md"

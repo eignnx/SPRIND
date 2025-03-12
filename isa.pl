@@ -7,6 +7,7 @@
 
 :- op(20, fx, #).
 :- op(50, xfx, ..=).
+:- op(500, xfy, ++).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -348,7 +349,7 @@ immbits_immrange(Bits, (0 ..= High)) :-
 immbits_immdescription(Bits, Descr) :-
     immbits_simmrange(Bits, SimmRange),
     immbits_immrange(Bits, ImmRange) ->
-        format(atom(Descr), 'imm~d in ~q | ~q', [Bits, SimmRange, ImmRange])
+        format(atom(Descr), 'imm~d in ~q or ~q', [Bits, SimmRange, ImmRange])
     ;
         Descr = ''.
 
@@ -360,30 +361,29 @@ show_table :-
     warn_if_nondet(show_table_).
 
 show_table_ :-
-    display_heading('Instruction Format Breakdown'),
+    emit_heading(3, 'Instruction Format Breakdown'),
     display_bitformat_legend,
     display_instr_format_breakdown,
 
-    display_heading('Instruction Counts by Format'),
+    emit_heading(3, 'Instruction Counts by Format'),
     display_instruction_counts_by_format,
 
     true.
 
 display_instruction_counts_by_format :-
-    format('|~`-t~20||~`-t~45||~`-t~80||~n'),
-    format('|~tGeneric Format~t~20||~tInstr. Count Opts.~t~45||~tDescription~t~80||~n'),
-    format('|~`-t~20||~`-t~45||~`-t~80||~n'),
+    emit_table_header(['Generic format', left('Description'), right('Instr. Count Options')]),
     foreach(
         genericfmt(GFmt),
         display_genericfmt_instr_count(GFmt)
     ),
-    format('|~`-t~45||~`-t~80||~n'),
+
     total_opcode_count_minmax(TotalMin, TotalMax),
+    format('~n~n'),
     format(
-        '|~t~5|~w  ~`.t  ~d, ~d~40|~t~45||~t~48|~t~80||~n',
-        ['Total (excl. `ext`)', TotalMin, TotalMax]
+        'Total instructions available (excluding `ext`): ~d (min), ~d (max)~n',
+        [TotalMin, TotalMax]
     ),
-    format('|~`-t~45||~`-t~80||~n').
+    format('~n').
 
 
 display_genericfmt_instr_count(GFmt) :-
@@ -393,69 +393,64 @@ display_genericfmt_instr_count(GFmt) :-
     ), Counts),
     phrase(sequence(integer, `, `, Counts), CountsList),
     genericfmt_description(GFmt, Descr),
-    format(
-        '|~t~5|~k  ~`.t~20|~`.t  ~s~40|~t~45||~t~48|~w~t~80||~n',
-        [GFmt, CountsList, Descr]
-    ).
+
+    % fmt_description(Fmt, Descr),
+    % fmt_assignedinstrcount(Fmt, AssignedCount, ReservedCount),
+    % fmt_maxopcodes(Fmt, MaxAvail),
+    % format(atom(CountSummary), '[ ~d max avail., ~d assigned, ~d reserved ]', [MaxAvail, AssignedCount, ReservedCount]),
+    % format('| ~w |~`-t~w~`-t~80||~n', [Descr, CountSummary]),
+
+    emit_table_row([code(fmt('~k', GFmt)), a(Descr), s(CountsList)]).
+    % format(
+    %     '|~t~5|`~k`~t~20||~t  ~w~40|~t~45||~t~48|~s~t~80||~n',
+    %     [GFmt, Descr, CountsList]
+    % ).
 
 
 display_instr_format_breakdown :-
-    display_table_header('Instruction Formats'),
+    emit_heading(4, 'Instruction Formats'),
+    emit_table_header([left('Format'), 'Bit Pattern', '# Opcodes', 'Range of Immediate']),
     foreach(
         fmt(Fmt),
         format_section(Fmt)
     ),
-    format('|~`-t~80||~n').
+    format('~n[^1]: Not enough opcodes given the assignment of instructions!').
 
 format_section(Fmt) :-
-    fmt_description(Fmt, Descr),
-    fmt_assignedinstrcount(Fmt, AssignedCount, ReservedCount),
-    fmt_maxopcodes(Fmt, MaxAvail),
-    % format('|~t~80||~n'),
-    format(atom(CountSummary), '[ ~d max avail., ~d assigned, ~d reserved ]', [MaxAvail, AssignedCount, ReservedCount]),
-    format('|~`-t[ ~w ]~`-t~35|~`-t~w~`-t~80||~n', [Descr, CountSummary]),
-    format('|~t~80||~n'),
     foreach(
         fmt_layout(Fmt, Layout),
         format_layout_row(Fmt, Layout)
-    ),
-    format('|~t~80||~n').
+    ).
 
 format_layout_row(Fmt, Layout) :-
     list_item_occurrances(Layout, o, OBits),
-    #Ops #= 2 ^ #OBits,
-    ( \+ validate_instr_assignments(Fmt, Ops) ->
-        AnsiStyle = [fg(red)]
-    ;
-        AnsiStyle = []
-    ),
     list_item_occurrances(Layout, i, IBits),
     immbits_immdescription(IBits, ImmDescr),
-    ansi_format(
-        AnsiStyle,
-        '|~|~t~k~t~8|~s~+~t~d opcode(s)~16+~t~w~t~40+|~n',
-        [Fmt, Layout, Ops, ImmDescr]
-    ).
+    #Ops #= 2 ^ #OBits,
+    ( \+ validate_instr_assignments(Fmt, Ops) ->
+        FmtChecked = code(a(Fmt)) + a('[^1]')
+    ;
+        FmtChecked = code(a(Fmt))
+    ),
+    emit_table_row([FmtChecked, code(chars(Layout)), fmt('~d opcode(s)', Ops), a(ImmDescr)]).
 
 
 display_bitformat_legend :-
-    display_table_header('Legend'),
-    format('|~`-t~15||~`-t~80||~n'),
-    format('|~tBit Symbol~t~15||~tDescription~t~80||~n'),
-    format('|~`-t~15||~`-t~80||~n'),
+    emit_heading(4, 'Legend'),
+    emit_table_header(['Bit Symbol', left('Description')]),
     foreach(
         bitformatchar_description(Char, Descr),
-        format('|~t~w~t~15||~t~w~t~80||~n', [Char, Descr])
+        emit_table_row([fmt('`~w`', Char), a(Descr)])
     ),
-    format('|~`-t~80||~n'),
     format('~n').
 
-bitformatchar_description('0, 1', 'A literal `0` or `1` embedded in the instruction.').
 bitformatchar_description(o, 'A bit in the instruction''s opcode.').
 bitformatchar_description(i, 'A bit in an immediate value.').
 bitformatchar_description(r, 'A bit in a register specifier.').
 bitformatchar_description('R', 'A bit in a second register specifier.').
 bitformatchar_description(a, 'A bit in an address register specifier.').
+bitformatchar_description('0', 'A literal `0` embedded in the instruction.').
+bitformatchar_description('1', 'A literal `1` embedded in the instruction.').
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% UTILS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -466,16 +461,6 @@ huffmantree_item_prefix([Left | _Right], Fmt, ['0' | Prefix]) :-
     huffmantree_item_prefix(Left, Fmt, Prefix).
 huffmantree_item_prefix([_Left | Right], Fmt, ['1' | Prefix]) :-
     huffmantree_item_prefix(Right, Fmt, Prefix).
-
-
-display_heading(Content) :-
-    format('~n~n~`=t ~w ~`=t~80|~n~n', [Content]).
-
-display_table_header(Content) :-
-    format('|~`-t~80||~n'),
-    format('|~t~80||~n'),
-    format('|~t ~w ~t~80||~n', [Content]),
-    format('|~t~80||~n').
 
 
 item_count_replication(Item, Count, Replication) :-
@@ -494,3 +479,35 @@ list_item_occurrances([X | Xs], Y, N) :-
 warn_if_nondet(Goal) :-
     aggregate(count, Goal, Count),
     Count > 1 -> throw(error(redundant_choicepoint_for_goal(Goal))) ; true.
+
+emit_heading(Level, Content) :-
+    item_count_replication('#', Level, Hashes),
+    format('~n~s ~w~n~n', [Hashes, Content]).
+
+emit_table_header(ColSpecs) :-
+    maplist([Spec, Name, Align]>>(
+        Spec = center(Name)  -> Align = ':---:'
+        ; Spec = left(Name)  -> Align = ':----'
+        ; Spec = right(Name) -> Align = '----:'
+        ; Name = Spec, Align = ':---:'
+    ), ColSpecs, ColNames, ColAligns),
+    phrase(sequence(`| `, atom, ` | `, ` |`, ColNames), ColNamesRow),
+    phrase(sequence(`|`, atom, `|`, `|`, ColAligns), HorizontalRule),
+    format('~n'),
+    format('~s~n', [ColNamesRow]),
+    format('~s~n', [HorizontalRule]).
+
+emit_table_row(ColumnData) :-
+    phrase(sequence(`| `, variant_type, ` | `, ` |`, ColumnData), RowText),
+    format('~s~n', [RowText]).
+
+variant_type(s(Content)) --> string(Content).
+variant_type(chars(Content)) --> { format(codes(Codes), '~s', [Content]) }, Codes.
+variant_type(a(Content)) --> atom(Content).
+variant_type(d(Content)) --> integer(Content).
+variant_type(code(Inner)) --> `\``, variant_type(Inner), `\``.
+variant_type(fmt(FormatString, Content)) -->
+    { format(atom(Formatted), FormatString, [Content]) },
+    atom(Formatted).
+variant_type(First + Second) --> variant_type(First), variant_type(Second).
+variant_type(First ++ Second) --> variant_type(First), ` `, variant_type(Second).
