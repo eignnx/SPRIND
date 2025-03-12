@@ -368,10 +368,26 @@ show_table_ :-
     emit_heading(3, 'Instruction Counts by Format'),
     display_instruction_counts_by_format,
 
+    emit_heading(3, 'Format Assignment Availability'),
+    display_opcode_availability_by_format,
+
     true.
 
+
+display_opcode_availability_by_format :-
+    emit_table_header(['Format', 'Max Opcodes Available', 'Opcodes Assigned', 'Opcodes Reserved']),
+    foreach(
+        fmt(Fmt),
+        display_opcode_availability(Fmt)
+    ).
+
+display_opcode_availability(Fmt) :-
+    fmt_assignedinstrcount(Fmt, AssignedCount, ReservedCount),
+    fmt_maxopcodes(Fmt, MaxAvail),
+    emit_table_row([fmt('`~k`', Fmt), d(MaxAvail), d(AssignedCount), d(ReservedCount)]).
+
 display_instruction_counts_by_format :-
-    emit_table_header(['Generic format', left('Description'), right('Instr. Count Options')]),
+    emit_table_header(['Generic format', left('Description'), right('Instr. Count Options'), 'Assignment Counts']),
     foreach(
         genericfmt(GFmt),
         display_genericfmt_instr_count(GFmt)
@@ -394,17 +410,7 @@ display_genericfmt_instr_count(GFmt) :-
     phrase(sequence(integer, `, `, Counts), CountsList),
     genericfmt_description(GFmt, Descr),
 
-    % fmt_description(Fmt, Descr),
-    % fmt_assignedinstrcount(Fmt, AssignedCount, ReservedCount),
-    % fmt_maxopcodes(Fmt, MaxAvail),
-    % format(atom(CountSummary), '[ ~d max avail., ~d assigned, ~d reserved ]', [MaxAvail, AssignedCount, ReservedCount]),
-    % format('| ~w |~`-t~w~`-t~80||~n', [Descr, CountSummary]),
-
     emit_table_row([code(fmt('~k', GFmt)), a(Descr), s(CountsList)]).
-    % format(
-    %     '|~t~5|`~k`~t~20||~t  ~w~40|~t~45||~t~48|~s~t~80||~n',
-    %     [GFmt, Descr, CountsList]
-    % ).
 
 
 display_instr_format_breakdown :-
