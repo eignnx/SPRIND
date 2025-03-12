@@ -25,15 +25,15 @@
 ### Instruction Counts by Format
 
 
-| Generic format | Description | Instr. Count Options |
-|:---:|:----|----:|
+| Generic format | Description | Instr. Count |
+|:---:|:----|:---:|
 | `lsd` | Load-store with Displacement | 4 |
 | `subr` | Subroutine Call | 1 |
 | `b` | Branch | 4 |
 | `ext` | Reserved for Extension | 4096 |
 | `li` | Load Immediate | 2 |
-| `ri(_)` | Register-register | 28 |
-| `rr(_)` | Register-immediate | 28 |
+| `ri(_)` | Register-immediate | 28 |
+| `rr(_)` | Register-register | 28 |
 | `r(_)` | Register | 28 |
 | `o` | Opcode | 32 |
 
@@ -81,28 +81,24 @@ Total instructions available (excluding `ext`): 127 (min), 127 (max)
 
 #### Instruction Format Layouts
 
-Consequtive rows with the same format represent alternative 
-        representations. For example if format `xyz` has two rows in the table 
-        then the constraints are not strict enough find a unique layout for 
-        `xyz`.
 
-| Format | Bit Pattern | # Opcodes | Range of Immediate | Too Many Instr.s Assigned? |
-|:----|:---:|:---:|:---:|:---:|
-| `lsd` | `00ooiiiiiiiaarrr` | 4 opcode(s) | imm7 in ..=(-64,63) or ..=(0,127) |  |
-| `subr` | `010iiiiiiiiiiiii` | 1 opcode(s) | imm13 in ..=(-4096,4095) or ..=(0,8191) |  |
-| `b` | `0110ooiiiiiiiiii` | 4 opcode(s) | imm10 in ..=(-512,511) or ..=(0,1023) |  |
-| `ext` | `0111oooooooooooo` | 4096 opcode(s) |  |  |
-| `li` | `10oiiiiiiiiiirrr` | 2 opcode(s) | imm10 in ..=(-512,511) or ..=(0,1023) |  |
-| `ri(1)` | `110ooooiiiiiirrr` | 16 opcode(s) | imm6 in ..=(-32,31) or ..=(0,63) |  |
-| `ri(2)` | `1110oooiiiiiirrr` | 8 opcode(s) | imm6 in ..=(-32,31) or ..=(0,63) |  |
-| `ri(3)` | `11110ooiiiiiirrr` | 4 opcode(s) | imm6 in ..=(-32,31) or ..=(0,63) |  |
-| `rr(1)` | `111110ooooRRRrrr` | 16 opcode(s) |  |  |
-| `rr(2)` | `1111110oooRRRrrr` | 8 opcode(s) |  |  |
-| `rr(3)` | `11111110ooRRRrrr` | 4 opcode(s) |  |  |
-| `r(1)` | `111111110oooorrr` | 16 opcode(s) |  |  |
-| `r(2)` | `1111111110ooorrr` | 8 opcode(s) |  |  |
-| `r(3)` | `11111111110oorrr` | 4 opcode(s) |  |  |
-| `o` | `11111111111ooooo` | 32 opcode(s) |  |  |
+| Format | Bit Pattern | \# Opcodes | Range of Immediate |
+|:----|:---:|:---:|:---:|
+| `lsd` | `00ooiiiiiiiaarrr` | 4 | imm7 in ..=(-64,63) or ..=(0,127) |
+| `subr` | `010iiiiiiiiiiiii` | 1 | imm13 in ..=(-4096,4095) or ..=(0,8191) |
+| `b` | `0110ooiiiiiiiiii` | 4 | imm10 in ..=(-512,511) or ..=(0,1023) |
+| `ext` | `0111oooooooooooo` | 4096 |  |
+| `li` | `10oiiiiiiiiiirrr` | 2 | imm10 in ..=(-512,511) or ..=(0,1023) |
+| `ri(1)` | `110ooooiiiiiirrr` | 16 | imm6 in ..=(-32,31) or ..=(0,63) |
+| `ri(2)` | `1110oooiiiiiirrr` | 8 | imm6 in ..=(-32,31) or ..=(0,63) |
+| `ri(3)` | `11110ooiiiiiirrr` | 4 | imm6 in ..=(-32,31) or ..=(0,63) |
+| `rr(1)` | `111110ooooRRRrrr` | 16 |  |
+| `rr(2)` | `1111110oooRRRrrr` | 8 |  |
+| `rr(3)` | `11111110ooRRRrrr` | 4 |  |
+| `r(1)` | `111111110oooorrr` | 16 |  |
+| `r(2)` | `1111111110ooorrr` | 8 |  |
+| `r(3)` | `11111111110oorrr` | 4 |  |
+| `o` | `11111111111ooooo` | 32 |  |
 
 ### Instruction Specifications
 
