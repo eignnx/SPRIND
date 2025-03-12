@@ -9,8 +9,8 @@
 | `b` | Branch | 4 |
 | `ext` | Reserved for Extension | 4096 |
 | `li` | Load Immediate | 2 |
-| `ri(_)` | Register-immediate | 28 |
-| `rr(_)` | Register-register | 28 |
+| `ri(_)` | Register-register | 28 |
+| `rr(_)` | Register-immediate | 28 |
 | `r(_)` | Register | 28 |
 | `o` | Opcode | 32 |
 

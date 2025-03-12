@@ -11,6 +11,15 @@
 
 :- set_prolog_flag(double_quotes, chars).
 :- encoding(utf8).
+                              
+
+fmt_operands(Fmt, Operands) :-
+    isa:fmt_operands_description(Fmt, Operands, _).
+
+genericfmt_description(Fmt, Descr) :-
+    isa:fmt_operands_description(Fmt, _, Descr).
+
+
 
 fmt_instr_title(Fmt, Instr, Title) :- isa:fmt_instr_title_description(Fmt, Instr, Title, _).
 fmt_instr(Fmt, Instr) :- fmt_instr_title(Fmt, Instr, _).
@@ -88,7 +97,7 @@ fmt_opcodebits_immbits(Fmt, OpcodeBits, ImmBits) :-
     ImmBits in 0 .. 16,
     fmt_prefix(Fmt, Prefix),
     length(Prefix, PrefixLen),
-    isa:fmt_operands(Fmt, Operands),
+    fmt_operands(Fmt, Operands),
     maplist([O, S, O-S]>>operand_size(O, S), Operands, Sizes, OperandsSizes),
     list_to_assoc(OperandsSizes, Assoc),
     ( get_assoc(i, Assoc, ImmBits) -> true ; ImmBits = 0 ),
@@ -105,7 +114,7 @@ fmt_maxopcodes(Fmt, MaxOpcodes) :-
 
 
 fmt_layout(Fmt, Layout) :-
-    isa:fmt_operands(Fmt, Operands),
+    fmt_operands(Fmt, Operands),
     fmt_opcodebits_immbits(Fmt, OBits, IBits),
     label([OBits, IBits]),
     maplist({IBits}/[Operand, OperandReplicated]>>(
@@ -198,7 +207,7 @@ display_instr_specification(Fmt, Instr, Title, Descr) :-
     emit_table_header(['Format Prefix', 'Opcode']),
     emit_table_row([fmt('`~q`', Fmt)++a(=)++fmt('0b~s', Prefix), fmt('0x~16R', OpcodeIndex)]),
 
-    ( isa:fmt_operands(Fmt, Operands), member(i, Operands) ->
+    ( fmt_operands(Fmt, Operands), member(i, Operands) ->
         MaybeImmRange = ['Immediate Bits', 'Immediate Range']
     ;
         MaybeImmRange = []

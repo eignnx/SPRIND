@@ -1,6 +1,5 @@
 :- module(isa, [
-    fmt_operands/2,
-    genericfmt_description/2,
+    fmt_operands_description/3,
     fmt_huffman_enc/1,
     fmt_instr_title_description/4,
     fmt_immsizeconstraint/2,
@@ -23,30 +22,17 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%% Instructions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- det(fmt_operands/2).
+:- det(fmt_operands_description/3).
 
-fmt_operands(lsd, [i, a, r]).
-fmt_operands(subr, [i]).
-fmt_operands(li, [i, r]).
-fmt_operands(b, [i]).
-fmt_operands(ri(_), [i, r]).
-fmt_operands(rr(_), ['R', r]).
-fmt_operands(r(_), [r]).
-fmt_operands(o, []).
-fmt_operands(ext, []).
-
-:- det(genericfmt_description/2).
-
-genericfmt_description(lsd,  'Load-store with Displacement').
-genericfmt_description(subr,  'Subroutine Call').
-genericfmt_description(li,    'Load Immediate').
-genericfmt_description(b,     'Branch').
-genericfmt_description(lsx,   'Load-store with Index').
-genericfmt_description(rr(_), 'Register-register').
-genericfmt_description(ri(_), 'Register-immediate').
-genericfmt_description(r(_),  'Register').
-genericfmt_description(o,     'Opcode').
-genericfmt_description(ext,   'Reserved for Extension').
+fmt_operands_description(lsd,   [i, a, r], 'Load-store with Displacement').
+fmt_operands_description(subr,  [i],       'Subroutine Call').        
+fmt_operands_description(li,    [i, r],    'Load Immediate').         
+fmt_operands_description(b,     [i],       'Branch').                 
+fmt_operands_description(ri(_), [i, r],    'Register-register').     
+fmt_operands_description(rr(_), ['R', r],  'Register-immediate').
+fmt_operands_description(r(_),  [r],       'Register').               
+fmt_operands_description(o,     [],        'Opcode').                 
+fmt_operands_description(ext,   [],        'Reserved for Extension'). 
 
 % A cons-cell based tree representation of the encoding space. The program uses
 % this tree to construct prefix codes for the different instruction formats.
