@@ -19,6 +19,18 @@
 | `a` | saved |
 | `b` | saved |
 
+### Register Uses and Calling Convention
+
+
+| Usage Name | Description |
+|:---:|:----|
+| `stack_ptr` | Register serves as the stack pointer. |
+| `addr` | Only some of the registers can be used as the address in a load/store instruction. |
+| `temp` | Register may be used to hold temporary values without restriction. |
+| `arg(_)` | Register is used as the Nth argument to a subroutine. |
+| `retval` | A subroutine's return value is passed in this register. |
+| `saved` | A called subroutine must save the content of these registers before using them, but their values persist across subroutine calls. |
+
 ## Instruction Specifications
 
 

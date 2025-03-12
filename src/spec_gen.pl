@@ -182,6 +182,9 @@ show_table_ :-
 display_machine_overview :-
     emit_heading(2, 'Machine Overview'),
     display_gprs,
+
+    display_register_uses,
+
     true.
 
 display_gprs :-
@@ -195,6 +198,17 @@ display_gprs :-
 display_gpr_info(Reg, Uses) :-
     phrase(sequence(atom, `, `, Uses), UsesList),
     emit_table_row([code(a(Reg)), s(UsesList)]).
+
+
+display_register_uses :-
+    emit_heading(3, 'Register Uses and Calling Convention'),
+    emit_table_header(['Usage Name', left('Description')]),
+    foreach(
+        isa:reguse_description(RegUse, Descr),
+        emit_table_row([code(fmt('~k', RegUse)), a(Descr)])
+    ).
+
+
 
 display_instructions_spec :-
     emit_heading(2, 'Instruction Specifications'),

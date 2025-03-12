@@ -9,6 +9,7 @@
     gpr_count_bits/1,
     addr_reg_count_bits/1,
     regname_uses/2,
+    reguse_description/2,
     sysregname_name_description/3
 ]).
 
@@ -210,9 +211,16 @@ regname_uses(v,  [temp, retval]).
 regname_uses(a,  [saved]).
 regname_uses(b,  [saved]).
 
+reguse_description(stack_ptr, 'Register serves as the stack pointer.').
+reguse_description(addr,      'Only some of the registers can be used as the address in a load/store instruction.').
+reguse_description(temp,      'Register may be used to hold temporary values without restriction.').
+reguse_description(arg(_),    'Register is used as the Nth argument to a subroutine.').
+reguse_description(retval,    'A subroutine''s return value is passed in this register.').
+reguse_description(saved,     'A called subroutine must save the content of these registers before using them, but their values persist across subroutine calls.').
+
 sysregname_name_description('PC', 'Program Counter', 'Keeps track of the currently executing instruction.').
 sysregname_name_description('RA', 'Return Address',  'Saves the program counter for subroutine return.').
-sysregname_name_description('TS', 'Test Stack',      'Stores boolean values in a stack which branch instructions can use.').
+sysregname_name_description('TS', 'Test Stack',      'Stores boolean values in a stack used by branch instructions.').
 sysregname_name_description('CC', 'Condition Codes', 'Stores carry and overflow flags.').
 sysregname_name_description('GP', 'Global Pointer',  'Points to a region of process memory reserved for global variables.').
 sysregname_name_description('KR', 'Kernel Return',   'Holds the value of the program counter during interrupts.').
