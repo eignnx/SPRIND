@@ -1,4 +1,27 @@
 
+# SPRIND Instruction Set Architecture Specification
+
+
+## Machine Overview
+
+
+### General Purpose Registers
+
+
+| Register Name | Uses |
+|:---:|:---:|
+| `sp` | stack_ptr, addr |
+| `x` | temp, arg(1), addr |
+| `y` | temp, arg(2), addr |
+| `z` | temp, arg(3), addr |
+| `w` | temp, arg(4) |
+| `v` | temp, retval |
+| `a` | saved |
+| `b` | saved |
+
+## Instruction Specifications
+
+
 ### Instruction Counts by Format
 
 
@@ -911,7 +934,7 @@ Write a value to the system `$GP` register from a general purpose register.
 
 #### `NONEXE1` - Non-executable (1's Version)
 
-Non-executable instruction (1's version).
+Triggers a "non-executable instruction" exception. The entire instruction is 16 `1`s.
 
 ##### Layout
 

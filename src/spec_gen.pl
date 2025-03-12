@@ -174,6 +174,31 @@ show_table :-
     warn_if_nondet(show_table_).
 
 show_table_ :-
+    emit_heading(1, 'SPRIND Instruction Set Architecture Specification'),
+    display_machine_overview,
+    display_instructions_spec,
+    true.
+
+display_machine_overview :-
+    emit_heading(2, 'Machine Overview'),
+    display_gprs,
+    true.
+
+display_gprs :-
+    emit_heading(3, 'General Purpose Registers'),
+    emit_table_header(['Register Name', 'Uses']),
+    foreach(
+        isa:regname_uses(Reg, Uses),
+        display_gpr_info(Reg, Uses)
+    ).
+
+display_gpr_info(Reg, Uses) :-
+    phrase(sequence(atom, `, `, Uses), UsesList),
+    emit_table_row([code(a(Reg)), s(UsesList)]).
+
+display_instructions_spec :-
+    emit_heading(2, 'Instruction Specifications'),
+
     emit_heading(3, 'Instruction Counts by Format'),
     display_instruction_counts_by_format,
 
@@ -185,9 +210,8 @@ show_table_ :-
     display_instr_format_breakdown,
 
     emit_heading(3, 'Instruction Specifications'),
-    display_instr_specifications,
+    display_instr_specifications.
 
-    true.
 
 
 display_instr_specifications :-
