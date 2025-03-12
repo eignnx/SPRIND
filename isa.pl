@@ -387,7 +387,7 @@ display_opcode_availability(Fmt) :-
     emit_table_row([fmt('`~k`', Fmt), d(MaxAvail), d(AssignedCount), d(ReservedCount)]).
 
 display_instruction_counts_by_format :-
-    emit_table_header(['Generic format', left('Description'), right('Instr. Count Options'), 'Assignment Counts']),
+    emit_table_header(['Generic format', left('Description'), right('Instr. Count Options')]),
     foreach(
         genericfmt(GFmt),
         display_genericfmt_instr_count(GFmt)
@@ -415,12 +415,11 @@ display_genericfmt_instr_count(GFmt) :-
 
 display_instr_format_breakdown :-
     emit_heading(4, 'Instruction Formats'),
-    emit_table_header([left('Format'), 'Bit Pattern', '# Opcodes', 'Range of Immediate']),
+    emit_table_header([left('Format'), 'Bit Pattern', '# Opcodes', 'Range of Immediate', 'Too Many Instr.s Assigned?']),
     foreach(
         fmt(Fmt),
         format_section(Fmt)
-    ),
-    format('~n[^1]: Not enough opcodes given the assignment of instructions!').
+    ).
 
 format_section(Fmt) :-
     foreach(
@@ -434,11 +433,11 @@ format_layout_row(Fmt, Layout) :-
     immbits_immdescription(IBits, ImmDescr),
     #Ops #= 2 ^ #OBits,
     ( \+ validate_instr_assignments(Fmt, Ops) ->
-        FmtChecked = code(a(Fmt)) + a('[^1]')
+        TooManyInstrs = 'X'
     ;
-        FmtChecked = code(a(Fmt))
+        TooManyInstrs = ''
     ),
-    emit_table_row([FmtChecked, code(chars(Layout)), fmt('~d opcode(s)', Ops), a(ImmDescr)]).
+    emit_table_row([code(a(Fmt)), code(chars(Layout)), fmt('~d opcode(s)', Ops), a(ImmDescr), a(TooManyInstrs)]).
 
 
 display_bitformat_legend :-
