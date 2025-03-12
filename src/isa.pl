@@ -4,10 +4,11 @@
     fmt_instr_title_description/4,
     fmt_immsizeconstraint/2,
     fmt_opcodesizeconstraint/2,
+    instr_size/1,
     register_size/1,
     gpr_count_bits/1,
     addr_reg_count_bits/1,
-    regid_name_uses/2
+    regname_uses/2
 ]).
 
 :- set_prolog_flag(double_quotes, chars).
@@ -81,7 +82,8 @@ fmt_immsizeconstraint(subr, Bits) :-
 fmt_immsizeconstraint(b, Bits) :-
     #Bits #>= 7. % See `design.md` for RISC-V study. They found 77.5% of conditional jumps use only 7 bit immediates.
 fmt_immsizeconstraint(li, Bits) :-
-    #Bits #>= 8. % 8-bit immediates allow 16-bit immediates to be loaded in two instructions.
+    register_size(RegBits),
+    #Bits #>= #RegBits div 2. % 8-bit immediates allow 16-bit immediates to be loaded in two instructions.
 fmt_immsizeconstraint(ri(_), Bits) :-
     #Bits #>= 4, % Shift and individual bit manipulation instructions can refer to any of the 16 bits.
     #Bits #= 6. % 6 Seems to be a sweet spot.
@@ -193,21 +195,23 @@ fmt_instr_title_description(o, 'rstr.cc', 'Restore $CC', 'Restore the value of t
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Registers %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+instr_size(16).
 register_size(16).
 gpr_count_bits(3).
 addr_reg_count_bits(2).
 
-regid_name_uses(sp, [stack_ptr, addr]).
-regid_name_uses(x,  [temp, arg(1), addr]).
-regid_name_uses(y,  [temp, arg(2), addr]).
-regid_name_uses(z,  [temp, arg(3), addr]).
-regid_name_uses(w,  [temp, arg(4)]).
-regid_name_uses(v,  [temp, retval]).
-regid_name_uses(a,  [saved]).
-regid_name_uses(b,  [saved]).
+regname_uses(sp, [stack_ptr, addr]).
+regname_uses(x,  [temp, arg(1), addr]).
+regname_uses(y,  [temp, arg(2), addr]).
+regname_uses(z,  [temp, arg(3), addr]).
+regname_uses(w,  [temp, arg(4)]).
+regname_uses(v,  [temp, retval]).
+regname_uses(a,  [saved]).
+regname_uses(b,  [saved]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 addrsize_maxalignment(Bits, MaxAlign) :-
-    2 ^ #Bits #>= 2^16 div #MaxAlign.
+    instr_size(InstrSizeBits),
+    2 ^ #Bits #>= (2 ^ #InstrSizeBits) div #MaxAlign.
