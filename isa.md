@@ -48,8 +48,8 @@
 ### Instruction Counts by Format
 
 
-| Generic format | Description | Instr. Count Options |
-|:---:|:----|----:|
+| Generic format | Description | Instr. Count Options | Assignment Counts |
+|:---:|:----|----:|:---:|
 | `lsd` | Load-store with Displacement | 4, 8 |
 | `subr` | Subroutine Call | 1 |
 | `b` | Branch | 2, 4, 8, 16 |
@@ -63,3 +63,24 @@
 
 Total instructions available (excluding `ext`): 124 (min), 149 (max)
 
+
+### Format Assignment Availability
+
+
+| Format | Max Opcodes Available | Opcodes Assigned | Opcodes Reserved |
+|:---:|:---:|:---:|:---:|
+| `lsd` | 8 | 4 | 0 |
+| `subr` | 1 | 1 | 0 |
+| `b` | 16 | 3 | 0 |
+| `ext` | 4096 | 0 | 0 |
+| `li` | 8 | 2 | 0 |
+| `ri(1)` | 16 | 16 | 0 |
+| `ri(2)` | 8 | 4 | 0 |
+| `ri(3)` | 4 | 0 | 0 |
+| `rr(1)` | 16 | 14 | 0 |
+| `rr(2)` | 8 | 0 | 0 |
+| `rr(3)` | 4 | 0 | 0 |
+| `r(1)` | 16 | 11 | 0 |
+| `r(2)` | 8 | 0 | 0 |
+| `r(3)` | 4 | 0 | 0 |
+| `o` | 32 | 27 | 0 |
