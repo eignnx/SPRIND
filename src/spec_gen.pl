@@ -298,7 +298,7 @@ display_opcode_availability(Fmt) :-
     emit_table_row([fmt('`~k`', Fmt), d(MaxAvail), d(AssignedCount), d(ReservedCount)]).
 
 display_instruction_counts_by_format :-
-    emit_table_header(['Generic format', left('Description'), right('Instr. Count Options')]),
+    emit_table_header(['Generic format', left('Description'), 'Instr. Count']),
     foreach(
         genericfmt(GFmt),
         display_genericfmt_instr_count(GFmt)
@@ -327,14 +327,7 @@ display_genericfmt_instr_count(GFmt) :-
 display_instr_format_breakdown :-
     emit_heading(4, 'Instruction Format Layouts'),
 
-    format(
-        'Consequtive rows with the same format represent alternative 
-        representations. For example if format `xyz` has two rows in the table 
-        then the constraints are not strict enough find a unique layout for 
-        `xyz`.~n'
-    ),
-
-    emit_table_header([left('Format'), 'Bit Pattern', '# Opcodes', 'Range of Immediate', 'Too Many Instr.s Assigned?']),
+    emit_table_header([left('Format'), 'Bit Pattern', '\\# Opcodes', 'Range of Immediate']),
     foreach(
         fmt(Fmt),
         format_section(Fmt)
@@ -351,12 +344,8 @@ format_layout_row(Fmt, Layout) :-
     list_item_occurrances(Layout, i, IBits),
     immbits_immdescription(IBits, ImmDescr),
     #Ops #= 2 ^ #OBits,
-    ( \+ validate_instr_assignments(Fmt, Ops) ->
-        TooManyInstrs = 'X'
-    ;
-        TooManyInstrs = ''
-    ),
-    emit_table_row([code(a(Fmt)), code(chars(Layout)), fmt('~d opcode(s)', Ops), a(ImmDescr), a(TooManyInstrs)]).
+    validate_instr_assignments(Fmt, Ops),
+    emit_table_row([code(a(Fmt)), code(chars(Layout)), d(Ops), a(ImmDescr)]).
 
 
 display_bitformat_legend :-
