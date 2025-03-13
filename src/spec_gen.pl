@@ -46,7 +46,7 @@ validate_instr_assignments(Fmt, AvailableCount) :-
 validate_instr_assignments_or_throw(Fmt, AvailableCount) :-
     fmt_assignedinstrcount(Fmt, AssignedCount, ReservedCount),
     (
-        validate_instr_assignments(Fmt, OpcodeCount) ->
+        validate_instr_assignments(Fmt, AvailableCount) ->
             true
         ;
             throw(error(too_many_opcodes_assigned(
