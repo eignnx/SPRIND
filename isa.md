@@ -31,6 +31,19 @@
 | `retval` | A subroutine's return value is passed in this register. |
 | `saved` | A called subroutine must save the content of these registers before using them, but their values persist across subroutine calls. |
 
+### System Registers
+
+
+| Register | Register Name | Size | Description |
+|:---:|:---:|:---:|:----|
+| `$PC` | Program Counter | 16-bits | Keeps track of the currently executing instruction. |
+| `$RA` | Return Address | 16-bits | Saves the program counter for subroutine return. |
+| `$TS` | Test Stack | 16-bits | Stores boolean values in a stack used by branch instructions. |
+| `$CC` | Condition Codes | 16-bits | Stores carry and overflow flags. |
+| `$GP` | Global Pointer | 16-bits | Points to a region of process memory reserved for global variables. |
+| `$KR` | Kernel Return | 16-bits | Holds the value of the program counter during interrupts. |
+| `$MP` | Multiplication Product | 32-bits | Holds the accumulating product during a multiplication. |
+
 ## Instruction Specifications
 
 
@@ -44,7 +57,8 @@
 | `b` | Branch | 4 |
 | `ext` | Reserved for Extension | 4096 |
 | `li` | Load Immediate | 2 |
-| `ri(_)` | Register-immediate | 28 |
+| `ri(_)` | Register-immediate | 24 |
+| `rrr` | Register-register-register | 4 |
 | `rr(_)` | Register-register | 28 |
 | `r(_)` | Register | 28 |
 | `o` | Opcode | 32 |
@@ -56,23 +70,23 @@ Total instructions available (excluding `ext`): 127 (min), 127 (max)
 ### Format Assignment Availability
 
 
-| Format | Max Opcodes Available | Opcodes Assigned | Opcodes Reserved |
-|:---:|:---:|:---:|:---:|
-| `lsd` | 4 | 4 | 0 |
-| `subr` | 1 | 1 | 0 |
-| `b` | 4 | 3 | 0 |
-| `ext` | 4096 | 0 | 0 |
-| `li` | 2 | 2 | 0 |
-| `ri(1)` | 16 | 16 | 0 |
-| `ri(2)` | 8 | 4 | 0 |
-| `ri(3)` | 4 | 0 | 0 |
-| `rr(1)` | 16 | 14 | 0 |
-| `rr(2)` | 8 | 0 | 0 |
-| `rr(3)` | 4 | 0 | 0 |
-| `r(1)` | 16 | 11 | 0 |
-| `r(2)` | 8 | 0 | 0 |
-| `r(3)` | 4 | 0 | 0 |
-| `o` | 32 | 27 | 0 |
+| Format | Max Opcodes Available | Opcodes Assigned | Opcodes Reserved | Usage Percent |
+|:---:|:---:|:---:|:---:|:---:|
+| `lsd` | 4 | 4 | 0 | 100% |
+| `subr` | 1 | 1 | 0 | 100% |
+| `b` | 4 | 3 | 0 | 75% |
+| `ext` | 4096 | 0 | 0 | 0% |
+| `li` | 2 | 2 | 0 | 100% |
+| `ri(1)` | 16 | 16 | 0 | 100% |
+| `ri(2)` | 8 | 4 | 0 | 50% |
+| `rrr` | 4 | 1 | 0 | 25% |
+| `rr(1)` | 16 | 14 | 0 | 88% |
+| `rr(2)` | 8 | 0 | 0 | 0% |
+| `rr(3)` | 4 | 0 | 0 | 0% |
+| `r(1)` | 16 | 12 | 0 | 75% |
+| `r(2)` | 8 | 0 | 0 | 0% |
+| `r(3)` | 4 | 0 | 0 | 0% |
+| `o` | 32 | 27 | 0 | 84% |
 
 ### Instruction Format Breakdown
 
@@ -85,7 +99,8 @@ Total instructions available (excluding `ext`): 127 (min), 127 (max)
 | `o` | A bit in the instruction's opcode. |
 | `i` | A bit in an immediate value. |
 | `r` | A bit in a register specifier. |
-| `R` | A bit in a second register specifier. |
+| `s` | A bit in a second register specifier. |
+| `t` | A bit in a third register specifier. |
 | `a` | A bit in an address register specifier. |
 | `0` | A literal `0` embedded in the instruction. |
 | `1` | A literal `1` embedded in the instruction. |
@@ -103,10 +118,10 @@ Total instructions available (excluding `ext`): 127 (min), 127 (max)
 | `li` | `10oiiiiiiiiiirrr` | 2 | imm10 in [-512,511] or [0,1023] |
 | `ri(1)` | `110ooooiiiiiirrr` | 16 | imm6 in [-32,31] or [0,63] |
 | `ri(2)` | `1110oooiiiiiirrr` | 8 | imm6 in [-32,31] or [0,63] |
-| `ri(3)` | `11110ooiiiiiirrr` | 4 | imm6 in [-32,31] or [0,63] |
-| `rr(1)` | `111110ooooRRRrrr` | 16 |  |
-| `rr(2)` | `1111110oooRRRrrr` | 8 |  |
-| `rr(3)` | `11111110ooRRRrrr` | 4 |  |
+| `rrr` | `11110ootttsssrrr` | 4 |  |
+| `rr(1)` | `111110oooosssrrr` | 16 |  |
+| `rr(2)` | `1111110ooosssrrr` | 8 |  |
+| `rr(3)` | `11111110oosssrrr` | 4 |  |
 | `r(1)` | `111111110oooorrr` | 16 |  |
 | `r(2)` | `1111111110ooorrr` | 8 |  |
 | `r(3)` | `11111111110oorrr` | 4 |  |
@@ -541,7 +556,7 @@ Perform a bitwise XOR between a register and an immediate value.
 |:---:|:---:|:---:|
 | `1110000iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 
-##### Logical Shift Right Immediate - `lsri`
+##### Logical Shift Right Immediate - `lsr`
 
 Perform a logical shift right on a register by an immediate value.
 
@@ -556,7 +571,7 @@ Perform a logical shift right on a register by an immediate value.
 |:---:|:---:|:---:|
 | `1110001iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 
-##### Logical Shift Left Immediate - `lsli`
+##### Logical Shift Left Immediate - `lsl`
 
 Perform a logical shift left on a register by an immediate value.
 
@@ -571,7 +586,7 @@ Perform a logical shift left on a register by an immediate value.
 |:---:|:---:|:---:|
 | `1110010iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 
-##### Arithmetic Shift Right Immediate - `asri`
+##### Arithmetic Shift Right Immediate - `asr`
 
 Perform an arithmetic shift right on a register by an immediate value.
 
@@ -586,8 +601,23 @@ Perform an arithmetic shift right on a register by an immediate value.
 |:---:|:---:|:---:|
 | `1110011iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 
-#### Instruction Format `ri(3)`
+#### Instruction Format `rrr`
 
+
+##### Multiplication Step - `mulstep`
+
+Computes one step in a full 16-bit by 16-bit multiplication.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `rrr` = 0b11110 | 0x0 |
+
+| Bit Layout |
+|:---:|
+| `1111000rrr` |
 
 #### Instruction Format `rr(1)`
 
@@ -605,7 +635,7 @@ Add the values of two registers.
 
 | Bit Layout |
 |:---:|
-| `1111100000RRRrrr` |
+| `1111100000rrr` |
 
 ##### Subtract - `sub`
 
@@ -620,7 +650,7 @@ Subtract the value of one register from another.
 
 | Bit Layout |
 |:---:|
-| `1111100001RRRrrr` |
+| `1111100001rrr` |
 
 ##### AND - `and`
 
@@ -635,7 +665,7 @@ Perform a bitwise AND between two registers.
 
 | Bit Layout |
 |:---:|
-| `1111100010RRRrrr` |
+| `1111100010rrr` |
 
 ##### OR - `or`
 
@@ -650,7 +680,7 @@ Perform a bitwise OR between two registers.
 
 | Bit Layout |
 |:---:|
-| `1111100011RRRrrr` |
+| `1111100011rrr` |
 
 ##### XOR - `xor`
 
@@ -665,7 +695,7 @@ Perform a bitwise XOR between two registers.
 
 | Bit Layout |
 |:---:|
-| `1111100100RRRrrr` |
+| `1111100100rrr` |
 
 ##### Move - `mov`
 
@@ -680,7 +710,7 @@ Move the value from one register to another.
 
 | Bit Layout |
 |:---:|
-| `1111100101RRRrrr` |
+| `1111100101rrr` |
 
 ##### Add with Carry - `addcy`
 
@@ -695,7 +725,7 @@ Add the values of two registers with carry.
 
 | Bit Layout |
 |:---:|
-| `1111100110RRRrrr` |
+| `1111100110rrr` |
 
 ##### Subtract with Carry - `subcy`
 
@@ -710,7 +740,7 @@ Subtract the value of one register from another with carry.
 
 | Bit Layout |
 |:---:|
-| `1111100111RRRrrr` |
+| `1111100111rrr` |
 
 ##### Test Less-than - `tl`
 
@@ -725,7 +755,7 @@ Test if the value of one register is less than another.
 
 | Bit Layout |
 |:---:|
-| `1111101000RRRrrr` |
+| `1111101000rrr` |
 
 ##### Test Greater-than or Equal - `tge`
 
@@ -740,7 +770,7 @@ Test if the value of one register is greater than or equal to another.
 
 | Bit Layout |
 |:---:|
-| `1111101001RRRrrr` |
+| `1111101001rrr` |
 
 ##### Test Below - `tb`
 
@@ -755,7 +785,7 @@ Test if the value of one register is below another.
 
 | Bit Layout |
 |:---:|
-| `1111101010RRRrrr` |
+| `1111101010rrr` |
 
 ##### Test Above or Equal - `tae`
 
@@ -770,7 +800,7 @@ Test if the value of one register is above or equal to another.
 
 | Bit Layout |
 |:---:|
-| `1111101011RRRrrr` |
+| `1111101011rrr` |
 
 ##### Test Not Equal - `tne`
 
@@ -785,7 +815,7 @@ Test if the value of one register is not equal to another.
 
 | Bit Layout |
 |:---:|
-| `1111101100RRRrrr` |
+| `1111101100rrr` |
 
 ##### Test Equal - `teq`
 
@@ -800,7 +830,7 @@ Test if the value of one register is equal to another.
 
 | Bit Layout |
 |:---:|
-| `1111101101RRRrrr` |
+| `1111101101rrr` |
 
 #### Instruction Format `rr(2)`
 
@@ -931,9 +961,9 @@ Sign extend a byte in a register.
 |:---:|
 | `1111111100111rrr` |
 
-##### Read $HI - `r.hi`
+##### Read $MP.lo - `rd.mp.lo`
 
-Read the value of the system `$HI` register into a general purpose register.
+Read the low word in the system `$MP` register into a general purpose register.
 
 ###### Layout
 
@@ -946,9 +976,9 @@ Read the value of the system `$HI` register into a general purpose register.
 |:---:|
 | `1111111101000rrr` |
 
-##### Read $GP - `r.gp`
+##### Read $MP.hi - `rd.mp.hi`
 
-Read the value of the system `$GP` register into a general purpose register.
+Read the high word in the system `$MP` register into a general purpose register.
 
 ###### Layout
 
@@ -961,9 +991,9 @@ Read the value of the system `$GP` register into a general purpose register.
 |:---:|
 | `1111111101001rrr` |
 
-##### Write $GP - `w.gp`
+##### Read $GP - `rd.gp`
 
-Write a value to the system `$GP` register from a general purpose register.
+Read the value of the system `$GP` register into a general purpose register.
 
 ###### Layout
 
@@ -975,6 +1005,21 @@ Write a value to the system `$GP` register from a general purpose register.
 | Bit Layout |
 |:---:|
 | `1111111101010rrr` |
+
+##### Write $GP - `wr.gp`
+
+Write a value to the system `$GP` register from a general purpose register.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `r(1)` = 0b111111110 | 0xB |
+
+| Bit Layout |
+|:---:|
+| `1111111101011rrr` |
 
 #### Instruction Format `r(2)`
 
@@ -1120,7 +1165,7 @@ Test for carry.
 |:---:|
 | `1111111111101000` |
 
-##### Clear Carry - `cy0`
+##### Clear Carry - `clr.cy`
 
 Clear the carry flag.
 
@@ -1135,7 +1180,7 @@ Clear the carry flag.
 |:---:|
 | `1111111111101001` |
 
-##### Set Carry - `cy1`
+##### Set Carry - `set.cy`
 
 Set the carry flag.
 

@@ -39,9 +39,23 @@ fmt_assignedinstrcount(Fmt, AssignedCount, ReservedCount) :-
         ReservedCount
     ).
 
-validate_instr_assignments(Fmt, OpcodeCount) :-
+validate_instr_assignments(Fmt, AvailableCount) :-
     fmt_assignedinstrcount(Fmt, AssignedCount, ReservedCount),
-    #OpcodeCount #>= #AssignedCount + #ReservedCount.
+    #AvailableCount #>= #AssignedCount + #ReservedCount.
+
+validate_instr_assignments_or_throw(Fmt, AvailableCount) :-
+    fmt_assignedinstrcount(Fmt, AssignedCount, ReservedCount),
+    (
+        validate_instr_assignments(Fmt, OpcodeCount) ->
+            true
+        ;
+            throw(error(too_many_opcodes_assigned(
+                Fmt,
+                available(AvailableCount),
+                assigned(AssignedCount),
+                reserved(ReservedCount)
+            )))
+    ).
 
 fmt_description(Fmt, Descr) :-
     Fmt =.. [_Functor],
@@ -87,7 +101,8 @@ fmt_prefix(Fmt, Prefix) :-
 
 
 operand_size(r, Bits) :- isa:gpr_count_bits(Bits).
-operand_size('R', Bits) :- isa:gpr_count_bits(Bits).
+operand_size(s, Bits) :- isa:gpr_count_bits(Bits).
+operand_size(t, Bits) :- isa:gpr_count_bits(Bits).
 operand_size(a, Bits) :- isa:addr_reg_count_bits(Bits).
 operand_size(i, Size) :- isa:register_size(RegBits), Size in 0 .. RegBits.
 
@@ -182,8 +197,8 @@ show_table_ :-
 display_machine_overview :-
     emit_heading(2, 'Machine Overview'),
     display_gprs,
-
     display_register_uses,
+    display_sysregs,
 
     true.
 
@@ -206,6 +221,14 @@ display_register_uses :-
     foreach(
         isa:reguse_description(RegUse, Descr),
         emit_table_row([code(fmt('~k', RegUse)), a(Descr)])
+    ).
+
+display_sysregs :-
+    emit_heading(3, 'System Registers'),
+    emit_table_header(['Register', 'Register Name', 'Size', left('Description')]),
+    foreach(
+        isa:sysregname_name_size_description(Reg, Name, Size, Descr),
+        emit_table_row([code(fmt('$~w', Reg)), a(Name), fmt('~d-bits', Size), a(Descr)])
     ).
 
 
@@ -307,7 +330,7 @@ bitlayout_opcodebits(BitLayout, Count) :-
     length(OpcodeBits, Count).
 
 display_opcode_availability_by_format :-
-    emit_table_header(['Format', 'Max Opcodes Available', 'Opcodes Assigned', 'Opcodes Reserved']),
+    emit_table_header(['Format', 'Max Opcodes Available', 'Opcodes Assigned', 'Opcodes Reserved', 'Usage Percent']),
     foreach(
         fmt(Fmt),
         display_opcode_availability(Fmt)
@@ -316,7 +339,8 @@ display_opcode_availability_by_format :-
 display_opcode_availability(Fmt) :-
     fmt_assignedinstrcount(Fmt, AssignedCount, ReservedCount),
     fmt_maxopcodes(Fmt, MaxAvail),
-    emit_table_row([fmt('`~k`', Fmt), d(MaxAvail), d(AssignedCount), d(ReservedCount)]).
+    UsagePct is 100 * (AssignedCount + ReservedCount) / MaxAvail,
+    emit_table_row([fmt('`~k`', Fmt), d(MaxAvail), d(AssignedCount), d(ReservedCount), fmt('~0f%', UsagePct)]).
 
 display_instruction_counts_by_format :-
     emit_table_header(['Generic format', left('Description'), 'Instr. Count']),
@@ -335,10 +359,12 @@ display_instruction_counts_by_format :-
 
 
 display_genericfmt_instr_count(GFmt) :-
-    bagof(Opcodes, GFmt^(
-        genericfmt_opcodes(GFmt, Opcodes),
-        labeling([up, bisect], [Opcodes])
-    ), Counts),
+    (
+        bagof(Opcodes, GFmt^(
+            genericfmt_opcodes(GFmt, Opcodes),
+            labeling([up, bisect], [Opcodes])
+        ), Counts) -> true ; throw(error(could_not_solve))
+    ),
     phrase(sequence(integer, `, `, Counts), CountsList),
     genericfmt_description(GFmt, Descr),
 
@@ -365,7 +391,7 @@ format_layout_row(Fmt, Layout) :-
     list_item_occurrances(Layout, i, IBits),
     immbits_immdescription(IBits, ImmDescr),
     #Ops #= 2 ^ #OBits,
-    validate_instr_assignments(Fmt, Ops),
+    validate_instr_assignments_or_throw(Fmt, Ops),
     emit_table_row([code(a(Fmt)), code(chars(Layout)), d(Ops), a(ImmDescr)]).
 
 
@@ -381,7 +407,8 @@ display_bitformat_legend :-
 bitformatchar_description(o, 'A bit in the instruction''s opcode.').
 bitformatchar_description(i, 'A bit in an immediate value.').
 bitformatchar_description(r, 'A bit in a register specifier.').
-bitformatchar_description('R', 'A bit in a second register specifier.').
+bitformatchar_description(s, 'A bit in a second register specifier.').
+bitformatchar_description(t, 'A bit in a third register specifier.').
 bitformatchar_description(a, 'A bit in an address register specifier.').
 bitformatchar_description('0', 'A literal `0` embedded in the instruction.').
 bitformatchar_description('1', 'A literal `1` embedded in the instruction.').

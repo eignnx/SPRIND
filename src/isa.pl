@@ -10,7 +10,7 @@
     addr_reg_count_bits/1,
     regname_uses/2,
     reguse_description/2,
-    sysregname_name_description/3
+    sysregname_name_size_description/4
 ]).
 
 :- set_prolog_flag(double_quotes, chars).
@@ -32,7 +32,8 @@ fmt_operands_description(subr,  [i],       'Subroutine Call').
 fmt_operands_description(li,    [i, r],    'Load Immediate').         
 fmt_operands_description(b,     [i],       'Branch').                 
 fmt_operands_description(ri(_), [i, r],    'Register-immediate').     
-fmt_operands_description(rr(_), ['R', r],  'Register-register').
+fmt_operands_description(rrr,   [t, s, r], 'Register-register-register').
+fmt_operands_description(rr(_), [s, r],    'Register-register').
 fmt_operands_description(r(_),  [r],       'Register').               
 fmt_operands_description(o,     [],        'Opcode').                 
 fmt_operands_description(ext,   [],        'Reserved for Extension'). 
@@ -63,7 +64,7 @@ fmt_huffman_enc([
         li,
         ri(1),
         ri(2),
-        ri(3),
+        rrr,
         rr(1),
         rr(2),
         rr(3),
@@ -87,8 +88,10 @@ fmt_immsizeconstraint(li, Bits) :-
     register_size(RegBits),
     #Bits #>= #RegBits div 2. % 8-bit immediates allow 16-bit immediates to be loaded in two instructions.
 fmt_immsizeconstraint(ri(_), Bits) :-
-    #Bits #>= 4, % Shift and individual bit manipulation instructions can refer to any of the 16 bits.
-    #Bits #= 6. % 6 Seems to be a sweet spot.
+    #Bits #>= 4, % Allows shift and individual bit manipulation instructions to refer to any of the 16 bits.
+    % Size bits seems to be a sweet spot for evenly distributing opcode space among formats. According 
+    % to the RISC-V study (see `design.md`), it should be enough 70% of the time.
+    #Bits #= 6.
 
 fmt_opcodesizeconstraint(lsd, Bits) :-
     2 ^ #Bits #>= 4, % We need at least 4 = |{load,store}x{byte,word}|
@@ -136,9 +139,9 @@ fmt_instr_title_description(ri(1), andi, 'AND Immediate', 'Perform a bitwise AND
 fmt_instr_title_description(ri(1), ori, 'OR Immediate', 'Perform a bitwise OR between a register and an immediate value.').
 
 fmt_instr_title_description(ri(2), xori, 'XOR Immediate', 'Perform a bitwise XOR between a register and an immediate value.').
-fmt_instr_title_description(ri(2), lsri, 'Logical Shift Right Immediate', 'Perform a logical shift right on a register by an immediate value.').
-fmt_instr_title_description(ri(2), lsli, 'Logical Shift Left Immediate', 'Perform a logical shift left on a register by an immediate value.').
-fmt_instr_title_description(ri(2), asri, 'Arithmetic Shift Right Immediate', 'Perform an arithmetic shift right on a register by an immediate value.').
+fmt_instr_title_description(ri(2), lsr, 'Logical Shift Right Immediate', 'Perform a logical shift right on a register by an immediate value.').
+fmt_instr_title_description(ri(2), lsl, 'Logical Shift Left Immediate', 'Perform a logical shift left on a register by an immediate value.').
+fmt_instr_title_description(ri(2), asr, 'Arithmetic Shift Right Immediate', 'Perform an arithmetic shift right on a register by an immediate value.').
 
 fmt_instr_title_description(rr(1), add, 'Add', 'Add the values of two registers.').
 fmt_instr_title_description(rr(1), sub, 'Subtract', 'Subtract the value of one register from another.').
@@ -155,6 +158,8 @@ fmt_instr_title_description(rr(1), tae, 'Test Above or Equal', 'Test if the valu
 fmt_instr_title_description(rr(1), tne, 'Test Not Equal', 'Test if the value of one register is not equal to another.').
 fmt_instr_title_description(rr(1), teq, 'Test Equal', 'Test if the value of one register is equal to another.').
 
+fmt_instr_title_description(rrr, mulstep, 'Multiplication Step', 'Computes one step in a full 16-bit by 16-bit multiplication.').
+
 fmt_instr_title_description(r(1), pushb, 'Push Byte', 'Push a byte from a register onto the stack.').
 fmt_instr_title_description(r(1), pushw, 'Push Word', 'Push a word from a register onto the stack.').
 fmt_instr_title_description(r(1), popb, 'Pop Byte', 'Pop a byte from the stack into a register.').
@@ -163,9 +168,10 @@ fmt_instr_title_description(r(1), callr, 'Call Register', 'Call a subroutine at 
 fmt_instr_title_description(r(1), jr, 'Jump Register', 'Jump to the address in a register.').
 fmt_instr_title_description(r(1), neg, 'Negate', 'Negate the value in a register.').
 fmt_instr_title_description(r(1), seb, 'Sign Extend Byte', 'Sign extend a byte in a register.').
-fmt_instr_title_description(r(1), 'r.hi', 'Read $HI', 'Read the value of the system `$HI` register into a general purpose register.').
-fmt_instr_title_description(r(1), 'r.gp', 'Read $GP', 'Read the value of the system `$GP` register into a general purpose register.').
-fmt_instr_title_description(r(1), 'w.gp', 'Write $GP', 'Write a value to the system `$GP` register from a general purpose register.').
+fmt_instr_title_description(r(1), 'rd.mp.lo', 'Read $MP.lo', 'Read the low word in the system `$MP` register into a general purpose register.').
+fmt_instr_title_description(r(1), 'rd.mp.hi', 'Read $MP.hi', 'Read the high word in the system `$MP` register into a general purpose register.').
+fmt_instr_title_description(r(1), 'rd.gp', 'Read $GP', 'Read the value of the system `$GP` register into a general purpose register.').
+fmt_instr_title_description(r(1), 'wr.gp', 'Write $GP', 'Write a value to the system `$GP` register from a general purpose register.').
 
 fmt_instr_title_description(o, 'NONEXE1', 'Non-executable (1''s Version)', 'Triggers a "non-executable instruction" exception. The entire instruction is 16 `1`s.').
 fmt_instr_title_description(o, 'BREAK', 'Breakpoint', 'Trigger a breakpoint.').
@@ -176,8 +182,8 @@ fmt_instr_title_description(o, kcall, 'Kernel Call', 'Call a kernel function.').
 fmt_instr_title_description(o, ret, 'Return', 'Return from a subroutine.').
 fmt_instr_title_description(o, tov, 'Test Overflow', 'Test for overflow.').
 fmt_instr_title_description(o, tcy, 'Test Carry', 'Test for carry.').
-fmt_instr_title_description(o, cy0, 'Clear Carry', 'Clear the carry flag.').
-fmt_instr_title_description(o, cy1, 'Set Carry', 'Set the carry flag.').
+fmt_instr_title_description(o, 'clr.cy', 'Clear Carry', 'Clear the carry flag.').
+fmt_instr_title_description(o, 'set.cy', 'Set Carry', 'Set the carry flag.').
 fmt_instr_title_description(o, tpush0, 'Teststack Push 0', 'Push 0 onto the test stack.').
 fmt_instr_title_description(o, tpush1, 'Teststack Push 1', 'Push 1 onto the test stack.').
 fmt_instr_title_description(o, tnot, 'Teststack NOT', 'Perform a NOT operation on the test stack.').
@@ -218,13 +224,16 @@ reguse_description(arg(_),    'Register is used as the Nth argument to a subrout
 reguse_description(retval,    'A subroutine''s return value is passed in this register.').
 reguse_description(saved,     'A called subroutine must save the content of these registers before using them, but their values persist across subroutine calls.').
 
-sysregname_name_description('PC', 'Program Counter', 'Keeps track of the currently executing instruction.').
-sysregname_name_description('RA', 'Return Address',  'Saves the program counter for subroutine return.').
-sysregname_name_description('TS', 'Test Stack',      'Stores boolean values in a stack used by branch instructions.').
-sysregname_name_description('CC', 'Condition Codes', 'Stores carry and overflow flags.').
-sysregname_name_description('GP', 'Global Pointer',  'Points to a region of process memory reserved for global variables.').
-sysregname_name_description('KR', 'Kernel Return',   'Holds the value of the program counter during interrupts.').
-% sysregname_name_description('HI', 'High',            'Used in multiplication instructions.').
+sysregname_name_size_description('PC', 'Program Counter', 16, 'Keeps track of the currently executing instruction.').
+sysregname_name_size_description('RA', 'Return Address',  16, 'Saves the program counter for subroutine return.').
+sysregname_name_size_description('TS', 'Test Stack',      16, 'Stores boolean values in a stack used by branch instructions.').
+sysregname_name_size_description('CC', 'Condition Codes', 16, 'Stores carry and overflow flags.').
+sysregname_name_size_description('GP', 'Global Pointer',  16, 'Points to a region of process memory reserved for global variables.').
+sysregname_name_size_description('KR', 'Kernel Return',   16, 'Holds the value of the program counter during interrupts.').
+% To multiply two words together in software, you need 4 words worth of space.
+% I considered having two 32-bit system registers for doing multiplication, but instead I'd like to just use one.
+% You could eliminate this one too, but `mulstep` would become a 4-register instruction (i.e. `mulstep x:y, w:v`).
+sysregname_name_size_description('MP', 'Multiplication Product', 32, 'Holds the accumulating product during a multiplication.').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,0 +1,40 @@
+#include "../sprind.customasm"
+#bank rom
+
+#align SPRIND_SUBR_ALIGN
+;= subr(operand1 => x, operand2 => y) -> (u32 in MP) {
+multiply:
+      ;= alias!(Q => z:w)
+
+      ; Q <- zxt(x)
+      mov Q.lo, x
+      clr Q.hi
+
+      ; MP <- 0
+      wr.mp.lo Q.hi
+      wr.mp.hi Q.hi
+
+
+      mulstep Q, y      ; same as `mulstep z:w, y`
+      mulstep Q, y
+      mulstep Q, y
+      mulstep Q, y
+
+      mulstep Q, y
+      mulstep Q, y
+      mulstep Q, y
+      mulstep Q, y
+
+      mulstep Q, y
+      mulstep Q, y
+      mulstep Q, y
+      mulstep Q, y
+
+      mulstep Q, y
+      mulstep Q, y
+      mulstep Q, y
+      mulstep Q, y
+
+
+      ret
+;= }
