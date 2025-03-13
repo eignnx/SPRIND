@@ -1,9 +1,12 @@
 :- module(spec_gen, [show_table/0]).
 
 :- use_module(isa).
+:- use_module(validate).
+
 :- use_module(library(clpfd)).
 :- use_module(library(dcg/basics)).
 :- use_module(library(dcg/high_order)).
+
 
 :- op(20, fx, #).
 :- op(50, xfx, ..=).
@@ -186,6 +189,7 @@ immbits_immdescription(Bits, Descr) :-
 
 
 show_table :-
+    validate:run_validations,
     warn_if_nondet(show_table_).
 
 show_table_ :-

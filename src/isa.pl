@@ -10,8 +10,12 @@
     addr_reg_count_bits/1,
     regname_uses/2,
     reguse_description/2,
-    sysregname_name_size_description/4
+    sysregname_name_size_description/4,
+    instr_info/2,
+    valid_semantics//1
 ]).
+
+:- use_module(library(ctypes), [upper_lower/2]).
 
 :- set_prolog_flag(double_quotes, chars).
 :- encoding(utf8).
@@ -255,23 +259,44 @@ sysregname_name_size_description('MP', 'Multiplication Product', 32, 'Holds the 
 
 %%%%%%%%%%%%%%%%%%%%%%% Instruction Details %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-semanticfn_title_description(mem(_),            'Memory Access',   'Represents the byte held in memory at the given address.').
-semanticfn_title_description(zxt(_),            'Zero Extend',     'Extend a binary value from A bits to B bits, left-padding with zeros.').
-semanticfn_title_description(sxt(_),            'Sign Extend',     'Extend a binary value from A bits to B bits, left-padding with the sign bit of the original number.').
-semanticfn_title_description(b_and(_A, _B),     'Bitwise AND',     'Perform bitwise AND between two values.').
-semanticfn_title_description(b_or(_A, _B),      'Bitwise OR',      'Perform bitwise OR between two values.').
-semanticfn_title_description(b_xor(_A, _B),     'Bitwise XOR',     'Perform bitwise XOR between two values.').
-semanticfn_title_description(hi_lo(_Hi, _Lo),   'Concat Bytes',    'Concatenate bytes `Hi` and `Lo` into a word where the most significant byte is `Hi` and least significant byte is `Lo`.').
-semanticfn_title_description(hi(_),             'High Byte',       'Extracts the high byte from a word.').
-semanticfn_title_description(lo(_),             'Low Byte',        'Extracts the low byte from a word.').
-semanticfn_title_description(const(_),          'Lookup Constant', 'Retrieves the value of the named, specification constant.').
-semanticfn_title_description(b_pop(_Reg),       'Pop Bit',         'Pops the LSB off from `Reg`, and shifts `Reg` right by 1. Yields the popped bit.').
-semanticfn_title_description(if(_Cond, _Consq), 'If-then',         'If the condition evaluates to `true`, executes the consequent.').
-semanticfn_title_description($_,                'Value in General-purpose Register',                '').
-semanticfn_title_description(&_,                'Value in Address Register',                '').
-semanticfn_title_description($$_,               'Value in System Register',                '').
-semanticfn_title_description(#_,                'Value in Immediate Field',         '').
-semanticfn_title_description([_],                'Byte in memory at given address', '').
+semanticfn_title_description(Integer,     'Integer Literal',    '') --> { integer(Integer) }.
+semanticfn_title_description($$S,           'Value in System Register',                '') --> { can_be(S, sysreg) }.
+semanticfn_title_description($R,                'Value in General-purpose Register',                '') --> { can_be(R, gprreg) }.
+semanticfn_title_description(&A,                'Value in Address Register',                '') --> { can_be(A, adrreg) }.
+semanticfn_title_description(#Imm,                'Value in Immediate Field',         '') --> { can_be(Imm, integer) }.
+semanticfn_title_description([Addr],               'Byte in memory at given address', '') --> sem(Addr).
+semanticfn_title_description(Dest <- Src,     'Parallel Assign',    'Assigns `Src` to `Dest`. All `_<-_` operations are executed simultaneously.') --> sem(Dest), sem(Src).
+semanticfn_title_description(Binding = Expr,  'Let-assignment',     'Gives name `Binding` to the semantics expression `Expr`.') --> sem(Expr), { Binding = Expr }.
+semanticfn_title_description(Stmt1 ; Stmt2,   'Joint Eval',         'Evaluates all let-assignments, then parallel-assignments in `Stmt1` and `Stmt2`') --> sem(Stmt1), sem(Stmt2).
+semanticfn_title_description(A + B,           'Addition',           'Adds two expressions.') --> sem(A), sem(B).
+semanticfn_title_description(A - B,           'Subtraction',        'Subtracts two expressions') --> sem(A), sem(B).
+semanticfn_title_description(A >> B,          'Right Shift',        'Performs logical right shift') --> sem(A), sem(B).
+semanticfn_title_description(A << B,          'Logical Left Shift', 'Performs logical left shift') --> sem(A), sem(B).
+semanticfn_title_description(A == B,          'Equality',           'Evaluates to `true` or `false` if operands are equal or not equal respectively.') --> sem(A), sem(B).
+semanticfn_title_description(zxt(A),            'Zero Extend',        'Extend a binary value from A bits to B bits, left-padding with zeros.') --> sem(A).
+semanticfn_title_description(sxt(A),            'Sign Extend',        'Extend a binary value from A bits to B bits, left-padding with the sign bit of the original number.') --> sem(A).
+semanticfn_title_description(b_and(A, B),     'Bitwise AND',        'Perform bitwise AND between two values.') --> sem(A), sem(B).
+semanticfn_title_description(b_or(A, B),      'Bitwise OR',         'Perform bitwise OR between two values.') --> sem(A), sem(B).
+semanticfn_title_description(b_xor(A, B),     'Bitwise XOR',        'Perform bitwise XOR between two values.') --> sem(A), sem(B).
+semanticfn_title_description(hi_lo(Hi, Lo),   'Concat Bytes',       'Concatenate bytes `Hi` and `Lo` into a word where the most significant byte is `Hi` and least significant byte is `Lo`.') --> sem(Hi), sem(Lo).
+semanticfn_title_description(hi(A),             'High Byte',          'Extracts the high byte from a word.') --> sem(A).
+semanticfn_title_description(lo(A),             'Low Byte',           'Extracts the low byte from a word.') --> sem(A).
+semanticfn_title_description(const(Sym),          'Lookup Constant',    'Retrieves the value of the named, specification constant.') --> { atom(Sym) }.
+semanticfn_title_description(b_pop($$Reg),       'Pop Bit',            'Pops the LSB off from `Reg`, and shifts `Reg` right by 1. Yields the popped bit.') --> { can_be(Reg, sysreg) }.
+semanticfn_title_description(if(Cond, Consq), 'If-then',            'If the condition evaluates to `true`, executes the consequent.') --> sem(Cond), sem(Consq).
+semanticfn_title_description(nop,               'Does nothing.', '') --> [].
+
+valid_semantics(Sem) --> semanticfn_title_description(Sem, _, _) -> [] ; ['non-well-formed semantic expression'(Sem)].
+sem(Sem) --> valid_semantics(Sem).
+
+can_be(Term, TypeTest) :- var(Term) ; call(TypeTest, Term).
+gprreg(R) :- regname_uses(R, _).
+adrreg(A) :- regname_uses(A, Uses), member(addr, Uses).
+sysreg(Name) :-
+    atom_codes(Name, LoCodes),
+    maplist(upper_lower, UpCodes, LoCodes),
+    atom_codes(UpName, UpCodes),
+    sysregname_name_size_description(UpName, _, _, _).
 
 instr_info(lb, info{
 	title: 'Load Byte',
@@ -286,7 +311,7 @@ instr_info(lw, info{
 	ex: ['lw w, [sp+12]'],
 	syn: lw(Rd, [Adr + Imm]),
 	sem: (
-        Ptr = b_and(&Adr + #Imm, '0b1111111111111110');
+        Ptr = b_and(&Adr + #Imm, 0b1111111111111110);
         $Rd <- hi_lo([Ptr + 1], [Ptr])
     )
 }).
@@ -303,7 +328,7 @@ instr_info(sw, info{
 	ex: ['sw [sp-20], x'],
 	syn: sw([Adr + Imm], Rs),
 	sem: (
-        Ptr = b_and(&Adr + #Imm, '0b1111111111111110');
+        Ptr = b_and(&Adr + #Imm, 0b1111111111111110);
         [Ptr] <- lo($Rs);
         [Ptr + 1] <- hi($Rs)
     )
@@ -370,7 +395,7 @@ instr_info(lgw, info{
 	ex: ['lgw x, [gp+8]'],
 	syn: lgw(Rd, Imm),
 	sem: (
-        Ptr = b_and($$gp + zxt(#Imm), '0b1111111111111110');
+        Ptr = b_and($$gp + zxt(#Imm), 0b1111111111111110);
         $Rd <- hi_lo([Ptr + 1], [Ptr])
     )
 }).
@@ -387,7 +412,7 @@ instr_info(sgw, info{
 	ex: ['sgw [gp+8], x'],
 	syn: sgw(Rs, Imm),
 	sem: (
-        Ptr = b_and($$gp + zxt(#Imm), '0b1111111111111110');
+        Ptr = b_and($$gp + zxt(#Imm), 0b1111111111111110);
         hi_lo([Ptr + 1], [Ptr]) <- $Rs
     )
 }).
