@@ -150,19 +150,19 @@ total_opcode_count_minmax(MinCount, MaxCount, BranchingStrat) :-
     once(labeling([BranchingStrat, max(MaxCount)], TotalCounts1)).
 
 
-immbits_simmrange(Bits, (Low ..= High)) :-
+immbits_simmrange(Bits, [Low, High]) :-
     #Bits #> 0,
     #Low #= -1 * 2 ^ (#Bits - 1),
     #High #= 2 ^ (#Bits - 1) - 1.
 
-immbits_immrange(Bits, (0 ..= High)) :-
+immbits_immrange(Bits, [0 , High]) :-
     #Bits #> 0,
     #High #= 2 ^ #Bits - 1.
 
 immbits_immdescription(Bits, Descr) :-
     immbits_simmrange(Bits, SimmRange),
     immbits_immrange(Bits, ImmRange) ->
-        format(atom(Descr), 'imm~d in ~q or ~q', [Bits, SimmRange, ImmRange])
+        format(atom(Descr), 'imm~d in ~p or ~p', [Bits, SimmRange, ImmRange])
     ;
         Descr = ''.
 
@@ -223,22 +223,29 @@ display_instructions_spec :-
     display_bitformat_legend,
     display_instr_format_breakdown,
 
-    emit_heading(3, 'Instruction Specifications'),
     display_instr_specifications.
 
 
 
 display_instr_specifications :-
+    emit_heading(3, 'Instruction Specifications'),
+    forall(
+        fmt(Fmt),
+        display_instr_specification_under_fmt(Fmt)
+    ).
+
+display_instr_specification_under_fmt(Fmt) :-
+    emit_heading(4, 'Instruction Format `~k`', [Fmt]),
     forall(
         fmt_instr_title_description(Fmt, Instr, Title, Descr),
         display_instr_specification(Fmt, Instr, Title, Descr)
     ).
 
 display_instr_specification(Fmt, Instr, Title, Descr) :-
-    emit_heading(4, '`~w` - ~w', [Instr, Title]),
+    emit_heading(5, '~w - `~w`', [Title, Instr]),
     format('~w~n', [Descr]),
 
-    emit_heading(5, 'Layout'),
+    emit_heading(6, 'Layout'),
     once(fmt_prefix(Fmt, Prefix)),
     bagof(I, Fmt^fmt_instr(Fmt, I), InstrsInFmt),
     once(nth0(OpcodeIndex, InstrsInFmt, Instr)),
@@ -260,7 +267,7 @@ display_instr_specification(Fmt, Instr, Title, Descr) :-
     ),
 
     true.
-    % emit_heading(5, 'Operation'),
+    % emit_heading(6, 'Operation'),
     % Operation = "RD <- RD + RS;\c
     %              RS <- RS + 1;",
     % format('```~n'),

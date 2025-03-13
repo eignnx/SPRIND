@@ -96,14 +96,14 @@ Total instructions available (excluding `ext`): 127 (min), 127 (max)
 
 | Format | Bit Pattern | \# Opcodes | Range of Immediate |
 |:----|:---:|:---:|:---:|
-| `lsd` | `00ooiiiiiiiaarrr` | 4 | imm7 in ..=(-64,63) or ..=(0,127) |
-| `subr` | `010iiiiiiiiiiiii` | 1 | imm13 in ..=(-4096,4095) or ..=(0,8191) |
-| `b` | `0110ooiiiiiiiiii` | 4 | imm10 in ..=(-512,511) or ..=(0,1023) |
+| `lsd` | `00ooiiiiiiiaarrr` | 4 | imm7 in [-64,63] or [0,127] |
+| `subr` | `010iiiiiiiiiiiii` | 1 | imm13 in [-4096,4095] or [0,8191] |
+| `b` | `0110ooiiiiiiiiii` | 4 | imm10 in [-512,511] or [0,1023] |
 | `ext` | `0111oooooooooooo` | 4096 |  |
-| `li` | `10oiiiiiiiiiirrr` | 2 | imm10 in ..=(-512,511) or ..=(0,1023) |
-| `ri(1)` | `110ooooiiiiiirrr` | 16 | imm6 in ..=(-32,31) or ..=(0,63) |
-| `ri(2)` | `1110oooiiiiiirrr` | 8 | imm6 in ..=(-32,31) or ..=(0,63) |
-| `ri(3)` | `11110ooiiiiiirrr` | 4 | imm6 in ..=(-32,31) or ..=(0,63) |
+| `li` | `10oiiiiiiiiiirrr` | 2 | imm10 in [-512,511] or [0,1023] |
+| `ri(1)` | `110ooooiiiiiirrr` | 16 | imm6 in [-32,31] or [0,63] |
+| `ri(2)` | `1110oooiiiiiirrr` | 8 | imm6 in [-32,31] or [0,63] |
+| `ri(3)` | `11110ooiiiiiirrr` | 4 | imm6 in [-32,31] or [0,63] |
 | `rr(1)` | `111110ooooRRRrrr` | 16 |  |
 | `rr(2)` | `1111110oooRRRrrr` | 8 |  |
 | `rr(3)` | `11111110ooRRRrrr` | 4 |  |
@@ -115,11 +115,14 @@ Total instructions available (excluding `ext`): 127 (min), 127 (max)
 ### Instruction Specifications
 
 
-#### `lb` - Load Byte
+#### Instruction Format `lsd`
+
+
+##### Load Byte - `lb`
 
 Load a byte from memory into a register.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -128,13 +131,13 @@ Load a byte from memory into a register.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `0000iiiiiiirrr` | 7 | imm7 in ..=(-64,63) or ..=(0,127) |
+| `0000iiiiiiirrr` | 7 | imm7 in [-64,63] or [0,127] |
 
-#### `lw` - Load Word
+##### Load Word - `lw`
 
 Load a word from memory into a register.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -143,13 +146,13 @@ Load a word from memory into a register.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `0001iiiiiiirrr` | 7 | imm7 in ..=(-64,63) or ..=(0,127) |
+| `0001iiiiiiirrr` | 7 | imm7 in [-64,63] or [0,127] |
 
-#### `sb` - Store Byte
+##### Store Byte - `sb`
 
 Store a byte from a register into memory.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -158,13 +161,13 @@ Store a byte from a register into memory.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `0010iiiiiiirrr` | 7 | imm7 in ..=(-64,63) or ..=(0,127) |
+| `0010iiiiiiirrr` | 7 | imm7 in [-64,63] or [0,127] |
 
-#### `sw` - Store Word
+##### Store Word - `sw`
 
 Store a word from a register into memory.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -173,13 +176,16 @@ Store a word from a register into memory.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `0011iiiiiiirrr` | 7 | imm7 in ..=(-64,63) or ..=(0,127) |
+| `0011iiiiiiirrr` | 7 | imm7 in [-64,63] or [0,127] |
 
-#### `call` - Call Subroutine
+#### Instruction Format `subr`
+
+
+##### Call Subroutine - `call`
 
 Call a subroutine at the specified address.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -188,13 +194,16 @@ Call a subroutine at the specified address.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `010iiiiiiiiiiiii` | 13 | imm13 in ..=(-4096,4095) or ..=(0,8191) |
+| `010iiiiiiiiiiiii` | 13 | imm13 in [-4096,4095] or [0,8191] |
 
-#### `b` - Branch
+#### Instruction Format `b`
+
+
+##### Branch - `b`
 
 Branch to the specified address by adding the immediate offset to `$PC`.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -203,13 +212,13 @@ Branch to the specified address by adding the immediate offset to `$PC`.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `011000iiiiiiiiii` | 10 | imm10 in ..=(-512,511) or ..=(0,1023) |
+| `011000iiiiiiiiii` | 10 | imm10 in [-512,511] or [0,1023] |
 
-#### `bt` - Branch If True
+##### Branch If True - `bt`
 
 Branch to the specified address if the condition is true by adding the immediate offset to `$PC`.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -218,13 +227,13 @@ Branch to the specified address if the condition is true by adding the immediate
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `011001iiiiiiiiii` | 10 | imm10 in ..=(-512,511) or ..=(0,1023) |
+| `011001iiiiiiiiii` | 10 | imm10 in [-512,511] or [0,1023] |
 
-#### `bf` - Branch If False
+##### Branch If False - `bf`
 
 Branch to the specified address if the condition is false by adding the immediate offset to `$PC`.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -233,13 +242,19 @@ Branch to the specified address if the condition is false by adding the immediat
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `011010iiiiiiiiii` | 10 | imm10 in ..=(-512,511) or ..=(0,1023) |
+| `011010iiiiiiiiii` | 10 | imm10 in [-512,511] or [0,1023] |
 
-#### `li` - Load Immediate
+#### Instruction Format `ext`
+
+
+#### Instruction Format `li`
+
+
+##### Load Immediate - `li`
 
 Load an immediate value into a register.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -248,13 +263,13 @@ Load an immediate value into a register.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `100iiiiiiiiiirrr` | 10 | imm10 in ..=(-512,511) or ..=(0,1023) |
+| `100iiiiiiiiiirrr` | 10 | imm10 in [-512,511] or [0,1023] |
 
-#### `szi` - Shift Zero-extended Immediate
+##### Shift Zero-extended Immediate - `szi`
 
 Left-shift a zero-extended immediate value into a register.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -263,13 +278,16 @@ Left-shift a zero-extended immediate value into a register.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `101iiiiiiiiiirrr` | 10 | imm10 in ..=(-512,511) or ..=(0,1023) |
+| `101iiiiiiiiiirrr` | 10 | imm10 in [-512,511] or [0,1023] |
 
-#### `lgb` - Load Global Byte
+#### Instruction Format `ri(1)`
+
+
+##### Load Global Byte - `lgb`
 
 Load a byte from a memory address offset from `$GP`.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -278,13 +296,13 @@ Load a byte from a memory address offset from `$GP`.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1100000iiiiiirrr` | 6 | imm6 in ..=(-32,31) or ..=(0,63) |
+| `1100000iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 
-#### `lgw` - Load Global Word
+##### Load Global Word - `lgw`
 
 Load a word from a memory address offset from `$GP`.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -293,13 +311,13 @@ Load a word from a memory address offset from `$GP`.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1100001iiiiiirrr` | 6 | imm6 in ..=(-32,31) or ..=(0,63) |
+| `1100001iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 
-#### `sgb` - Store Global Byte
+##### Store Global Byte - `sgb`
 
 Store a byte into memory address offset from `$GP`.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -308,13 +326,13 @@ Store a byte into memory address offset from `$GP`.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1100010iiiiiirrr` | 6 | imm6 in ..=(-32,31) or ..=(0,63) |
+| `1100010iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 
-#### `sgw` - Store Global Word
+##### Store Global Word - `sgw`
 
 Store a word into memory address offset from `$GP`.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -323,13 +341,13 @@ Store a word into memory address offset from `$GP`.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1100011iiiiiirrr` | 6 | imm6 in ..=(-32,31) or ..=(0,63) |
+| `1100011iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 
-#### `tbit` - Test Bit
+##### Test Bit - `tbit`
 
 Test a specific bit in a register, modifying `$TS`.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -338,13 +356,13 @@ Test a specific bit in a register, modifying `$TS`.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1100100iiiiiirrr` | 6 | imm6 in ..=(-32,31) or ..=(0,63) |
+| `1100100iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 
-#### `cbit` - Clear Bit
+##### Clear Bit - `cbit`
 
 Clear a specific bit in a register.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -353,13 +371,13 @@ Clear a specific bit in a register.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1100101iiiiiirrr` | 6 | imm6 in ..=(-32,31) or ..=(0,63) |
+| `1100101iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 
-#### `sbit` - Set Bit
+##### Set Bit - `sbit`
 
 Set a specific bit in a register.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -368,13 +386,13 @@ Set a specific bit in a register.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1100110iiiiiirrr` | 6 | imm6 in ..=(-32,31) or ..=(0,63) |
+| `1100110iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 
-#### `tli` - Test Less-than Immediate
+##### Test Less-than Immediate - `tli`
 
 Test if a register value is less than an immediate value.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -383,13 +401,13 @@ Test if a register value is less than an immediate value.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1100111iiiiiirrr` | 6 | imm6 in ..=(-32,31) or ..=(0,63) |
+| `1100111iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 
-#### `tgei` - Test Greater-than or Equal Immediate
+##### Test Greater-than or Equal Immediate - `tgei`
 
 Test if a register value is greater than or equal to an immediate value.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -398,13 +416,13 @@ Test if a register value is greater than or equal to an immediate value.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1101000iiiiiirrr` | 6 | imm6 in ..=(-32,31) or ..=(0,63) |
+| `1101000iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 
-#### `tbi` - Test Below Immediate
+##### Test Below Immediate - `tbi`
 
 Test if a register value is below an immediate value.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -413,13 +431,13 @@ Test if a register value is below an immediate value.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1101001iiiiiirrr` | 6 | imm6 in ..=(-32,31) or ..=(0,63) |
+| `1101001iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 
-#### `taei` - Test Above or Equal
+##### Test Above or Equal - `taei`
 
 Test if a register value is above or equal to an immediate value.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -428,13 +446,13 @@ Test if a register value is above or equal to an immediate value.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1101010iiiiiirrr` | 6 | imm6 in ..=(-32,31) or ..=(0,63) |
+| `1101010iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 
-#### `tnei` - Test Not Equal Immediate
+##### Test Not Equal Immediate - `tnei`
 
 Test if a register value is not equal to an immediate value.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -443,13 +461,13 @@ Test if a register value is not equal to an immediate value.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1101011iiiiiirrr` | 6 | imm6 in ..=(-32,31) or ..=(0,63) |
+| `1101011iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 
-#### `teqi` - Test Equal Immediate
+##### Test Equal Immediate - `teqi`
 
 Test if a register value is equal to an immediate value.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -458,13 +476,13 @@ Test if a register value is equal to an immediate value.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1101100iiiiiirrr` | 6 | imm6 in ..=(-32,31) or ..=(0,63) |
+| `1101100iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 
-#### `addi` - Add Immediate
+##### Add Immediate - `addi`
 
 Add an immediate value to a register.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -473,13 +491,13 @@ Add an immediate value to a register.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1101101iiiiiirrr` | 6 | imm6 in ..=(-32,31) or ..=(0,63) |
+| `1101101iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 
-#### `andi` - AND Immediate
+##### AND Immediate - `andi`
 
 Perform a bitwise AND between a register and an immediate value.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -488,13 +506,13 @@ Perform a bitwise AND between a register and an immediate value.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1101110iiiiiirrr` | 6 | imm6 in ..=(-32,31) or ..=(0,63) |
+| `1101110iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 
-#### `ori` - OR Immediate
+##### OR Immediate - `ori`
 
 Perform a bitwise OR between a register and an immediate value.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -503,13 +521,16 @@ Perform a bitwise OR between a register and an immediate value.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1101111iiiiiirrr` | 6 | imm6 in ..=(-32,31) or ..=(0,63) |
+| `1101111iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 
-#### `xori` - XOR Immediate
+#### Instruction Format `ri(2)`
+
+
+##### XOR Immediate - `xori`
 
 Perform a bitwise XOR between a register and an immediate value.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -518,13 +539,13 @@ Perform a bitwise XOR between a register and an immediate value.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1110000iiiiiirrr` | 6 | imm6 in ..=(-32,31) or ..=(0,63) |
+| `1110000iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 
-#### `lsri` - Logical Shift Right Immediate
+##### Logical Shift Right Immediate - `lsri`
 
 Perform a logical shift right on a register by an immediate value.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -533,13 +554,13 @@ Perform a logical shift right on a register by an immediate value.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1110001iiiiiirrr` | 6 | imm6 in ..=(-32,31) or ..=(0,63) |
+| `1110001iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 
-#### `lsli` - Logical Shift Left Immediate
+##### Logical Shift Left Immediate - `lsli`
 
 Perform a logical shift left on a register by an immediate value.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -548,13 +569,13 @@ Perform a logical shift left on a register by an immediate value.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1110010iiiiiirrr` | 6 | imm6 in ..=(-32,31) or ..=(0,63) |
+| `1110010iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 
-#### `asri` - Arithmetic Shift Right Immediate
+##### Arithmetic Shift Right Immediate - `asri`
 
 Perform an arithmetic shift right on a register by an immediate value.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -563,13 +584,19 @@ Perform an arithmetic shift right on a register by an immediate value.
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1110011iiiiiirrr` | 6 | imm6 in ..=(-32,31) or ..=(0,63) |
+| `1110011iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 
-#### `add` - Add
+#### Instruction Format `ri(3)`
+
+
+#### Instruction Format `rr(1)`
+
+
+##### Add - `add`
 
 Add the values of two registers.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -580,11 +607,11 @@ Add the values of two registers.
 |:---:|
 | `1111100000RRRrrr` |
 
-#### `sub` - Subtract
+##### Subtract - `sub`
 
 Subtract the value of one register from another.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -595,11 +622,11 @@ Subtract the value of one register from another.
 |:---:|
 | `1111100001RRRrrr` |
 
-#### `and` - AND
+##### AND - `and`
 
 Perform a bitwise AND between two registers.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -610,11 +637,11 @@ Perform a bitwise AND between two registers.
 |:---:|
 | `1111100010RRRrrr` |
 
-#### `or` - OR
+##### OR - `or`
 
 Perform a bitwise OR between two registers.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -625,11 +652,11 @@ Perform a bitwise OR between two registers.
 |:---:|
 | `1111100011RRRrrr` |
 
-#### `xor` - XOR
+##### XOR - `xor`
 
 Perform a bitwise XOR between two registers.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -640,11 +667,11 @@ Perform a bitwise XOR between two registers.
 |:---:|
 | `1111100100RRRrrr` |
 
-#### `mov` - Move
+##### Move - `mov`
 
 Move the value from one register to another.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -655,11 +682,11 @@ Move the value from one register to another.
 |:---:|
 | `1111100101RRRrrr` |
 
-#### `addcy` - Add with Carry
+##### Add with Carry - `addcy`
 
 Add the values of two registers with carry.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -670,11 +697,11 @@ Add the values of two registers with carry.
 |:---:|
 | `1111100110RRRrrr` |
 
-#### `subcy` - Subtract with Carry
+##### Subtract with Carry - `subcy`
 
 Subtract the value of one register from another with carry.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -685,11 +712,11 @@ Subtract the value of one register from another with carry.
 |:---:|
 | `1111100111RRRrrr` |
 
-#### `tl` - Test Less-than
+##### Test Less-than - `tl`
 
 Test if the value of one register is less than another.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -700,11 +727,11 @@ Test if the value of one register is less than another.
 |:---:|
 | `1111101000RRRrrr` |
 
-#### `tge` - Test Greater-than or Equal
+##### Test Greater-than or Equal - `tge`
 
 Test if the value of one register is greater than or equal to another.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -715,11 +742,11 @@ Test if the value of one register is greater than or equal to another.
 |:---:|
 | `1111101001RRRrrr` |
 
-#### `tb` - Test Below
+##### Test Below - `tb`
 
 Test if the value of one register is below another.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -730,11 +757,11 @@ Test if the value of one register is below another.
 |:---:|
 | `1111101010RRRrrr` |
 
-#### `tae` - Test Above or Equal
+##### Test Above or Equal - `tae`
 
 Test if the value of one register is above or equal to another.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -745,11 +772,11 @@ Test if the value of one register is above or equal to another.
 |:---:|
 | `1111101011RRRrrr` |
 
-#### `tne` - Test Not Equal
+##### Test Not Equal - `tne`
 
 Test if the value of one register is not equal to another.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -760,11 +787,11 @@ Test if the value of one register is not equal to another.
 |:---:|
 | `1111101100RRRrrr` |
 
-#### `teq` - Test Equal
+##### Test Equal - `teq`
 
 Test if the value of one register is equal to another.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -775,11 +802,20 @@ Test if the value of one register is equal to another.
 |:---:|
 | `1111101101RRRrrr` |
 
-#### `pushb` - Push Byte
+#### Instruction Format `rr(2)`
+
+
+#### Instruction Format `rr(3)`
+
+
+#### Instruction Format `r(1)`
+
+
+##### Push Byte - `pushb`
 
 Push a byte from a register onto the stack.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -790,11 +826,11 @@ Push a byte from a register onto the stack.
 |:---:|
 | `1111111100000rrr` |
 
-#### `pushw` - Push Word
+##### Push Word - `pushw`
 
 Push a word from a register onto the stack.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -805,11 +841,11 @@ Push a word from a register onto the stack.
 |:---:|
 | `1111111100001rrr` |
 
-#### `popb` - Pop Byte
+##### Pop Byte - `popb`
 
 Pop a byte from the stack into a register.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -820,11 +856,11 @@ Pop a byte from the stack into a register.
 |:---:|
 | `1111111100010rrr` |
 
-#### `popw` - Pop Word
+##### Pop Word - `popw`
 
 Pop a word from the stack into a register.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -835,11 +871,11 @@ Pop a word from the stack into a register.
 |:---:|
 | `1111111100011rrr` |
 
-#### `callr` - Call Register
+##### Call Register - `callr`
 
 Call a subroutine at the address in a register.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -850,11 +886,11 @@ Call a subroutine at the address in a register.
 |:---:|
 | `1111111100100rrr` |
 
-#### `jr` - Jump Register
+##### Jump Register - `jr`
 
 Jump to the address in a register.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -865,11 +901,11 @@ Jump to the address in a register.
 |:---:|
 | `1111111100101rrr` |
 
-#### `neg` - Negate
+##### Negate - `neg`
 
 Negate the value in a register.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -880,11 +916,11 @@ Negate the value in a register.
 |:---:|
 | `1111111100110rrr` |
 
-#### `seb` - Sign Extend Byte
+##### Sign Extend Byte - `seb`
 
 Sign extend a byte in a register.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -895,11 +931,11 @@ Sign extend a byte in a register.
 |:---:|
 | `1111111100111rrr` |
 
-#### `r.hi` - Read $HI
+##### Read $HI - `r.hi`
 
 Read the value of the system `$HI` register into a general purpose register.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -910,11 +946,11 @@ Read the value of the system `$HI` register into a general purpose register.
 |:---:|
 | `1111111101000rrr` |
 
-#### `r.gp` - Read $GP
+##### Read $GP - `r.gp`
 
 Read the value of the system `$GP` register into a general purpose register.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -925,11 +961,11 @@ Read the value of the system `$GP` register into a general purpose register.
 |:---:|
 | `1111111101001rrr` |
 
-#### `w.gp` - Write $GP
+##### Write $GP - `w.gp`
 
 Write a value to the system `$GP` register from a general purpose register.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -940,11 +976,20 @@ Write a value to the system `$GP` register from a general purpose register.
 |:---:|
 | `1111111101010rrr` |
 
-#### `NONEXE1` - Non-executable (1's Version)
+#### Instruction Format `r(2)`
+
+
+#### Instruction Format `r(3)`
+
+
+#### Instruction Format `o`
+
+
+##### Non-executable (1's Version) - `NONEXE1`
 
 Triggers a "non-executable instruction" exception. The entire instruction is 16 `1`s.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -955,11 +1000,11 @@ Triggers a "non-executable instruction" exception. The entire instruction is 16 
 |:---:|
 | `1111111111100000` |
 
-#### `BREAK` - Breakpoint
+##### Breakpoint - `BREAK`
 
 Trigger a breakpoint.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -970,11 +1015,11 @@ Trigger a breakpoint.
 |:---:|
 | `1111111111100001` |
 
-#### `HALT` - Halt
+##### Halt - `HALT`
 
 Halt the processor.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -985,11 +1030,11 @@ Halt the processor.
 |:---:|
 | `1111111111100010` |
 
-#### `UNIMPL` - Unimplemented
+##### Unimplemented - `UNIMPL`
 
 Unimplemented instruction.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -1000,11 +1045,11 @@ Unimplemented instruction.
 |:---:|
 | `1111111111100011` |
 
-#### `kret` - Kernel Return
+##### Kernel Return - `kret`
 
 Return from kernel mode.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -1015,11 +1060,11 @@ Return from kernel mode.
 |:---:|
 | `1111111111100100` |
 
-#### `kcall` - Kernel Call
+##### Kernel Call - `kcall`
 
 Call a kernel function.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -1030,11 +1075,11 @@ Call a kernel function.
 |:---:|
 | `1111111111100101` |
 
-#### `ret` - Return
+##### Return - `ret`
 
 Return from a subroutine.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -1045,11 +1090,11 @@ Return from a subroutine.
 |:---:|
 | `1111111111100110` |
 
-#### `tov` - Test Overflow
+##### Test Overflow - `tov`
 
 Test for overflow.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -1060,11 +1105,11 @@ Test for overflow.
 |:---:|
 | `1111111111100111` |
 
-#### `tcy` - Test Carry
+##### Test Carry - `tcy`
 
 Test for carry.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -1075,11 +1120,11 @@ Test for carry.
 |:---:|
 | `1111111111101000` |
 
-#### `cy0` - Clear Carry
+##### Clear Carry - `cy0`
 
 Clear the carry flag.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -1090,11 +1135,11 @@ Clear the carry flag.
 |:---:|
 | `1111111111101001` |
 
-#### `cy1` - Set Carry
+##### Set Carry - `cy1`
 
 Set the carry flag.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -1105,11 +1150,11 @@ Set the carry flag.
 |:---:|
 | `1111111111101010` |
 
-#### `tpush0` - Teststack Push 0
+##### Teststack Push 0 - `tpush0`
 
 Push 0 onto the test stack.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -1120,11 +1165,11 @@ Push 0 onto the test stack.
 |:---:|
 | `1111111111101011` |
 
-#### `tpush1` - Teststack Push 1
+##### Teststack Push 1 - `tpush1`
 
 Push 1 onto the test stack.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -1135,11 +1180,11 @@ Push 1 onto the test stack.
 |:---:|
 | `1111111111101100` |
 
-#### `tnot` - Teststack NOT
+##### Teststack NOT - `tnot`
 
 Perform a NOT operation on the test stack.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -1150,11 +1195,11 @@ Perform a NOT operation on the test stack.
 |:---:|
 | `1111111111101101` |
 
-#### `tand` - Teststack AND
+##### Teststack AND - `tand`
 
 Perform an AND operation on the test stack.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -1165,11 +1210,11 @@ Perform an AND operation on the test stack.
 |:---:|
 | `1111111111101110` |
 
-#### `tor` - Teststack OR
+##### Teststack OR - `tor`
 
 Perform an OR operation on the test stack.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -1180,11 +1225,11 @@ Perform an OR operation on the test stack.
 |:---:|
 | `1111111111101111` |
 
-#### `tdup` - Teststack Duplicate
+##### Teststack Duplicate - `tdup`
 
 Duplicate the top value on the test stack.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -1195,11 +1240,11 @@ Duplicate the top value on the test stack.
 |:---:|
 | `1111111111110000` |
 
-#### `prsv.hi` - Preserve $HI
+##### Preserve $HI - `prsv.hi`
 
 Preserve the value of the `$HI` register onto the stack.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -1210,11 +1255,11 @@ Preserve the value of the `$HI` register onto the stack.
 |:---:|
 | `1111111111110001` |
 
-#### `rstr.hi` - Restore $HI
+##### Restore $HI - `rstr.hi`
 
 Restore the value of the `$HI` register from the stack.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -1225,11 +1270,11 @@ Restore the value of the `$HI` register from the stack.
 |:---:|
 | `1111111111110010` |
 
-#### `prsv.ts` - Preserve $TS
+##### Preserve $TS - `prsv.ts`
 
 Preserve the value of the `$TS` register onto the stack.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -1240,11 +1285,11 @@ Preserve the value of the `$TS` register onto the stack.
 |:---:|
 | `1111111111110011` |
 
-#### `rstr.ts` - Restore $TS
+##### Restore $TS - `rstr.ts`
 
 Restore the value of the `$TS` register from the stack.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -1255,11 +1300,11 @@ Restore the value of the `$TS` register from the stack.
 |:---:|
 | `1111111111110100` |
 
-#### `prsv.ra` - Preserve $RA
+##### Preserve $RA - `prsv.ra`
 
 Preserve the value of the `$RA` register onto the stack.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -1270,11 +1315,11 @@ Preserve the value of the `$RA` register onto the stack.
 |:---:|
 | `1111111111110101` |
 
-#### `rstr.ra` - Restore $RA
+##### Restore $RA - `rstr.ra`
 
 Restore the value of the `$RA` register from the stack.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -1285,11 +1330,11 @@ Restore the value of the `$RA` register from the stack.
 |:---:|
 | `1111111111110110` |
 
-#### `prsv.gp` - Preserve $GP
+##### Preserve $GP - `prsv.gp`
 
 Preserve the value of the `$GP` register onto the stack.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -1300,11 +1345,11 @@ Preserve the value of the `$GP` register onto the stack.
 |:---:|
 | `1111111111110111` |
 
-#### `rstr.gp` - Restore $GP
+##### Restore $GP - `rstr.gp`
 
 Restore the value of the `$GP` register from the stack.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -1315,11 +1360,11 @@ Restore the value of the `$GP` register from the stack.
 |:---:|
 | `1111111111111000` |
 
-#### `prsv.cc` - Preserve $CC
+##### Preserve $CC - `prsv.cc`
 
 Preserve the value of the `$CC` register onto the stack.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
@@ -1330,11 +1375,11 @@ Preserve the value of the `$CC` register onto the stack.
 |:---:|
 | `1111111111111001` |
 
-#### `rstr.cc` - Restore $CC
+##### Restore $CC - `rstr.cc`
 
 Restore the value of the `$CC` register from the stack.
 
-##### Layout
+###### Layout
 
 
 | Format Prefix | Opcode |
