@@ -137,9 +137,10 @@ fmt_instr_title_description(ri(1), teqi, 'Test Equal Immediate', 'Test if a regi
 fmt_instr_title_description(ri(1), addi, 'Add Immediate', 'Add an immediate value to a register.').
 fmt_instr_title_description(ri(1), andi, 'AND Immediate', 'Perform a bitwise AND between a register and an immediate value.').
 fmt_instr_title_description(ri(1), ori, 'OR Immediate', 'Perform a bitwise OR between a register and an immediate value.').
-fmt_instr_title_description(ri(1), addicy, 'Add Immediate with Carry', 'Add an immediate value and the carry bit to a register.').
 
 fmt_instr_title_description(ri(2), xori, 'XOR Immediate', 'Perform a bitwise XOR between a register and an immediate value.').
+fmt_instr_title_description(ri(2), addicy, 'Add Immediate with Carry', 'Add an immediate value and the carry bit to a register.').
+fmt_instr_title_description(ri(2), subicy, 'Subtract Immediate with Carry', 'Sutract an immediate value and the carry bit from a register.').
 fmt_instr_title_description(ri(2), lsr, 'Logical Shift Right', 'Perform a logical shift right on a register by an immediate value.').
 fmt_instr_title_description(ri(2), lsl, 'Logical Shift Left', 'Perform a logical shift left on a register by an immediate value.').
 fmt_instr_title_description(ri(2), asr, 'Arithmetic Shift Right', 'Perform an arithmetic shift right on a register by an immediate value.').

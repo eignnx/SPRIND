@@ -78,7 +78,7 @@ Total instructions available (excluding `ext`): 127 (min), 127 (max)
 | `ext` | 4096 | 0 | 0 | 0% |
 | `li` | 2 | 2 | 0 | 100% |
 | `ri(1)` | 16 | 16 | 0 | 100% |
-| `ri(2)` | 8 | 4 | 0 | 50% |
+| `ri(2)` | 8 | 6 | 0 | 75% |
 | `rrr` | 4 | 1 | 0 | 25% |
 | `rr(1)` | 16 | 14 | 0 | 88% |
 | `rr(2)` | 8 | 0 | 0 | 0% |
@@ -583,9 +583,9 @@ Perform a bitwise XOR between a register and an immediate value.
 | `1110000iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 --------------
 
-##### Logical Shift Right Immediate - `lsr`
+##### Add Immediate with Carry - `addicy`
 
-Perform a logical shift right on a register by an immediate value.
+Add an immediate value and the carry bit to a register.
 
 ###### Layout
 
@@ -599,9 +599,9 @@ Perform a logical shift right on a register by an immediate value.
 | `1110001iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 --------------
 
-##### Logical Shift Left Immediate - `lsl`
+##### Subtract Immediate with Carry - `subicy`
 
-Perform a logical shift left on a register by an immediate value.
+Sutract an immediate value and the carry bit from a register.
 
 ###### Layout
 
@@ -615,9 +615,9 @@ Perform a logical shift left on a register by an immediate value.
 | `1110010iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 --------------
 
-##### Arithmetic Shift Right Immediate - `asr`
+##### Logical Shift Right - `lsr`
 
-Perform an arithmetic shift right on a register by an immediate value.
+Perform a logical shift right on a register by an immediate value.
 
 ###### Layout
 
@@ -629,6 +629,38 @@ Perform an arithmetic shift right on a register by an immediate value.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `1110011iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
+--------------
+
+##### Logical Shift Left - `lsl`
+
+Perform a logical shift left on a register by an immediate value.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `ri(2)` = 0b1110 | 0b100`3 |
+
+| Bit Layout | Immediate Bits | Immediate Range |
+|:---:|:---:|:---:|
+| `1110100iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
+--------------
+
+##### Arithmetic Shift Right - `asr`
+
+Perform an arithmetic shift right on a register by an immediate value.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `ri(2)` = 0b1110 | 0b101`3 |
+
+| Bit Layout | Immediate Bits | Immediate Range |
+|:---:|:---:|:---:|
+| `1110101iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
 --------------
 
 #### Instruction Format `rrr`
@@ -1359,9 +1391,9 @@ Duplicate the top value on the test stack.
 | `1111111111110000` |
 --------------
 
-##### Preserve $HI - `prsv.hi`
+##### Preserve $MP - `prsv.mp`
 
-Preserve the value of the `$HI` register onto the stack.
+Preserve the value of the `$MP` register onto the stack.
 
 ###### Layout
 
@@ -1375,9 +1407,9 @@ Preserve the value of the `$HI` register onto the stack.
 | `1111111111110001` |
 --------------
 
-##### Restore $HI - `rstr.hi`
+##### Restore $MP - `rstr.mp`
 
-Restore the value of the `$HI` register from the stack.
+Restore the value of the `$MP` register from the stack.
 
 ###### Layout
 
