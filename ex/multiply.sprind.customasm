@@ -1,0 +1,61 @@
+#include "../sprind.customasm"
+#bank rom
+
+#align SPRIND_SUBR_ALIGN
+;= subr(operand1 => x, operand2 => y) -> (u32 in ACC) {
+multiply:
+      pushw a
+      pushw b
+
+      ;= alias!(M => a:b)
+
+      ; M <- zxt(x)
+      mov M.lo, x
+      clear M.hi
+
+      ; ACC <- 0
+      wr.acc.lo M.hi
+      wr.acc.hi M.hi
+
+      ;= replicate!(16) {
+            ;= alias!(mask => z)
+
+            ; Copy `y` into `mask`
+            mov mask, y
+            andi mask, 1
+            subi mask, 1
+            inv mask
+
+            ; CY <- 0
+            clear.cy
+
+            ;= alias!(m_tmp_masked => x)
+            ;= alias!(acc_tmp => w)
+
+            ; ACC.lo <- ACC.lo + (M.lo & mask)
+            mov m_tmp_masked, mask
+            and m_tmp_masked, M.lo
+            rd.acc.lo acc_tmp
+            addcy acc_tmp, m_tmp_masked
+            wr.acc.lo acc_tmp
+
+            ; ACC.hi <- ACC.hi + (M.hi & mask) + CY
+            mov m_tmp_masked, mask
+            and m_tmp_masked, MD.hi
+            rd.acc.hi acc_tmp
+            addcy acc_tmp, m_tmp_masked
+            wr.acc.hi acc_tmp
+
+            ; M <- M << 1
+            clear.cy
+            lslcy M.lo, 1
+            lslcy M.hi, 1
+
+            ; y <- y >> 1
+            lsr y, 1
+      ;= }
+
+      popw b
+      popw a
+      ret
+;= }
