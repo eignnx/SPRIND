@@ -137,11 +137,12 @@ fmt_instr_title_description(ri(1), teqi, 'Test Equal Immediate', 'Test if a regi
 fmt_instr_title_description(ri(1), addi, 'Add Immediate', 'Add an immediate value to a register.').
 fmt_instr_title_description(ri(1), andi, 'AND Immediate', 'Perform a bitwise AND between a register and an immediate value.').
 fmt_instr_title_description(ri(1), ori, 'OR Immediate', 'Perform a bitwise OR between a register and an immediate value.').
+fmt_instr_title_description(ri(1), addicy, 'Add Immediate with Carry', 'Add an immediate value and the carry bit to a register.').
 
 fmt_instr_title_description(ri(2), xori, 'XOR Immediate', 'Perform a bitwise XOR between a register and an immediate value.').
-fmt_instr_title_description(ri(2), lsr, 'Logical Shift Right Immediate', 'Perform a logical shift right on a register by an immediate value.').
-fmt_instr_title_description(ri(2), lsl, 'Logical Shift Left Immediate', 'Perform a logical shift left on a register by an immediate value.').
-fmt_instr_title_description(ri(2), asr, 'Arithmetic Shift Right Immediate', 'Perform an arithmetic shift right on a register by an immediate value.').
+fmt_instr_title_description(ri(2), lsr, 'Logical Shift Right', 'Perform a logical shift right on a register by an immediate value.').
+fmt_instr_title_description(ri(2), lsl, 'Logical Shift Left', 'Perform a logical shift left on a register by an immediate value.').
+fmt_instr_title_description(ri(2), asr, 'Arithmetic Shift Right', 'Perform an arithmetic shift right on a register by an immediate value.').
 
 fmt_instr_title_description(rr(1), add, 'Add', 'Add the values of two registers.').
 fmt_instr_title_description(rr(1), sub, 'Subtract', 'Subtract the value of one register from another.').
@@ -190,8 +191,8 @@ fmt_instr_title_description(o, tnot, 'Teststack NOT', 'Perform a NOT operation o
 fmt_instr_title_description(o, tand, 'Teststack AND', 'Perform an AND operation on the test stack.').
 fmt_instr_title_description(o, tor, 'Teststack OR', 'Perform an OR operation on the test stack.').
 fmt_instr_title_description(o, tdup, 'Teststack Duplicate', 'Duplicate the top value on the test stack.').
-fmt_instr_title_description(o, 'prsv.hi', 'Preserve $HI', 'Preserve the value of the `$HI` register onto the stack.').
-fmt_instr_title_description(o, 'rstr.hi', 'Restore $HI', 'Restore the value of the `$HI` register from the stack.').
+fmt_instr_title_description(o, 'prsv.mp', 'Preserve $MP', 'Preserve the value of the `$MP` register onto the stack.').
+fmt_instr_title_description(o, 'rstr.mp', 'Restore $MP', 'Restore the value of the `$MP` register from the stack.').
 fmt_instr_title_description(o, 'prsv.ts', 'Preserve $TS', 'Preserve the value of the `$TS` register onto the stack.').
 fmt_instr_title_description(o, 'rstr.ts', 'Restore $TS', 'Restore the value of the `$TS` register from the stack.').
 fmt_instr_title_description(o, 'prsv.ra', 'Preserve $RA', 'Preserve the value of the `$RA` register onto the stack.').
@@ -200,6 +201,19 @@ fmt_instr_title_description(o, 'prsv.gp', 'Preserve $GP', 'Preserve the value of
 fmt_instr_title_description(o, 'rstr.gp', 'Restore $GP', 'Restore the value of the `$GP` register from the stack.').
 fmt_instr_title_description(o, 'prsv.cc', 'Preserve $CC', 'Preserve the value of the `$CC` register onto the stack.').
 fmt_instr_title_description(o, 'rstr.cc', 'Restore $CC', 'Restore the value of the `$CC` register from the stack.').
+
+%%%%%%%%%%%%%%%%%%%%%%%%% Synthetic Instructions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+synthinstr_descr_expansion_reversability(clr(Reg),    'Clear a register',               xor(Reg, Reg),  reversible).
+synthinstr_descr_expansion_reversability(nop,         'The no-op instruction',          ori(sp, 0),     reversible).
+synthinstr_descr_expansion_reversability(incr(Reg),   'Increment a register',           addi(Reg, 1),   reversible).
+synthinstr_descr_expansion_reversability(decr(Reg),   'Increment a register',           subi(Reg, 1),   reversible).
+synthinstr_descr_expansion_reversability(inv(Reg),    'Bitwise inversion (complement)', xori(Reg, -1),  reversible).
+synthinstr_descr_expansion_reversability(not(Reg),    'Invert a boolean (0 or 1)',      xori(Reg, 1),   reversible).
+synthinstr_descr_expansion_reversability(tg(R1, R2),  'Test greater-than',              tl(R2, R1),     one_way).
+synthinstr_descr_expansion_reversability(tle(R1, R2), 'Test Less-than or Equal',        tge(R2, R1),    one_way).
+synthinstr_descr_expansion_reversability(ta(R1, R2),  'Test Above',                     ta(R2, R1),     one_way).
+synthinstr_descr_expansion_reversability(tbe(R1, R2), 'Test Below or Equal',            tae(R2, R1),    one_way).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Registers %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
