@@ -274,7 +274,16 @@ display_instr_specification(Fmt, Instr, Title, Descr) :-
     once(nth0(OpcodeIndex, InstrsInFmt, Instr)),
 
     emit_table_header(['Format Prefix', 'Opcode']),
-    emit_table_row([fmt('`~q`', Fmt)++a(=)++fmt('0b~s', Prefix), fmt('0x~16R', OpcodeIndex)]),
+
+    fmt_opcodebits_immbits(Fmt, OBits, _),
+    label([OBits]),
+    (
+        OBits > 0 ->
+            format(atom(OpcodeBin), '0b~|~`0t~2r~*+`~d', [OpcodeIndex, OBits, OBits])
+        ;
+            OpcodeBin = 'NONE'
+    ),
+    emit_table_row([fmt('`~q`', Fmt)++a(=)++fmt('0b~s', Prefix), a(OpcodeBin)]),
 
     ( fmt_operands(Fmt, Operands), member(i, Operands) ->
         MaybeImmRange = ['Immediate Bits', 'Immediate Range']
@@ -289,13 +298,14 @@ display_instr_specification(Fmt, Instr, Title, Descr) :-
         display_detailed_instr_layout(Fmt, Prefix, OpcodeIndex, Layout)
     ),
 
-    true.
     % emit_heading(6, 'Operation'),
     % Operation = "RD <- RD + RS;\c
     %              RS <- RS + 1;",
     % format('```~n'),
     % format('~s~n', [Operation]),
     % format('```~n').
+
+    format('--------------~n').
 
 display_detailed_instr_layout(Fmt, Prefix, Opcode, Layout) :-
     bitlayout_opcodebits(Layout, OBits),
