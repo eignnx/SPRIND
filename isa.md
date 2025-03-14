@@ -137,6 +137,10 @@ Total instructions available (excluding `ext`): 127 (min), 127 (max)
 
 Load a byte from memory into a register.
 
+###### Examples
+
+- `lb w, [sp+12]`
+
 ###### Layout
 
 
@@ -147,11 +151,24 @@ Load a byte from memory into a register.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `0000iiiiiiirrr` | 7 | imm7 in [-64,63] or [0,127] |
+
+###### Semantics
+
+```
+lb(_37388,[_37408 + _37414])
+-----------------------
+$_37388 <- zxt([&_37408 + simm(7,_37414)])
+```
+
 --------------
 
 ##### Load Word - `lw`
 
 Load a word from memory into a register.
+
+###### Examples
+
+- `lw w, [sp+12]`
 
 ###### Layout
 
@@ -163,11 +180,25 @@ Load a word from memory into a register.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `0001iiiiiiirrr` | 7 | imm7 in [-64,63] or [0,127] |
+
+###### Semantics
+
+```
+lw(_55764,[_55744 + _55750])
+-----------------------
+?ptr = b_and(&_55744 + simm(7,_55750),#65534);
+$_55764 <- hi_lo([?ptr + #1],[?ptr])
+```
+
 --------------
 
 ##### Store Byte - `sb`
 
 Store a byte from a register into memory.
+
+###### Examples
+
+- `sb [sp-20], x`
 
 ###### Layout
 
@@ -179,11 +210,24 @@ Store a byte from a register into memory.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `0010iiiiiiirrr` | 7 | imm7 in [-64,63] or [0,127] |
+
+###### Semantics
+
+```
+sb([_55734 + _55740],_55744)
+-----------------------
+[&_55734 + simm(7,_55740)] <- $_55744
+```
+
 --------------
 
 ##### Store Word - `sw`
 
 Store a word from a register into memory.
+
+###### Examples
+
+- `sw [sp-20], x`
 
 ###### Layout
 
@@ -195,6 +239,17 @@ Store a word from a register into memory.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `0011iiiiiiirrr` | 7 | imm7 in [-64,63] or [0,127] |
+
+###### Semantics
+
+```
+sw([_55744 + _55750],_55784)
+-----------------------
+?ptr = b_and(&_55744 + simm(7,_55750),#65534);
+[?ptr] <- lo($_55784);
+[?ptr + #1] <- hi($_55784)
+```
+
 --------------
 
 #### Instruction Format `subr`
@@ -203,6 +258,10 @@ Store a word from a register into memory.
 ##### Call Subroutine - `call`
 
 Call a subroutine at the specified address.
+
+###### Examples
+
+- `call SOME_LABEL`
 
 ###### Layout
 
@@ -214,6 +273,16 @@ Call a subroutine at the specified address.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `010iiiiiiiiiiiii` | 13 | imm13 in [-4096,4095] or [0,8191] |
+
+###### Semantics
+
+```
+call(_55810)
+-----------------------
+$$pc <- $$pc + sxt(imm(_56130,_55810))<<#subr_align;
+$$ra <- $$pc + #2
+```
+
 --------------
 
 #### Instruction Format `b`
@@ -222,6 +291,10 @@ Call a subroutine at the specified address.
 ##### Branch - `b`
 
 Branch to the specified address by adding the immediate offset to `$PC`.
+
+###### Examples
+
+- `b SOME_LABEL`
 
 ###### Layout
 
@@ -233,11 +306,24 @@ Branch to the specified address by adding the immediate offset to `$PC`.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `011000iiiiiiiiii` | 10 | imm10 in [-512,511] or [0,1023] |
+
+###### Semantics
+
+```
+b(_55798)
+-----------------------
+$$pc <- $$pc + sxt(simm(10,_55798))
+```
+
 --------------
 
 ##### Branch If True - `bt`
 
 Branch to the specified address if the condition is true by adding the immediate offset to `$PC`.
+
+###### Examples
+
+- `bt SOME_LABEL`
 
 ###### Layout
 
@@ -249,11 +335,24 @@ Branch to the specified address if the condition is true by adding the immediate
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `011001iiiiiiiiii` | 10 | imm10 in [-512,511] or [0,1023] |
+
+###### Semantics
+
+```
+bt(_55820)
+-----------------------
+if(b_pop($$ts)==#1,$$pc <- $$pc + sxt(#_55820))
+```
+
 --------------
 
 ##### Branch If False - `bf`
 
 Branch to the specified address if the condition is false by adding the immediate offset to `$PC`.
+
+###### Examples
+
+- `bf SOME_LABEL`
 
 ###### Layout
 
@@ -265,6 +364,15 @@ Branch to the specified address if the condition is false by adding the immediat
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `011010iiiiiiiiii` | 10 | imm10 in [-512,511] or [0,1023] |
+
+###### Semantics
+
+```
+bf(_55816)
+-----------------------
+if(b_pop($$ts)==0,$$pc <- $$pc + sxt(#_55816))
+```
+
 --------------
 
 #### Instruction Format `ext`
@@ -277,6 +385,10 @@ Branch to the specified address if the condition is false by adding the immediat
 
 Load an immediate value into a register.
 
+###### Examples
+
+- `li x, 123`
+
 ###### Layout
 
 
@@ -287,11 +399,24 @@ Load an immediate value into a register.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `100iiiiiiiiiirrr` | 10 | imm10 in [-512,511] or [0,1023] |
+
+###### Semantics
+
+```
+li(_55778,_55786)
+-----------------------
+$_55778 <- sxt(#_55786)
+```
+
 --------------
 
 ##### Shift Zero-extended Immediate - `szi`
 
 Left-shift a zero-extended immediate value into a register.
+
+###### Examples
+
+- `szi x, 0xB3`
 
 ###### Layout
 
@@ -303,6 +428,15 @@ Left-shift a zero-extended immediate value into a register.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `101iiiiiiiiiirrr` | 10 | imm10 in [-512,511] or [0,1023] |
+
+###### Semantics
+
+```
+szi(_55778,_55802)
+-----------------------
+$_55778 <- b_or($_55778<<8,zxt(#_55802))
+```
+
 --------------
 
 #### Instruction Format `ri(1)`
@@ -311,6 +445,10 @@ Left-shift a zero-extended immediate value into a register.
 ##### Load Global Byte - `lgb`
 
 Load a byte from a memory address offset from `$GP`.
+
+###### Examples
+
+- `lgb x, [gp+8]`
 
 ###### Layout
 
@@ -322,11 +460,24 @@ Load a byte from a memory address offset from `$GP`.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `1100000iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
+
+###### Semantics
+
+```
+lgb(_55778,_55806)
+-----------------------
+$_55778 <- zxt([$$gp + zxt(#_55806)])
+```
+
 --------------
 
 ##### Load Global Word - `lgw`
 
 Load a word from a memory address offset from `$GP`.
+
+###### Examples
+
+- `lgw x, [gp+8]`
 
 ###### Layout
 
@@ -338,11 +489,25 @@ Load a word from a memory address offset from `$GP`.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `1100001iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
+
+###### Semantics
+
+```
+lgw(_55814,_55804)
+-----------------------
+_55778 = b_and($$gp + zxt(#_55804),65534);
+$_55814 <- hi_lo([_55778 + 1],[_55778])
+```
+
 --------------
 
 ##### Store Global Byte - `sgb`
 
 Store a byte into memory address offset from `$GP`.
+
+###### Examples
+
+- `sgb [gp+8], x`
 
 ###### Layout
 
@@ -354,11 +519,24 @@ Store a byte into memory address offset from `$GP`.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `1100010iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
+
+###### Semantics
+
+```
+sgb(_55802,_55798)
+-----------------------
+[$$gp + zxt(#_55798)] <- $_55802
+```
+
 --------------
 
 ##### Store Global Word - `sgw`
 
 Store a word into memory address offset from `$GP`.
+
+###### Examples
+
+- `sgw [gp+8], x`
 
 ###### Layout
 
@@ -370,6 +548,16 @@ Store a word into memory address offset from `$GP`.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `1100011iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
+
+###### Semantics
+
+```
+sgw(_55838,_55804)
+-----------------------
+_55778 = b_and($$gp + zxt(#_55804),65534);
+hi_lo([_55778 + 1],[_55778]) <- $_55838
+```
+
 --------------
 
 ##### Test Bit - `tbit`
@@ -386,6 +574,15 @@ Test a specific bit in a register, modifying `$TS`.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `1100100iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
+
+###### Semantics
+
+```
+tbit
+-----------------------
+nop
+```
+
 --------------
 
 ##### Clear Bit - `cbit`
@@ -402,6 +599,15 @@ Clear a specific bit in a register.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `1100101iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
+
+###### Semantics
+
+```
+cbit
+-----------------------
+nop
+```
+
 --------------
 
 ##### Set Bit - `sbit`
@@ -418,6 +624,15 @@ Set a specific bit in a register.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `1100110iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
+
+###### Semantics
+
+```
+sbit
+-----------------------
+nop
+```
+
 --------------
 
 ##### Test Less-than Immediate - `tli`
@@ -434,6 +649,15 @@ Test if a register value is less than an immediate value.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `1100111iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
+
+###### Semantics
+
+```
+tli
+-----------------------
+nop
+```
+
 --------------
 
 ##### Test Greater-than or Equal Immediate - `tgei`
@@ -450,6 +674,15 @@ Test if a register value is greater than or equal to an immediate value.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `1101000iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
+
+###### Semantics
+
+```
+tgei
+-----------------------
+nop
+```
+
 --------------
 
 ##### Test Below Immediate - `tbi`
@@ -466,6 +699,15 @@ Test if a register value is below an immediate value.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `1101001iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
+
+###### Semantics
+
+```
+tbi
+-----------------------
+nop
+```
+
 --------------
 
 ##### Test Above or Equal - `taei`
@@ -482,6 +724,15 @@ Test if a register value is above or equal to an immediate value.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `1101010iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
+
+###### Semantics
+
+```
+taei
+-----------------------
+nop
+```
+
 --------------
 
 ##### Test Not Equal Immediate - `tnei`
@@ -498,6 +749,15 @@ Test if a register value is not equal to an immediate value.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `1101011iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
+
+###### Semantics
+
+```
+tnei
+-----------------------
+nop
+```
+
 --------------
 
 ##### Test Equal Immediate - `teqi`
@@ -514,6 +774,15 @@ Test if a register value is equal to an immediate value.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `1101100iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
+
+###### Semantics
+
+```
+teqi
+-----------------------
+nop
+```
+
 --------------
 
 ##### Add Immediate - `addi`
@@ -530,6 +799,15 @@ Add an immediate value to a register.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `1101101iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
+
+###### Semantics
+
+```
+addi
+-----------------------
+nop
+```
+
 --------------
 
 ##### AND Immediate - `andi`
@@ -546,6 +824,15 @@ Perform a bitwise AND between a register and an immediate value.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `1101110iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
+
+###### Semantics
+
+```
+andi
+-----------------------
+nop
+```
+
 --------------
 
 ##### OR Immediate - `ori`
@@ -562,6 +849,15 @@ Perform a bitwise OR between a register and an immediate value.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `1101111iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
+
+###### Semantics
+
+```
+ori
+-----------------------
+nop
+```
+
 --------------
 
 #### Instruction Format `ri(2)`
@@ -581,6 +877,15 @@ Perform a bitwise XOR between a register and an immediate value.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `1110000iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
+
+###### Semantics
+
+```
+xori
+-----------------------
+nop
+```
+
 --------------
 
 ##### Add Immediate with Carry - `addicy`
@@ -597,6 +902,15 @@ Add an immediate value and the carry bit to a register.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `1110001iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
+
+###### Semantics
+
+```
+addicy
+-----------------------
+nop
+```
+
 --------------
 
 ##### Subtract Immediate with Carry - `subicy`
@@ -613,6 +927,15 @@ Sutract an immediate value and the carry bit from a register.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `1110010iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
+
+###### Semantics
+
+```
+subicy
+-----------------------
+nop
+```
+
 --------------
 
 ##### Logical Shift Right - `lsr`
@@ -629,6 +952,15 @@ Perform a logical shift right on a register by an immediate value.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `1110011iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
+
+###### Semantics
+
+```
+lsr
+-----------------------
+nop
+```
+
 --------------
 
 ##### Logical Shift Left - `lsl`
@@ -645,6 +977,15 @@ Perform a logical shift left on a register by an immediate value.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `1110100iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
+
+###### Semantics
+
+```
+lsl
+-----------------------
+nop
+```
+
 --------------
 
 ##### Arithmetic Shift Right - `asr`
@@ -661,6 +1002,15 @@ Perform an arithmetic shift right on a register by an immediate value.
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
 | `1110101iiiiiirrr` | 6 | imm6 in [-32,31] or [0,63] |
+
+###### Semantics
+
+```
+asr
+-----------------------
+nop
+```
+
 --------------
 
 #### Instruction Format `rrr`
@@ -680,6 +1030,15 @@ Computes one step in a full 16-bit by 16-bit multiplication.
 | Bit Layout |
 |:---:|
 | `1111000rrr` |
+
+###### Semantics
+
+```
+mulstep
+-----------------------
+nop
+```
+
 --------------
 
 #### Instruction Format `rr(1)`
@@ -699,6 +1058,15 @@ Add the values of two registers.
 | Bit Layout |
 |:---:|
 | `1111100000rrr` |
+
+###### Semantics
+
+```
+add
+-----------------------
+nop
+```
+
 --------------
 
 ##### Subtract - `sub`
@@ -715,6 +1083,15 @@ Subtract the value of one register from another.
 | Bit Layout |
 |:---:|
 | `1111100001rrr` |
+
+###### Semantics
+
+```
+sub
+-----------------------
+nop
+```
+
 --------------
 
 ##### AND - `and`
@@ -731,6 +1108,15 @@ Perform a bitwise AND between two registers.
 | Bit Layout |
 |:---:|
 | `1111100010rrr` |
+
+###### Semantics
+
+```
+and
+-----------------------
+nop
+```
+
 --------------
 
 ##### OR - `or`
@@ -747,6 +1133,15 @@ Perform a bitwise OR between two registers.
 | Bit Layout |
 |:---:|
 | `1111100011rrr` |
+
+###### Semantics
+
+```
+or
+-----------------------
+nop
+```
+
 --------------
 
 ##### XOR - `xor`
@@ -763,6 +1158,15 @@ Perform a bitwise XOR between two registers.
 | Bit Layout |
 |:---:|
 | `1111100100rrr` |
+
+###### Semantics
+
+```
+xor
+-----------------------
+nop
+```
+
 --------------
 
 ##### Move - `mov`
@@ -779,6 +1183,15 @@ Move the value from one register to another.
 | Bit Layout |
 |:---:|
 | `1111100101rrr` |
+
+###### Semantics
+
+```
+mov
+-----------------------
+nop
+```
+
 --------------
 
 ##### Add with Carry - `addcy`
@@ -795,6 +1208,15 @@ Add the values of two registers with carry.
 | Bit Layout |
 |:---:|
 | `1111100110rrr` |
+
+###### Semantics
+
+```
+addcy
+-----------------------
+nop
+```
+
 --------------
 
 ##### Subtract with Carry - `subcy`
@@ -811,6 +1233,15 @@ Subtract the value of one register from another with carry.
 | Bit Layout |
 |:---:|
 | `1111100111rrr` |
+
+###### Semantics
+
+```
+subcy
+-----------------------
+nop
+```
+
 --------------
 
 ##### Test Less-than - `tl`
@@ -827,6 +1258,15 @@ Test if the value of one register is less than another.
 | Bit Layout |
 |:---:|
 | `1111101000rrr` |
+
+###### Semantics
+
+```
+tl
+-----------------------
+nop
+```
+
 --------------
 
 ##### Test Greater-than or Equal - `tge`
@@ -843,6 +1283,15 @@ Test if the value of one register is greater than or equal to another.
 | Bit Layout |
 |:---:|
 | `1111101001rrr` |
+
+###### Semantics
+
+```
+tge
+-----------------------
+nop
+```
+
 --------------
 
 ##### Test Below - `tb`
@@ -859,6 +1308,15 @@ Test if the value of one register is below another.
 | Bit Layout |
 |:---:|
 | `1111101010rrr` |
+
+###### Semantics
+
+```
+tb
+-----------------------
+nop
+```
+
 --------------
 
 ##### Test Above or Equal - `tae`
@@ -875,6 +1333,15 @@ Test if the value of one register is above or equal to another.
 | Bit Layout |
 |:---:|
 | `1111101011rrr` |
+
+###### Semantics
+
+```
+tae
+-----------------------
+nop
+```
+
 --------------
 
 ##### Test Not Equal - `tne`
@@ -891,6 +1358,15 @@ Test if the value of one register is not equal to another.
 | Bit Layout |
 |:---:|
 | `1111101100rrr` |
+
+###### Semantics
+
+```
+tne
+-----------------------
+nop
+```
+
 --------------
 
 ##### Test Equal - `teq`
@@ -907,6 +1383,15 @@ Test if the value of one register is equal to another.
 | Bit Layout |
 |:---:|
 | `1111101101rrr` |
+
+###### Semantics
+
+```
+teq
+-----------------------
+nop
+```
+
 --------------
 
 #### Instruction Format `rr(2)`
@@ -932,6 +1417,15 @@ Push a byte from a register onto the stack.
 | Bit Layout |
 |:---:|
 | `1111111100000rrr` |
+
+###### Semantics
+
+```
+pushb
+-----------------------
+nop
+```
+
 --------------
 
 ##### Push Word - `pushw`
@@ -948,6 +1442,15 @@ Push a word from a register onto the stack.
 | Bit Layout |
 |:---:|
 | `1111111100001rrr` |
+
+###### Semantics
+
+```
+pushw
+-----------------------
+nop
+```
+
 --------------
 
 ##### Pop Byte - `popb`
@@ -964,6 +1467,15 @@ Pop a byte from the stack into a register.
 | Bit Layout |
 |:---:|
 | `1111111100010rrr` |
+
+###### Semantics
+
+```
+popb
+-----------------------
+nop
+```
+
 --------------
 
 ##### Pop Word - `popw`
@@ -980,6 +1492,15 @@ Pop a word from the stack into a register.
 | Bit Layout |
 |:---:|
 | `1111111100011rrr` |
+
+###### Semantics
+
+```
+popw
+-----------------------
+nop
+```
+
 --------------
 
 ##### Call Register - `callr`
@@ -996,6 +1517,15 @@ Call a subroutine at the address in a register.
 | Bit Layout |
 |:---:|
 | `1111111100100rrr` |
+
+###### Semantics
+
+```
+callr
+-----------------------
+nop
+```
+
 --------------
 
 ##### Jump Register - `jr`
@@ -1012,6 +1542,15 @@ Jump to the address in a register.
 | Bit Layout |
 |:---:|
 | `1111111100101rrr` |
+
+###### Semantics
+
+```
+jr
+-----------------------
+nop
+```
+
 --------------
 
 ##### Negate - `neg`
@@ -1028,6 +1567,15 @@ Negate the value in a register.
 | Bit Layout |
 |:---:|
 | `1111111100110rrr` |
+
+###### Semantics
+
+```
+neg
+-----------------------
+nop
+```
+
 --------------
 
 ##### Sign Extend Byte - `seb`
@@ -1044,6 +1592,15 @@ Sign extend a byte in a register.
 | Bit Layout |
 |:---:|
 | `1111111100111rrr` |
+
+###### Semantics
+
+```
+seb
+-----------------------
+nop
+```
+
 --------------
 
 ##### Read $MP.lo - `rd.mp.lo`
@@ -1060,6 +1617,15 @@ Read the low word in the system `$MP` register into a general purpose register.
 | Bit Layout |
 |:---:|
 | `1111111101000rrr` |
+
+###### Semantics
+
+```
+'rd.mp.lo'
+-----------------------
+nop
+```
+
 --------------
 
 ##### Read $MP.hi - `rd.mp.hi`
@@ -1076,6 +1642,15 @@ Read the high word in the system `$MP` register into a general purpose register.
 | Bit Layout |
 |:---:|
 | `1111111101001rrr` |
+
+###### Semantics
+
+```
+'rd.mp.hi'
+-----------------------
+nop
+```
+
 --------------
 
 ##### Read $GP - `rd.gp`
@@ -1092,6 +1667,15 @@ Read the value of the system `$GP` register into a general purpose register.
 | Bit Layout |
 |:---:|
 | `1111111101010rrr` |
+
+###### Semantics
+
+```
+'rd.gp'
+-----------------------
+nop
+```
+
 --------------
 
 ##### Write $GP - `wr.gp`
@@ -1108,6 +1692,15 @@ Write a value to the system `$GP` register from a general purpose register.
 | Bit Layout |
 |:---:|
 | `1111111101011rrr` |
+
+###### Semantics
+
+```
+'wr.gp'
+-----------------------
+nop
+```
+
 --------------
 
 #### Instruction Format `r(2)`
@@ -1119,7 +1712,7 @@ Write a value to the system `$GP` register from a general purpose register.
 #### Instruction Format `o`
 
 
-##### Non-executable (1's Version) - `NONEXE1`
+##### Non-executable (1s Version) - `NONEXE1`
 
 Triggers a "non-executable instruction" exception. The entire instruction is 16 `1`s.
 
@@ -1133,6 +1726,15 @@ Triggers a "non-executable instruction" exception. The entire instruction is 16 
 | Bit Layout |
 |:---:|
 | `1111111111100000` |
+
+###### Semantics
+
+```
+'NONEXE1'
+-----------------------
+nop
+```
+
 --------------
 
 ##### Breakpoint - `BREAK`
@@ -1149,6 +1751,15 @@ Trigger a breakpoint.
 | Bit Layout |
 |:---:|
 | `1111111111100001` |
+
+###### Semantics
+
+```
+'BREAK'
+-----------------------
+nop
+```
+
 --------------
 
 ##### Halt - `HALT`
@@ -1165,6 +1776,15 @@ Halt the processor.
 | Bit Layout |
 |:---:|
 | `1111111111100010` |
+
+###### Semantics
+
+```
+'HALT'
+-----------------------
+nop
+```
+
 --------------
 
 ##### Unimplemented - `UNIMPL`
@@ -1181,6 +1801,15 @@ Unimplemented instruction.
 | Bit Layout |
 |:---:|
 | `1111111111100011` |
+
+###### Semantics
+
+```
+'UNIMPL'
+-----------------------
+nop
+```
+
 --------------
 
 ##### Kernel Return - `kret`
@@ -1197,6 +1826,15 @@ Return from kernel mode.
 | Bit Layout |
 |:---:|
 | `1111111111100100` |
+
+###### Semantics
+
+```
+kret
+-----------------------
+nop
+```
+
 --------------
 
 ##### Kernel Call - `kcall`
@@ -1213,6 +1851,15 @@ Call a kernel function.
 | Bit Layout |
 |:---:|
 | `1111111111100101` |
+
+###### Semantics
+
+```
+kcall
+-----------------------
+nop
+```
+
 --------------
 
 ##### Return - `ret`
@@ -1229,6 +1876,15 @@ Return from a subroutine.
 | Bit Layout |
 |:---:|
 | `1111111111100110` |
+
+###### Semantics
+
+```
+ret
+-----------------------
+nop
+```
+
 --------------
 
 ##### Test Overflow - `tov`
@@ -1245,6 +1901,15 @@ Test for overflow.
 | Bit Layout |
 |:---:|
 | `1111111111100111` |
+
+###### Semantics
+
+```
+tov
+-----------------------
+nop
+```
+
 --------------
 
 ##### Test Carry - `tcy`
@@ -1261,6 +1926,15 @@ Test for carry.
 | Bit Layout |
 |:---:|
 | `1111111111101000` |
+
+###### Semantics
+
+```
+tcy
+-----------------------
+nop
+```
+
 --------------
 
 ##### Clear Carry - `clr.cy`
@@ -1277,6 +1951,15 @@ Clear the carry flag.
 | Bit Layout |
 |:---:|
 | `1111111111101001` |
+
+###### Semantics
+
+```
+'clr.cy'
+-----------------------
+nop
+```
+
 --------------
 
 ##### Set Carry - `set.cy`
@@ -1293,6 +1976,15 @@ Set the carry flag.
 | Bit Layout |
 |:---:|
 | `1111111111101010` |
+
+###### Semantics
+
+```
+'set.cy'
+-----------------------
+nop
+```
+
 --------------
 
 ##### Teststack Push 0 - `tpush0`
@@ -1309,6 +2001,15 @@ Push 0 onto the test stack.
 | Bit Layout |
 |:---:|
 | `1111111111101011` |
+
+###### Semantics
+
+```
+tpush0
+-----------------------
+nop
+```
+
 --------------
 
 ##### Teststack Push 1 - `tpush1`
@@ -1325,6 +2026,15 @@ Push 1 onto the test stack.
 | Bit Layout |
 |:---:|
 | `1111111111101100` |
+
+###### Semantics
+
+```
+tpush1
+-----------------------
+nop
+```
+
 --------------
 
 ##### Teststack NOT - `tnot`
@@ -1341,6 +2051,15 @@ Perform a NOT operation on the test stack.
 | Bit Layout |
 |:---:|
 | `1111111111101101` |
+
+###### Semantics
+
+```
+tnot
+-----------------------
+nop
+```
+
 --------------
 
 ##### Teststack AND - `tand`
@@ -1357,6 +2076,15 @@ Perform an AND operation on the test stack.
 | Bit Layout |
 |:---:|
 | `1111111111101110` |
+
+###### Semantics
+
+```
+tand
+-----------------------
+nop
+```
+
 --------------
 
 ##### Teststack OR - `tor`
@@ -1373,6 +2101,15 @@ Perform an OR operation on the test stack.
 | Bit Layout |
 |:---:|
 | `1111111111101111` |
+
+###### Semantics
+
+```
+tor
+-----------------------
+nop
+```
+
 --------------
 
 ##### Teststack Duplicate - `tdup`
@@ -1389,6 +2126,15 @@ Duplicate the top value on the test stack.
 | Bit Layout |
 |:---:|
 | `1111111111110000` |
+
+###### Semantics
+
+```
+tdup
+-----------------------
+nop
+```
+
 --------------
 
 ##### Preserve $MP - `prsv.mp`
@@ -1405,6 +2151,15 @@ Preserve the value of the `$MP` register onto the stack.
 | Bit Layout |
 |:---:|
 | `1111111111110001` |
+
+###### Semantics
+
+```
+'prsv.mp'
+-----------------------
+nop
+```
+
 --------------
 
 ##### Restore $MP - `rstr.mp`
@@ -1421,6 +2176,15 @@ Restore the value of the `$MP` register from the stack.
 | Bit Layout |
 |:---:|
 | `1111111111110010` |
+
+###### Semantics
+
+```
+'rstr.mp'
+-----------------------
+nop
+```
+
 --------------
 
 ##### Preserve $TS - `prsv.ts`
@@ -1437,6 +2201,15 @@ Preserve the value of the `$TS` register onto the stack.
 | Bit Layout |
 |:---:|
 | `1111111111110011` |
+
+###### Semantics
+
+```
+'prsv.ts'
+-----------------------
+nop
+```
+
 --------------
 
 ##### Restore $TS - `rstr.ts`
@@ -1453,6 +2226,15 @@ Restore the value of the `$TS` register from the stack.
 | Bit Layout |
 |:---:|
 | `1111111111110100` |
+
+###### Semantics
+
+```
+'rstr.ts'
+-----------------------
+nop
+```
+
 --------------
 
 ##### Preserve $RA - `prsv.ra`
@@ -1469,6 +2251,15 @@ Preserve the value of the `$RA` register onto the stack.
 | Bit Layout |
 |:---:|
 | `1111111111110101` |
+
+###### Semantics
+
+```
+'prsv.ra'
+-----------------------
+nop
+```
+
 --------------
 
 ##### Restore $RA - `rstr.ra`
@@ -1485,6 +2276,15 @@ Restore the value of the `$RA` register from the stack.
 | Bit Layout |
 |:---:|
 | `1111111111110110` |
+
+###### Semantics
+
+```
+'rstr.ra'
+-----------------------
+nop
+```
+
 --------------
 
 ##### Preserve $GP - `prsv.gp`
@@ -1501,6 +2301,15 @@ Preserve the value of the `$GP` register onto the stack.
 | Bit Layout |
 |:---:|
 | `1111111111110111` |
+
+###### Semantics
+
+```
+'prsv.gp'
+-----------------------
+nop
+```
+
 --------------
 
 ##### Restore $GP - `rstr.gp`
@@ -1517,6 +2326,15 @@ Restore the value of the `$GP` register from the stack.
 | Bit Layout |
 |:---:|
 | `1111111111111000` |
+
+###### Semantics
+
+```
+'rstr.gp'
+-----------------------
+nop
+```
+
 --------------
 
 ##### Preserve $CC - `prsv.cc`
@@ -1533,6 +2351,15 @@ Preserve the value of the `$CC` register onto the stack.
 | Bit Layout |
 |:---:|
 | `1111111111111001` |
+
+###### Semantics
+
+```
+'prsv.cc'
+-----------------------
+nop
+```
+
 --------------
 
 ##### Restore $CC - `rstr.cc`
@@ -1549,7 +2376,13 @@ Restore the value of the `$CC` register from the stack.
 | Bit Layout |
 |:---:|
 | `1111111111111010` |
+
+###### Semantics
+
+```
+'rstr.cc'
+-----------------------
+nop
+```
+
 --------------
-
-> !!! validation_failed(ill-formed instruction semantics(bt,[invalid_rval(1),invalid_rval(#(_208))]))
-

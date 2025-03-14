@@ -3,6 +3,7 @@
 :- use_module(isa).
 :- use_module(utils).
 :- use_module(validate).
+:- use_module(sem).
 :- use_module(derive).
 
 :- use_module(library(clpfd)).
@@ -16,11 +17,6 @@
 
 :- set_prolog_flag(double_quotes, chars).
 :- encoding(utf8).
-                              
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 show_table :-
@@ -100,13 +96,25 @@ display_instr_specifications :-
 display_instr_specification_under_fmt(Fmt) :-
     emit_heading(4, 'Instruction Format `~k`', [Fmt]),
     forall(
-        fmt_instr_title_description(Fmt, Instr, Title, Descr),
-        display_instr_specification(Fmt, Instr, Title, Descr)
+        fmt_instr(Fmt, Instr),
+        display_instr_specification(Fmt, Instr)
     ).
 
-display_instr_specification(Fmt, Instr, Title, Descr) :-
-    emit_heading(5, '~w - `~w`', [Title, Instr]),
-    format('~w~n', [Descr]),
+display_instr_specification(Fmt, Instr) :-
+    sem:instr_info(Instr, Info),
+
+    emit_heading(5, '~w - `~w`', [Info.title, Instr]),
+    format('~w~n', [Info.descr]),
+
+    ( Info.ex = [_|_] ->
+        emit_heading(6, 'Examples'),
+        maplist(
+            [Ex]>>format('- `~w`~n', [Ex]),
+            Info.ex
+        )
+    ;
+        true
+    ),
 
     emit_heading(6, 'Layout'),
     once(derive:fmt_prefix(Fmt, Prefix)),
@@ -138,14 +146,12 @@ display_instr_specification(Fmt, Instr, Title, Descr) :-
         display_detailed_instr_layout(Fmt, Prefix, OpcodeIndex, Layout)
     ),
 
-    % emit_heading(6, 'Operation'),
-    % Operation = "RD <- RD + RS;\c
-    %              RS <- RS + 1;",
-    % format('```~n'),
-    % format('~s~n', [Operation]),
-    % format('```~n').
+    emit_heading(6, 'Semantics'),
+    format('```~n'),
+    format('~p~n', [---(Info.syn, Info.sem)]),
+    format('```~n'),
 
-    format('--------------~n').
+    format('~n--------------~n').
 
 display_detailed_instr_layout(Fmt, Prefix, Opcode, Layout) :-
     bitlayout_opcodebits(Layout, OBits),
@@ -253,6 +259,10 @@ display_bitformat_legend :-
         emit_table_row([fmt('`~w`', Char), a(Descr)])
     ),
     format('~n').
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 bitformatchar_description(o, 'A bit in the instruction''s opcode.').
 bitformatchar_description(i, 'A bit in an immediate value.').

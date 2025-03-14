@@ -16,6 +16,10 @@
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+instr_immbits(Instr, IBits) :-
+    derive:fmt_instr(Fmt, Instr),
+    derive:fmt_opcodebits_immbits(Fmt, _, IBits).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 valid_semantics(Stmt) --> stmt(Stmt).
@@ -63,6 +67,19 @@ stmt_(S1 ; S2) -->
 
 stmt(Stmt) --> stmt_(Stmt) -> [] ; [invalid_stmt(Stmt)].
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+user:portray(---(Hypothesis, Conclusion)) :- print(Hypothesis), format('~n-----------------------~n'), print(Conclusion).
+user:portray(Dst <- Src) :- print(Dst), format(' <- '), print(Src).
+user:portray(Dst = Src) :- print(Dst), format(' = '), print(Src).
+user:portray(A + B) :- print(A), format(' + '), print(B).
+user:portray(A - B) :- print(A), format(' - '), print(B).
+user:portray(S1 ; S2) :- print(S1), format(';~n'), print(S2).
+user:portray(#X) :- format('#'), print(X).
+user:portray($X) :- format('$'), print(X).
+user:portray($$X) :- format('$$'), print(X).
+user:portray(&X) :- format('&'), print(X).
+user:portray(?X) :- format('?'), print(X).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -72,36 +89,36 @@ instr_info(lb, info{
 	descr: 'Load a byte from memory into a register.',
     ex: ['lb w, [sp+12]'],
     syn: lb(Rd, [Adr + Imm]),
-	sem: $Rd <- zxt([&Adr + simm(7, Imm)])
-}).
+	sem: $Rd <- zxt([&Adr + simm(N, Imm)])
+}) :- instr_immbits(lb, N).
 instr_info(lw, info{
 	title: 'Load Word',
 	descr: 'Load a word from memory into a register.',
 	ex: ['lw w, [sp+12]'],
 	syn: lw(Rd, [Adr + Imm]),
 	sem: (
-        ?ptr = b_and(&Adr + simm(7, Imm), #0b1111111111111110);
+        ?ptr = b_and(&Adr + simm(N, Imm), #0b1111111111111110);
         $Rd <- hi_lo([?ptr + #1], [?ptr])
     )
-}).
+}) :- instr_immbits(lw, N).
 instr_info(sb, info{
 	title: 'Store Byte',
 	descr: 'Store a byte from a register into memory.',
 	ex: ['sb [sp-20], x'],
 	syn: sb([Adr + Imm], Rs),
-	sem: [&Adr + simm(7, Imm)] <- $Rs
-}).
+	sem: [&Adr + simm(N, Imm)] <- $Rs
+}) :- instr_immbits(sb, N).
 instr_info(sw, info{
 	title: 'Store Word',
 	descr: 'Store a word from a register into memory.',
 	ex: ['sw [sp-20], x'],
 	syn: sw([Adr + Imm], Rs),
 	sem: (
-        ?ptr = b_and(&Adr + simm(7, Imm), #0b1111111111111110);
+        ?ptr = b_and(&Adr + simm(N, Imm), #0b1111111111111110);
         [?ptr] <- lo($Rs);
         [?ptr + #1] <- hi($Rs)
     )
-}).
+}) :- instr_immbits(sw, N).
 
 instr_info(call, info{
 	title: 'Call Subroutine',
@@ -109,24 +126,24 @@ instr_info(call, info{
 	ex: ['call SOME_LABEL'],
 	syn: call(Imm),
 	sem: (
-        $$pc <- $$pc + (sxt(imm(7, Imm)) << #subr_align);
+        $$pc <- $$pc + (sxt(imm(N, Imm)) << #subr_align);
         $$ra <- $$pc + #2
     )
-}).
+}) :- instr_immbits(call, N).
 
 instr_info(b, info{
 	title: 'Branch',
 	descr: 'Branch to the specified address by adding the immediate offset to `$PC`.',
 	ex: ['b SOME_LABEL'],
 	syn: b(Imm),
-	sem: $$pc <- $$pc + sxt(simm(7, Imm))
-}).
+	sem: $$pc <- $$pc + sxt(simm(N, Imm))
+}) :- instr_immbits(b, N).
 instr_info(bt, info{
 	title: 'Branch If True',
 	descr: 'Branch to the specified address if the condition is true by adding the immediate offset to `$PC`.',
 	ex: ['bt SOME_LABEL'],
 	syn: bt(Imm),
-	sem: if(b_pop($$ts) == 1, $$pc <- $$pc + sxt(#Imm))
+	sem: if(b_pop($$ts) == #1, $$pc <- $$pc + sxt(#Imm))
 }).
 instr_info(bf, info{
 	title: 'Branch If False',
