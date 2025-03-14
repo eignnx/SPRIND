@@ -36,13 +36,13 @@
 
 | Register | Register Name | Size | Description |
 |:---:|:---:|:---:|:----|
-| `$PC` | Program Counter | 16-bits | Keeps track of the currently executing instruction. |
-| `$RA` | Return Address | 16-bits | Saves the program counter for subroutine return. |
-| `$TS` | Test Stack | 16-bits | Stores boolean values in a stack used by branch instructions. |
-| `$CC` | Condition Codes | 16-bits | Stores carry and overflow flags. |
-| `$GP` | Global Pointer | 16-bits | Points to a region of process memory reserved for global variables. |
-| `$KR` | Kernel Return | 16-bits | Holds the value of the program counter during interrupts. |
-| `$MP` | Multiplication Product | 32-bits | Holds the accumulating product during a multiplication. |
+| `$pc` | Program Counter | 16-bits | Keeps track of the currently executing instruction. |
+| `$ra` | Return Address | 16-bits | Saves the program counter for subroutine return. |
+| `$ts` | Test Stack | 16-bits | Stores boolean values in a stack used by branch instructions. |
+| `$cc` | Condition Codes | 16-bits | Stores carry and overflow flags. |
+| `$gp` | Global Pointer | 16-bits | Points to a region of process memory reserved for global variables. |
+| `$kr` | Kernel Return | 16-bits | Holds the value of the program counter during interrupts. |
+| `$mp` | Multiplication Product | 32-bits | Holds the accumulating product during a multiplication. |
 
 ## Instruction Specifications
 
@@ -1550,3 +1550,6 @@ Restore the value of the `$CC` register from the stack.
 |:---:|
 | `1111111111111010` |
 --------------
+
+> !!! validation_failed(ill-formed instruction semantics(bt,[invalid_rval(1),invalid_rval(#(_208))]))
+

@@ -119,7 +119,7 @@ instr_info(b, info{
 	descr: 'Branch to the specified address by adding the immediate offset to `$PC`.',
 	ex: ['b SOME_LABEL'],
 	syn: b(Imm),
-	sem: $$pc <- $$pc + sxt(#Imm)
+	sem: $$pc <- $$pc + sxt(simm(7, Imm))
 }).
 instr_info(bt, info{
 	title: 'Branch If True',

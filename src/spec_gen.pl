@@ -1,7 +1,9 @@
 :- module(spec_gen, [show_table/0]).
 
 :- use_module(isa).
+:- use_module(utils).
 :- use_module(validate).
+:- use_module(derive).
 
 :- use_module(library(clpfd)).
 :- use_module(library(dcg/basics)).
@@ -16,181 +18,15 @@
 :- encoding(utf8).
                               
 
-fmt_operands(Fmt, Operands) :-
-    isa:fmt_operands_description(Fmt, Operands, _).
-
-genericfmt_description(Fmt, Descr) :-
-    isa:fmt_operands_description(Fmt, _, Descr).
-
-
-
-fmt_instr_title(Fmt, Instr, Title) :- isa:fmt_instr_title_description(Fmt, Instr, Title, _).
-fmt_instr(Fmt, Instr) :- fmt_instr_title(Fmt, Instr, _).
-
-fmt_assignedinstrcount(Fmt, AssignedCount) :-
-    fmt_assignedinstrcount(Fmt, AssignedCount, _ReservedCount).
-fmt_assignedinstrcount(Fmt, AssignedCount, ReservedCount) :-
-    aggregate_all(count, (
-            fmt_instr(Fmt, Instr),
-            dif(Instr, ???) % For spacing out instructions in opcode space.
-        ),
-        AssignedCount
-    ),
-    aggregate_all(count, (
-            fmt_instr(Fmt, ???) % For spacing out instructions in opcode space.
-        ),
-        ReservedCount
-    ).
-
-validate_instr_assignments(Fmt, AvailableCount) :-
-    fmt_assignedinstrcount(Fmt, AssignedCount, ReservedCount),
-    #AvailableCount #>= #AssignedCount + #ReservedCount.
-
-validate_instr_assignments_or_throw(Fmt, AvailableCount) :-
-    fmt_assignedinstrcount(Fmt, AssignedCount, ReservedCount),
-    (
-        validate_instr_assignments(Fmt, AvailableCount) ->
-            true
-        ;
-            throw(error(too_many_opcodes_assigned(
-                Fmt,
-                available(AvailableCount),
-                assigned(AssignedCount),
-                reserved(ReservedCount)
-            )))
-    ).
-
-fmt_description(Fmt, Descr) :-
-    Fmt =.. [_Functor],
-    !,
-    genericfmt_description(Fmt, Descr).
-fmt_description(Fmt, Descr) :-
-    Fmt =.. [_Functor, Arg],
-    genericfmt_description(Fmt, Descr0),
-    format(atom(Descr), '~w #~d', [Descr0, Arg]).
-
-tree_leaf(Tree, Leaf) :-
-    Tree = [Left | Right] ->
-        ( tree_leaf(Left, Leaf) ; tree_leaf(Right, Leaf) )
-    ;
-        Leaf = Tree.
-
-:- 
-    retractall(fmt(_)),
-    fmt_huffman_enc(Tree),
-    foreach(
-        tree_leaf(Tree, Leaf),
-        assertz(fmt(Leaf))
-    ).
-
-:-
-    retractall(genericfmt(_)),
-    bagof(Fmt, fmt(Fmt), Fmts),
-    maplist([Fmt, Functor-Arity]>>(
-        Fmt =.. [Functor | Args],
-        length(Args, Arity)
-    ), Fmts, FunctorsAritiesDup),
-    list_to_set(FunctorsAritiesDup, FunctorsArities),
-    maplist([Functor-Arity, GFmt]>>(
-        length(FreeArgs, Arity),
-        GFmt =.. [Functor | FreeArgs]
-    ), FunctorsArities, GFmts),
-    maplist([GFmt]>>assertz(genericfmt(GFmt)), GFmts).
-
-
-fmt_prefix(Fmt, Prefix) :-
-    fmt_huffman_enc(Tree),
-    huffmantree_item_prefix(Tree, Fmt, Prefix).
-
-
-operand_size(r, Bits) :- isa:gpr_count_bits(Bits).
-operand_size(s, Bits) :- isa:gpr_count_bits(Bits).
-operand_size(t, Bits) :- isa:gpr_count_bits(Bits).
-operand_size(a, Bits) :- isa:addr_reg_count_bits(Bits).
-operand_size(i, Size) :- isa:register_size(RegBits), Size in 0 .. RegBits.
-
-
-fmt_opcodebits_immbits(Fmt, OpcodeBits, ImmBits) :-
-    isa:instr_size(InstrSize),
-    OpcodeBits in 0 .. InstrSize,
-    ImmBits in 0 .. InstrSize,
-    fmt_prefix(Fmt, Prefix),
-    length(Prefix, PrefixLen),
-    fmt_operands(Fmt, Operands),
-    maplist([O, S, O-S]>>operand_size(O, S), Operands, Sizes, OperandsSizes),
-    list_to_assoc(OperandsSizes, Assoc),
-    ( get_assoc(i, Assoc, ImmBits) -> true ; ImmBits = 0 ),
-    ( isa:fmt_immsizeconstraint(Fmt, ImmBits) -> true ; true ),
-    ( isa:fmt_opcodesizeconstraint(Fmt, OpcodeBits) -> true ; true ),
-    sum(Sizes, #=, #OperandsTotalSize),
-    #PrefixLen + #OpcodeBits + #OperandsTotalSize #= InstrSize.
-
-
-fmt_maxopcodes(Fmt, MaxOpcodes) :-
-    fmt_opcodebits_immbits(Fmt, OpcodeBits, _),
-    #MaxOpcodes #= 2 ^ #OpcodeBits,
-    once(labeling([bisect, max(MaxOpcodes)], [MaxOpcodes])).
-
-
-fmt_layout(Fmt, Layout) :-
-    fmt_operands(Fmt, Operands),
-    fmt_opcodebits_immbits(Fmt, OBits, IBits),
-    label([OBits, IBits]),
-    maplist({IBits}/[Operand, OperandReplicated]>>(
-        ( Operand = i -> Count = IBits ; operand_size(Operand, Count) ),
-        item_count_replication(Operand, Count, OperandReplicated)
-    ), Operands, OperandBits),
-    fmt_prefix(Fmt, Prefix),
-    item_count_replication(o, OBits, Opcode),
-    append([Prefix, Opcode | OperandBits], Layout),
-    true.
-
-
-genericfmt_opcodes(GFmt, Opcodes) :-
-    bagof(OBits, GFmt^fmt_opcodebits_immbits(GFmt, OBits, _), OBitRows),
-    maplist([Bits, Count]>>(#Count #= 2 ^ #Bits), OBitRows, OpcodeCounts),
-    sum(OpcodeCounts, #=, Opcodes).
-
-
-total_opcode_count(Count) :-
-    total_opcode_count(Count, _Counts).
-total_opcode_count(Count, TotalCounts) :-
-    bagof(GFmt, (genericfmt(GFmt), dif(GFmt, ext)), GFmts),
-    maplist([GFmt, Ops]>>genericfmt_opcodes(GFmt, Ops), GFmts, TotalCounts),
-    sum(TotalCounts, #=, Count).
-
-total_opcode_count_minmax(MinCount, MaxCount) :-
-    total_opcode_count_minmax(MinCount, MaxCount, bisect).
-total_opcode_count_minmax(MinCount, MaxCount, BranchingStrat) :-
-    total_opcode_count(MinCount, TotalCounts0),
-    once(labeling([BranchingStrat, min(MinCount)], TotalCounts0)),
-    total_opcode_count(MaxCount, TotalCounts1),
-    once(labeling([BranchingStrat, max(MaxCount)], TotalCounts1)).
-
-
-immbits_simmrange(Bits, [Low, High]) :-
-    #Bits #> 0,
-    #Low #= -1 * 2 ^ (#Bits - 1),
-    #High #= 2 ^ (#Bits - 1) - 1.
-
-immbits_immrange(Bits, [0 , High]) :-
-    #Bits #> 0,
-    #High #= 2 ^ #Bits - 1.
-
-immbits_immdescription(Bits, Descr) :-
-    immbits_simmrange(Bits, SimmRange),
-    immbits_immrange(Bits, ImmRange) ->
-        format(atom(Descr), 'imm~d in ~p or ~p', [Bits, SimmRange, ImmRange])
-    ;
-        Descr = ''.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 show_table :-
-    validate:run_validations,
-    warn_if_nondet(show_table_).
+    utils:warn_if_nondet(spec_gen:show_table_),
+    catch(validate:run_validations, error(E), format('~n> !!! ~w~n~n', [E])),
+    true.
 
 show_table_ :-
     emit_heading(1, 'SPRIND Instruction Set Architecture Specification'),
@@ -273,13 +109,13 @@ display_instr_specification(Fmt, Instr, Title, Descr) :-
     format('~w~n', [Descr]),
 
     emit_heading(6, 'Layout'),
-    once(fmt_prefix(Fmt, Prefix)),
+    once(derive:fmt_prefix(Fmt, Prefix)),
     bagof(I, Fmt^fmt_instr(Fmt, I), InstrsInFmt),
     once(nth0(OpcodeIndex, InstrsInFmt, Instr)),
 
     emit_table_header(['Format Prefix', 'Opcode']),
 
-    fmt_opcodebits_immbits(Fmt, OBits, _),
+    derive:fmt_opcodebits_immbits(Fmt, OBits, _),
     label([OBits]),
     (
         OBits > 0 ->
@@ -289,7 +125,7 @@ display_instr_specification(Fmt, Instr, Title, Descr) :-
     ),
     emit_table_row([fmt('`~q`', Fmt)++a(=)++fmt('0b~s', Prefix), a(OpcodeBin)]),
 
-    ( fmt_operands(Fmt, Operands), member(i, Operands) ->
+    ( derive:fmt_operands(Fmt, Operands), member(i, Operands) ->
         MaybeImmRange = ['Immediate Bits', 'Immediate Range']
     ;
         MaybeImmRange = []
@@ -298,7 +134,7 @@ display_instr_specification(Fmt, Instr, Title, Descr) :-
     emit_table_header(['Bit Layout' | MaybeImmRange]),
 
     foreach(
-        fmt_layout(Fmt, Layout),
+        derive:fmt_layout(Fmt, Layout),
         display_detailed_instr_layout(Fmt, Prefix, OpcodeIndex, Layout)
     ),
 
@@ -351,8 +187,8 @@ display_opcode_availability_by_format :-
     ).
 
 display_opcode_availability(Fmt) :-
-    fmt_assignedinstrcount(Fmt, AssignedCount, ReservedCount),
-    fmt_maxopcodes(Fmt, MaxAvail),
+    derive:fmt_assignedinstrcount(Fmt, AssignedCount, ReservedCount),
+    derive:fmt_maxopcodes(Fmt, MaxAvail),
     UsagePct is 100 * (AssignedCount + ReservedCount) / MaxAvail,
     emit_table_row([fmt('`~k`', Fmt), d(MaxAvail), d(AssignedCount), d(ReservedCount), fmt('~0f%', UsagePct)]).
 
@@ -363,7 +199,7 @@ display_instruction_counts_by_format :-
         display_genericfmt_instr_count(GFmt)
     ),
 
-    total_opcode_count_minmax(TotalMin, TotalMax),
+    derive:total_opcode_count_minmax(TotalMin, TotalMax),
     format('~n~n'),
     format(
         'Total instructions available (excluding `ext`): ~d (min), ~d (max)~n',
@@ -390,13 +226,13 @@ display_instr_format_breakdown :-
 
     emit_table_header([left('Format'), 'Bit Pattern', '\\# Opcodes', 'Range of Immediate']),
     foreach(
-        fmt(Fmt),
+        derive:fmt(Fmt),
         format_section(Fmt)
     ).
 
 format_section(Fmt) :-
     foreach(
-        fmt_layout(Fmt, Layout),
+        derive:fmt_layout(Fmt, Layout),
         format_layout_row(Fmt, Layout)
     ).
 
@@ -405,7 +241,7 @@ format_layout_row(Fmt, Layout) :-
     list_item_occurrances(Layout, i, IBits),
     immbits_immdescription(IBits, ImmDescr),
     #Ops #= 2 ^ #OBits,
-    validate_instr_assignments_or_throw(Fmt, Ops),
+    derive:validate_instr_assignments_or_throw(Fmt, Ops),
     emit_table_row([code(a(Fmt)), code(chars(Layout)), d(Ops), a(ImmDescr)]).
 
 
@@ -427,33 +263,37 @@ bitformatchar_description(a, 'A bit in an address register specifier.').
 bitformatchar_description('0', 'A literal `0` embedded in the instruction.').
 bitformatchar_description('1', 'A literal `1` embedded in the instruction.').
 
+genericfmt_description(Fmt, Descr) :-
+    isa:fmt_operands_description(Fmt, _, Descr).
+
+fmt_description(Fmt, Descr) :-
+    Fmt =.. [_Functor],
+    !,
+    genericfmt_description(Fmt, Descr).
+fmt_description(Fmt, Descr) :-
+    Fmt =.. [_Functor, Arg],
+    genericfmt_description(Fmt, Descr0),
+    format(atom(Descr), '~w #~d', [Descr0, Arg]).
+
+immbits_simmrange(Bits, [Low, High]) :-
+    #Bits #> 0,
+    #Low #= -1 * 2 ^ (#Bits - 1),
+    #High #= 2 ^ (#Bits - 1) - 1.
+
+immbits_immrange(Bits, [0 , High]) :-
+    #Bits #> 0,
+    #High #= 2 ^ #Bits - 1.
+
+immbits_immdescription(Bits, Descr) :-
+    immbits_simmrange(Bits, SimmRange),
+    immbits_immrange(Bits, ImmRange) ->
+        format(atom(Descr), 'imm~d in ~p or ~p', [Bits, SimmRange, ImmRange])
+    ;
+        Descr = ''.
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% UTILS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-huffmantree_item_prefix(Fmt, Fmt, []).
-huffmantree_item_prefix([Left | _Right], Fmt, ['0' | Prefix]) :-
-    huffmantree_item_prefix(Left, Fmt, Prefix).
-huffmantree_item_prefix([_Left | Right], Fmt, ['1' | Prefix]) :-
-    huffmantree_item_prefix(Right, Fmt, Prefix).
-
-
-item_count_replication(Item, Count, Replication) :-
-    length(Replication, Count),
-    maplist(=(Item), Replication).
-
-
-list_item_occurrances([], _, 0).
-list_item_occurrances([X | Xs], Y, N) :-
-    dif(X, Y) ->
-        list_item_occurrances(Xs, Y, N)
-    ;
-        list_item_occurrances(Xs, Y, M),
-        #N #= #M + 1.
-
-warn_if_nondet(Goal) :-
-    aggregate(count, Goal, Count),
-    Count > 1 -> throw(error(redundant_choicepoint_for_goal(Goal))) ; true.
 
 emit_heading(Level, Content) :-
     emit_heading(Level, '~w', [Content]).
