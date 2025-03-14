@@ -109,8 +109,7 @@ fmt_prefix(Fmt, Prefix) :-
 operand_size(r, Bits) :- isa:gpr_count_bits(Bits).
 operand_size(s, Bits) :- isa:gpr_count_bits(Bits).
 operand_size(t, Bits) :- isa:gpr_count_bits(Bits).
-operand_size(a, Bits) :- isa:addr_reg_count_bits(Bits).
-operand_size(i, Size) :- isa:register_size(RegBits), Size in 0 .. RegBits.
+operand_size(i, Size) :- isa:instr_size(RegBits), Size in 0 .. RegBits.
 
 
 fmt_opcodebits_immbits(Fmt, OpcodeBits, ImmBits) :-

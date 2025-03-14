@@ -7,13 +7,11 @@
     instr_size/1,
     register_size/1,
     gpr_count_bits/1,
-    addr_reg_count_bits/1,
     regname_uses/2,
     reguse_description/2,
     sysregname_name_size_description/4,
     instr/1,
     gprreg/1,
-    adrreg/1,
     sysreg/1
 ]).
 
@@ -31,7 +29,7 @@
 
 :- det(fmt_operands_description/3).
 
-fmt_operands_description(lsd,   [i, a, r], 'Load-store with Displacement').
+fmt_operands_description(lsd,   [i, s, r], 'Load-store with Displacement').
 fmt_operands_description(subr,  [i],       'Subroutine Call').        
 fmt_operands_description(li,    [i, r],    'Load Immediate').         
 fmt_operands_description(b,     [i],       'Branch').                 
@@ -268,6 +266,5 @@ addrsize_maxalignment(Bits, MaxAlign) :-
 instr(Instr) :- fmt_instr_title_description(_, Instr, _, _).
 
 gprreg(R) :- regname_uses(R, _).
-adrreg(A) :- regname_uses(A, Uses), member(addr, Uses).
 sysreg(Name) :- sysregname_name_size_description(Name, _, _, _).
 

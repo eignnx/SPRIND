@@ -127,7 +127,7 @@ display_instr_specification(Fmt, Instr) :-
     label([OBits]),
     (
         OBits > 0 ->
-            format(atom(OpcodeBin), '0b~|~`0t~2r~*+`~d', [OpcodeIndex, OBits, OBits])
+            format(atom(OpcodeBin), '0b~|~`0t~2r~*+', [OpcodeIndex, OBits])
         ;
             OpcodeBin = 'NONE'
     ),
@@ -147,8 +147,18 @@ display_instr_specification(Fmt, Instr) :-
     ),
 
     emit_heading(6, 'Semantics'),
+
+    format(codes(OperandsCodes), '~p', [Info.operands]),
+    length(OperandsCodes, OLen),
+    format(codes(SemanticsCodes), '~p', [Info.sem]),
+    string_lines(SemanticsCodes, SLines),
+    maplist(string_length, SLines, SLens),
+    max_member(MaxLen, [OLen | SLens]),
+
     format('```~n'),
-    format('~p~n', [---(Info.syn, Info.sem)]),
+    format('~s~n', [OperandsCodes]),
+    format('~`-t~*|~n', [MaxLen]),
+    format('~s~n', [SemanticsCodes]),
     format('```~n'),
 
     format('~n--------------~n').
@@ -269,7 +279,6 @@ bitformatchar_description(i, 'A bit in an immediate value.').
 bitformatchar_description(r, 'A bit in a register specifier.').
 bitformatchar_description(s, 'A bit in a second register specifier.').
 bitformatchar_description(t, 'A bit in a third register specifier.').
-bitformatchar_description(a, 'A bit in an address register specifier.').
 bitformatchar_description('0', 'A literal `0` embedded in the instruction.').
 bitformatchar_description('1', 'A literal `1` embedded in the instruction.').
 
@@ -297,7 +306,7 @@ immbits_immrange(Bits, [0 , High]) :-
 immbits_immdescription(Bits, Descr) :-
     immbits_simmrange(Bits, SimmRange),
     immbits_immrange(Bits, ImmRange) ->
-        format(atom(Descr), 'imm~d in ~p or ~p', [Bits, SimmRange, ImmRange])
+        format(atom(Descr), 'imm~d in $~p$ or $~p$', [Bits, SimmRange, ImmRange])
     ;
         Descr = ''.
 
