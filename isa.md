@@ -184,8 +184,8 @@ Load a word from memory into a register.
 
 ```
 [imm(?simm),reg(?adr),reg(?rd)]
-----------------------------------
-?ptr = b_and(?adr + ?simm,#65534);
+---------------------------------
+?ptr = ?adr + ?simm  and  #65534;
 ?rd <- hi_lo([?ptr + #1],[?ptr])
 ```
 
@@ -243,8 +243,8 @@ Store a word from a register into memory.
 
 ```
 [imm(?simm),reg(?adr),reg(?rs)]
-----------------------------------
-?ptr = b_and(?adr + ?simm,#65534);
+---------------------------------
+?ptr = ?adr + ?simm  and  #65534;
 [?ptr] <- lo(?rs);
 [?ptr + #1] <- hi(?rs)
 ```
@@ -277,8 +277,8 @@ Call a subroutine at the specified address.
 
 ```
 [imm(?imm)]
---------------------------------------
-$$pc <- $$pc + sxt(?imm)<<#subr_align;
+----------------------------------------
+$$pc <- $$pc + sxt(?imm) << #subr_align;
 $$ra <- $$pc + #2
 ```
 
@@ -436,8 +436,8 @@ Left-shift a zero-extended immediate value into a register.
 
 ```
 [imm(?imm),reg(?rd)]
-------------------------------
-?rd <- b_or(?rd<<#8,zxt(?imm))
+-------------------------------
+?rd <- ?rd << #8  or  zxt(?imm)
 ```
 
 --------------
@@ -497,8 +497,8 @@ Load a word from a memory address offset from `$GP`.
 
 ```
 [imm(?disp),reg(?rd)]
----------------------------------------
-?ptr = b_and($$gp + zxt(?disp),#65534);
+--------------------------------------
+?ptr = $$gp + zxt(?disp)  and  #65534;
 ?rd <- hi_lo([?ptr + #1],[?ptr])
 ```
 
@@ -556,8 +556,8 @@ Store a word into memory address offset from `$GP`.
 
 ```
 [imm(?disp),reg(?rs)]
----------------------------------------
-?ptr = b_and($$gp + zxt(?disp),#65534);
+--------------------------------------
+?ptr = $$gp + zxt(?disp)  and  #65534;
 hi_lo([?ptr + #1],[?ptr]) <- ?rs
 ```
 

@@ -11,14 +11,10 @@
 :- op(20, fx, #).
 :- op(20, fx, $$).
 :- op(20, fx, ?).
-:- op(1050, xfy, <-).
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-instr_immbits(Instr, IBits) :-
-    derive:fmt_instr(Fmt, Instr),
-    derive:fmt_opcodebits_immbits(Fmt, _, IBits).
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+:- op(1050, xfx, <-).
+:- op(400, yfx, xor).
+:- op(400, yfx, and).
+:- op(400, yfx, or).
 
 
 valid_semantics(Stmt) --> stmt(Stmt).
@@ -34,9 +30,9 @@ rval_(A - B) --> rval(A), rval(B).
 rval_(A << B) --> rval(A), rval(B).
 rval_(A >> B) --> rval(A), rval(B).
 rval_(A == B) --> rval(A), rval(B).
-rval_(b_and(A, B)) --> rval(A), rval(B).
-rval_(b_or(A, B)) --> rval(A), rval(B).
-rval_(b_xor(A, B)) --> rval(A), rval(B).
+rval_(A and B) --> rval(A), rval(B).
+rval_(A or B) --> rval(A), rval(B).
+rval_(A xor B) --> rval(A), rval(B).
 rval_(b_pop(LVal)) --> lval(LVal).
 rval_(const(Symbol)) --> { atom(Symbol) }.
 rval_(zxt(RVal)) --> rval(RVal).
@@ -72,6 +68,11 @@ user:portray(Dst = Src) :- print(Dst), format(' = '), print(Src).
 user:portray(A + B) :- print(A), format(' + '), print(B).
 user:portray(A - B) :- print(A), format(' - '), print(B).
 user:portray(A == B) :- print(A), format(' == '), print(B).
+user:portray(A >> B) :- print(A), format(' >> '), print(B).
+user:portray(A << B) :- print(A), format(' << '), print(B).
+user:portray(A and B) :- print(A), format('  and  '), print(B).
+user:portray(A or B) :- print(A), format('  or  '), print(B).
+user:portray(A xor B) :- print(A), format('  xor  '), print(B).
 user:portray(S1 ; S2) :- print(S1), format(';~n'), print(S2).
 user:portray(#X) :- format('#'), print(X).
 user:portray($X) :- format('$'), print(X).
@@ -101,7 +102,7 @@ instr_info(lw, info{
 	ex: ['lw w, [sp+12]'],
     operands: [imm(?simm), reg(?adr), reg(?rd)],
 	sem: (
-        ?ptr = b_and(?adr + ?simm, #0b1111111111111110);
+        ?ptr = (?adr + ?simm) and #0b1111111111111110;
         ?rd <- hi_lo([?ptr + #1], [?ptr])
     )
 }).
@@ -118,7 +119,7 @@ instr_info(sw, info{
 	ex: ['sw [sp-20], x'],
     operands: [imm(?simm), reg(?adr), reg(?rs)],
 	sem: (
-        ?ptr = b_and(?adr + ?simm, #0b1111111111111110);
+        ?ptr = (?adr + ?simm) and #0b1111111111111110;
         [?ptr] <- lo(?rs);
         [?ptr + #1] <- hi(?rs)
     )
@@ -173,7 +174,7 @@ instr_info(szi, info{
 	descr: 'Left-shift a zero-extended immediate value into a register.',
 	ex: ['szi x, 0xB3'],
 	operands: [imm(?imm), reg(?rd)],
-	sem: ?rd <- b_or(?rd << #8, zxt(?imm))
+	sem: ?rd <- (?rd << #8) or zxt(?imm)
 }).
 
 instr_info(lgb, info{
@@ -189,7 +190,7 @@ instr_info(lgw, info{
 	ex: ['lgw x, [gp+8]'],
 	operands: [imm(?disp), reg(?rd)],
 	sem: (
-        ?ptr = b_and($$gp + zxt(?disp), #0b1111111111111110);
+        ?ptr = ($$gp + zxt(?disp)) and #0b1111111111111110;
         ?rd <- hi_lo([?ptr + #1], [?ptr])
     )
 }).
@@ -206,7 +207,7 @@ instr_info(sgw, info{
 	ex: ['sgw [gp+8], x'],
 	operands: [imm(?disp), reg(?rs)],
 	sem: (
-        ?ptr = b_and($$gp + zxt(?disp), #0b1111111111111110);
+        ?ptr = ($$gp + zxt(?disp)) and #0b1111111111111110;
         hi_lo([?ptr + #1], [?ptr]) <- ?rs
     )
 }).
