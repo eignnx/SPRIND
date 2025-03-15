@@ -50,46 +50,45 @@
 ### Instruction Counts by Format
 
 
-| Generic format | Description | Instr. Count |
-|:---:|:----|:---:|
-| `rri` | Register-register-immediate | 4 |
-| `subr` | Subroutine Call | 1 |
-| `b` | Branch | 4 |
-| `li` | Load Immediate | 2 |
-| `ri(_)` | Register-immediate | 48 |
-| `ext` | Reserved for Extension | 4096 |
-| `rrr` | Register-register-register | 4 |
-| `rr(_)` | Register-register | 28 |
-| `r(_)` | Register | 28 |
-| `o` | Opcode | 32 |
+| Generic format | Description | Available Opcodes | Assigned | Utilization |
+|:---:|:----|:---:|:---:|:---:|
+| `rri` | Register-register-immediate | 4 | 4 | 100% |
+| `subr` | Subroutine Call | 1 | 1 | 100% |
+| `b` | Branch | 4 | 3 | 75% |
+| `li` | Load Immediate | 2 | 2 | 100% |
+| `ri(_)` | Register-immediate | 48 | 22 | 46% |
+| `ext` | Reserved for Extension | 4096 | 0 | 0% |
+| `rrr` | Register-register-register | 4 | 1 | 25% |
+| `rr(_)` | Register-register | 28 | 14 | 50% |
+| `r(_)` | Register | 28 | 12 | 43% |
+| `o` | Opcode | 32 | 27 | 84% |
+|  | **Totals (excluding `ext`)** | **151** | **86** | **57%** |
 
 
-Total instructions available (excluding `ext`): 151 (min), 151 (max)
-
-
-### Format Assignment Availability
-
-
-| Format | Max Opcodes Available | Opcodes Assigned | Opcodes Reserved | Usage Percent |
-|:---:|:---:|:---:|:---:|:---:|
-| `rri` | 4 | 4 | 0 | 100% |
-| `subr` | 1 | 1 | 0 | 100% |
-| `b` | 4 | 3 | 0 | 75% |
-| `li` | 2 | 2 | 0 | 100% |
-| `ri(1)` | 32 | 22 | 0 | 69% |
-| `ri(2)` | 16 | 0 | 0 | 0% |
-| `ext` | 4096 | 0 | 0 | 0% |
-| `rrr` | 4 | 1 | 0 | 25% |
-| `rr(1)` | 16 | 8 | 0 | 50% |
-| `rr(2)` | 8 | 4 | 0 | 50% |
-| `rr(3)` | 4 | 2 | 0 | 50% |
-| `r(1)` | 16 | 7 | 0 | 44% |
-| `r(2)` | 8 | 4 | 0 | 50% |
-| `r(3)` | 4 | 1 | 0 | 25% |
-| `o` | 32 | 27 | 0 | 84% |
 
 ### Instruction Format Breakdown
 
+
+#### Instruction Format Layouts
+
+
+| Format | Bit Pattern | Opcodes Available | Assigned | Utilization | Range of Immediate |
+|:----|:---:|:---:|:---:|:---:|:---:|
+| `rri` | `00ooiiiiiisssrrr` | 4 | 4 | 100% | `imm6` in `[-32,31]` or `[0,63]` |
+| `subr` | `010iiiiiiiiiiiii` | 1 | 1 | 100% | `imm13` in `[-4096,4095]` or `[0,8191]` |
+| `b` | `0110ooiiiiiiiiii` | 4 | 3 | 75% | `imm10` in `[-512,511]` or `[0,1023]` |
+| `li` | `0111oiiiiiiiirrr` | 2 | 2 | 100% | `imm8` in `[-128,127]` or `[0,255]` |
+| `ri(1)` | `10oooooiiiiiirrr` | 32 | 22 | 69% | `imm6` in `[-32,31]` or `[0,63]` |
+| `ri(2)` | `110ooooiiiiiirrr` | 16 | 0 | 0% | `imm6` in `[-32,31]` or `[0,63]` |
+| `ext` | `1110oooooooooooo` | 4096 | 0 | 0% |  |
+| `rrr` | `11110ootttsssrrr` | 4 | 1 | 25% |  |
+| `rr(1)` | `111110oooosssrrr` | 16 | 8 | 50% |  |
+| `rr(2)` | `1111110ooosssrrr` | 8 | 4 | 50% |  |
+| `rr(3)` | `11111110oosssrrr` | 4 | 2 | 50% |  |
+| `r(1)` | `111111110oooorrr` | 16 | 7 | 44% |  |
+| `r(2)` | `1111111110ooorrr` | 8 | 4 | 50% |  |
+| `r(3)` | `11111111110oorrr` | 4 | 1 | 25% |  |
+| `o` | `11111111111ooooo` | 32 | 27 | 84% |  |
 
 #### Legend
 
@@ -104,27 +103,6 @@ Total instructions available (excluding `ext`): 151 (min), 151 (max)
 | `0` | A literal `0` embedded in the instruction. |
 | `1` | A literal `1` embedded in the instruction. |
 
-
-#### Instruction Format Layouts
-
-
-| Format | Bit Pattern | \# Opcodes | Range of Immediate |
-|:----|:---:|:---:|:---:|
-| `rri` | `00ooiiiiiisssrrr` | 4 | `imm6` in `[-32,31]` or `[0,63]` |
-| `subr` | `010iiiiiiiiiiiii` | 1 | `imm13` in `[-4096,4095]` or `[0,8191]` |
-| `b` | `0110ooiiiiiiiiii` | 4 | `imm10` in `[-512,511]` or `[0,1023]` |
-| `li` | `0111oiiiiiiiirrr` | 2 | `imm8` in `[-128,127]` or `[0,255]` |
-| `ri(1)` | `10oooooiiiiiirrr` | 32 | `imm6` in `[-32,31]` or `[0,63]` |
-| `ri(2)` | `110ooooiiiiiirrr` | 16 | `imm6` in `[-32,31]` or `[0,63]` |
-| `ext` | `1110oooooooooooo` | 4096 |  |
-| `rrr` | `11110ootttsssrrr` | 4 |  |
-| `rr(1)` | `111110oooosssrrr` | 16 |  |
-| `rr(2)` | `1111110ooosssrrr` | 8 |  |
-| `rr(3)` | `11111110oosssrrr` | 4 |  |
-| `r(1)` | `111111110oooorrr` | 16 |  |
-| `r(2)` | `1111111110ooorrr` | 8 |  |
-| `r(3)` | `11111111110oorrr` | 4 |  |
-| `o` | `11111111111ooooo` | 32 |  |
 
 ### Instruction Specifications
 
@@ -670,8 +648,8 @@ Test if a register value is less than an immediate value.
 
 ```
 [simm(?simm),reg(?rs)]
------------------------------------
-b_push($$ts,s16_lt(?rs,sxt(?simm)))
+-------------------------------------------
+b_push($$ts,compare(?rs,s16(<),sxt(?simm)))
 ```
 
 --------------
@@ -699,8 +677,8 @@ Test if a register value is greater than or equal to an immediate value.
 
 ```
 [simm(?simm),reg(?rs)]
-------------------------------------
-b_push($$ts,s16_gte(?rs,sxt(?simm)))
+--------------------------------------------
+b_push($$ts,compare(?rs,s16(>=),sxt(?simm)))
 ```
 
 --------------
@@ -728,8 +706,8 @@ Test if a register value is below an immediate value.
 
 ```
 [imm(?imm),reg(?rs)]
-----------------------------------
-b_push($$ts,u16_lt(?rs,zxt(?imm)))
+------------------------------------------
+b_push($$ts,compare(?rs,u16(<),zxt(?imm)))
 ```
 
 --------------
@@ -757,8 +735,8 @@ Test if a register value is above or equal to an immediate value.
 
 ```
 [imm(?imm),reg(?rs)]
------------------------------------
-b_push($$ts,u16_gte(?rs,zxt(?imm)))
+-------------------------------------------
+b_push($$ts,compare(?rs,u16(>=),zxt(?imm)))
 ```
 
 --------------
@@ -781,7 +759,7 @@ Test if a register value is not equal to an immediate value.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -806,7 +784,7 @@ Test if a register value is equal to an immediate value.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -831,7 +809,7 @@ Add an immediate value to a register.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -856,7 +834,7 @@ Perform a bitwise AND between a register and an immediate value.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -881,7 +859,7 @@ Perform a bitwise OR between a register and an immediate value.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -906,7 +884,7 @@ Perform a bitwise XOR between a register and an immediate value.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -931,7 +909,7 @@ Add an immediate value and the carry bit to a register.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -956,7 +934,7 @@ Sutract an immediate value and the carry bit from a register.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -981,7 +959,7 @@ Perform a logical shift right on a register by an immediate value.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1006,7 +984,7 @@ Perform a logical shift left on a register by an immediate value.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1031,7 +1009,7 @@ Perform an arithmetic shift right on a register by an immediate value.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1065,7 +1043,7 @@ Computes one step in a full 16-bit by 16-bit multiplication.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1093,7 +1071,7 @@ Add the values of two registers.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1118,7 +1096,7 @@ Subtract the value of one register from another.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1143,7 +1121,7 @@ Perform a bitwise AND between two registers.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1168,7 +1146,7 @@ Perform a bitwise OR between two registers.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1193,7 +1171,7 @@ Perform a bitwise XOR between two registers.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1218,7 +1196,7 @@ Move the value from one register to another.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1243,7 +1221,7 @@ Add the values of two registers with carry.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1268,7 +1246,7 @@ Subtract the value of one register from another with carry.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1296,7 +1274,7 @@ Test if the value of one register is less than another.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1321,7 +1299,7 @@ Test if the value of one register is greater than or equal to another.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1346,7 +1324,7 @@ Test if the value of one register is below another.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1371,7 +1349,7 @@ Test if the value of one register is above or equal to another.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1399,7 +1377,7 @@ Test if the value of one register is not equal to another.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1424,7 +1402,7 @@ Test if the value of one register is equal to another.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1452,7 +1430,7 @@ Push a byte from a register onto the stack.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1477,7 +1455,7 @@ Push a word from a register onto the stack.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1502,7 +1480,7 @@ Pop a byte from the stack into a register.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1527,7 +1505,7 @@ Pop a word from the stack into a register.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1552,7 +1530,7 @@ Call a subroutine at the address in a register.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1577,7 +1555,7 @@ Jump to the address in a register.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1602,7 +1580,7 @@ Negate the value in a register.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1630,7 +1608,7 @@ Sign extend a byte in a register.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1655,7 +1633,7 @@ Read the low word in the system `$MP` register into a general purpose register.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1680,7 +1658,7 @@ Read the high word in the system `$MP` register into a general purpose register.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1705,7 +1683,7 @@ Read the value of the system `$GP` register into a general purpose register.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1733,7 +1711,7 @@ Write a value to the system `$GP` register from a general purpose register.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1761,7 +1739,7 @@ Triggers a "non-executable instruction" exception. The entire instruction is 16 
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1786,7 +1764,7 @@ Trigger a breakpoint.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1811,7 +1789,7 @@ Halt the processor.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1836,7 +1814,7 @@ Unimplemented instruction.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1861,7 +1839,7 @@ Return from kernel mode.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1886,7 +1864,7 @@ Call a kernel function.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1911,7 +1889,7 @@ Return from a subroutine.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1936,7 +1914,7 @@ Test for overflow.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1961,7 +1939,7 @@ Test for carry.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -1986,7 +1964,7 @@ Clear the carry flag.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -2011,7 +1989,7 @@ Set the carry flag.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -2036,7 +2014,7 @@ Push 0 onto the test stack.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -2061,7 +2039,7 @@ Push 1 onto the test stack.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -2086,7 +2064,7 @@ Perform a NOT operation on the test stack.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -2111,7 +2089,7 @@ Perform an AND operation on the test stack.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -2136,7 +2114,7 @@ Perform an OR operation on the test stack.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -2161,7 +2139,7 @@ Duplicate the top value on the test stack.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -2186,7 +2164,7 @@ Preserve the value of the `$MP` register onto the stack.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -2211,7 +2189,7 @@ Restore the value of the `$MP` register from the stack.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -2236,7 +2214,7 @@ Preserve the value of the `$TS` register onto the stack.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -2261,7 +2239,7 @@ Restore the value of the `$TS` register from the stack.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -2286,7 +2264,7 @@ Preserve the value of the `$RA` register onto the stack.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -2311,7 +2289,7 @@ Restore the value of the `$RA` register from the stack.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -2336,7 +2314,7 @@ Preserve the value of the `$GP` register onto the stack.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -2361,7 +2339,7 @@ Restore the value of the `$GP` register from the stack.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -2386,7 +2364,7 @@ Preserve the value of the `$CC` register onto the stack.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```
@@ -2411,7 +2389,7 @@ Restore the value of the `$CC` register from the stack.
 ###### Semantics
 
 ```
-[_75674]
+[_63718]
 --------
 nop
 ```

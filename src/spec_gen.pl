@@ -75,12 +75,9 @@ display_instructions_spec :-
     emit_heading(3, 'Instruction Counts by Format'),
     display_instruction_counts_by_format,
 
-    emit_heading(3, 'Format Assignment Availability'),
-    display_opcode_availability_by_format,
-
     emit_heading(3, 'Instruction Format Breakdown'),
-    display_bitformat_legend,
     display_instr_format_breakdown,
+    display_bitformat_legend,
 
     display_instr_specifications.
 
@@ -195,33 +192,28 @@ bitlayout_opcodebits(BitLayout, Count) :-
     include(=(o), BitLayout, OpcodeBits),
     length(OpcodeBits, Count).
 
-display_opcode_availability_by_format :-
-    emit_table_header(['Format', 'Max Opcodes Available', 'Opcodes Assigned', 'Opcodes Reserved', 'Usage Percent']),
-    foreach(
-        fmt(Fmt),
-        display_opcode_availability(Fmt)
-    ).
-
-display_opcode_availability(Fmt) :-
-    derive:fmt_assignedinstrcount(Fmt, AssignedCount, ReservedCount),
-    derive:fmt_maxopcodes(Fmt, MaxAvail),
-    UsagePct is 100 * (AssignedCount + ReservedCount) / MaxAvail,
-    emit_table_row([fmt('`~k`', Fmt), d(MaxAvail), d(AssignedCount), d(ReservedCount), fmt('~0f%', UsagePct)]).
-
 display_instruction_counts_by_format :-
-    emit_table_header(['Generic format', left('Description'), 'Instr. Count']),
+    emit_table_header(['Generic format', left('Description'), 'Available Opcodes', 'Assigned', 'Utilization']),
     foreach(
         genericfmt(GFmt),
         display_genericfmt_instr_count(GFmt)
     ),
 
     derive:total_opcode_count_minmax(TotalMin, TotalMax),
-    format('~n~n'),
-    format(
-        'Total instructions available (excluding `ext`): ~d (min), ~d (max)~n',
-        [TotalMin, TotalMax]
+
+    ( TotalMin == TotalMax -> TotalAvailable = TotalMin
+    ; throw(error(non_unique_total_available_opcode_count(TotalMax, TotalMin)))
     ),
-    format('~n').
+
+    aggregate_all(count, (
+        derive:fmt_instr(_Fmt, Instr),
+        dif(Instr, ???)
+    ), TotalAssigned),
+
+    TotalUtilization is 100 * TotalAssigned / TotalAvailable,
+
+    emit_table_row([a(''), bold(a('Totals (excluding `ext`)')), bold(d(TotalAvailable)), bold(d(TotalAssigned)), bold(fmt('~0f%', TotalUtilization))]),
+    format('~n~n').
 
 
 display_genericfmt_instr_count(GFmt) :-
@@ -231,16 +223,21 @@ display_genericfmt_instr_count(GFmt) :-
             labeling([up, bisect], [Opcodes])
         ), Counts) -> true ; throw(error(could_not_solve))
     ),
-    phrase(sequence(integer, `, `, Counts), CountsList),
     genericfmt_description(GFmt, Descr),
 
-    emit_table_row([code(fmt('~k', GFmt)), a(Descr), s(CountsList)]).
+    aggregate_all(count, (
+        derive:fmt_instr(GFmt, _Instr),
+        dif(Instr, ???)
+    ), Assigned),
+    ( [Available] = Counts -> true ; throw(error(non_unique_availableopcodecount(GFmt, Counts)))),
+    Utilization is 100 * Assigned / Available,
+    emit_table_row([code(fmt('~k', GFmt)), a(Descr), d(Available), d(Assigned), fmt('~0f%', Utilization)]).
 
 
 display_instr_format_breakdown :-
     emit_heading(4, 'Instruction Format Layouts'),
 
-    emit_table_header([left('Format'), 'Bit Pattern', '\\# Opcodes', 'Range of Immediate']),
+    emit_table_header([left('Format'), 'Bit Pattern', 'Opcodes Available', 'Assigned', 'Utilization', 'Range of Immediate']),
     foreach(
         derive:fmt(Fmt),
         format_section(Fmt)
@@ -253,12 +250,13 @@ format_section(Fmt) :-
     ).
 
 format_layout_row(Fmt, Layout) :-
-    list_item_occurrances(Layout, o, OBits),
     list_item_occurrances(Layout, i, IBits),
     immbits_immdescription(IBits, ImmDescr),
-    #Ops #= 2 ^ #OBits,
     derive:validate_instr_assignments_or_throw(Fmt, Ops),
-    emit_table_row([code(a(Fmt)), code(chars(Layout)), d(Ops), a(ImmDescr)]).
+    derive:fmt_assignedinstrcount(Fmt, AssignedCount, _ReservedCount),
+    derive:fmt_maxopcodes(Fmt, MaxAvail),
+    UsagePct is 100 * AssignedCount / MaxAvail,
+    emit_table_row([code(a(Fmt)), code(chars(Layout)), d(MaxAvail), d(AssignedCount), fmt('~0f%', UsagePct), a(ImmDescr)]).
 
 
 display_bitformat_legend :-
@@ -338,13 +336,15 @@ emit_table_row(ColumnData) :-
     phrase(sequence(`| `, variant_type, ` | `, ` |`, ColumnData), RowText),
     format('~s~n', [RowText]).
 
-variant_type(s(Content)) --> string(Content).
-variant_type(chars(Content)) --> { format(codes(Codes), '~s', [Content]) }, Codes.
-variant_type(a(Content)) --> atom(Content).
-variant_type(d(Content)) --> integer(Content).
-variant_type(code(Inner)) --> `\``, variant_type(Inner), `\``.
-variant_type(fmt(FormatString, Content)) -->
+variant_type(s(Content)) --> !, string(Content).
+variant_type(chars(Content)) --> !, { format(codes(Codes), '~s', [Content]) }, Codes.
+variant_type(a(Content)) --> !, atom(Content).
+variant_type(d(Content)) --> !, integer(Content).
+variant_type(code(Inner)) --> !, `\``, variant_type(Inner), `\``.
+variant_type(bold(Inner)) --> !, `**`, variant_type(Inner), `**`.
+variant_type(fmt(FormatString, Content)) --> !,
     { format(atom(Formatted), FormatString, [Content]) },
     atom(Formatted).
-variant_type(First + Second) --> variant_type(First), variant_type(Second).
-variant_type(First ++ Second) --> variant_type(First), ` `, variant_type(Second).
+variant_type(First + Second) --> !, variant_type(First), variant_type(Second).
+variant_type(First ++ Second) --> !, variant_type(First), ` `, variant_type(Second).
+variant_type(Other) --> { throw(error(unknown_format_command(Other))) }.

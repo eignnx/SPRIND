@@ -38,6 +38,13 @@ rval_(b_pop(LVal)) --> lval(LVal).
 rval_(const(Symbol)) --> { atom(Symbol) }.
 rval_(zxt(RVal)) --> rval(RVal).
 rval_(sxt(RVal)) --> rval(RVal).
+rval_(compare(A, u16(RelOp), B)) --> { relop(RelOp) }, rval(A), rval(B).
+rval_(compare(A, s16(RelOp), B)) -->  { relop(RelOp) }, rval(A), rval(B).
+
+relop(<).
+relop(>).
+relop(<=).
+relop(>=).
 
 rval(RVal) --> rval_(RVal) -> [] ; [invalid_rval(RVal)].
 
@@ -48,7 +55,7 @@ lval(?Var) --> { atom(Var) }.
 lval(hi(RVal)) --> rval(RVal).
 lval(lo(RVal)) --> rval(RVal).
 lval(hi_lo(A, B)) --> rval(A), rval(B).
-lval(bitslice(LVal, Bound1 .. Bound2)) --> lval(LVal), integer(Bound1), integer(Bound2).
+lval(bitslice(LVal, Bound1 .. Bound2)) --> lval(LVal), { integer(Bound1), integer(Bound2) }.
 
 stmt_(nop) --> [].
 stmt_(b_push(LVal, RVal)) --> lval(LVal), rval(RVal).
@@ -240,28 +247,28 @@ instr_info(tli, info{
 	descr: 'Test if a register value is less than an immediate value.',
 	ex: ['tli x, -5'],
 	operands: [simm(?simm), reg(?rs)],
-	sem: b_push($$ts, s16_lt(?rs, sxt(?simm)))
+	sem: b_push($$ts, compare(?rs, s16(<), sxt(?simm)))
 }).
 instr_info(tgei, info{
 	title: 'Test Greater-than or Equal Immediate',
 	descr: 'Test if a register value is greater than or equal to an immediate value.',
 	ex: ['tgei x, -5'],
 	operands: [simm(?simm), reg(?rs)],
-	sem: b_push($$ts, s16_gte(?rs, sxt(?simm)))
+	sem: b_push($$ts, compare(?rs, s16(>=), sxt(?simm)))
 }).
 instr_info(tbi, info{
 	title: 'Test Below Immediate',
 	descr: 'Test if a register value is below an immediate value.',
 	ex: ['tbi x, 10'],
 	operands: [imm(?imm), reg(?rs)],
-	sem: b_push($$ts, u16_lt(?rs, zxt(?imm)))
+	sem: b_push($$ts, compare(?rs, u16(<), zxt(?imm)))
 }).
 instr_info(taei, info{
 	title: 'Test Above or Equal',
 	descr: 'Test if a register value is above or equal to an immediate value.',
 	ex: ['taei x, 10'],
 	operands: [imm(?imm), reg(?rs)],
-	sem: b_push($$ts, u16_gte(?rs, zxt(?imm)))
+	sem: b_push($$ts, compare(?rs, u16(>=), zxt(?imm)))
 }).
 instr_info(tnei, info{
 	title: 'Test Not Equal Immediate',
