@@ -66,6 +66,39 @@
 
 
 
+### Instruction Listing
+
+
+| `rri` | `subr` | `b` | `li` | `ri(_)` | `rrr` | `rr(_)` | `r(_)` | `o` |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| [`lb`](#`lb`) | [`call`](#`call`) | [`b`](#`b`) | [`li`](#`li`) | [`lgb`](#`lgb`) | [`mulstep`](#`mulstep`) | [`add`](#`add`) | [`pushb`](#`pushb`) | [`NONEXE1`](#`NONEXE1`) |
+| [`lw`](#`lw`) |  | [`bt`](#`bt`) | [`szi`](#`szi`) | [`lgw`](#`lgw`) |  | [`sub`](#`sub`) | [`pushw`](#`pushw`) | [`BREAK`](#`BREAK`) |
+| [`sb`](#`sb`) |  | [`bf`](#`bf`) |  | [`sgb`](#`sgb`) |  | [`and`](#`and`) | [`popb`](#`popb`) | [`HALT`](#`HALT`) |
+| [`sw`](#`sw`) |  |  |  | [`sgw`](#`sgw`) |  | [`or`](#`or`) | [`popw`](#`popw`) | [`UNIMPL`](#`UNIMPL`) |
+|  |  |  |  | [`tbit`](#`tbit`) |  | [`xor`](#`xor`) | [`callr`](#`callr`) | [`kret`](#`kret`) |
+|  |  |  |  | [`cbit`](#`cbit`) |  | [`mov`](#`mov`) | [`jr`](#`jr`) | [`kcall`](#`kcall`) |
+|  |  |  |  | [`sbit`](#`sbit`) |  | [`addcy`](#`addcy`) | [`neg`](#`neg`) | [`ret`](#`ret`) |
+|  |  |  |  | [`tli`](#`tli`) |  | [`subcy`](#`subcy`) | [`seb`](#`seb`) | [`tov`](#`tov`) |
+|  |  |  |  | [`tgei`](#`tgei`) |  | [`tl`](#`tl`) | [`rd.mp.lo`](#`rd.mp.lo`) | [`tcy`](#`tcy`) |
+|  |  |  |  | [`tbi`](#`tbi`) |  | [`tge`](#`tge`) | [`rd.mp.hi`](#`rd.mp.hi`) | [`clr.cy`](#`clr.cy`) |
+|  |  |  |  | [`taei`](#`taei`) |  | [`tb`](#`tb`) | [`rd.gp`](#`rd.gp`) | [`set.cy`](#`set.cy`) |
+|  |  |  |  | [`tnei`](#`tnei`) |  | [`tae`](#`tae`) | [`wr.gp`](#`wr.gp`) | [`tpush0`](#`tpush0`) |
+|  |  |  |  | [`teqi`](#`teqi`) |  | [`tne`](#`tne`) |  | [`tpush1`](#`tpush1`) |
+|  |  |  |  | [`addi`](#`addi`) |  | [`teq`](#`teq`) |  | [`tnot`](#`tnot`) |
+|  |  |  |  | [`andi`](#`andi`) |  |  |  | [`tand`](#`tand`) |
+|  |  |  |  | [`ori`](#`ori`) |  |  |  | [`tor`](#`tor`) |
+|  |  |  |  | [`xori`](#`xori`) |  |  |  | [`tdup`](#`tdup`) |
+|  |  |  |  | [`addicy`](#`addicy`) |  |  |  | [`prsv.mp`](#`prsv.mp`) |
+|  |  |  |  | [`subicy`](#`subicy`) |  |  |  | [`rstr.mp`](#`rstr.mp`) |
+|  |  |  |  | [`lsr`](#`lsr`) |  |  |  | [`prsv.ts`](#`prsv.ts`) |
+|  |  |  |  | [`lsl`](#`lsl`) |  |  |  | [`rstr.ts`](#`rstr.ts`) |
+|  |  |  |  | [`asr`](#`asr`) |  |  |  | [`prsv.ra`](#`prsv.ra`) |
+|  |  |  |  |  |  |  |  | [`rstr.ra`](#`rstr.ra`) |
+|  |  |  |  |  |  |  |  | [`prsv.gp`](#`prsv.gp`) |
+|  |  |  |  |  |  |  |  | [`rstr.gp`](#`rstr.gp`) |
+|  |  |  |  |  |  |  |  | [`prsv.cc`](#`prsv.cc`) |
+|  |  |  |  |  |  |  |  | [`rstr.cc`](#`rstr.cc`) |
+
 ### Instruction Format Breakdown
 
 
@@ -110,9 +143,9 @@
 #### Instruction Format `rri`
 
 
-##### Load Byte - `lb`
+##### `lb`
 
-Load a byte from memory into a register.
+**Load Byte** --- Load a byte from memory into a register.
 
 ###### Examples
 
@@ -139,9 +172,9 @@ Load a byte from memory into a register.
 
 --------------
 
-##### Load Word - `lw`
+##### `lw`
 
-Load a word from memory into a register.
+**Load Word** --- Load a word from memory into a register.
 
 ###### Examples
 
@@ -169,9 +202,9 @@ Load a word from memory into a register.
 
 --------------
 
-##### Store Byte - `sb`
+##### `sb`
 
-Store a byte from a register into memory.
+**Store Byte** --- Store a byte from a register into memory.
 
 ###### Examples
 
@@ -198,9 +231,9 @@ Store a byte from a register into memory.
 
 --------------
 
-##### Store Word - `sw`
+##### `sw`
 
-Store a word from a register into memory.
+**Store Word** --- Store a word from a register into memory.
 
 ###### Examples
 
@@ -232,9 +265,9 @@ Store a word from a register into memory.
 #### Instruction Format `subr`
 
 
-##### Call Subroutine - `call`
+##### `call`
 
-Call a subroutine at the specified address.
+**Call Subroutine** --- Call a subroutine at the specified address.
 
 ###### Examples
 
@@ -265,9 +298,9 @@ $$ra <- $$pc + #2
 #### Instruction Format `b`
 
 
-##### Branch - `b`
+##### `b`
 
-Branch to the specified address by adding the immediate offset to `$PC`.
+**Branch** --- Branch to the specified address by adding the immediate offset to `$PC`.
 
 ###### Examples
 
@@ -294,9 +327,9 @@ $$pc <- $$pc + sxt(?offset)
 
 --------------
 
-##### Branch If True - `bt`
+##### `bt`
 
-Branch to the specified address if the condition is true by adding the immediate offset to `$PC`.
+**Branch If True** --- Branch to the specified address if the condition is true by adding the immediate offset to `$PC`.
 
 ###### Examples
 
@@ -325,9 +358,9 @@ if b_pop($$ts) == #1 {
 
 --------------
 
-##### Branch If False - `bf`
+##### `bf`
 
-Branch to the specified address if the condition is false by adding the immediate offset to `$PC`.
+**Branch If False** --- Branch to the specified address if the condition is false by adding the immediate offset to `$PC`.
 
 ###### Examples
 
@@ -359,9 +392,9 @@ if b_pop($$ts) == #0 {
 #### Instruction Format `li`
 
 
-##### Load Immediate - `li`
+##### `li`
 
-Load an immediate value into a register.
+**Load Immediate** --- Load an immediate value into a register.
 
 ###### Examples
 
@@ -388,9 +421,9 @@ Load an immediate value into a register.
 
 --------------
 
-##### Shift Zero-extended Immediate - `szi`
+##### `szi`
 
-Left-shift a zero-extended immediate value into a register.
+**Shift Zero-extended Immediate** --- Left-shift a zero-extended immediate value into a register.
 
 ###### Examples
 
@@ -420,9 +453,9 @@ Left-shift a zero-extended immediate value into a register.
 #### Instruction Format `ri(1)`
 
 
-##### Load Global Byte - `lgb`
+##### `lgb`
 
-Load a byte from a memory address offset from `$GP`.
+**Load Global Byte** --- Load a byte from a memory address offset from `$GP`.
 
 ###### Examples
 
@@ -449,9 +482,9 @@ Load a byte from a memory address offset from `$GP`.
 
 --------------
 
-##### Load Global Word - `lgw`
+##### `lgw`
 
-Load a word from a memory address offset from `$GP`.
+**Load Global Word** --- Load a word from a memory address offset from `$GP`.
 
 ###### Examples
 
@@ -479,9 +512,9 @@ Load a word from a memory address offset from `$GP`.
 
 --------------
 
-##### Store Global Byte - `sgb`
+##### `sgb`
 
-Store a byte into memory address offset from `$GP`.
+**Store Global Byte** --- Store a byte into memory address offset from `$GP`.
 
 ###### Examples
 
@@ -508,9 +541,9 @@ Store a byte into memory address offset from `$GP`.
 
 --------------
 
-##### Store Global Word - `sgw`
+##### `sgw`
 
-Store a word into memory address offset from `$GP`.
+**Store Global Word** --- Store a word into memory address offset from `$GP`.
 
 ###### Examples
 
@@ -538,9 +571,9 @@ hi_lo([?ptr + #1],[?ptr]) <- ?rs
 
 --------------
 
-##### Test Bit - `tbit`
+##### `tbit`
 
-Test a specific bit in a register, modifying `$TS`.
+**Test Bit** --- Test a specific bit in a register, modifying `$TS`.
 
 ###### Examples
 
@@ -567,9 +600,9 @@ b_push($$ts,?rs >> bitslice(?bit_idx,..(3,0))  and  #1 == #1)
 
 --------------
 
-##### Clear Bit - `cbit`
+##### `cbit`
 
-Clear a specific bit in a register.
+**Clear Bit** --- Clear a specific bit in a register.
 
 ###### Examples
 
@@ -596,9 +629,9 @@ Clear a specific bit in a register.
 
 --------------
 
-##### Set Bit - `sbit`
+##### `sbit`
 
-Set a specific bit in a register.
+**Set Bit** --- Set a specific bit in a register.
 
 ###### Examples
 
@@ -625,9 +658,9 @@ Set a specific bit in a register.
 
 --------------
 
-##### Test Less-than Immediate - `tli`
+##### `tli`
 
-Test if a register value is less than an immediate value.
+**Test Less-than Immediate** --- Test if a register value is less than an immediate value.
 
 ###### Examples
 
@@ -654,9 +687,9 @@ b_push($$ts,compare(?rs,s16(<),sxt(?simm)))
 
 --------------
 
-##### Test Greater-than or Equal Immediate - `tgei`
+##### `tgei`
 
-Test if a register value is greater than or equal to an immediate value.
+**Test Greater-than or Equal Immediate** --- Test if a register value is greater than or equal to an immediate value.
 
 ###### Examples
 
@@ -683,9 +716,9 @@ b_push($$ts,compare(?rs,s16(>=),sxt(?simm)))
 
 --------------
 
-##### Test Below Immediate - `tbi`
+##### `tbi`
 
-Test if a register value is below an immediate value.
+**Test Below Immediate** --- Test if a register value is below an immediate value.
 
 ###### Examples
 
@@ -712,9 +745,9 @@ b_push($$ts,compare(?rs,u16(<),zxt(?imm)))
 
 --------------
 
-##### Test Above or Equal - `taei`
+##### `taei`
 
-Test if a register value is above or equal to an immediate value.
+**Test Above or Equal** --- Test if a register value is above or equal to an immediate value.
 
 ###### Examples
 
@@ -741,9 +774,9 @@ b_push($$ts,compare(?rs,u16(>=),zxt(?imm)))
 
 --------------
 
-##### Test Not Equal Immediate - `tnei`
+##### `tnei`
 
-Test if a register value is not equal to an immediate value.
+**Test Not Equal Immediate** --- Test if a register value is not equal to an immediate value.
 
 ###### Layout
 
@@ -759,16 +792,16 @@ Test if a register value is not equal to an immediate value.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Test Equal Immediate - `teqi`
+##### `teqi`
 
-Test if a register value is equal to an immediate value.
+**Test Equal Immediate** --- Test if a register value is equal to an immediate value.
 
 ###### Layout
 
@@ -784,16 +817,16 @@ Test if a register value is equal to an immediate value.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Add Immediate - `addi`
+##### `addi`
 
-Add an immediate value to a register.
+**Add Immediate** --- Add an immediate value to a register.
 
 ###### Layout
 
@@ -809,16 +842,16 @@ Add an immediate value to a register.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### AND Immediate - `andi`
+##### `andi`
 
-Perform a bitwise AND between a register and an immediate value.
+**AND Immediate** --- Perform a bitwise AND between a register and an immediate value.
 
 ###### Layout
 
@@ -834,16 +867,16 @@ Perform a bitwise AND between a register and an immediate value.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### OR Immediate - `ori`
+##### `ori`
 
-Perform a bitwise OR between a register and an immediate value.
+**OR Immediate** --- Perform a bitwise OR between a register and an immediate value.
 
 ###### Layout
 
@@ -859,16 +892,16 @@ Perform a bitwise OR between a register and an immediate value.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### XOR Immediate - `xori`
+##### `xori`
 
-Perform a bitwise XOR between a register and an immediate value.
+**XOR Immediate** --- Perform a bitwise XOR between a register and an immediate value.
 
 ###### Layout
 
@@ -884,16 +917,16 @@ Perform a bitwise XOR between a register and an immediate value.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Add Immediate with Carry - `addicy`
+##### `addicy`
 
-Add an immediate value and the carry bit to a register.
+**Add Immediate with Carry** --- Add an immediate value and the carry bit to a register.
 
 ###### Layout
 
@@ -909,16 +942,16 @@ Add an immediate value and the carry bit to a register.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Subtract Immediate with Carry - `subicy`
+##### `subicy`
 
-Sutract an immediate value and the carry bit from a register.
+**Subtract Immediate with Carry** --- Sutract an immediate value and the carry bit from a register.
 
 ###### Layout
 
@@ -934,16 +967,16 @@ Sutract an immediate value and the carry bit from a register.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Logical Shift Right - `lsr`
+##### `lsr`
 
-Perform a logical shift right on a register by an immediate value.
+**Logical Shift Right** --- Perform a logical shift right on a register by an immediate value.
 
 ###### Layout
 
@@ -959,16 +992,16 @@ Perform a logical shift right on a register by an immediate value.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Logical Shift Left - `lsl`
+##### `lsl`
 
-Perform a logical shift left on a register by an immediate value.
+**Logical Shift Left** --- Perform a logical shift left on a register by an immediate value.
 
 ###### Layout
 
@@ -984,16 +1017,16 @@ Perform a logical shift left on a register by an immediate value.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Arithmetic Shift Right - `asr`
+##### `asr`
 
-Perform an arithmetic shift right on a register by an immediate value.
+**Arithmetic Shift Right** --- Perform an arithmetic shift right on a register by an immediate value.
 
 ###### Layout
 
@@ -1009,7 +1042,7 @@ Perform an arithmetic shift right on a register by an immediate value.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
@@ -1025,9 +1058,9 @@ nop
 #### Instruction Format `rrr`
 
 
-##### Multiplication Step - `mulstep`
+##### `mulstep`
 
-Computes one step in a full 16-bit by 16-bit multiplication.
+**Multiplication Step** --- Computes one step in a full 16-bit by 16-bit multiplication.
 
 ###### Layout
 
@@ -1043,7 +1076,7 @@ Computes one step in a full 16-bit by 16-bit multiplication.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
@@ -1053,9 +1086,9 @@ nop
 #### Instruction Format `rr(1)`
 
 
-##### Add - `add`
+##### `add`
 
-Add the values of two registers.
+**Add** --- Add the values of two registers.
 
 ###### Layout
 
@@ -1071,16 +1104,16 @@ Add the values of two registers.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Subtract - `sub`
+##### `sub`
 
-Subtract the value of one register from another.
+**Subtract** --- Subtract the value of one register from another.
 
 ###### Layout
 
@@ -1096,16 +1129,16 @@ Subtract the value of one register from another.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### AND - `and`
+##### `and`
 
-Perform a bitwise AND between two registers.
+**AND** --- Perform a bitwise AND between two registers.
 
 ###### Layout
 
@@ -1121,16 +1154,16 @@ Perform a bitwise AND between two registers.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### OR - `or`
+##### `or`
 
-Perform a bitwise OR between two registers.
+**OR** --- Perform a bitwise OR between two registers.
 
 ###### Layout
 
@@ -1146,16 +1179,16 @@ Perform a bitwise OR between two registers.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### XOR - `xor`
+##### `xor`
 
-Perform a bitwise XOR between two registers.
+**XOR** --- Perform a bitwise XOR between two registers.
 
 ###### Layout
 
@@ -1171,16 +1204,16 @@ Perform a bitwise XOR between two registers.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Move - `mov`
+##### `mov`
 
-Move the value from one register to another.
+**Move** --- Move the value from one register to another.
 
 ###### Layout
 
@@ -1196,16 +1229,16 @@ Move the value from one register to another.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Add with Carry - `addcy`
+##### `addcy`
 
-Add the values of two registers with carry.
+**Add with Carry** --- Add the values of two registers with carry.
 
 ###### Layout
 
@@ -1221,16 +1254,16 @@ Add the values of two registers with carry.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Subtract with Carry - `subcy`
+##### `subcy`
 
-Subtract the value of one register from another with carry.
+**Subtract with Carry** --- Subtract the value of one register from another with carry.
 
 ###### Layout
 
@@ -1246,7 +1279,7 @@ Subtract the value of one register from another with carry.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
@@ -1256,9 +1289,9 @@ nop
 #### Instruction Format `rr(2)`
 
 
-##### Test Less-than - `tl`
+##### `tl`
 
-Test if the value of one register is less than another.
+**Test Less-than** --- Test if the value of one register is less than another.
 
 ###### Layout
 
@@ -1274,16 +1307,16 @@ Test if the value of one register is less than another.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Test Greater-than or Equal - `tge`
+##### `tge`
 
-Test if the value of one register is greater than or equal to another.
+**Test Greater-than or Equal** --- Test if the value of one register is greater than or equal to another.
 
 ###### Layout
 
@@ -1299,16 +1332,16 @@ Test if the value of one register is greater than or equal to another.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Test Below - `tb`
+##### `tb`
 
-Test if the value of one register is below another.
+**Test Below** --- Test if the value of one register is below another.
 
 ###### Layout
 
@@ -1324,16 +1357,16 @@ Test if the value of one register is below another.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Test Above or Equal - `tae`
+##### `tae`
 
-Test if the value of one register is above or equal to another.
+**Test Above or Equal** --- Test if the value of one register is above or equal to another.
 
 ###### Layout
 
@@ -1349,7 +1382,7 @@ Test if the value of one register is above or equal to another.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
@@ -1359,9 +1392,9 @@ nop
 #### Instruction Format `rr(3)`
 
 
-##### Test Not Equal - `tne`
+##### `tne`
 
-Test if the value of one register is not equal to another.
+**Test Not Equal** --- Test if the value of one register is not equal to another.
 
 ###### Layout
 
@@ -1377,16 +1410,16 @@ Test if the value of one register is not equal to another.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Test Equal - `teq`
+##### `teq`
 
-Test if the value of one register is equal to another.
+**Test Equal** --- Test if the value of one register is equal to another.
 
 ###### Layout
 
@@ -1402,7 +1435,7 @@ Test if the value of one register is equal to another.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
@@ -1412,9 +1445,9 @@ nop
 #### Instruction Format `r(1)`
 
 
-##### Push Byte - `pushb`
+##### `pushb`
 
-Push a byte from a register onto the stack.
+**Push Byte** --- Push a byte from a register onto the stack.
 
 ###### Layout
 
@@ -1430,16 +1463,16 @@ Push a byte from a register onto the stack.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Push Word - `pushw`
+##### `pushw`
 
-Push a word from a register onto the stack.
+**Push Word** --- Push a word from a register onto the stack.
 
 ###### Layout
 
@@ -1455,16 +1488,16 @@ Push a word from a register onto the stack.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Pop Byte - `popb`
+##### `popb`
 
-Pop a byte from the stack into a register.
+**Pop Byte** --- Pop a byte from the stack into a register.
 
 ###### Layout
 
@@ -1480,16 +1513,16 @@ Pop a byte from the stack into a register.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Pop Word - `popw`
+##### `popw`
 
-Pop a word from the stack into a register.
+**Pop Word** --- Pop a word from the stack into a register.
 
 ###### Layout
 
@@ -1505,16 +1538,16 @@ Pop a word from the stack into a register.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Call Register - `callr`
+##### `callr`
 
-Call a subroutine at the address in a register.
+**Call Register** --- Call a subroutine at the address in a register.
 
 ###### Layout
 
@@ -1530,16 +1563,16 @@ Call a subroutine at the address in a register.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Jump Register - `jr`
+##### `jr`
 
-Jump to the address in a register.
+**Jump Register** --- Jump to the address in a register.
 
 ###### Layout
 
@@ -1555,16 +1588,16 @@ Jump to the address in a register.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Negate - `neg`
+##### `neg`
 
-Negate the value in a register.
+**Negate** --- Negate the value in a register.
 
 ###### Layout
 
@@ -1580,7 +1613,7 @@ Negate the value in a register.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
@@ -1590,9 +1623,9 @@ nop
 #### Instruction Format `r(2)`
 
 
-##### Sign Extend Byte - `seb`
+##### `seb`
 
-Sign extend a byte in a register.
+**Sign Extend Byte** --- Sign extend a byte in a register.
 
 ###### Layout
 
@@ -1608,16 +1641,16 @@ Sign extend a byte in a register.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Read $MP.lo - `rd.mp.lo`
+##### `rd.mp.lo`
 
-Read the low word in the system `$MP` register into a general purpose register.
+**Read $MP.lo** --- Read the low word in the system `$MP` register into a general purpose register.
 
 ###### Layout
 
@@ -1633,16 +1666,16 @@ Read the low word in the system `$MP` register into a general purpose register.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Read $MP.hi - `rd.mp.hi`
+##### `rd.mp.hi`
 
-Read the high word in the system `$MP` register into a general purpose register.
+**Read $MP.hi** --- Read the high word in the system `$MP` register into a general purpose register.
 
 ###### Layout
 
@@ -1658,16 +1691,16 @@ Read the high word in the system `$MP` register into a general purpose register.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Read $GP - `rd.gp`
+##### `rd.gp`
 
-Read the value of the system `$GP` register into a general purpose register.
+**Read $GP** --- Read the value of the system `$GP` register into a general purpose register.
 
 ###### Layout
 
@@ -1683,7 +1716,7 @@ Read the value of the system `$GP` register into a general purpose register.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
@@ -1693,9 +1726,9 @@ nop
 #### Instruction Format `r(3)`
 
 
-##### Write $GP - `wr.gp`
+##### `wr.gp`
 
-Write a value to the system `$GP` register from a general purpose register.
+**Write $GP** --- Write a value to the system `$GP` register from a general purpose register.
 
 ###### Layout
 
@@ -1711,7 +1744,7 @@ Write a value to the system `$GP` register from a general purpose register.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
@@ -1721,9 +1754,9 @@ nop
 #### Instruction Format `o`
 
 
-##### Non-executable (1s Version) - `NONEXE1`
+##### `NONEXE1`
 
-Triggers a "non-executable instruction" exception. The entire instruction is 16 `1`s.
+**Non-executable (1s Version)** --- Triggers a "non-executable instruction" exception. The entire instruction is 16 `1`s.
 
 ###### Layout
 
@@ -1739,16 +1772,16 @@ Triggers a "non-executable instruction" exception. The entire instruction is 16 
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Breakpoint - `BREAK`
+##### `BREAK`
 
-Trigger a breakpoint.
+**Breakpoint** --- Trigger a breakpoint.
 
 ###### Layout
 
@@ -1764,16 +1797,16 @@ Trigger a breakpoint.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Halt - `HALT`
+##### `HALT`
 
-Halt the processor.
+**Halt** --- Halt the processor.
 
 ###### Layout
 
@@ -1789,16 +1822,16 @@ Halt the processor.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Unimplemented - `UNIMPL`
+##### `UNIMPL`
 
-Unimplemented instruction.
+**Unimplemented** --- Unimplemented instruction.
 
 ###### Layout
 
@@ -1814,16 +1847,16 @@ Unimplemented instruction.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Kernel Return - `kret`
+##### `kret`
 
-Return from kernel mode.
+**Kernel Return** --- Return from kernel mode.
 
 ###### Layout
 
@@ -1839,16 +1872,16 @@ Return from kernel mode.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Kernel Call - `kcall`
+##### `kcall`
 
-Call a kernel function.
+**Kernel Call** --- Call a kernel function.
 
 ###### Layout
 
@@ -1864,16 +1897,16 @@ Call a kernel function.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Return - `ret`
+##### `ret`
 
-Return from a subroutine.
+**Return** --- Return from a subroutine.
 
 ###### Layout
 
@@ -1889,16 +1922,16 @@ Return from a subroutine.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Test Overflow - `tov`
+##### `tov`
 
-Test for overflow.
+**Test Overflow** --- Test for overflow.
 
 ###### Layout
 
@@ -1914,16 +1947,16 @@ Test for overflow.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Test Carry - `tcy`
+##### `tcy`
 
-Test for carry.
+**Test Carry** --- Test for carry.
 
 ###### Layout
 
@@ -1939,16 +1972,16 @@ Test for carry.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Clear Carry - `clr.cy`
+##### `clr.cy`
 
-Clear the carry flag.
+**Clear Carry** --- Clear the carry flag.
 
 ###### Layout
 
@@ -1964,16 +1997,16 @@ Clear the carry flag.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Set Carry - `set.cy`
+##### `set.cy`
 
-Set the carry flag.
+**Set Carry** --- Set the carry flag.
 
 ###### Layout
 
@@ -1989,16 +2022,16 @@ Set the carry flag.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Teststack Push 0 - `tpush0`
+##### `tpush0`
 
-Push 0 onto the test stack.
+**Teststack Push 0** --- Push 0 onto the test stack.
 
 ###### Layout
 
@@ -2014,16 +2047,16 @@ Push 0 onto the test stack.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Teststack Push 1 - `tpush1`
+##### `tpush1`
 
-Push 1 onto the test stack.
+**Teststack Push 1** --- Push 1 onto the test stack.
 
 ###### Layout
 
@@ -2039,16 +2072,16 @@ Push 1 onto the test stack.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Teststack NOT - `tnot`
+##### `tnot`
 
-Perform a NOT operation on the test stack.
+**Teststack NOT** --- Perform a NOT operation on the test stack.
 
 ###### Layout
 
@@ -2064,16 +2097,16 @@ Perform a NOT operation on the test stack.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Teststack AND - `tand`
+##### `tand`
 
-Perform an AND operation on the test stack.
+**Teststack AND** --- Perform an AND operation on the test stack.
 
 ###### Layout
 
@@ -2089,16 +2122,16 @@ Perform an AND operation on the test stack.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Teststack OR - `tor`
+##### `tor`
 
-Perform an OR operation on the test stack.
+**Teststack OR** --- Perform an OR operation on the test stack.
 
 ###### Layout
 
@@ -2114,16 +2147,16 @@ Perform an OR operation on the test stack.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Teststack Duplicate - `tdup`
+##### `tdup`
 
-Duplicate the top value on the test stack.
+**Teststack Duplicate** --- Duplicate the top value on the test stack.
 
 ###### Layout
 
@@ -2139,16 +2172,16 @@ Duplicate the top value on the test stack.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Preserve $MP - `prsv.mp`
+##### `prsv.mp`
 
-Preserve the value of the `$MP` register onto the stack.
+**Preserve $MP** --- Preserve the value of the `$MP` register onto the stack.
 
 ###### Layout
 
@@ -2164,16 +2197,16 @@ Preserve the value of the `$MP` register onto the stack.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Restore $MP - `rstr.mp`
+##### `rstr.mp`
 
-Restore the value of the `$MP` register from the stack.
+**Restore $MP** --- Restore the value of the `$MP` register from the stack.
 
 ###### Layout
 
@@ -2189,16 +2222,16 @@ Restore the value of the `$MP` register from the stack.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Preserve $TS - `prsv.ts`
+##### `prsv.ts`
 
-Preserve the value of the `$TS` register onto the stack.
+**Preserve $TS** --- Preserve the value of the `$TS` register onto the stack.
 
 ###### Layout
 
@@ -2214,16 +2247,16 @@ Preserve the value of the `$TS` register onto the stack.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Restore $TS - `rstr.ts`
+##### `rstr.ts`
 
-Restore the value of the `$TS` register from the stack.
+**Restore $TS** --- Restore the value of the `$TS` register from the stack.
 
 ###### Layout
 
@@ -2239,16 +2272,16 @@ Restore the value of the `$TS` register from the stack.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Preserve $RA - `prsv.ra`
+##### `prsv.ra`
 
-Preserve the value of the `$RA` register onto the stack.
+**Preserve $RA** --- Preserve the value of the `$RA` register onto the stack.
 
 ###### Layout
 
@@ -2264,16 +2297,16 @@ Preserve the value of the `$RA` register onto the stack.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Restore $RA - `rstr.ra`
+##### `rstr.ra`
 
-Restore the value of the `$RA` register from the stack.
+**Restore $RA** --- Restore the value of the `$RA` register from the stack.
 
 ###### Layout
 
@@ -2289,16 +2322,16 @@ Restore the value of the `$RA` register from the stack.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Preserve $GP - `prsv.gp`
+##### `prsv.gp`
 
-Preserve the value of the `$GP` register onto the stack.
+**Preserve $GP** --- Preserve the value of the `$GP` register onto the stack.
 
 ###### Layout
 
@@ -2314,16 +2347,16 @@ Preserve the value of the `$GP` register onto the stack.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Restore $GP - `rstr.gp`
+##### `rstr.gp`
 
-Restore the value of the `$GP` register from the stack.
+**Restore $GP** --- Restore the value of the `$GP` register from the stack.
 
 ###### Layout
 
@@ -2339,16 +2372,16 @@ Restore the value of the `$GP` register from the stack.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Preserve $CC - `prsv.cc`
+##### `prsv.cc`
 
-Preserve the value of the `$CC` register onto the stack.
+**Preserve $CC** --- Preserve the value of the `$CC` register onto the stack.
 
 ###### Layout
 
@@ -2364,16 +2397,16 @@ Preserve the value of the `$CC` register onto the stack.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```
 
 --------------
 
-##### Restore $CC - `rstr.cc`
+##### `rstr.cc`
 
-Restore the value of the `$CC` register from the stack.
+**Restore $CC** --- Restore the value of the `$CC` register from the stack.
 
 ###### Layout
 
@@ -2389,7 +2422,7 @@ Restore the value of the `$CC` register from the stack.
 ###### Semantics
 
 ```
-[_63718]
+[_61432]
 --------
 nop
 ```

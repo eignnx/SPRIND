@@ -75,6 +75,9 @@ display_instructions_spec :-
     emit_heading(3, 'Instruction Counts by Format'),
     display_instruction_counts_by_format,
 
+    emit_heading(3, 'Instruction Listing'),
+    display_instruction_listing,
+
     emit_heading(3, 'Instruction Format Breakdown'),
     display_instr_format_breakdown,
     display_bitformat_legend,
@@ -100,8 +103,8 @@ display_instr_specification_under_fmt(Fmt) :-
 display_instr_specification(Fmt, Instr) :-
     sem:instr_info(Instr, Info),
 
-    emit_heading(5, '~w - `~w`', [Info.title, Instr]),
-    format('~w~n', [Info.descr]),
+    emit_heading(5, '`~w`', [Instr]),
+    format('**~w** --- ~w~n', [Info.title, Info.descr]),
 
     ( Info.ex = [_|_] ->
         emit_heading(6, 'Examples'),
@@ -226,12 +229,35 @@ display_genericfmt_instr_count(GFmt) :-
     genericfmt_description(GFmt, Descr),
 
     aggregate_all(count, (
-        derive:fmt_instr(GFmt, _Instr),
+        derive:fmt_instr(GFmt, Instr),
         dif(Instr, ???)
     ), Assigned),
     ( [Available] = Counts -> true ; throw(error(non_unique_availableopcodecount(GFmt, Counts)))),
     Utilization is 100 * Assigned / Available,
     emit_table_row([code(fmt('~k', GFmt)), a(Descr), d(Available), d(Assigned), fmt('~0f%', Utilization)]).
+
+
+display_instruction_listing :-
+    bagof(GFmt, (
+        derive:genericfmt(GFmt),
+        dif(GFmt, ext)
+    ), GFmts),
+    maplist([GF0, GFAtom]>>(format(atom(GFAtom), '`~k`', [GF0])), GFmts, GFmtsFormatted),
+    emit_table_header(GFmtsFormatted),
+
+    maplist(
+        [GF, Instrs]>>(
+            findall(
+                (fmt('[`~w`]', Instr)+fmt('(#`~w`)', Instr)),
+                fmt_instr(GF, Instr),
+                Instrs
+            )
+        ),
+        GFmts,
+        Cols
+    ),
+    nzip_longest(Cols, Rows, a('')),
+    maplist(emit_table_row, Rows).
 
 
 display_instr_format_breakdown :-
@@ -252,7 +278,7 @@ format_section(Fmt) :-
 format_layout_row(Fmt, Layout) :-
     list_item_occurrances(Layout, i, IBits),
     immbits_immdescription(IBits, ImmDescr),
-    derive:validate_instr_assignments_or_throw(Fmt, Ops),
+    derive:validate_instr_assignments_or_throw(Fmt, _Ops),
     derive:fmt_assignedinstrcount(Fmt, AssignedCount, _ReservedCount),
     derive:fmt_maxopcodes(Fmt, MaxAvail),
     UsagePct is 100 * AssignedCount / MaxAvail,
