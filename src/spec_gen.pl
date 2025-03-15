@@ -103,7 +103,7 @@ display_instr_specification_under_fmt(Fmt) :-
 display_instr_specification(Fmt, Instr) :-
     sem:instr_info(Instr, Info),
 
-    emit_heading(5, '`~w`', [Instr]),
+    emit_heading(5, 'The `~w` Instruction', [Instr]),
     format('**~w** --- ~w~n', [Info.title, Info.descr]),
 
     ( Info.ex = [_|_] ->
@@ -248,7 +248,7 @@ display_instruction_listing :-
     maplist(
         [GF, Instrs]>>(
             findall(
-                (fmt('[`~w`]', Instr)+fmt('(#`~w`)', Instr)),
+                (fmt('[`~w`]', Instr)+fmt('(#the-~w-instruction)', Instr)),
                 fmt_instr(GF, Instr),
                 Instrs
             )
