@@ -273,9 +273,9 @@ instr_info(taei, info{
 instr_info(tnei, info{
 	title: 'Test Not Equal Immediate',
 	descr: 'Test if a register value is not equal to an immediate value.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['tnei x, 0'],
+	operands: [simm(?simm), reg(?rs)],
+	sem: b_push($$ts, ?rs \= sxt(?simm))
 }).
 instr_info(teqi, info{
 	title: 'Test Equal Immediate',
