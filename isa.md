@@ -8,7 +8,7 @@
 ### General Purpose Registers
 
 
-| Register Name | Uses |
+| Register Name | [Uses](#register-uses-and-calling-convention) |
 |:---:|:---:|
 | `sp` | stack_ptr, addr |
 | `x` | temp, arg(1), addr |
@@ -44,7 +44,7 @@
 | `$kr` | Kernel Return | 16-bits | Holds the value of the program counter during interrupts. |
 | `$mp` | Multiplication Product | 32-bits | Holds the accumulating product during a multiplication. |
 
-## Instruction Specifications
+## Instructions
 
 
 ### Instruction Counts by Format
@@ -105,7 +105,7 @@
 #### Instruction Format Layouts
 
 
-| Format | Bit Pattern | Opcodes Available | Assigned | Utilization | Range of Immediate |
+| Format | [Bit Pattern](#legend) | Opcodes Available | Assigned | Utilization | Range of Immediate |
 |:----|:---:|:---:|:---:|:---:|:---:|
 | `rri` | `00ooiiiiiisssrrr` | 4 | 4 | 100% | `imm6` in `[-32,31]` or `[0,63]` |
 | `subr` | `010iiiiiiiiiiiii` | 1 | 1 | 100% | `imm13` in `[-4096,4095]` or `[0,8191]` |
@@ -143,7 +143,7 @@
 #### Instruction Format `rri`
 
 
-##### The **`lb`** Instruction
+##### The `lb` Instruction
 
 **Load Byte** --- Load a byte from memory into a register.
 
@@ -172,7 +172,7 @@
 
 --------------
 
-##### The **`lw`** Instruction
+##### The `lw` Instruction
 
 **Load Word** --- Load a word from memory into a register.
 
@@ -202,7 +202,7 @@
 
 --------------
 
-##### The **`sb`** Instruction
+##### The `sb` Instruction
 
 **Store Byte** --- Store a byte from a register into memory.
 
@@ -231,7 +231,7 @@
 
 --------------
 
-##### The **`sw`** Instruction
+##### The `sw` Instruction
 
 **Store Word** --- Store a word from a register into memory.
 
@@ -265,7 +265,7 @@
 #### Instruction Format `subr`
 
 
-##### The **`call`** Instruction
+##### The `call` Instruction
 
 **Call Subroutine** --- Call a subroutine at the specified address.
 
@@ -298,7 +298,7 @@ $$ra <- $$pc + #2
 #### Instruction Format `b`
 
 
-##### The **`b`** Instruction
+##### The `b` Instruction
 
 **Branch** --- Branch to the specified address by adding the immediate offset to `$PC`.
 
@@ -327,7 +327,7 @@ $$pc <- $$pc + sxt(?offset)
 
 --------------
 
-##### The **`bt`** Instruction
+##### The `bt` Instruction
 
 **Branch If True** --- Branch to the specified address if the condition is true by adding the immediate offset to `$PC`.
 
@@ -358,7 +358,7 @@ if b_pop($$ts) == #1 {
 
 --------------
 
-##### The **`bf`** Instruction
+##### The `bf` Instruction
 
 **Branch If False** --- Branch to the specified address if the condition is false by adding the immediate offset to `$PC`.
 
@@ -392,7 +392,7 @@ if b_pop($$ts) == #0 {
 #### Instruction Format `li`
 
 
-##### The **`li`** Instruction
+##### The `li` Instruction
 
 **Load Immediate** --- Load an immediate value into a register.
 
@@ -421,7 +421,7 @@ if b_pop($$ts) == #0 {
 
 --------------
 
-##### The **`szi`** Instruction
+##### The `szi` Instruction
 
 **Shift Zero-extended Immediate** --- Left-shift a zero-extended immediate value into a register.
 
@@ -453,7 +453,7 @@ if b_pop($$ts) == #0 {
 #### Instruction Format `ri(1)`
 
 
-##### The **`lgb`** Instruction
+##### The `lgb` Instruction
 
 **Load Global Byte** --- Load a byte from a memory address offset from `$GP`.
 
@@ -482,7 +482,7 @@ if b_pop($$ts) == #0 {
 
 --------------
 
-##### The **`lgw`** Instruction
+##### The `lgw` Instruction
 
 **Load Global Word** --- Load a word from a memory address offset from `$GP`.
 
@@ -512,7 +512,7 @@ if b_pop($$ts) == #0 {
 
 --------------
 
-##### The **`sgb`** Instruction
+##### The `sgb` Instruction
 
 **Store Global Byte** --- Store a byte into memory address offset from `$GP`.
 
@@ -541,7 +541,7 @@ if b_pop($$ts) == #0 {
 
 --------------
 
-##### The **`sgw`** Instruction
+##### The `sgw` Instruction
 
 **Store Global Word** --- Store a word into memory address offset from `$GP`.
 
@@ -571,7 +571,7 @@ hi_lo([?ptr + #1],[?ptr]) <- ?rs
 
 --------------
 
-##### The **`tbit`** Instruction
+##### The `tbit` Instruction
 
 **Test Bit** --- Test a specific bit in a register, modifying `$TS`.
 
@@ -600,7 +600,7 @@ b_push($$ts,?rs >> bitslice(?bit_idx,..(3,0))  and  #1 == #1)
 
 --------------
 
-##### The **`cbit`** Instruction
+##### The `cbit` Instruction
 
 **Clear Bit** --- Clear a specific bit in a register.
 
@@ -629,7 +629,7 @@ b_push($$ts,?rs >> bitslice(?bit_idx,..(3,0))  and  #1 == #1)
 
 --------------
 
-##### The **`sbit`** Instruction
+##### The `sbit` Instruction
 
 **Set Bit** --- Set a specific bit in a register.
 
@@ -658,7 +658,7 @@ b_push($$ts,?rs >> bitslice(?bit_idx,..(3,0))  and  #1 == #1)
 
 --------------
 
-##### The **`tli`** Instruction
+##### The `tli` Instruction
 
 **Test Less-than Immediate** --- Test if a register value is less than an immediate value.
 
@@ -687,7 +687,7 @@ b_push($$ts,compare(?rs,s16(<),sxt(?simm)))
 
 --------------
 
-##### The **`tgei`** Instruction
+##### The `tgei` Instruction
 
 **Test Greater-than or Equal Immediate** --- Test if a register value is greater than or equal to an immediate value.
 
@@ -716,7 +716,7 @@ b_push($$ts,compare(?rs,s16(>=),sxt(?simm)))
 
 --------------
 
-##### The **`tbi`** Instruction
+##### The `tbi` Instruction
 
 **Test Below Immediate** --- Test if a register value is below an immediate value.
 
@@ -745,7 +745,7 @@ b_push($$ts,compare(?rs,u16(<),zxt(?imm)))
 
 --------------
 
-##### The **`taei`** Instruction
+##### The `taei` Instruction
 
 **Test Above or Equal** --- Test if a register value is above or equal to an immediate value.
 
@@ -774,7 +774,7 @@ b_push($$ts,compare(?rs,u16(>=),zxt(?imm)))
 
 --------------
 
-##### The **`tnei`** Instruction
+##### The `tnei` Instruction
 
 **Test Not Equal Immediate** --- Test if a register value is not equal to an immediate value.
 
@@ -799,7 +799,7 @@ nop
 
 --------------
 
-##### The **`teqi`** Instruction
+##### The `teqi` Instruction
 
 **Test Equal Immediate** --- Test if a register value is equal to an immediate value.
 
@@ -824,7 +824,7 @@ nop
 
 --------------
 
-##### The **`addi`** Instruction
+##### The `addi` Instruction
 
 **Add Immediate** --- Add an immediate value to a register.
 
@@ -849,7 +849,7 @@ nop
 
 --------------
 
-##### The **`andi`** Instruction
+##### The `andi` Instruction
 
 **AND Immediate** --- Perform a bitwise AND between a register and an immediate value.
 
@@ -874,7 +874,7 @@ nop
 
 --------------
 
-##### The **`ori`** Instruction
+##### The `ori` Instruction
 
 **OR Immediate** --- Perform a bitwise OR between a register and an immediate value.
 
@@ -899,7 +899,7 @@ nop
 
 --------------
 
-##### The **`xori`** Instruction
+##### The `xori` Instruction
 
 **XOR Immediate** --- Perform a bitwise XOR between a register and an immediate value.
 
@@ -924,7 +924,7 @@ nop
 
 --------------
 
-##### The **`addicy`** Instruction
+##### The `addicy` Instruction
 
 **Add Immediate with Carry** --- Add an immediate value and the carry bit to a register.
 
@@ -949,7 +949,7 @@ nop
 
 --------------
 
-##### The **`subicy`** Instruction
+##### The `subicy` Instruction
 
 **Subtract Immediate with Carry** --- Sutract an immediate value and the carry bit from a register.
 
@@ -974,7 +974,7 @@ nop
 
 --------------
 
-##### The **`lsr`** Instruction
+##### The `lsr` Instruction
 
 **Logical Shift Right** --- Perform a logical shift right on a register by an immediate value.
 
@@ -999,7 +999,7 @@ nop
 
 --------------
 
-##### The **`lsl`** Instruction
+##### The `lsl` Instruction
 
 **Logical Shift Left** --- Perform a logical shift left on a register by an immediate value.
 
@@ -1024,7 +1024,7 @@ nop
 
 --------------
 
-##### The **`asr`** Instruction
+##### The `asr` Instruction
 
 **Arithmetic Shift Right** --- Perform an arithmetic shift right on a register by an immediate value.
 
@@ -1058,7 +1058,7 @@ nop
 #### Instruction Format `rrr`
 
 
-##### The **`mulstep`** Instruction
+##### The `mulstep` Instruction
 
 **Multiplication Step** --- Computes one step in a full 16-bit by 16-bit multiplication.
 
@@ -1086,7 +1086,7 @@ nop
 #### Instruction Format `rr(1)`
 
 
-##### The **`add`** Instruction
+##### The `add` Instruction
 
 **Add** --- Add the values of two registers.
 
@@ -1111,7 +1111,7 @@ nop
 
 --------------
 
-##### The **`sub`** Instruction
+##### The `sub` Instruction
 
 **Subtract** --- Subtract the value of one register from another.
 
@@ -1136,7 +1136,7 @@ nop
 
 --------------
 
-##### The **`and`** Instruction
+##### The `and` Instruction
 
 **AND** --- Perform a bitwise AND between two registers.
 
@@ -1161,7 +1161,7 @@ nop
 
 --------------
 
-##### The **`or`** Instruction
+##### The `or` Instruction
 
 **OR** --- Perform a bitwise OR between two registers.
 
@@ -1186,7 +1186,7 @@ nop
 
 --------------
 
-##### The **`xor`** Instruction
+##### The `xor` Instruction
 
 **XOR** --- Perform a bitwise XOR between two registers.
 
@@ -1211,7 +1211,7 @@ nop
 
 --------------
 
-##### The **`mov`** Instruction
+##### The `mov` Instruction
 
 **Move** --- Move the value from one register to another.
 
@@ -1236,7 +1236,7 @@ nop
 
 --------------
 
-##### The **`addcy`** Instruction
+##### The `addcy` Instruction
 
 **Add with Carry** --- Add the values of two registers with carry.
 
@@ -1261,7 +1261,7 @@ nop
 
 --------------
 
-##### The **`subcy`** Instruction
+##### The `subcy` Instruction
 
 **Subtract with Carry** --- Subtract the value of one register from another with carry.
 
@@ -1289,7 +1289,7 @@ nop
 #### Instruction Format `rr(2)`
 
 
-##### The **`tl`** Instruction
+##### The `tl` Instruction
 
 **Test Less-than** --- Test if the value of one register is less than another.
 
@@ -1314,7 +1314,7 @@ nop
 
 --------------
 
-##### The **`tge`** Instruction
+##### The `tge` Instruction
 
 **Test Greater-than or Equal** --- Test if the value of one register is greater than or equal to another.
 
@@ -1339,7 +1339,7 @@ nop
 
 --------------
 
-##### The **`tb`** Instruction
+##### The `tb` Instruction
 
 **Test Below** --- Test if the value of one register is below another.
 
@@ -1364,7 +1364,7 @@ nop
 
 --------------
 
-##### The **`tae`** Instruction
+##### The `tae` Instruction
 
 **Test Above or Equal** --- Test if the value of one register is above or equal to another.
 
@@ -1392,7 +1392,7 @@ nop
 #### Instruction Format `rr(3)`
 
 
-##### The **`tne`** Instruction
+##### The `tne` Instruction
 
 **Test Not Equal** --- Test if the value of one register is not equal to another.
 
@@ -1417,7 +1417,7 @@ nop
 
 --------------
 
-##### The **`teq`** Instruction
+##### The `teq` Instruction
 
 **Test Equal** --- Test if the value of one register is equal to another.
 
@@ -1445,7 +1445,7 @@ nop
 #### Instruction Format `r(1)`
 
 
-##### The **`pushb`** Instruction
+##### The `pushb` Instruction
 
 **Push Byte** --- Push a byte from a register onto the stack.
 
@@ -1470,7 +1470,7 @@ nop
 
 --------------
 
-##### The **`pushw`** Instruction
+##### The `pushw` Instruction
 
 **Push Word** --- Push a word from a register onto the stack.
 
@@ -1495,7 +1495,7 @@ nop
 
 --------------
 
-##### The **`popb`** Instruction
+##### The `popb` Instruction
 
 **Pop Byte** --- Pop a byte from the stack into a register.
 
@@ -1520,7 +1520,7 @@ nop
 
 --------------
 
-##### The **`popw`** Instruction
+##### The `popw` Instruction
 
 **Pop Word** --- Pop a word from the stack into a register.
 
@@ -1545,7 +1545,7 @@ nop
 
 --------------
 
-##### The **`callr`** Instruction
+##### The `callr` Instruction
 
 **Call Register** --- Call a subroutine at the address in a register.
 
@@ -1570,7 +1570,7 @@ nop
 
 --------------
 
-##### The **`jr`** Instruction
+##### The `jr` Instruction
 
 **Jump Register** --- Jump to the address in a register.
 
@@ -1595,7 +1595,7 @@ nop
 
 --------------
 
-##### The **`neg`** Instruction
+##### The `neg` Instruction
 
 **Negate** --- Negate the value in a register.
 
@@ -1623,7 +1623,7 @@ nop
 #### Instruction Format `r(2)`
 
 
-##### The **`seb`** Instruction
+##### The `seb` Instruction
 
 **Sign Extend Byte** --- Sign extend a byte in a register.
 
@@ -1648,7 +1648,7 @@ nop
 
 --------------
 
-##### The **`rd.mp.lo`** Instruction
+##### The `rd.mp.lo` Instruction
 
 **Read $MP.lo** --- Read the low word in the system `$MP` register into a general purpose register.
 
@@ -1673,7 +1673,7 @@ nop
 
 --------------
 
-##### The **`rd.mp.hi`** Instruction
+##### The `rd.mp.hi` Instruction
 
 **Read $MP.hi** --- Read the high word in the system `$MP` register into a general purpose register.
 
@@ -1698,7 +1698,7 @@ nop
 
 --------------
 
-##### The **`rd.gp`** Instruction
+##### The `rd.gp` Instruction
 
 **Read $GP** --- Read the value of the system `$GP` register into a general purpose register.
 
@@ -1726,7 +1726,7 @@ nop
 #### Instruction Format `r(3)`
 
 
-##### The **`wr.gp`** Instruction
+##### The `wr.gp` Instruction
 
 **Write $GP** --- Write a value to the system `$GP` register from a general purpose register.
 
@@ -1754,7 +1754,7 @@ nop
 #### Instruction Format `o`
 
 
-##### The **`NONEXE1`** Instruction
+##### The `NONEXE1` Instruction
 
 **Non-executable (1s Version)** --- Triggers a "non-executable instruction" exception. The entire instruction is 16 `1`s.
 
@@ -1779,7 +1779,7 @@ nop
 
 --------------
 
-##### The **`BREAK`** Instruction
+##### The `BREAK` Instruction
 
 **Breakpoint** --- Trigger a breakpoint.
 
@@ -1804,7 +1804,7 @@ nop
 
 --------------
 
-##### The **`HALT`** Instruction
+##### The `HALT` Instruction
 
 **Halt** --- Halt the processor.
 
@@ -1829,7 +1829,7 @@ nop
 
 --------------
 
-##### The **`UNIMPL`** Instruction
+##### The `UNIMPL` Instruction
 
 **Unimplemented** --- Unimplemented instruction.
 
@@ -1854,7 +1854,7 @@ nop
 
 --------------
 
-##### The **`kret`** Instruction
+##### The `kret` Instruction
 
 **Kernel Return** --- Return from kernel mode.
 
@@ -1879,7 +1879,7 @@ nop
 
 --------------
 
-##### The **`kcall`** Instruction
+##### The `kcall` Instruction
 
 **Kernel Call** --- Call a kernel function.
 
@@ -1904,7 +1904,7 @@ nop
 
 --------------
 
-##### The **`ret`** Instruction
+##### The `ret` Instruction
 
 **Return** --- Return from a subroutine.
 
@@ -1929,7 +1929,7 @@ nop
 
 --------------
 
-##### The **`tov`** Instruction
+##### The `tov` Instruction
 
 **Test Overflow** --- Test for overflow.
 
@@ -1954,7 +1954,7 @@ nop
 
 --------------
 
-##### The **`tcy`** Instruction
+##### The `tcy` Instruction
 
 **Test Carry** --- Test for carry.
 
@@ -1979,7 +1979,7 @@ nop
 
 --------------
 
-##### The **`clr.cy`** Instruction
+##### The `clr.cy` Instruction
 
 **Clear Carry** --- Clear the carry flag.
 
@@ -2004,7 +2004,7 @@ nop
 
 --------------
 
-##### The **`set.cy`** Instruction
+##### The `set.cy` Instruction
 
 **Set Carry** --- Set the carry flag.
 
@@ -2029,7 +2029,7 @@ nop
 
 --------------
 
-##### The **`tpush0`** Instruction
+##### The `tpush0` Instruction
 
 **Teststack Push 0** --- Push 0 onto the test stack.
 
@@ -2054,7 +2054,7 @@ nop
 
 --------------
 
-##### The **`tpush1`** Instruction
+##### The `tpush1` Instruction
 
 **Teststack Push 1** --- Push 1 onto the test stack.
 
@@ -2079,7 +2079,7 @@ nop
 
 --------------
 
-##### The **`tnot`** Instruction
+##### The `tnot` Instruction
 
 **Teststack NOT** --- Perform a NOT operation on the test stack.
 
@@ -2104,7 +2104,7 @@ nop
 
 --------------
 
-##### The **`tand`** Instruction
+##### The `tand` Instruction
 
 **Teststack AND** --- Perform an AND operation on the test stack.
 
@@ -2129,7 +2129,7 @@ nop
 
 --------------
 
-##### The **`tor`** Instruction
+##### The `tor` Instruction
 
 **Teststack OR** --- Perform an OR operation on the test stack.
 
@@ -2154,7 +2154,7 @@ nop
 
 --------------
 
-##### The **`tdup`** Instruction
+##### The `tdup` Instruction
 
 **Teststack Duplicate** --- Duplicate the top value on the test stack.
 
@@ -2179,7 +2179,7 @@ nop
 
 --------------
 
-##### The **`prsv.mp`** Instruction
+##### The `prsv.mp` Instruction
 
 **Preserve $MP** --- Preserve the value of the `$MP` register onto the stack.
 
@@ -2204,7 +2204,7 @@ nop
 
 --------------
 
-##### The **`rstr.mp`** Instruction
+##### The `rstr.mp` Instruction
 
 **Restore $MP** --- Restore the value of the `$MP` register from the stack.
 
@@ -2229,7 +2229,7 @@ nop
 
 --------------
 
-##### The **`prsv.ts`** Instruction
+##### The `prsv.ts` Instruction
 
 **Preserve $TS** --- Preserve the value of the `$TS` register onto the stack.
 
@@ -2254,7 +2254,7 @@ nop
 
 --------------
 
-##### The **`rstr.ts`** Instruction
+##### The `rstr.ts` Instruction
 
 **Restore $TS** --- Restore the value of the `$TS` register from the stack.
 
@@ -2279,7 +2279,7 @@ nop
 
 --------------
 
-##### The **`prsv.ra`** Instruction
+##### The `prsv.ra` Instruction
 
 **Preserve $RA** --- Preserve the value of the `$RA` register onto the stack.
 
@@ -2304,7 +2304,7 @@ nop
 
 --------------
 
-##### The **`rstr.ra`** Instruction
+##### The `rstr.ra` Instruction
 
 **Restore $RA** --- Restore the value of the `$RA` register from the stack.
 
@@ -2329,7 +2329,7 @@ nop
 
 --------------
 
-##### The **`prsv.gp`** Instruction
+##### The `prsv.gp` Instruction
 
 **Preserve $GP** --- Preserve the value of the `$GP` register onto the stack.
 
@@ -2354,7 +2354,7 @@ nop
 
 --------------
 
-##### The **`rstr.gp`** Instruction
+##### The `rstr.gp` Instruction
 
 **Restore $GP** --- Restore the value of the `$GP` register from the stack.
 
@@ -2379,7 +2379,7 @@ nop
 
 --------------
 
-##### The **`prsv.cc`** Instruction
+##### The `prsv.cc` Instruction
 
 **Preserve $CC** --- Preserve the value of the `$CC` register onto the stack.
 
@@ -2404,7 +2404,7 @@ nop
 
 --------------
 
-##### The **`rstr.cc`** Instruction
+##### The `rstr.cc` Instruction
 
 **Restore $CC** --- Restore the value of the `$CC` register from the stack.
 

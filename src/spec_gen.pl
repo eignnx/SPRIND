@@ -40,7 +40,7 @@ display_machine_overview :-
 
 display_gprs :-
     emit_heading(3, 'General Purpose Registers'),
-    emit_table_header(['Register Name', 'Uses']),
+    emit_table_header(['Register Name', '[Uses](#register-uses-and-calling-convention)']),
     foreach(
         isa:regname_uses(Reg, Uses),
         display_gpr_info(Reg, Uses)
@@ -70,7 +70,7 @@ display_sysregs :-
 
 
 display_instructions_spec :-
-    emit_heading(2, 'Instruction Specifications'),
+    emit_heading(2, 'Instructions'),
 
     emit_heading(3, 'Instruction Counts by Format'),
     display_instruction_counts_by_format,
@@ -263,7 +263,7 @@ display_instruction_listing :-
 display_instr_format_breakdown :-
     emit_heading(4, 'Instruction Format Layouts'),
 
-    emit_table_header([left('Format'), 'Bit Pattern', 'Opcodes Available', 'Assigned', 'Utilization', 'Range of Immediate']),
+    emit_table_header([left('Format'), '[Bit Pattern](#legend)', 'Opcodes Available', 'Assigned', 'Utilization', 'Range of Immediate']),
     foreach(
         derive:fmt(Fmt),
         format_section(Fmt)
