@@ -29,7 +29,7 @@
 
 :- det(fmt_operands_description/3).
 
-fmt_operands_description(lsd,   [i, s, r], 'Load-store with Displacement').
+fmt_operands_description(rri,   [i, s, r], 'Register-register-immediate').
 fmt_operands_description(subr,  [i],       'Subroutine Call').        
 fmt_operands_description(li,    [i, r],    'Load Immediate').         
 fmt_operands_description(b,     [i],       'Branch').                 
@@ -48,7 +48,7 @@ fmt_operands_description(ext,   [],        'Reserved for Extension').
 % See: https://en.wikipedia.org/wiki/Huffman_coding
 fmt_huffman_enc([
     [
-        lsd
+        rri
     |
         [
             subr
@@ -56,16 +56,16 @@ fmt_huffman_enc([
             [
                 b
             |
-                ext
+                li
             ]
         ]
     ]
 |
     % Note: `[a | [b | [c | d]]] == [a, b, c | d]`
     [
-        li,
         ri(1),
         ri(2),
+        ext,
         rrr,
         rr(1),
         rr(2),
@@ -80,7 +80,7 @@ fmt_huffman_enc([
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Constraints %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-fmt_immsizeconstraint(lsd, Bits) :-
+fmt_immsizeconstraint(rri, Bits) :-
     2 ^ (#Bits - 1) #>= 32. % I'd like to be able to in one load/store instruction index at least 32 bytes in a stackframe.
 fmt_immsizeconstraint(subr, Bits) :-
     addrsize_maxalignment(Bits, 32). % Alignment of 32-bytes is definitely too much wasted space (16 instructions wasted in worst case, 8 in average case).
@@ -95,7 +95,7 @@ fmt_immsizeconstraint(ri(_), Bits) :-
     % to the RISC-V study (see `design.md`), it should be enough 70% of the time.
     #Bits #= 6.
 
-fmt_opcodesizeconstraint(lsd, Bits) :-
+fmt_opcodesizeconstraint(rri, Bits) :-
     2 ^ #Bits #>= 4, % We need at least 4 = |{load,store}x{byte,word}|
     2 ^ #Bits #= 4. % I can only think of 4 instructions for this category at this time.
 fmt_opcodesizeconstraint(li, Bits) :-
@@ -109,10 +109,10 @@ fmt_opcodesizeconstraint(subr, Bits) :-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% Instruction Assignments %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-fmt_instr_title_description(lsd, lb, 'Load Byte', 'Load a byte from memory into a register.').
-fmt_instr_title_description(lsd, lw, 'Load Word', 'Load a word from memory into a register.').
-fmt_instr_title_description(lsd, sb, 'Store Byte', 'Store a byte from a register into memory.').
-fmt_instr_title_description(lsd, sw, 'Store Word', 'Store a word from a register into memory.').
+fmt_instr_title_description(rri, lb, 'Load Byte', 'Load a byte from memory into a register.').
+fmt_instr_title_description(rri, lw, 'Load Word', 'Load a word from memory into a register.').
+fmt_instr_title_description(rri, sb, 'Store Byte', 'Store a byte from a register into memory.').
+fmt_instr_title_description(rri, sw, 'Store Word', 'Store a word from a register into memory.').
 
 fmt_instr_title_description(subr, call, 'Call Subroutine', 'Call a subroutine at the specified address.').
 
@@ -140,12 +140,12 @@ fmt_instr_title_description(ri(1), addi, 'Add Immediate', 'Add an immediate valu
 fmt_instr_title_description(ri(1), andi, 'AND Immediate', 'Perform a bitwise AND between a register and an immediate value.').
 fmt_instr_title_description(ri(1), ori, 'OR Immediate', 'Perform a bitwise OR between a register and an immediate value.').
 
-fmt_instr_title_description(ri(2), xori, 'XOR Immediate', 'Perform a bitwise XOR between a register and an immediate value.').
-fmt_instr_title_description(ri(2), addicy, 'Add Immediate with Carry', 'Add an immediate value and the carry bit to a register.').
-fmt_instr_title_description(ri(2), subicy, 'Subtract Immediate with Carry', 'Sutract an immediate value and the carry bit from a register.').
-fmt_instr_title_description(ri(2), lsr, 'Logical Shift Right', 'Perform a logical shift right on a register by an immediate value.').
-fmt_instr_title_description(ri(2), lsl, 'Logical Shift Left', 'Perform a logical shift left on a register by an immediate value.').
-fmt_instr_title_description(ri(2), asr, 'Arithmetic Shift Right', 'Perform an arithmetic shift right on a register by an immediate value.').
+fmt_instr_title_description(ri(1), xori, 'XOR Immediate', 'Perform a bitwise XOR between a register and an immediate value.').
+fmt_instr_title_description(ri(1), addicy, 'Add Immediate with Carry', 'Add an immediate value and the carry bit to a register.').
+fmt_instr_title_description(ri(1), subicy, 'Subtract Immediate with Carry', 'Sutract an immediate value and the carry bit from a register.').
+fmt_instr_title_description(ri(1), lsr, 'Logical Shift Right', 'Perform a logical shift right on a register by an immediate value.').
+fmt_instr_title_description(ri(1), lsl, 'Logical Shift Left', 'Perform a logical shift left on a register by an immediate value.').
+fmt_instr_title_description(ri(1), asr, 'Arithmetic Shift Right', 'Perform an arithmetic shift right on a register by an immediate value.').
 
 fmt_instr_title_description(rr(1), add, 'Add', 'Add the values of two registers.').
 fmt_instr_title_description(rr(1), sub, 'Subtract', 'Subtract the value of one register from another.').
@@ -155,12 +155,12 @@ fmt_instr_title_description(rr(1), xor, 'XOR', 'Perform a bitwise XOR between tw
 fmt_instr_title_description(rr(1), mov, 'Move', 'Move the value from one register to another.').
 fmt_instr_title_description(rr(1), addcy, 'Add with Carry', 'Add the values of two registers with carry.').
 fmt_instr_title_description(rr(1), subcy, 'Subtract with Carry', 'Subtract the value of one register from another with carry.').
-fmt_instr_title_description(rr(1), tl, 'Test Less-than', 'Test if the value of one register is less than another.').
-fmt_instr_title_description(rr(1), tge, 'Test Greater-than or Equal', 'Test if the value of one register is greater than or equal to another.').
-fmt_instr_title_description(rr(1), tb, 'Test Below', 'Test if the value of one register is below another.').
-fmt_instr_title_description(rr(1), tae, 'Test Above or Equal', 'Test if the value of one register is above or equal to another.').
-fmt_instr_title_description(rr(1), tne, 'Test Not Equal', 'Test if the value of one register is not equal to another.').
-fmt_instr_title_description(rr(1), teq, 'Test Equal', 'Test if the value of one register is equal to another.').
+fmt_instr_title_description(rr(2), tl, 'Test Less-than', 'Test if the value of one register is less than another.').
+fmt_instr_title_description(rr(2), tge, 'Test Greater-than or Equal', 'Test if the value of one register is greater than or equal to another.').
+fmt_instr_title_description(rr(2), tb, 'Test Below', 'Test if the value of one register is below another.').
+fmt_instr_title_description(rr(2), tae, 'Test Above or Equal', 'Test if the value of one register is above or equal to another.').
+fmt_instr_title_description(rr(3), tne, 'Test Not Equal', 'Test if the value of one register is not equal to another.').
+fmt_instr_title_description(rr(3), teq, 'Test Equal', 'Test if the value of one register is equal to another.').
 
 fmt_instr_title_description(rrr, mulstep, 'Multiplication Step', 'Computes one step in a full 16-bit by 16-bit multiplication.').
 
@@ -171,11 +171,11 @@ fmt_instr_title_description(r(1), popw, 'Pop Word', 'Pop a word from the stack i
 fmt_instr_title_description(r(1), callr, 'Call Register', 'Call a subroutine at the address in a register.').
 fmt_instr_title_description(r(1), jr, 'Jump Register', 'Jump to the address in a register.').
 fmt_instr_title_description(r(1), neg, 'Negate', 'Negate the value in a register.').
-fmt_instr_title_description(r(1), seb, 'Sign Extend Byte', 'Sign extend a byte in a register.').
-fmt_instr_title_description(r(1), 'rd.mp.lo', 'Read $MP.lo', 'Read the low word in the system `$MP` register into a general purpose register.').
-fmt_instr_title_description(r(1), 'rd.mp.hi', 'Read $MP.hi', 'Read the high word in the system `$MP` register into a general purpose register.').
-fmt_instr_title_description(r(1), 'rd.gp', 'Read $GP', 'Read the value of the system `$GP` register into a general purpose register.').
-fmt_instr_title_description(r(1), 'wr.gp', 'Write $GP', 'Write a value to the system `$GP` register from a general purpose register.').
+fmt_instr_title_description(r(2), seb, 'Sign Extend Byte', 'Sign extend a byte in a register.').
+fmt_instr_title_description(r(2), 'rd.mp.lo', 'Read $MP.lo', 'Read the low word in the system `$MP` register into a general purpose register.').
+fmt_instr_title_description(r(2), 'rd.mp.hi', 'Read $MP.hi', 'Read the high word in the system `$MP` register into a general purpose register.').
+fmt_instr_title_description(r(2), 'rd.gp', 'Read $GP', 'Read the value of the system `$GP` register into a general purpose register.').
+fmt_instr_title_description(r(3), 'wr.gp', 'Write $GP', 'Write a value to the system `$GP` register from a general purpose register.').
 
 fmt_instr_title_description(o, 'NONEXE1', 'Non-executable (1''s Version)', 'Triggers a "non-executable instruction" exception. The entire instruction is 16 `1`s.').
 fmt_instr_title_description(o, 'BREAK', 'Breakpoint', 'Trigger a breakpoint.').

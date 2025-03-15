@@ -25,6 +25,7 @@ rval_(#Term) --> % Constant or Immediate
     ; { integer(Term) } -> [] % Numeric Literal
     ; { Term = ?Var, atom(Var) } -> [] % Immediate
     ).
+rval_(~(A)) --> rval(A).
 rval_(A + B) --> rval(A), rval(B).
 rval_(A - B) --> rval(A), rval(B).
 rval_(A << B) --> rval(A), rval(B).
@@ -47,8 +48,10 @@ lval(?Var) --> { atom(Var) }.
 lval(hi(RVal)) --> rval(RVal).
 lval(lo(RVal)) --> rval(RVal).
 lval(hi_lo(A, B)) --> rval(A), rval(B).
+lval(bitslice(LVal, Bound1 .. Bound2)) --> lval(LVal), integer(Bound1), integer(Bound2).
 
 stmt_(nop) --> [].
+stmt_(b_push(LVal, RVal)) --> lval(LVal), rval(RVal).
 stmt_(if(Cond, Consq)) --> rval(Cond), stmt(Consq).
 stmt_(if(Cond, Consq, Alt)) --> rval(Cond), stmt(Consq), stmt(Alt).
 stmt_(Dst <- Src) --> lval(Dst), rval(Src).
@@ -214,51 +217,51 @@ instr_info(sgw, info{
 instr_info(tbit, info{
 	title: 'Test Bit',
 	descr: 'Test a specific bit in a register, modifying `$TS`.',
-	ex: [],
-	operands: [OPERANDS],
-	sem: nop
+	ex: ['tbit 12, w'],
+	operands: [imm(?bit_idx), reg(?rs)],
+	sem: b_push($$ts, ((?rs >> bitslice(?bit_idx, 3..0)) and #1) == #1)
 }).
 instr_info(cbit, info{
 	title: 'Clear Bit',
 	descr: 'Clear a specific bit in a register.',
-	ex: [],
-	operands: [OPERANDS],
-	sem: nop
+	ex: ['cbit 9, v'],
+	operands: [imm(?bit_idx), reg(?rd)],
+	sem: ?rd <- ?rd and ~(#1 << bitslice(?bit_idx, 3..0))
 }).
 instr_info(sbit, info{
 	title: 'Set Bit',
 	descr: 'Set a specific bit in a register.',
-	ex: [],
-	operands: [OPERANDS],
-	sem: nop
+	ex: ['sbit 15, a'],
+	operands: [imm(?bit_idx), reg(?rd)],
+	sem: ?rd <- ?rd or (#1 << bitslice(?bit_idx, 3..0))
 }).
 instr_info(tli, info{
 	title: 'Test Less-than Immediate',
 	descr: 'Test if a register value is less than an immediate value.',
-	ex: [],
-	operands: [OPERANDS],
-	sem: nop
+	ex: ['tli x, -5'],
+	operands: [simm(?simm), reg(?rs)],
+	sem: b_push($$ts, s16_lt(?rs, sxt(?simm)))
 }).
 instr_info(tgei, info{
 	title: 'Test Greater-than or Equal Immediate',
 	descr: 'Test if a register value is greater than or equal to an immediate value.',
-	ex: [],
-	operands: [OPERANDS],
-	sem: nop
+	ex: ['tgei x, -5'],
+	operands: [simm(?simm), reg(?rs)],
+	sem: b_push($$ts, s16_gte(?rs, sxt(?simm)))
 }).
 instr_info(tbi, info{
 	title: 'Test Below Immediate',
 	descr: 'Test if a register value is below an immediate value.',
-	ex: [],
-	operands: [OPERANDS],
-	sem: nop
+	ex: ['tbi x, 10'],
+	operands: [imm(?imm), reg(?rs)],
+	sem: b_push($$ts, u16_lt(?rs, zxt(?imm)))
 }).
 instr_info(taei, info{
 	title: 'Test Above or Equal',
 	descr: 'Test if a register value is above or equal to an immediate value.',
-	ex: [],
-	operands: [OPERANDS],
-	sem: nop
+	ex: ['taei x, 10'],
+	operands: [imm(?imm), reg(?rs)],
+	sem: b_push($$ts, u16_gte(?rs, zxt(?imm)))
 }).
 instr_info(tnei, info{
 	title: 'Test Not Equal Immediate',
