@@ -431,51 +431,55 @@ instr_info(addcy, info{
 instr_info(subcy, info{
 	title: 'Subtract with Carry',
 	descr: 'Subtract the value of one register from another with carry.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['subcy x, y'],
+	operands: [reg(?rs), reg(?rd)],
+	sem: (
+        ?rd <- ?rd - ?rs - bit($$cc, #carry_flag_bit);
+        bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
+        bit($$cc, #overflow_flag_bit) <- attr(cpu/alu/overflow)
+    )
 }).
 instr_info(tl, info{
 	title: 'Test Less-than',
 	descr: 'Test if the value of one register is less than another.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['tl x, y'],
+	operands: [reg(?r1), reg(?r2)],
+	sem: b_push($$ts, compare(?r1, s16(<), ?r2))
 }).
 instr_info(tge, info{
 	title: 'Test Greater-than or Equal',
 	descr: 'Test if the value of one register is greater than or equal to another.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['tge x, y'],
+	operands: [reg(?r1), reg(?r2)],
+	sem: b_push($$ts, compare(?r1, s16(>=), ?r2))
 }).
 instr_info(tb, info{
 	title: 'Test Below',
 	descr: 'Test if the value of one register is below another.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['tb x, y'],
+	operands: [reg(?r1), reg(?r2)],
+	sem: b_push($$ts, compare(?r1, u16(<), ?r2))
 }).
 instr_info(tae, info{
 	title: 'Test Above or Equal',
 	descr: 'Test if the value of one register is above or equal to another.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['tae x, y'],
+	operands: [reg(?r1), reg(?r2)],
+	sem: b_push($$ts, compare(?r1, u16(>=), ?r2))
 }).
 instr_info(tne, info{
 	title: 'Test Not Equal',
 	descr: 'Test if the value of one register is not equal to another.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['tne x, y'],
+	operands: [reg(?r1), reg(?r2)],
+	sem: b_push($$ts, ?r1 \= ?r2)
 }).
 instr_info(teq, info{
 	title: 'Test Equal',
 	descr: 'Test if the value of one register is equal to another.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['teq x, y'],
+	operands: [reg(?r1), reg(?r2)],
+	sem: b_push($$ts, ?r1 == ?r2)
 }).
 
 instr_info(mulstep, info{
