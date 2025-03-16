@@ -165,9 +165,9 @@
 ###### Semantics
 
 ```
-[imm(?(simm)),reg(?(adr)),reg(?(rd))]
--------------------------------------
-<-(?(rd),zxt([?(adr)+ ?(simm)]))
+[imm(?simm),reg(?adr),reg(?rd)]
+-------------------------------
+?rd <- zxt([?adr + ?simm])
 ```
 
 --------------
@@ -194,9 +194,10 @@
 ###### Semantics
 
 ```
-[imm(?(simm)),reg(?(adr)),reg(?(rd))]
------------------------------------------------------------------------------
-?(ptr)=and(?(adr)+ ?(simm),#(65534));<-(?(rd),hi_lo([?(ptr)+ #(1)],[?(ptr)]))
+[imm(?simm),reg(?adr),reg(?rd)]
+---------------------------------
+?ptr = ?adr + ?simm  and  #65534;
+?rd <- hi_lo([?ptr + #1],[?ptr])
 ```
 
 --------------
@@ -223,9 +224,9 @@
 ###### Semantics
 
 ```
-[imm(?(simm)),reg(?(adr)),reg(?(rs))]
--------------------------------------
-<-([?(adr)+ ?(simm)],?(rs))
+[imm(?simm),reg(?adr),reg(?rs)]
+-------------------------------
+[?adr + ?simm] <- ?rs
 ```
 
 --------------
@@ -252,9 +253,11 @@
 ###### Semantics
 
 ```
-[imm(?(simm)),reg(?(adr)),reg(?(rs))]
-----------------------------------------------------------------------------------------
-?(ptr)=and(?(adr)+ ?(simm),#(65534));<-([?(ptr)],lo(?(rs)));<-([?(ptr)+ #(1)],hi(?(rs)))
+[imm(?simm),reg(?adr),reg(?rs)]
+---------------------------------
+?ptr = ?adr + ?simm  and  #65534;
+[?ptr] <- lo(?rs);
+[?ptr + #1] <- hi(?rs)
 ```
 
 --------------
@@ -284,9 +287,10 @@
 ###### Semantics
 
 ```
-[imm(?(imm))]
----------------------------------------------------------------------
-<-($$(pc),$$(pc)+sxt(?(imm))<< #(subr_align));<-($$(ra),$$(pc)+ #(2))
+[imm(?imm)]
+----------------------------------------
+$$pc <- $$pc + sxt(?imm) << #subr_align;
+$$ra <- $$pc + #2
 ```
 
 --------------
@@ -316,9 +320,9 @@
 ###### Semantics
 
 ```
-[imm(?(offset))]
---------------------------------
-<-($$(pc),$$(pc)+sxt(?(offset)))
+[imm(?offset)]
+---------------------------
+$$pc <- $$pc + sxt(?offset)
 ```
 
 --------------
@@ -345,9 +349,11 @@
 ###### Semantics
 
 ```
-[imm(?(offset))]
----------------------------------------------------------
-if(b_pop($$(ts))== #(1),<-($$(pc),$$(pc)+sxt(?(offset))))
+[imm(?offset)]
+-------------------------------
+if b_pop($$ts) == #1 {
+    $$pc <- $$pc + sxt(?offset)
+}
 ```
 
 --------------
@@ -374,9 +380,11 @@ if(b_pop($$(ts))== #(1),<-($$(pc),$$(pc)+sxt(?(offset))))
 ###### Semantics
 
 ```
-[imm(?(offset))]
----------------------------------------------------------
-if(b_pop($$(ts))== #(0),<-($$(pc),$$(pc)+sxt(?(offset))))
+[imm(?offset)]
+-------------------------------
+if b_pop($$ts) == #0 {
+    $$pc <- $$pc + sxt(?offset)
+}
 ```
 
 --------------
@@ -406,9 +414,9 @@ if(b_pop($$(ts))== #(0),<-($$(pc),$$(pc)+sxt(?(offset))))
 ###### Semantics
 
 ```
-[imm(?(simm)),reg(?(rd))]
--------------------------
-<-(?(rd),sxt(?(simm)))
+[imm(?simm),reg(?rd)]
+---------------------
+?rd <- sxt(?simm)
 ```
 
 --------------
@@ -435,9 +443,9 @@ if(b_pop($$(ts))== #(0),<-($$(pc),$$(pc)+sxt(?(offset))))
 ###### Semantics
 
 ```
-[imm(?(imm)),reg(?(rd))]
---------------------------------------
-<-(?(rd),or(?(rd)<< #(8),zxt(?(imm))))
+[imm(?imm),reg(?rd)]
+-------------------------------
+?rd <- ?rd << #8  or  zxt(?imm)
 ```
 
 --------------
@@ -467,9 +475,9 @@ if(b_pop($$(ts))== #(0),<-($$(pc),$$(pc)+sxt(?(offset))))
 ###### Semantics
 
 ```
-[imm(?(disp)),reg(?(rd))]
-------------------------------------
-<-(?(rd),zxt([$$(gp)+zxt(?(disp))]))
+[imm(?disp),reg(?rd)]
+-------------------------------
+?rd <- zxt([$$gp + zxt(?disp)])
 ```
 
 --------------
@@ -496,9 +504,10 @@ if(b_pop($$(ts))== #(0),<-($$(pc),$$(pc)+sxt(?(offset))))
 ###### Semantics
 
 ```
-[imm(?(disp)),reg(?(rd))]
----------------------------------------------------------------------------------
-?(ptr)=and($$(gp)+zxt(?(disp)),#(65534));<-(?(rd),hi_lo([?(ptr)+ #(1)],[?(ptr)]))
+[imm(?disp),reg(?rd)]
+--------------------------------------
+?ptr = $$gp + zxt(?disp)  and  #65534;
+?rd <- hi_lo([?ptr + #1],[?ptr])
 ```
 
 --------------
@@ -525,9 +534,9 @@ if(b_pop($$(ts))== #(0),<-($$(pc),$$(pc)+sxt(?(offset))))
 ###### Semantics
 
 ```
-[imm(?(disp)),reg(?(rs))]
--------------------------------
-<-([$$(gp)+zxt(?(disp))],?(rs))
+[imm(?disp),reg(?rs)]
+--------------------------
+[$$gp + zxt(?disp)] <- ?rs
 ```
 
 --------------
@@ -554,9 +563,10 @@ if(b_pop($$(ts))== #(0),<-($$(pc),$$(pc)+sxt(?(offset))))
 ###### Semantics
 
 ```
-[imm(?(disp)),reg(?(rs))]
----------------------------------------------------------------------------------
-?(ptr)=and($$(gp)+zxt(?(disp)),#(65534));<-(hi_lo([?(ptr)+ #(1)],[?(ptr)]),?(rs))
+[imm(?disp),reg(?rs)]
+--------------------------------------
+?ptr = $$gp + zxt(?disp)  and  #65534;
+hi_lo([?ptr + #1],[?ptr]) <- ?rs
 ```
 
 --------------
@@ -583,9 +593,9 @@ if(b_pop($$(ts))== #(0),<-($$(pc),$$(pc)+sxt(?(offset))))
 ###### Semantics
 
 ```
-[imm(?(bit_idx)),reg(?(rs))]
--------------------------------------------------------------------
-b_push($$(ts),and(?(rs)>>bitslice(?(bit_idx),..(3,0)),#(1))== #(1))
+[imm(?bit_idx),reg(?rs)]
+------------------------------------------------------------
+b_push($$ts,?rs >> bitslice(?bit_idx,#3..#0)  and  #1 == #1)
 ```
 
 --------------
@@ -612,9 +622,9 @@ b_push($$(ts),and(?(rs)>>bitslice(?(bit_idx),..(3,0)),#(1))== #(1))
 ###### Semantics
 
 ```
-[imm(?(bit_idx)),reg(?(rd))]
-----------------------------------------------------------
-<-(?(rd),and(?(rd),~(#(1)<<bitslice(?(bit_idx),..(3,0)))))
+[imm(?bit_idx),reg(?rd)]
+---------------------------------------------------
+?rd <- ?rd  and  ~(#1 << bitslice(?bit_idx,#3..#0))
 ```
 
 --------------
@@ -641,9 +651,9 @@ b_push($$(ts),and(?(rs)>>bitslice(?(bit_idx),..(3,0)),#(1))== #(1))
 ###### Semantics
 
 ```
-[imm(?(bit_idx)),reg(?(rd))]
-------------------------------------------------------
-<-(?(rd),or(?(rd),#(1)<<bitslice(?(bit_idx),..(3,0))))
+[imm(?bit_idx),reg(?rd)]
+-----------------------------------------------
+?rd <- ?rd  or  #1 << bitslice(?bit_idx,#3..#0)
 ```
 
 --------------
@@ -670,9 +680,9 @@ b_push($$(ts),and(?(rs)>>bitslice(?(bit_idx),..(3,0)),#(1))== #(1))
 ###### Semantics
 
 ```
-[simm(?(simm)),reg(?(rs))]
--------------------------------------------------
-b_push($$(ts),compare(?(rs),s16(<),sxt(?(simm))))
+[simm(?simm),reg(?rs)]
+-------------------------------------------
+b_push($$ts,compare(?rs,s16(<),sxt(?simm)))
 ```
 
 --------------
@@ -699,9 +709,9 @@ b_push($$(ts),compare(?(rs),s16(<),sxt(?(simm))))
 ###### Semantics
 
 ```
-[simm(?(simm)),reg(?(rs))]
---------------------------------------------------
-b_push($$(ts),compare(?(rs),s16(>=),sxt(?(simm))))
+[simm(?simm),reg(?rs)]
+--------------------------------------------
+b_push($$ts,compare(?rs,s16(>=),sxt(?simm)))
 ```
 
 --------------
@@ -728,9 +738,9 @@ b_push($$(ts),compare(?(rs),s16(>=),sxt(?(simm))))
 ###### Semantics
 
 ```
-[imm(?(imm)),reg(?(rs))]
-------------------------------------------------
-b_push($$(ts),compare(?(rs),u16(<),zxt(?(imm))))
+[imm(?imm),reg(?rs)]
+------------------------------------------
+b_push($$ts,compare(?rs,u16(<),zxt(?imm)))
 ```
 
 --------------
@@ -757,9 +767,9 @@ b_push($$(ts),compare(?(rs),u16(<),zxt(?(imm))))
 ###### Semantics
 
 ```
-[imm(?(imm)),reg(?(rs))]
--------------------------------------------------
-b_push($$(ts),compare(?(rs),u16(>=),zxt(?(imm))))
+[imm(?imm),reg(?rs)]
+-------------------------------------------
+b_push($$ts,compare(?rs,u16(>=),zxt(?imm)))
 ```
 
 --------------
@@ -786,9 +796,9 @@ b_push($$(ts),compare(?(rs),u16(>=),zxt(?(imm))))
 ###### Semantics
 
 ```
-[simm(?(simm)),reg(?(rs))]
-----------------------------------
-b_push($$(ts),?(rs)\=sxt(?(simm)))
+[simm(?simm),reg(?rs)]
+------------------------------
+b_push($$ts,?rs != sxt(?simm))
 ```
 
 --------------
@@ -796,6 +806,10 @@ b_push($$(ts),?(rs)\=sxt(?(simm)))
 ##### The `teqi` Instruction
 
 **Test Equal Immediate** --- Test if a register value is equal to an immediate value.
+
+###### Examples
+
+- `teqi x, -5`
 
 ###### Layout
 
@@ -811,9 +825,9 @@ b_push($$(ts),?(rs)\=sxt(?(simm)))
 ###### Semantics
 
 ```
-[]
-----
-todo
+[simm(?simm),reg(?rs)]
+------------------------------
+b_push($$ts,?rs == sxt(?simm))
 ```
 
 --------------
@@ -821,6 +835,10 @@ todo
 ##### The `addi` Instruction
 
 **Add Immediate** --- Add an immediate value to a register.
+
+###### Examples
+
+- `addi x, -5`
 
 ###### Layout
 
@@ -836,9 +854,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[simm(?simm),reg(?rd)]
+-----------------------
+?rd <- ?rd + sxt(?simm)
 ```
 
 --------------
@@ -846,6 +864,10 @@ todo
 ##### The `andi` Instruction
 
 **AND Immediate** --- Perform a bitwise AND between a register and an immediate value.
+
+###### Examples
+
+- `andi x, 3`
 
 ###### Layout
 
@@ -861,9 +883,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[simm(?simm),reg(?rd)]
+---------------------------
+?rd <- ?rd  and  sxt(?simm)
 ```
 
 --------------
@@ -871,6 +893,10 @@ todo
 ##### The `ori` Instruction
 
 **OR Immediate** --- Perform a bitwise OR between a register and an immediate value.
+
+###### Examples
+
+- `ori x, 3`
 
 ###### Layout
 
@@ -886,9 +912,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[simm(?simm),reg(?rd)]
+--------------------------
+?rd <- ?rd  or  sxt(?simm)
 ```
 
 --------------
@@ -896,6 +922,10 @@ todo
 ##### The `xori` Instruction
 
 **XOR Immediate** --- Perform a bitwise XOR between a register and an immediate value.
+
+###### Examples
+
+- `xori x, 3`
 
 ###### Layout
 
@@ -911,9 +941,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[simm(?simm),reg(?rd)]
+---------------------------
+?rd <- ?rd  xor  sxt(?simm)
 ```
 
 --------------
@@ -921,6 +951,10 @@ todo
 ##### The `addicy` Instruction
 
 **Add Immediate with Carry** --- Add an immediate value and the carry bit to a register.
+
+###### Examples
+
+- `addicy x, 3`
 
 ###### Layout
 
@@ -936,9 +970,11 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[simm(?simm),reg(?rd)]
+------------------------------------------------------
+?rd <- ?rd + sxt(?simm) + bit($$cc,#carry_flag_bit);
+bit($$cc,#carry_flag_bit) <- attr(cpu/alu/carryout);
+bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
 ```
 
 --------------
@@ -946,6 +982,10 @@ todo
 ##### The `subicy` Instruction
 
 **Subtract Immediate with Carry** --- Sutract an immediate value and the carry bit from a register.
+
+###### Examples
+
+- `subicy x, 3`
 
 ###### Layout
 
@@ -961,9 +1001,11 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[simm(?simm),reg(?rd)]
+------------------------------------------------------
+?rd <- ?rd - sxt(?simm) - bit($$cc,#carry_flag_bit);
+bit($$cc,#carry_flag_bit) <- attr(cpu/alu/carryout);
+bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
 ```
 
 --------------
@@ -971,6 +1013,10 @@ todo
 ##### The `lsr` Instruction
 
 **Logical Shift Right** --- Perform a logical shift right on a register by an immediate value.
+
+###### Examples
+
+- `lsr x, 15`
 
 ###### Layout
 
@@ -986,9 +1032,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[imm(?imm),reg(?rd)]
+--------------------
+?rd <- ?rd >> ?imm
 ```
 
 --------------
@@ -996,6 +1042,10 @@ todo
 ##### The `lsl` Instruction
 
 **Logical Shift Left** --- Perform a logical shift left on a register by an immediate value.
+
+###### Examples
+
+- `lsl x, 8`
 
 ###### Layout
 
@@ -1011,9 +1061,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[imm(?imm),reg(?rd)]
+--------------------
+?rd <- ?rd << ?imm
 ```
 
 --------------
@@ -1021,6 +1071,10 @@ todo
 ##### The `asr` Instruction
 
 **Arithmetic Shift Right** --- Perform an arithmetic shift right on a register by an immediate value.
+
+###### Examples
+
+- `asr x, 3`
 
 ###### Layout
 
@@ -1036,9 +1090,10 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[imm(?imm),reg(?rd)]
+------------------------------------------------------------------
+?sign_extension = sxt(bit(?rd,#15) - #1) << #reg_size_bits - ?imm;
+?rd <- ?rd >> ?imm  or  ?sign_extension
 ```
 
 --------------
@@ -1084,6 +1139,10 @@ todo
 
 **Add** --- Add the values of two registers.
 
+###### Examples
+
+- `add x, y`
+
 ###### Layout
 
 
@@ -1098,9 +1157,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[reg(?rs),reg(?rd)]
+-------------------
+?rd <- ?rd + ?rs
 ```
 
 --------------
@@ -1108,6 +1167,10 @@ todo
 ##### The `sub` Instruction
 
 **Subtract** --- Subtract the value of one register from another.
+
+###### Examples
+
+- `sub x, y`
 
 ###### Layout
 
@@ -1123,9 +1186,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[reg(?rs),reg(?rd)]
+-------------------
+?rd <- ?rd - ?rs
 ```
 
 --------------
@@ -1133,6 +1196,10 @@ todo
 ##### The `and` Instruction
 
 **AND** --- Perform a bitwise AND between two registers.
+
+###### Examples
+
+- `and x, y`
 
 ###### Layout
 
@@ -1148,9 +1215,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[reg(?rs),reg(?rd)]
+--------------------
+?rd <- ?rd  and  ?rs
 ```
 
 --------------
@@ -1158,6 +1225,10 @@ todo
 ##### The `or` Instruction
 
 **OR** --- Perform a bitwise OR between two registers.
+
+###### Examples
+
+- `or x, y`
 
 ###### Layout
 
@@ -1173,9 +1244,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[reg(?rs),reg(?rd)]
+-------------------
+?rd <- ?rd  or  ?rs
 ```
 
 --------------
@@ -1183,6 +1254,10 @@ todo
 ##### The `xor` Instruction
 
 **XOR** --- Perform a bitwise XOR between two registers.
+
+###### Examples
+
+- `xor x, y`
 
 ###### Layout
 
@@ -1198,9 +1273,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[reg(?rs),reg(?rd)]
+--------------------
+?rd <- ?rd  xor  ?rs
 ```
 
 --------------
@@ -1208,6 +1283,10 @@ todo
 ##### The `mov` Instruction
 
 **Move** --- Move the value from one register to another.
+
+###### Examples
+
+- `mov x, y`
 
 ###### Layout
 
@@ -1223,9 +1302,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[reg(?rs),reg(?rd)]
+-------------------
+?rd <- ?rs
 ```
 
 --------------
@@ -1233,6 +1312,10 @@ todo
 ##### The `addcy` Instruction
 
 **Add with Carry** --- Add the values of two registers with carry.
+
+###### Examples
+
+- `addcy x, y`
 
 ###### Layout
 
@@ -1248,9 +1331,11 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[reg(?rs),reg(?rd)]
+------------------------------------------------------
+?rd <- ?rd + ?rs + bit($$cc,#carry_flag_bit);
+bit($$cc,#carry_flag_bit) <- attr(cpu/alu/carryout);
+bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
 ```
 
 --------------

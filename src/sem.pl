@@ -1,6 +1,7 @@
 :- module(sem, [
     instr_info/2,
-    valid_semantics//1
+    valid_semantics//1,
+    def/2
 ]).
 
 :- set_prolog_flag(double_quotes, chars).
@@ -21,9 +22,8 @@ valid_semantics(Stmt) --> stmt(Stmt).
 
 rval_(LVal) --> lval(LVal).
 rval_(#Term) --> % Constant or Immediate
-    ( { atom(Term) } -> [] % Specification-time named constant
+    ( { atom(Term) } -> [constant(#Term)] % Specification-time named constant
     ; { integer(Term) } -> [] % Numeric Literal
-    ; { Term = ?Var, atom(Var) } -> [] % Immediate
     ).
 rval_(~(A)) --> rval(A).
 rval_(A + B) --> rval(A), rval(B).
@@ -31,11 +31,11 @@ rval_(A - B) --> rval(A), rval(B).
 rval_(A << B) --> rval(A), rval(B).
 rval_(A >> B) --> rval(A), rval(B).
 rval_(A == B) --> rval(A), rval(B).
+rval_(A \= B) --> rval(A), rval(B).
 rval_(A and B) --> rval(A), rval(B).
 rval_(A or B) --> rval(A), rval(B).
 rval_(A xor B) --> rval(A), rval(B).
 rval_(b_pop(LVal)) --> lval(LVal).
-rval_(const(Symbol)) --> { atom(Symbol) }.
 rval_(zxt(RVal)) --> rval(RVal).
 rval_(sxt(RVal)) --> rval(RVal).
 rval_(compare(A, u16(RelOp), B)) --> { relop(RelOp) }, rval(A), rval(B).
@@ -46,16 +46,21 @@ relop(>).
 relop(<=).
 relop(>=).
 
-rval(RVal) --> rval_(RVal) -> [] ; [invalid_rval(RVal)].
+rval(RVal) --> rval_(RVal) -> [] ; [error(invalid_rval(RVal))].
 
 lval([Term]) --> rval(Term).
 lval($Reg) --> { isa:gprreg(Reg) }.
 lval($$Reg) --> { isa:sysreg(Reg) }.
 lval(?Var) --> { atom(Var) }.
+lval(attr(Path)) --> path(Path), [constant(attr(Path))].
 lval(hi(RVal)) --> rval(RVal).
 lval(lo(RVal)) --> rval(RVal).
 lval(hi_lo(A, B)) --> rval(A), rval(B).
-lval(bitslice(LVal, Bound1 .. Bound2)) --> lval(LVal), { integer(Bound1), integer(Bound2) }.
+lval(bitslice(LVal, Bound1 .. Bound2)) --> lval(LVal), rval(Bound1), rval(Bound2).
+lval(bit(LVal, Index)) --> lval(LVal), rval(Index).
+
+path(Atom) --> { atom(Atom) }.
+path(Parent/Child) --> { atom(Child) }, path(Parent).
 
 stmt_(todo) --> [].
 stmt_(b_push(LVal, RVal)) --> lval(LVal), rval(RVal).
@@ -68,22 +73,32 @@ stmt_(S1 ; S2) -->
     ;
         stmt(S1), stmt(S2).
 
-stmt(Stmt) --> stmt_(Stmt) -> [] ; [invalid_stmt(Stmt)].
+stmt(Stmt) --> stmt_(Stmt) -> [] ; [error(invalid_stmt(Stmt))].
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-user:portray(---(Hypothesis, Conclusion)) :- print(Hypothesis), format('~n-----------------------~n'), print(Conclusion).
+def(attr(cpu/alu/carryout), signal).
+def(attr(cpu/alu/overflow), signal).
+def(#carry_flag_bit, _).
+def(#overflow_flag_bit, _).
+def(#subr_align, _).
+def(#reg_size_bits, Size) :- isa:register_size(Size).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 user:portray(Dst <- Src) :- print(Dst), format(' <- '), print(Src).
 user:portray(Dst = Src) :- print(Dst), format(' = '), print(Src).
 user:portray(A + B) :- print(A), format(' + '), print(B).
 user:portray(A - B) :- print(A), format(' - '), print(B).
 user:portray(A == B) :- print(A), format(' == '), print(B).
+user:portray(A \= B) :- print(A), format(' != '), print(B).
 user:portray(A >> B) :- print(A), format(' >> '), print(B).
 user:portray(A << B) :- print(A), format(' << '), print(B).
 user:portray(A and B) :- print(A), format('  and  '), print(B).
 user:portray(A or B) :- print(A), format('  or  '), print(B).
 user:portray(A xor B) :- print(A), format('  xor  '), print(B).
 user:portray(S1 ; S2) :- print(S1), format(';~n'), print(S2).
+user:portray(S1 .. S2) :- print(S1), format('..'), print(S2).
 user:portray(#X) :- format('#'), print(X).
 user:portray($X) :- format('$'), print(X).
 user:portray($$X) :- format('$$'), print(X).
@@ -226,21 +241,21 @@ instr_info(tbit, info{
 	descr: 'Test a specific bit in a register, modifying `$TS`.',
 	ex: ['tbit 12, w'],
 	operands: [imm(?bit_idx), reg(?rs)],
-	sem: b_push($$ts, ((?rs >> bitslice(?bit_idx, 3..0)) and #1) == #1)
+	sem: b_push($$ts, ((?rs >> bitslice(?bit_idx, #3 .. #0)) and #1) == #1)
 }).
 instr_info(cbit, info{
 	title: 'Clear Bit',
 	descr: 'Clear a specific bit in a register.',
 	ex: ['cbit 9, v'],
 	operands: [imm(?bit_idx), reg(?rd)],
-	sem: ?rd <- ?rd and ~(#1 << bitslice(?bit_idx, 3..0))
+	sem: ?rd <- ?rd and ~(#1 << bitslice(?bit_idx, #3 .. #0))
 }).
 instr_info(sbit, info{
 	title: 'Set Bit',
 	descr: 'Set a specific bit in a register.',
 	ex: ['sbit 15, a'],
 	operands: [imm(?bit_idx), reg(?rd)],
-	sem: ?rd <- ?rd or (#1 << bitslice(?bit_idx, 3..0))
+	sem: ?rd <- ?rd or (#1 << bitslice(?bit_idx, #3 .. #0))
 }).
 instr_info(tli, info{
 	title: 'Test Less-than Immediate',
@@ -280,123 +295,138 @@ instr_info(tnei, info{
 instr_info(teqi, info{
 	title: 'Test Equal Immediate',
 	descr: 'Test if a register value is equal to an immediate value.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['teqi x, -5'],
+	operands: [simm(?simm), reg(?rs)],
+	sem: b_push($$ts, ?rs == sxt(?simm))
 }).
 instr_info(addi, info{
 	title: 'Add Immediate',
 	descr: 'Add an immediate value to a register.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['addi x, -5'],
+	operands: [simm(?simm), reg(?rd)],
+	sem: ?rd <- ?rd + sxt(?simm)
 }).
 instr_info(andi, info{
 	title: 'AND Immediate',
 	descr: 'Perform a bitwise AND between a register and an immediate value.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['andi x, 3'],
+	operands: [simm(?simm), reg(?rd)],
+	sem: ?rd <- ?rd and sxt(?simm)
 }).
 instr_info(ori, info{
 	title: 'OR Immediate',
 	descr: 'Perform a bitwise OR between a register and an immediate value.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['ori x, 3'],
+	operands: [simm(?simm), reg(?rd)],
+	sem: ?rd <- ?rd or sxt(?simm)
 }).
 
 instr_info(xori, info{
 	title: 'XOR Immediate',
 	descr: 'Perform a bitwise XOR between a register and an immediate value.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['xori x, 3'],
+	operands: [simm(?simm), reg(?rd)],
+	sem: ?rd <- ?rd xor sxt(?simm)
 }).
 instr_info(addicy, info{
 	title: 'Add Immediate with Carry',
 	descr: 'Add an immediate value and the carry bit to a register.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['addicy x, 3'],
+	operands: [simm(?simm), reg(?rd)],
+	sem: (
+        ?rd <- ?rd + sxt(?simm) + bit($$cc, #carry_flag_bit);
+        bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
+        bit($$cc, #overflow_flag_bit) <- attr(cpu/alu/overflow)
+    )
 }).
 instr_info(subicy, info{
 	title: 'Subtract Immediate with Carry',
 	descr: 'Sutract an immediate value and the carry bit from a register.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['subicy x, 3'],
+	operands: [simm(?simm), reg(?rd)],
+	sem: (
+        ?rd <- ?rd - sxt(?simm) - bit($$cc, #carry_flag_bit);
+        bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
+        bit($$cc, #overflow_flag_bit) <- attr(cpu/alu/overflow)
+    )
 }).
 instr_info(lsr, info{
 	title: 'Logical Shift Right',
 	descr: 'Perform a logical shift right on a register by an immediate value.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['lsr x, 15'],
+	operands: [imm(?imm), reg(?rd)],
+	sem: ?rd <- ?rd >> ?imm
 }).
 instr_info(lsl, info{
 	title: 'Logical Shift Left',
 	descr: 'Perform a logical shift left on a register by an immediate value.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['lsl x, 8'],
+	operands: [imm(?imm), reg(?rd)],
+	sem: ?rd <- ?rd << ?imm
 }).
 instr_info(asr, info{
 	title: 'Arithmetic Shift Right',
 	descr: 'Perform an arithmetic shift right on a register by an immediate value.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['asr x, 3'],
+	operands: [imm(?imm), reg(?rd)],
+	sem: (
+        ?sign_extension = (sxt(bit(?rd, #15) - #1)) << (#reg_size_bits - ?imm);
+        ?rd <- (?rd >> ?imm) or ?sign_extension 
+    )
 }).
 
 instr_info(add, info{
 	title: 'Add',
 	descr: 'Add the values of two registers.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['add x, y'],
+	operands: [reg(?rs), reg(?rd)],
+	sem: ?rd <- ?rd + ?rs
 }).
 instr_info(sub, info{
 	title: 'Subtract',
 	descr: 'Subtract the value of one register from another.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['sub x, y'],
+	operands: [reg(?rs), reg(?rd)],
+	sem: ?rd <- ?rd - ?rs
 }).
 instr_info(and, info{
 	title: 'AND',
 	descr: 'Perform a bitwise AND between two registers.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['and x, y'],
+	operands: [reg(?rs), reg(?rd)],
+	sem: ?rd <- ?rd and ?rs
 }).
 instr_info(or, info{
 	title: 'OR',
 	descr: 'Perform a bitwise OR between two registers.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['or x, y'],
+	operands: [reg(?rs), reg(?rd)],
+	sem: ?rd <- ?rd or ?rs
 }).
 instr_info(xor, info{
 	title: 'XOR',
 	descr: 'Perform a bitwise XOR between two registers.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['xor x, y'],
+	operands: [reg(?rs), reg(?rd)],
+	sem: ?rd <- ?rd xor ?rs
 }).
 instr_info(mov, info{
 	title: 'Move',
 	descr: 'Move the value from one register to another.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['mov x, y'],
+	operands: [reg(?rs), reg(?rd)],
+	sem: ?rd <- ?rs
 }).
 instr_info(addcy, info{
 	title: 'Add with Carry',
 	descr: 'Add the values of two registers with carry.',
-	ex: [],
-	operands: [],
-	sem: todo
+	ex: ['addcy x, y'],
+	operands: [reg(?rs), reg(?rd)],
+	sem: (
+        ?rd <- ?rd + ?rs + bit($$cc, #carry_flag_bit);
+        bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
+        bit($$cc, #overflow_flag_bit) <- attr(cpu/alu/overflow)
+    )
 }).
 instr_info(subcy, info{
 	title: 'Subtract with Carry',
