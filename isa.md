@@ -1109,7 +1109,11 @@ bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
 
 ##### The `mulstep` Instruction
 
-**Multiplication Step** --- Computes one step in a full 16-bit by 16-bit multiplication.
+**Unsigned Multiplication Step** --- Computes one step in a full 16-bit by 16-bit unsigned multiplication.
+
+###### Examples
+
+- `mulstep x:y, z`
 
 ###### Layout
 
@@ -1125,9 +1129,17 @@ bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
 ###### Semantics
 
 ```
-[]
-----
-todo
+[reg(?multiplicand_hi),reg(?multiplicand_lo),reg(?multiplier)]
+------------------------------------------------------------------------
+?mask = ~(?multiplier  and  #1 - #1);
+?masked_multiplicand_lo <- ?multiplicand_lo  and  ?mask;
+?masked_multiplicand_hi <- ?multiplicand_hi  and  ?mask;
+lo($$mp) <- lo($$mp) + ?masked_multiplicand_lo;
+hi($$mp) <- hi($$mp) + ?masked_multiplicand_hi + attr(cpu/alu/carryout);
+?shift_cout = bit(?multiplicand_lo,#reg_size_bits - #1);
+?multiplicand_lo <- ?multiplicand_lo << #1;
+?multiplicand_hi <- ?multiplicand_hi << #1 + ?shift_cout;
+?multiplier <- ?multiplier >> #1
 ```
 
 --------------
@@ -1344,6 +1356,10 @@ bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
 
 **Subtract with Carry** --- Subtract the value of one register from another with carry.
 
+###### Examples
+
+- `subcy x, y`
+
 ###### Layout
 
 
@@ -1358,9 +1374,11 @@ bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
 ###### Semantics
 
 ```
-[]
-----
-todo
+[reg(?rs),reg(?rd)]
+------------------------------------------------------
+?rd <- ?rd - ?rs - bit($$cc,#carry_flag_bit);
+bit($$cc,#carry_flag_bit) <- attr(cpu/alu/carryout);
+bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
 ```
 
 --------------
@@ -1371,6 +1389,10 @@ todo
 ##### The `tl` Instruction
 
 **Test Less-than** --- Test if the value of one register is less than another.
+
+###### Examples
+
+- `tl x, y`
 
 ###### Layout
 
@@ -1386,9 +1408,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[reg(?r1),reg(?r2)]
+------------------------------------
+b_push($$ts,compare(?r1,s16(<),?r2))
 ```
 
 --------------
@@ -1396,6 +1418,10 @@ todo
 ##### The `tge` Instruction
 
 **Test Greater-than or Equal** --- Test if the value of one register is greater than or equal to another.
+
+###### Examples
+
+- `tge x, y`
 
 ###### Layout
 
@@ -1411,9 +1437,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[reg(?r1),reg(?r2)]
+-------------------------------------
+b_push($$ts,compare(?r1,s16(>=),?r2))
 ```
 
 --------------
@@ -1421,6 +1447,10 @@ todo
 ##### The `tb` Instruction
 
 **Test Below** --- Test if the value of one register is below another.
+
+###### Examples
+
+- `tb x, y`
 
 ###### Layout
 
@@ -1436,9 +1466,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[reg(?r1),reg(?r2)]
+------------------------------------
+b_push($$ts,compare(?r1,u16(<),?r2))
 ```
 
 --------------
@@ -1446,6 +1476,10 @@ todo
 ##### The `tae` Instruction
 
 **Test Above or Equal** --- Test if the value of one register is above or equal to another.
+
+###### Examples
+
+- `tae x, y`
 
 ###### Layout
 
@@ -1461,9 +1495,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[reg(?r1),reg(?r2)]
+-------------------------------------
+b_push($$ts,compare(?r1,u16(>=),?r2))
 ```
 
 --------------
@@ -1474,6 +1508,10 @@ todo
 ##### The `tne` Instruction
 
 **Test Not Equal** --- Test if the value of one register is not equal to another.
+
+###### Examples
+
+- `tne x, y`
 
 ###### Layout
 
@@ -1489,9 +1527,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[reg(?r1),reg(?r2)]
+-----------------------
+b_push($$ts,?r1 != ?r2)
 ```
 
 --------------
@@ -1499,6 +1537,10 @@ todo
 ##### The `teq` Instruction
 
 **Test Equal** --- Test if the value of one register is equal to another.
+
+###### Examples
+
+- `teq x, y`
 
 ###### Layout
 
@@ -1514,9 +1556,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[reg(?r1),reg(?r2)]
+-----------------------
+b_push($$ts,?r1 == ?r2)
 ```
 
 --------------

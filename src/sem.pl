@@ -483,11 +483,21 @@ instr_info(teq, info{
 }).
 
 instr_info(mulstep, info{
-	title: 'Multiplication Step',
-	descr: 'Computes one step in a full 16-bit by 16-bit multiplication.',
-	ex: [],
-	operands: [],
-	sem: todo
+	title: 'Unsigned Multiplication Step',
+	descr: 'Computes one step in a full 16-bit by 16-bit unsigned multiplication.',
+	ex: ['mulstep x:y, z'],
+	operands: [reg(?multiplicand_hi), reg(?multiplicand_lo), reg(?multiplier)],
+	sem: (
+        ?mask = ~((?multiplier and #1) - #1);
+        ?masked_multiplicand_lo <- ?multiplicand_lo and ?mask;
+        ?masked_multiplicand_hi <- ?multiplicand_hi and ?mask;
+        lo($$mp) <- lo($$mp) + ?masked_multiplicand_lo;
+        hi($$mp) <- hi($$mp) + ?masked_multiplicand_hi + attr(cpu/alu/carryout);
+        ?shift_cout = bit(?multiplicand_lo, (#reg_size_bits - #1));
+        ?multiplicand_lo <- ?multiplicand_lo << #1;
+        ?multiplicand_hi <- ?multiplicand_hi << #1 + ?shift_cout;
+        ?multiplier <- ?multiplier >> #1
+    )
 }).
 
 instr_info(pushb, info{
