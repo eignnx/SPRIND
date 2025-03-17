@@ -1,8 +1,15 @@
+
 :- module(validate, [
+    op(20, fx, #),
+    op(20, fx, $$),
+    op(20, fx, ?),
+    op(1050, xfx, <-),
+    op(400, yfx, xor),
+    op(400, yfx, and),
+    op(400, yfx, or),
     run_validations/0
 ]).
 
-:- use_module(library(clpfd)).
 :- op(20, fx, #).
 :- op(20, fx, $$).
 :- op(20, fx, ?).
@@ -11,6 +18,7 @@
 :- op(400, yfx, and).
 :- op(400, yfx, or).
 
+:- use_module(library(clpfd)).
 :- use_module(isa).
 :- use_module(sem).
 
@@ -96,6 +104,25 @@ inference(Tcx, A + B, Ty) :-
 inference(Tcx, ?Symbol, Ty) :-
     member(Symbol-Ty, Tcx).
 
+inference(Tcx, zxt(Expr), i(ZxtBits)) :-
+    inference(Tcx, Expr, i(ExprBits)),
+    #ZxtBits #>= #ExprBits.
+inference(Tcx, zxt(Expr), u(ZxtBits)) :-
+    inference(Tcx, Expr, u(ExprBits)),
+    #ZxtBits #>= #ExprBits.
+inference(Tcx, sxt(Expr), i(SxtBits)) :-
+    inference(Tcx, Expr, i(ExprBits)),
+    #SxtBits #>= #ExprBits.
+inference(Tcx, sxt(Expr), s(SxtBits)) :-
+    inference(Tcx, Expr, s(ExprBits)),
+    #SxtBits #>= #ExprBits.
+inference(Tcx, sxt(Expr), _) :-
+    inference(Tcx, Expr, u(ExprBits)),
+    throw(error('`sxt` cannot accept a `u(_)` argument.'(expression(Expr)))).
+inference(Tcx, zxt(Expr), _) :-
+    inference(Tcx, Expr, s(ExprBits)),
+    throw(error('`zxt` cannot accept a `s(_)` argument.'(expression(Expr)))).
+
 stmt_inference(Tcx0, ?Var = Expr ; Rest0, Tcx) :-
     inference(Tcx0, Expr, ExprTy),
     TcxExt = [Var-ExprTy | Tcx0],
@@ -104,7 +131,7 @@ stmt_inference(Tcx0, ?Var = Expr ; Rest0, Tcx) :-
 stmt_inference(Tcx, Dst <- Src, Tcx) :-
     inference(Tcx, Dst, DstTy),
     inference(Tcx, Src, SrcTy),
-    DstTy = SrcTy.
+    supertype_subtype(DstTy, SrcTy).
 
 stmt_inference(Tcx, todo, todo, Tcx).
 
