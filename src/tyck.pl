@@ -132,13 +132,20 @@ inference(Tcx, A xor B, i/Bits) :-
 
 inference(Tcx, A << B, TyA) :-
     inference(Tcx, A, TyA),
+    TyB = u/IdxBits,
+    ( inference(Tcx, B, TyB) -> true
+    ; throw(error('shift amount must be an unsigned integer'(B/TyB)))
+    ),
     _/TyABits = TyA,
-    inference(Tcx, B, u/IdxBits),
-    2 ^ #IdxBits #>= #TyABits.
+    ( 2 ^ #IdxBits #>= #TyABits -> true
+    ; throw(error('type of shift amount must have at least lg(N) bits to shift a value with N bits.'(A/TyA >> B/TyB)))
+    ).
 inference(Tcx, A >> B, TyA) :-
     inference(Tcx, A, TyA),
-    inference(Tcx, B, TyB),
-    u/IdxBits = TyB,
+    TyB = u/IdxBits,
+    ( inference(Tcx, B, TyB) -> true
+    ; throw(error('shift amount must be an unsigned integer'(B/TyB)))
+    ),
     _/TyABits = TyA,
     ( 2 ^ #IdxBits #>= #TyABits -> true
     ; throw(error('type of shift amount must have at least lg(N) bits to shift a value with N bits.'(A/TyA >> B/TyB)))

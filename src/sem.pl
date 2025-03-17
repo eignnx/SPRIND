@@ -268,14 +268,22 @@ instr_info(cbit, info{
 	descr: 'Clear a specific bit in a register.',
 	ex: ['cbit 9, v'],
 	operands: [imm(?bit_idx), reg(?rd)],
-	sem: ?rd <- ?rd and ~(#1 << bitslice(?bit_idx, #3 .. #0))
+	sem: (
+        ?idx = bitslice(?bit_idx, #3 .. #0)/u;
+        ?mask = ~(#1 << ?idx);
+        ?rd <- ?rd and ?mask
+    )
 }).
 instr_info(sbit, info{
 	title: 'Set Bit',
 	descr: 'Set a specific bit in a register.',
 	ex: ['sbit 15, a'],
 	operands: [imm(?bit_idx), reg(?rd)],
-	sem: ?rd <- ?rd or (#1 << bitslice(?bit_idx, #3 .. #0))
+	sem: (
+        ?idx = bitslice(?bit_idx, #3 .. #0)/u;
+        ?mask = ~(#1 << ?idx);
+        ?rd <- ?rd or ?mask
+    )
 }).
 instr_info(tli, info{
 	title: 'Test Less-than Immediate',
