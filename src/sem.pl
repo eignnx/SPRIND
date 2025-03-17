@@ -16,6 +16,7 @@
 :- op(400, yfx, xor).
 :- op(400, yfx, and).
 :- op(400, yfx, or).
+:- op(250, yfx, \).
 
 
 valid_semantics(Stmt) --> stmt(Stmt).
@@ -41,16 +42,16 @@ rval_(b_pop(LVal)) --> lval(LVal).
 rval_(zxt(RVal)) --> rval(RVal).
 rval_(sxt(RVal)) --> rval(RVal).
 rval_(compare(A, RelOp, B)) --> { relop(RelOp) }, rval(A), rval(B).
-rval_(RVal/Coersion) --> rval(RVal), { member(Coersion, [u, s, i]) ; integer(Coersion) }.
+rval_(RVal\Coersion) --> rval(RVal), { member(Coersion, [u, s, i]) ; integer(Coersion) }.
 
 relop(<(IntTy)) :- int_ty(IntTy).
 relop(>(IntTy)) :- int_ty(IntTy).
 relop(<=(IntTy)) :- int_ty(IntTy).
 relop(>=(IntTy)) :- int_ty(IntTy).
 
-int_ty(u/N) :- N in 1 .. sup.
-int_ty(s/N) :- N in 1 .. sup.
-int_ty(i/N) :- N in 1 .. sup.
+int_ty(u\N) :- N in 1 .. sup.
+int_ty(s\N) :- N in 1 .. sup.
+int_ty(i\N) :- N in 1 .. sup.
 
 rval(RVal) --> rval_(RVal) -> [] ; [error(invalid_rval(RVal))].
 
@@ -130,7 +131,7 @@ instr_info(lb, info{
     ex: ['lb w, [sp+12]'],
     operands: [simm(?simm), reg(?rs), reg(?rd)],
 	sem: (
-        ?ptr = (?rs/s + sxt(?simm))/u;
+        ?ptr = (?rs\s + sxt(?simm))\u;
         ?rd <- zxt([?ptr])
     )
 }).
@@ -140,7 +141,7 @@ instr_info(lw, info{
 	ex: ['lw w, [sp+12]'],
     operands: [simm(?simm), reg(?rs), reg(?rd)],
 	sem: (
-        ?ptr = ((?rs/s + sxt(?simm)) and #0b1111111111111110)/u;
+        ?ptr = ((?rs\s + sxt(?simm)) and #0b1111111111111110)\u;
         ?rd <- {[?ptr + #1], [?ptr]}
     )
 }).
@@ -150,8 +151,8 @@ instr_info(sb, info{
 	ex: ['sb [sp-20], x'],
     operands: [simm(?simm), reg(?rd), reg(?rs)],
 	sem: (
-        ?ptr = ?rd/s + sxt(?simm);
-        [?ptr/u] <- lo(?rs)
+        ?ptr = ?rd\s + sxt(?simm);
+        [?ptr\u] <- lo(?rs)
     )
 }).
 instr_info(sw, info{
@@ -160,7 +161,7 @@ instr_info(sw, info{
 	ex: ['sw [sp-20], x'],
     operands: [simm(?simm), reg(?rd), reg(?rs)],
 	sem: (
-        ?ptr = ((?rd/s + sxt(?simm)) and #0b1111111111111110)/u;
+        ?ptr = ((?rd\s + sxt(?simm)) and #0b1111111111111110)\u;
         [?ptr] <- lo(?rs);
         [?ptr + #1] <- hi(?rs)
     )
@@ -172,7 +173,7 @@ instr_info(call, info{
 	ex: ['call SOME_LABEL'],
 	operands: [simm(?simm)],
 	sem: (
-        $$pc <- $$pc/s + (sxt(?simm) << #subr_align);
+        $$pc <- $$pc\s + (sxt(?simm) << #subr_align);
         $$ra <- $$pc + #2
     )
 }).
@@ -182,7 +183,7 @@ instr_info(b, info{
 	descr: 'Branch to the specified address by adding the immediate offset to `$PC`.',
 	ex: ['b SOME_LABEL'],
 	operands: [simm(?offset)],
-	sem: $$pc <- $$pc/s + sxt(?offset)
+	sem: $$pc <- $$pc\s + sxt(?offset)
 }).
 instr_info(bt, info{
 	title: 'Branch If True',
@@ -190,7 +191,7 @@ instr_info(bt, info{
 	ex: ['bt SOME_LABEL'],
 	operands: [simm(?offset)],
 	sem: if(b_pop($$ts),
-        $$pc <- $$pc/s + sxt(?offset)
+        $$pc <- $$pc\s + sxt(?offset)
     )
 }).
 instr_info(bf, info{
@@ -199,7 +200,7 @@ instr_info(bf, info{
 	ex: ['bf SOME_LABEL'],
 	operands: [simm(?offset)],
 	sem: if(!(b_pop($$ts)),
-        $$pc <- $$pc/s + sxt(?offset)
+        $$pc <- $$pc\s + sxt(?offset)
     )
 }).
 
@@ -223,7 +224,7 @@ instr_info(lgb, info{
 	descr: 'Load a byte from a memory address offset from `$GP`.',
 	ex: ['lgb x, [gp+8]'],
 	operands: [imm(?disp), reg(?rd)],
-	sem: ?rd <- zxt([$$gp/u + zxt(?disp)])
+	sem: ?rd <- zxt([$$gp\u + zxt(?disp)])
 }).
 instr_info(lgw, info{
 	title: 'Load Global Word',
@@ -231,7 +232,7 @@ instr_info(lgw, info{
 	ex: ['lgw x, [gp+8]'],
 	operands: [imm(?disp), reg(?rd)],
 	sem: (
-        ?ptr = (($$gp/u + zxt(?disp)) and #0b1111111111111110)/u;
+        ?ptr = (($$gp\u + zxt(?disp)) and #0b1111111111111110)\u;
         ?rd <- {[?ptr + #1], [?ptr]}
     )
 }).
@@ -240,7 +241,7 @@ instr_info(sgb, info{
 	descr: 'Store a byte into memory address offset from `$GP`.',
 	ex: ['sgb [gp+8], x'],
 	operands: [imm(?disp), reg(?rs)],
-	sem: [$$gp/u + zxt(?disp)] <- lo(?rs)
+	sem: [$$gp\u + zxt(?disp)] <- lo(?rs)
 }).
 instr_info(sgw, info{
 	title: 'Store Global Word',
@@ -248,7 +249,7 @@ instr_info(sgw, info{
 	ex: ['sgw [gp+8], x'],
 	operands: [imm(?disp), reg(?rs)],
 	sem: (
-        ?ptr = (($$gp/u + zxt(?disp)) and #0b1111111111111110)/u;
+        ?ptr = (($$gp\u + zxt(?disp)) and #0b1111111111111110)\u;
         {[?ptr + #1], [?ptr]} <- ?rs
     )
 }).
@@ -259,7 +260,7 @@ instr_info(tbit, info{
 	operands: [imm(?bit_idx), reg(?rs)],
 	sem: (
         ?shamt = bitslice(?bit_idx, #3 .. #0);
-        ?bit = (?rs >> (?shamt/u)) and #1;
+        ?bit = (?rs >> (?shamt\u)) and #1;
         b_push($$ts, ?bit == #1)
     )
 }).
@@ -269,7 +270,7 @@ instr_info(cbit, info{
 	ex: ['cbit 9, v'],
 	operands: [imm(?bit_idx), reg(?rd)],
 	sem: (
-        ?idx = bitslice(?bit_idx, #3 .. #0)/u;
+        ?idx = bitslice(?bit_idx, #3 .. #0)\u;
         ?mask = ~(#1 << ?idx);
         ?rd <- ?rd and ?mask
     )
@@ -280,7 +281,7 @@ instr_info(sbit, info{
 	ex: ['sbit 15, a'],
 	operands: [imm(?bit_idx), reg(?rd)],
 	sem: (
-        ?idx = bitslice(?bit_idx, #3 .. #0)/u;
+        ?idx = bitslice(?bit_idx, #3 .. #0)\u;
         ?mask = ~(#1 << ?idx);
         ?rd <- ?rd or ?mask
     )
@@ -290,28 +291,28 @@ instr_info(tli, info{
 	descr: 'Test if a register value is less than an immediate value.',
 	ex: ['tli x, -5'],
 	operands: [simm(?simm), reg(?rs)],
-	sem: b_push($$ts, compare(?rs, <(s/16), sxt(?simm)))
+	sem: b_push($$ts, compare(?rs, <(s\16), sxt(?simm)))
 }).
 instr_info(tgei, info{
 	title: 'Test Greater-than or Equal Immediate',
 	descr: 'Test if a register value is greater than or equal to an immediate value.',
 	ex: ['tgei x, -5'],
 	operands: [simm(?simm), reg(?rs)],
-	sem: b_push($$ts, compare(?rs, >=(s/16), sxt(?simm)))
+	sem: b_push($$ts, compare(?rs, >=(s\16), sxt(?simm)))
 }).
 instr_info(tbi, info{
 	title: 'Test Below Immediate',
 	descr: 'Test if a register value is below an immediate value.',
 	ex: ['tbi x, 10'],
 	operands: [imm(?imm), reg(?rs)],
-	sem: b_push($$ts, compare(?rs, <(u/16), zxt(?imm)))
+	sem: b_push($$ts, compare(?rs, <(u\16), zxt(?imm)))
 }).
 instr_info(taei, info{
 	title: 'Test Above or Equal',
 	descr: 'Test if a register value is above or equal to an immediate value.',
 	ex: ['taei x, 10'],
 	operands: [imm(?imm), reg(?rs)],
-	sem: b_push($$ts, compare(?rs, >=(u/16), zxt(?imm)))
+	sem: b_push($$ts, compare(?rs, >=(u\16), zxt(?imm)))
 }).
 instr_info(tnei, info{
 	title: 'Test Not Equal Immediate',
@@ -472,28 +473,28 @@ instr_info(tl, info{
 	descr: 'Test if the value of one register is less than another.',
 	ex: ['tl x, y'],
 	operands: [reg(?r1), reg(?r2)],
-	sem: b_push($$ts, compare(?r1, <(s/16), ?r2))
+	sem: b_push($$ts, compare(?r1, <(s\16), ?r2))
 }).
 instr_info(tge, info{
 	title: 'Test Greater-than or Equal',
 	descr: 'Test if the value of one register is greater than or equal to another.',
 	ex: ['tge x, y'],
 	operands: [reg(?r1), reg(?r2)],
-	sem: b_push($$ts, compare(?r1, >=(s/16), ?r2))
+	sem: b_push($$ts, compare(?r1, >=(s\16), ?r2))
 }).
 instr_info(tb, info{
 	title: 'Test Below',
 	descr: 'Test if the value of one register is below another.',
 	ex: ['tb x, y'],
 	operands: [reg(?r1), reg(?r2)],
-	sem: b_push($$ts, compare(?r1, <(u/16), ?r2))
+	sem: b_push($$ts, compare(?r1, <(u\16), ?r2))
 }).
 instr_info(tae, info{
 	title: 'Test Above or Equal',
 	descr: 'Test if the value of one register is above or equal to another.',
 	ex: ['tae x, y'],
 	operands: [reg(?r1), reg(?r2)],
-	sem: b_push($$ts, compare(?r1, >=(u/16), ?r2))
+	sem: b_push($$ts, compare(?r1, >=(u\16), ?r2))
 }).
 instr_info(tne, info{
 	title: 'Test Not Equal',
