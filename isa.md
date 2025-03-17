@@ -1,5 +1,5 @@
 
-> !!! validation_failed(incompatible bit sizes(instruction(sb),memory access must produce a `u(16)` address(?(adr)+ ?(simm))))
+> !!! validation_failed(tyck:incompatible bit sizes(instruction(sb),memory access must produce a `u(16)` address(?(adr)+ ?(simm))))
 
 
 # SPRIND Instruction Set Architecture Specification
