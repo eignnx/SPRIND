@@ -157,18 +157,35 @@ inference(Tcx, ~(A), i\Bits) :-
 inference(Tcx, !(A), bool) :-
     inference(Tcx, A, bool).
 
-inference(Tcx, compare(A, <(Ty), B), bool) :-
-    inference(Tcx, A, Ty),
-    inference(Tcx, B, Ty).
-inference(Tcx, compare(A, >(Ty), B), bool) :-
-    inference(Tcx, A, Ty),
-    inference(Tcx, B, Ty).
-inference(Tcx, compare(A, <=(Ty), B), bool) :-
-    inference(Tcx, A, Ty),
-    inference(Tcx, B, Ty).
-inference(Tcx, compare(A, >=(Ty), B), bool) :-
-    inference(Tcx, A, Ty),
-    inference(Tcx, B, Ty).
+%% meet(Lhs:ty, Meeting:ty, Rhs:ty).
+meet(u\Bits, i\Bits, i\Bits).
+meet(s\Bits, i\Bits, i\Bits).
+meet(i\Bits, i\Bits, i\Bits).
+meet(i\Bits, i\Bits, u\Bits).
+meet(i\Bits, i\Bits, s\Bits).
+meet(s\Bits, s\Bits, s\Bits).
+meet(u\Bits, u\Bits, u\Bits).
+meet(bool, bool, bool).
+
+inference(Tcx, compare(A, RelOp, B), bool) :-
+    relop(RelOp, Ty),
+    ( inference(Tcx, A, TyA) -> true
+    ; throw(error('failure to infer `compare` operand'(A)))
+    ),
+    ( TyA = Ty -> true
+    ; throw(error('`compare` operand type doesn''t match operator type'(compare(A\TyA, RelOp, B\TyB))))
+    ),
+    ( inference(Tcx, B, TyB) -> true
+    ; throw(error('failure to infer `compare` operand'(B)))
+    ),
+    ( TyB = Ty -> true
+    ; throw(error('`compare` operand type doesn''t match operator type'(compare(A\TyA, RelOp, B\TyB))))
+    ).
+
+relop(<(Ty), Ty) :- int_ty(Ty).
+relop(>(Ty), Ty) :- int_ty(Ty).
+relop(<=(Ty), Ty) :- int_ty(Ty).
+relop(>=(Ty), Ty) :- int_ty(Ty).
 
 
 inference(Tcx, [Address], _\8) :-
@@ -207,10 +224,10 @@ inference(Tcx, sxt(Expr), s\SxtBits) :-
 
 inference(Tcx, sxt(Expr), _) :-
     inference(Tcx, Expr, u\_),
-    throw(error('`sxt` cannot accept a `u\_` argument.'(expression(Expr)))).
+    throw(error('`sxt` cannot accept a `u\\_` argument.'(expression(Expr)))).
 inference(Tcx, zxt(Expr), _) :-
     inference(Tcx, Expr, s\_),
-    throw(error('`zxt` cannot accept a `s\_` argument.'(expression(Expr)))).
+    throw(error('`zxt` cannot accept a `s\\_` argument.'(expression(Expr)))).
 
 inference(Tcx, hi(X), i\HalfBits) :-
     inference(Tcx, X, _\XBits),
@@ -269,7 +286,9 @@ stmt_inference(Tcx, todo, Tcx).
 stmt_inference(Tcx, b_push(LVal, RVal), Tcx) :-
     inference(Tcx, LVal, LValTy),
     int_ty(LValTy),
-    inference(Tcx, RVal, RValTy),
+    ( inference(Tcx, RVal, RValTy) -> true
+    ; throw(error('`b_push` could not infer 2nd arg'(RVal)))
+    ),
     ( RValTy = bool -> true
     ; throw(error('`b_push` accepts a boolean as 2nd arg'(RVal\RValTy)))
     ).

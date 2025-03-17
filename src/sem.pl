@@ -260,7 +260,7 @@ instr_info(tbit, info{
 	operands: [imm(?bit_idx), reg(?rs)],
 	sem: (
         ?shamt = bitslice(?bit_idx, #3 .. #0);
-        ?bit = (?rs >> (?shamt\u)) and #1;
+        ?bit = (?rs >> ?shamt\u) and #1;
         b_push($$ts, ?bit == #1)
     )
 }).
@@ -291,49 +291,49 @@ instr_info(tli, info{
 	descr: 'Test if a register value is less than an immediate value.',
 	ex: ['tli x, -5'],
 	operands: [simm(?simm), reg(?rs)],
-	sem: b_push($$ts, compare(?rs, <(s\16), sxt(?simm)))
+	sem: b_push($$ts, compare(?rs\s, <(s\16), sxt(?simm)))
 }).
 instr_info(tgei, info{
 	title: 'Test Greater-than or Equal Immediate',
 	descr: 'Test if a register value is greater than or equal to an immediate value.',
 	ex: ['tgei x, -5'],
 	operands: [simm(?simm), reg(?rs)],
-	sem: b_push($$ts, compare(?rs, >=(s\16), sxt(?simm)))
+	sem: b_push($$ts, compare(?rs\s, >=(s\16), sxt(?simm)))
 }).
 instr_info(tbi, info{
 	title: 'Test Below Immediate',
 	descr: 'Test if a register value is below an immediate value.',
 	ex: ['tbi x, 10'],
 	operands: [imm(?imm), reg(?rs)],
-	sem: b_push($$ts, compare(?rs, <(u\16), zxt(?imm)))
+	sem: b_push($$ts, compare(?rs\u, <(u\16), zxt(?imm)))
 }).
 instr_info(taei, info{
 	title: 'Test Above or Equal',
 	descr: 'Test if a register value is above or equal to an immediate value.',
 	ex: ['taei x, 10'],
 	operands: [imm(?imm), reg(?rs)],
-	sem: b_push($$ts, compare(?rs, >=(u\16), zxt(?imm)))
+	sem: b_push($$ts, compare(?rs\u, >=(u\16), zxt(?imm)))
 }).
 instr_info(tnei, info{
 	title: 'Test Not Equal Immediate',
 	descr: 'Test if a register value is not equal to an immediate value.',
 	ex: ['tnei x, 0'],
 	operands: [simm(?simm), reg(?rs)],
-	sem: b_push($$ts, ?rs \= sxt(?simm))
+	sem: b_push($$ts, ?rs\s \= sxt(?simm))
 }).
 instr_info(teqi, info{
 	title: 'Test Equal Immediate',
 	descr: 'Test if a register value is equal to an immediate value.',
 	ex: ['teqi x, -5'],
 	operands: [simm(?simm), reg(?rs)],
-	sem: b_push($$ts, ?rs == sxt(?simm))
+	sem: b_push($$ts, ?rs\s == sxt(?simm))
 }).
 instr_info(addi, info{
 	title: 'Add Immediate',
 	descr: 'Add an immediate value to a register.',
 	ex: ['addi x, -5'],
 	operands: [simm(?simm), reg(?rd)],
-	sem: ?rd <- ?rd + sxt(?simm)
+	sem: ?rd <- ?rd\s + sxt(?simm)
 }).
 instr_info(andi, info{
 	title: 'AND Immediate',
