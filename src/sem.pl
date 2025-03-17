@@ -257,7 +257,11 @@ instr_info(tbit, info{
 	descr: 'Test a specific bit in a register, modifying `$TS`.',
 	ex: ['tbit 12, w'],
 	operands: [imm(?bit_idx), reg(?rs)],
-	sem: b_push($$ts, ((?rs >> bitslice(?bit_idx, #3 .. #0)) and #1) == #1)
+	sem: (
+        ?shamt = bitslice(?bit_idx, #3 .. #0);
+        ?bit = (?rs >> (?shamt/u)) and #1;
+        b_push($$ts, ?bit == #1)
+    )
 }).
 instr_info(cbit, info{
 	title: 'Clear Bit',

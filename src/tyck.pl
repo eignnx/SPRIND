@@ -60,21 +60,30 @@ int_ty(i/N) :- N in 1 .. sup.
 inference(_Tcx, #Term, Ty) :-
     ( integer(Term) ->
         N = Term,
-        zcompare(Ordering, N, 0),
-        ord_inference(Ordering, Ty, N)
+        integer_inference(N, Ty)
     ; atom(Term) ->
         Constant = Term,
         sem:def(#Constant, N),
-        zcompare(Ordering, N, 0),
-        ord_inference(Ordering, Ty, N)
+        integer_inference(N, Ty)
     ).
+
+integer_inference(N, Ty) :-
+    zcompare(Ordering, N, 0),
+    ord_inference(Ordering, Ty, N).
+
 
 ord_inference(>, u/Bits, N) :- 2 ^ #Bits #> #N.
 ord_inference(>, s/Bits, N) :- 2 ^ (#Bits - 1) #> #N.
 ord_inference(>, i/Bits, N) :- 2 ^ #Bits #> #N.
 ord_inference(<, s/Bits, N) :- -1 * 2 ^ (#Bits - 1) #< #N.
 ord_inference(<, i/Bits, N) :- -1 * 2 ^ (#Bits - 1) #< #N.
+ord_inference(=, u/Bits, 0) :- Bits in 1 .. sup.
+ord_inference(=, s/Bits, 0) :- Bits in 1 .. sup.
+ord_inference(=, i/Bits, 0) :- Bits in 1 .. sup.
     
+kind(u).
+kind(s).
+kind(i).
 
 % Type coercion sytax.
 % `#123/9` -> 9-bit integer
@@ -82,6 +91,15 @@ ord_inference(<, i/Bits, N) :- -1 * 2 ^ (#Bits - 1) #< #N.
 % `#123/i/32` -> 32-bit bitvector
 % `#123/8/u` -> 8-bit unsigned integer
 % Note: `#9999999999999999/8` is invalid, cause the number doesn't fit in 8 bits.
+inference(_Tcx, #N/Kind, Kind/Bits) :-
+    integer(N), kind(Kind), !,
+    integer_inference(N, Kind/Bits).
+inference(_Tcx, #N/Bits, Kind/Bits) :-
+    integer(N), integer(Bits), !,
+    integer_inference(N, Kind/Bits).
+inference(Tcx, Expr/Kind/Bits, Kind/Bits) :-
+    kind(Kind), integer(Bits), !,
+    inference(Tcx, Expr, Kind/Bits).
 inference(Tcx, Expr/Bits, Kind/Bits) :- integer(Bits), inference(Tcx, Expr, Kind/_).
 inference(Tcx, Expr/u, u/Bits) :- inference(Tcx, Expr, _/Bits).
 inference(Tcx, Expr/s, s/Bits) :- inference(Tcx, Expr, _/Bits).
@@ -111,6 +129,7 @@ inference(Tcx, A or B, i/Bits) :-
 inference(Tcx, A xor B, i/Bits) :-
     inference(Tcx, A, _/Bits),
     inference(Tcx, B, _/Bits).
+
 inference(Tcx, A << B, TyA) :-
     inference(Tcx, A, TyA),
     _/TyABits = TyA,
@@ -118,9 +137,12 @@ inference(Tcx, A << B, TyA) :-
     2 ^ #IdxBits #>= #TyABits.
 inference(Tcx, A >> B, TyA) :-
     inference(Tcx, A, TyA),
+    inference(Tcx, B, TyB),
+    u/IdxBits = TyB,
     _/TyABits = TyA,
-    inference(Tcx, B, u/IdxBits),
-    2 ^ #IdxBits #>= #TyABits.
+    ( 2 ^ #IdxBits #>= #TyABits -> true
+    ; throw(error('type of shift amount must have at least lg(N) bits to shift a value with N bits.'(A/TyA >> B/TyB)))
+    ).
 
 inference(Tcx, ~(A), i/Bits) :-
     inference(Tcx, A, _/Bits).
@@ -196,7 +218,7 @@ inference(Tcx, hi_lo(Hi, Lo), i/WholeBits) :-
     inference(Tcx, Hi, HiTy),
     inference(Tcx, Lo, LoTy),
     HiTy = LoTy,
-    Kind/Bits = HiTy,
+    _/Bits = HiTy,
     #WholeBits #= 2 * #Bits.
 
 inference(Tcx, { Elements }, Ty) :-
@@ -217,16 +239,15 @@ inference(Tcx, bit(LVal, Index), bool) :-
     _/LValTyBits = LValTy,
     2 ^ #IndexBits #>= #LValTyBits.
 
-inference(Tcx, bitslice(LVal, HiExpr .. LoExpr), LValKind/NewSize) :-
-    inference(Tcx, LVal, LValTy),
+inference(Tcx, bitslice(LVal, HiExpr .. LoExpr), i/NewSize) :-
+    inference(Tcx, LVal, _/LValBits),
     inference(Tcx, HiExpr, u/IndexBits),
     inference(Tcx, LoExpr, u/IndexBits),
     rval_consteval(HiExpr, #Hi),
     rval_consteval(LoExpr, #Lo),
     #Hi #> #Lo,
-    LValKind/LValBits = LValTy,
     2 ^ #IndexBits #> #LValBits,
-    #NewSize #= #Hi - #Lo.
+    #NewSize #= #Hi - #Lo + 1.
 
 rval_consteval(#N, #N) :- integer(N).
 rval_consteval(#Sym, #N) :-
