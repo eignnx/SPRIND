@@ -363,7 +363,7 @@ instr_info(addicy, info{
 	ex: ['addicy x, 3'],
 	operands: [simm(?simm), reg(?rd)],
 	sem: (
-        ?rd <- ?rd + sxt(?simm) + bit($$cc, #carry_flag_bit);
+        ?rd <- ?rd\s + sxt(?simm) + bit($$cc, #carry_flag_bit)\16\s;
         bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
         bit($$cc, #overflow_flag_bit) <- attr(cpu/alu/overflow)
     )
@@ -374,7 +374,7 @@ instr_info(subicy, info{
 	ex: ['subicy x, 3'],
 	operands: [simm(?simm), reg(?rd)],
 	sem: (
-        ?rd <- ?rd - sxt(?simm) - bit($$cc, #carry_flag_bit);
+        ?rd <- ?rd\s - sxt(?simm) - bit($$cc, #carry_flag_bit)\16\s;
         bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
         bit($$cc, #overflow_flag_bit) <- attr(cpu/alu/overflow)
     )
@@ -452,7 +452,7 @@ instr_info(addcy, info{
 	ex: ['addcy x, y'],
 	operands: [reg(?rs), reg(?rd)],
 	sem: (
-        ?rd <- ?rd + ?rs + bit($$cc, #carry_flag_bit);
+        ?rd <- ?rd + ?rs + bit($$cc, #carry_flag_bit)\16;
         bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
         bit($$cc, #overflow_flag_bit) <- attr(cpu/alu/overflow)
     )
@@ -463,7 +463,7 @@ instr_info(subcy, info{
 	ex: ['subcy x, y'],
 	operands: [reg(?rs), reg(?rd)],
 	sem: (
-        ?rd <- ?rd - ?rs - bit($$cc, #carry_flag_bit);
+        ?rd <- ?rd - ?rs - bit($$cc, #carry_flag_bit)\16;
         bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
         bit($$cc, #overflow_flag_bit) <- attr(cpu/alu/overflow)
     )

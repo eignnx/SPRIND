@@ -48,9 +48,6 @@ operand_immbits_name_type(simm(?Name), ImmBits, Name, s\ImmBits).
 supertype_subtype(i\Bits, s\Bits).
 supertype_subtype(i\Bits, u\Bits).
 supertype_subtype(Ty, Ty).
-% supertype_subtype(bool, i\1).
-% supertype_subtype(bool, u\1).
-% supertype_subtype(bool, s\1).
 
 int_ty(u\N) :- N in 1 .. sup.
 int_ty(s\N) :- N in 1 .. sup.
@@ -113,11 +110,11 @@ inference(Tcx, A - B, TyA) :-
     inference(Tcx, A, TyA),
     inference(Tcx, B, TyB),
     TyA = TyB.
-inference(Tcx, A == B, bool) :-
+inference(Tcx, A == B, i\1) :-
     inference(Tcx, A, TyA),
     inference(Tcx, B, TyB),
     TyA = TyB.
-inference(Tcx, A \= B, bool) :-
+inference(Tcx, A \= B, i\1) :-
     inference(Tcx, A, TyA),
     inference(Tcx, B, TyB),
     TyA = TyB.
@@ -154,8 +151,8 @@ inference(Tcx, A >> B, TyA) :-
 
 inference(Tcx, ~(A), i\Bits) :-
     inference(Tcx, A, _\Bits).
-inference(Tcx, !(A), bool) :-
-    inference(Tcx, A, bool).
+inference(Tcx, !(A), i\1) :-
+    inference(Tcx, A, _\1).
 
 %% meet(Lhs:ty, Meeting:ty, Rhs:ty).
 meet(u\Bits, i\Bits, i\Bits).
@@ -165,9 +162,8 @@ meet(i\Bits, i\Bits, u\Bits).
 meet(i\Bits, i\Bits, s\Bits).
 meet(s\Bits, s\Bits, s\Bits).
 meet(u\Bits, u\Bits, u\Bits).
-meet(bool, bool, bool).
 
-inference(Tcx, compare(A, RelOp, B), bool) :-
+inference(Tcx, compare(A, RelOp, B), i\1) :-
     relop(RelOp, Ty),
     ( inference(Tcx, A, TyA) -> true
     ; throw(error('failure to infer `compare` operand'(A)))
@@ -204,7 +200,7 @@ inference(Tcx, attr(Path), Ty) :-
     ; inference(Tcx, Value, Ty)
     ).
 
-inference(Tcx, b_pop(LVal), bool) :-
+inference(Tcx, b_pop(LVal), i\1) :-
     inference(Tcx, LVal, Ty),
     int_ty(Ty).
 
@@ -258,11 +254,12 @@ fold_concat_element_tys(Tcx, [X | Xs], i\N) :-
     fold_concat_element_tys(Tcx, Xs, i\N0).
     
 
-inference(Tcx, bit(LVal, Index), bool) :-
+inference(Tcx, bit(LVal, Index), i\1) :-
+    inference(Tcx, LVal, _\LValBits),
     inference(Tcx, Index, u\IndexBits),
-    inference(Tcx, LVal, LValTy),
-    _\LValTyBits = LValTy,
-    2 ^ #IndexBits #>= #LValTyBits.
+    ( 2 ^ #IndexBits #>= #LValBits -> true
+    ; throw(error('`bit` index value must have lg(N) bits to index a value with N bits'(bit(LVal\LValBits, Index\IndexBits))))
+    ).
 
 inference(Tcx, bitslice(LVal, HiExpr .. LoExpr), i\NewSize) :-
     inference(Tcx, LVal, _\LValBits),
@@ -289,16 +286,16 @@ stmt_inference(Tcx, b_push(LVal, RVal), Tcx) :-
     ( inference(Tcx, RVal, RValTy) -> true
     ; throw(error('`b_push` could not infer 2nd arg'(RVal)))
     ),
-    ( RValTy = bool -> true
+    ( RValTy = i\1 -> true
     ; throw(error('`b_push` accepts a boolean as 2nd arg'(RVal\RValTy)))
     ).
 
 stmt_inference(Tcx, if(Cond, Consq), Tcx) :-
-    (inference(Tcx, Cond, bool) -> true ; throw(error('if condition must be type bool'(Cond)))),
+    (inference(Tcx, Cond, i\1) -> true ; throw(error('if condition must be type `i\\1`'(Cond)))),
     stmt_inference(Tcx, Consq, _).
 
 stmt_inference(Tcx, if(Cond, Consq, Alt), Tcx) :-
-    (inference(Tcx, Cond, bool) -> true ; throw(error('if condition must be type bool'(Cond)))),
+    (inference(Tcx, Cond, i\1) -> true ; throw(error('if condition must be type `i\\1`'(Cond)))),
     stmt_inference(Tcx, Consq, _),
     stmt_inference(Tcx, Alt, _).
 
