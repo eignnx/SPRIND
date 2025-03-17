@@ -1,4 +1,7 @@
 
+> !!! validation_failed(incompatible bit sizes(instruction(sb),memory access must produce a `u(16)` address(?(adr)+ ?(simm))))
+
+
 # SPRIND Instruction Set Architecture Specification
 
 
@@ -2550,6 +2553,3 @@ todo
 ```
 
 --------------
-
-> !!! validation_failed(incompatible bit sizes(instruction(sb),memory access must produce a `u(16)` address(?(adr)+ ?(simm))))
-

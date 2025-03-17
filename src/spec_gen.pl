@@ -20,8 +20,8 @@
 
 
 show_table :-
-    utils:warn_if_nondet(spec_gen:show_table_),
     catch(validate:run_validations, error(E), format('~n> !!! ~w~n~n', [E])),
+    utils:warn_if_nondet(spec_gen:show_table_),
     true.
 
 show_table_ :-
