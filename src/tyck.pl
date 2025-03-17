@@ -122,6 +122,11 @@ inference(Tcx, A >> B, TyA) :-
     inference(Tcx, B, u/IdxBits),
     2 ^ #IdxBits #>= #TyABits.
 
+inference(Tcx, ~(A), i/Bits) :-
+    inference(Tcx, A, _/Bits).
+inference(Tcx, !(A), bool) :-
+    inference(Tcx, A, bool).
+
 inference(Tcx, compare(A, <(Ty), B), bool) :-
     inference(Tcx, A, Ty),
     inference(Tcx, B, Ty).
@@ -137,8 +142,10 @@ inference(Tcx, compare(A, >=(Ty), B), bool) :-
 
 
 inference(Tcx, [Address], _/8) :-
-    inference(Tcx, Address, u/16) -> true
-    ; throw(error('memory must be accessed with a `u/16` address'(Address))).
+    inference(Tcx, Address, AddressTy),
+    ( AddressTy = u/16 -> true
+    ; throw(error('memory must be accessed with a `u/16` address'(Address/AddressTy)))
+    ).
 
 inference(Tcx, ?Symbol, Ty) :-
     member(Symbol-Ty, Tcx).
@@ -261,9 +268,13 @@ stmt_inference(Tcx0, First ; Rest, Tcx) :-
 
 stmt_inference(Tcx, Dst <- Src, Tcx) :-
     inference(Tcx, Dst, DstTy),
-    inference(Tcx, Src, SrcTy),
+    ( inference(Tcx, Src, SrcTy) -> true
+    ; throw(error('bad binding expression'(Src)))
+    ),
     ( supertype_subtype(DstTy, SrcTy) -> true
-    ; throw(error('bad assignment stmt'(Dst/DstTy <- Src/SrcTy)))
+    ;
+        format(atom(Msg), 'cannot store a `~q` in a `~q`', [SrcTy, DstTy]),
+        throw(error('bad assignment'(Dst <- Src, Msg)))
     ).
 
 

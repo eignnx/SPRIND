@@ -35,6 +35,8 @@ rval_(A \= B) --> rval(A), rval(B).
 rval_(A and B) --> rval(A), rval(B).
 rval_(A or B) --> rval(A), rval(B).
 rval_(A xor B) --> rval(A), rval(B).
+rval_(!(A)) --> rval(A).
+rval_(~(A)) --> rval(A).
 rval_(b_pop(LVal)) --> lval(LVal).
 rval_(zxt(RVal)) --> rval(RVal).
 rval_(sxt(RVal)) --> rval(RVal).
@@ -138,7 +140,7 @@ instr_info(lw, info{
 	ex: ['lw w, [sp+12]'],
     operands: [simm(?simm), reg(?rs), reg(?rd)],
 	sem: (
-        ?ptr = (?rs/s + sxt(?simm))/u and #0b1111111111111110;
+        ?ptr = ((?rs/s + sxt(?simm)) and #0b1111111111111110)/u;
         ?rd <- {[?ptr + #1], [?ptr]}
     )
 }).
@@ -158,9 +160,9 @@ instr_info(sw, info{
 	ex: ['sw [sp-20], x'],
     operands: [simm(?simm), reg(?rd), reg(?rs)],
 	sem: (
-        ?ptr = (?rd + ?simm) and #0b1111111111111110;
-        [?ptr/u] <- lo(?rs);
-        [?ptr/u + #1] <- hi(?rs)
+        ?ptr = ((?rd/s + sxt(?simm)) and #0b1111111111111110)/u;
+        [?ptr] <- lo(?rs);
+        [?ptr + #1] <- hi(?rs)
     )
 }).
 
@@ -168,9 +170,9 @@ instr_info(call, info{
 	title: 'Call Subroutine',
 	descr: 'Call a subroutine at the specified address.',
 	ex: ['call SOME_LABEL'],
-	operands: [imm(?imm)],
+	operands: [simm(?simm)],
 	sem: (
-        $$pc <- $$pc + (sxt(?imm) << #subr_align);
+        $$pc <- $$pc/s + (sxt(?simm) << #subr_align);
         $$ra <- $$pc + #2
     )
 }).
@@ -179,25 +181,25 @@ instr_info(b, info{
 	title: 'Branch',
 	descr: 'Branch to the specified address by adding the immediate offset to `$PC`.',
 	ex: ['b SOME_LABEL'],
-	operands: [imm(?offset)],
-	sem: $$pc <- $$pc + sxt(?offset)
+	operands: [simm(?offset)],
+	sem: $$pc <- $$pc/s + sxt(?offset)
 }).
 instr_info(bt, info{
 	title: 'Branch If True',
 	descr: 'Branch to the specified address if the condition is true by adding the immediate offset to `$PC`.',
 	ex: ['bt SOME_LABEL'],
-	operands: [imm(?offset)],
-	sem: if(b_pop($$ts) == #1,
-        $$pc <- $$pc + sxt(?offset)
+	operands: [simm(?offset)],
+	sem: if(b_pop($$ts),
+        $$pc <- $$pc/s + sxt(?offset)
     )
 }).
 instr_info(bf, info{
 	title: 'Branch If False',
 	descr: 'Branch to the specified address if the condition is false by adding the immediate offset to `$PC`.',
 	ex: ['bf SOME_LABEL'],
-	operands: [imm(?offset)],
-	sem: if(b_pop($$ts) == #0,
-        $$pc <- $$pc + sxt(?offset)
+	operands: [simm(?offset)],
+	sem: if(!(b_pop($$ts)),
+        $$pc <- $$pc/s + sxt(?offset)
     )
 }).
 
@@ -205,7 +207,7 @@ instr_info(li, info{
 	title: 'Load Immediate',
 	descr: 'Load an immediate value into a register.',
 	ex: ['li x, 123'],
-	operands: [imm(?simm), reg(?rd)],
+	operands: [simm(?simm), reg(?rd)],
 	sem: ?rd <- sxt(?simm)
 }).
 instr_info(szi, info{
@@ -221,7 +223,7 @@ instr_info(lgb, info{
 	descr: 'Load a byte from a memory address offset from `$GP`.',
 	ex: ['lgb x, [gp+8]'],
 	operands: [imm(?disp), reg(?rd)],
-	sem: ?rd <- zxt([$$gp + zxt(?disp)])
+	sem: ?rd <- zxt([$$gp/u + zxt(?disp)])
 }).
 instr_info(lgw, info{
 	title: 'Load Global Word',
@@ -229,8 +231,8 @@ instr_info(lgw, info{
 	ex: ['lgw x, [gp+8]'],
 	operands: [imm(?disp), reg(?rd)],
 	sem: (
-        ?ptr = ($$gp + zxt(?disp)) and #0b1111111111111110;
-        ?rd <- hi_lo([?ptr + #1], [?ptr])
+        ?ptr = (($$gp/u + zxt(?disp)) and #0b1111111111111110)/u;
+        ?rd <- {[?ptr + #1], [?ptr]}
     )
 }).
 instr_info(sgb, info{
@@ -238,7 +240,7 @@ instr_info(sgb, info{
 	descr: 'Store a byte into memory address offset from `$GP`.',
 	ex: ['sgb [gp+8], x'],
 	operands: [imm(?disp), reg(?rs)],
-	sem: [$$gp + zxt(?disp)] <- ?rs
+	sem: [$$gp/u + zxt(?disp)] <- lo(?rs)
 }).
 instr_info(sgw, info{
 	title: 'Store Global Word',
@@ -246,8 +248,8 @@ instr_info(sgw, info{
 	ex: ['sgw [gp+8], x'],
 	operands: [imm(?disp), reg(?rs)],
 	sem: (
-        ?ptr = ($$gp + zxt(?disp)) and #0b1111111111111110;
-        hi_lo([?ptr + #1], [?ptr]) <- ?rs
+        ?ptr = (($$gp/u + zxt(?disp)) and #0b1111111111111110)/u;
+        {[?ptr + #1], [?ptr]} <- ?rs
     )
 }).
 instr_info(tbit, info{
