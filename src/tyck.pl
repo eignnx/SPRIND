@@ -47,21 +47,20 @@ operand_immbits_name_type(simm(?Name), ImmBits, Name, s/ImmBits).
 supertype_subtype(i/Bits, s/Bits).
 supertype_subtype(i/Bits, u/Bits).
 supertype_subtype(Ty, Ty).
+% supertype_subtype(bool, i/1).
+% supertype_subtype(bool, u/1).
+% supertype_subtype(bool, s/1).
 
-ty(u/N, N) :- N in 1 .. sup.
-ty(s/N, N) :- N in 1 .. sup.
-ty(i/N, N) :- N in 1 .. sup.
-
-ty_newsize(u/_, N, u/N) :- N in 1 .. sup.
-ty_newsize(s/_, N, s/N) :- N in 1 .. sup.
-ty_newsize(i/_, N, i/N) :- N in 1 .. sup.
+int_ty(u/N) :- N in 1 .. sup.
+int_ty(s/N) :- N in 1 .. sup.
+int_ty(i/N) :- N in 1 .. sup.
 
 :- discontiguous inference/3.
 
 inference(_Tcx, #Term, Ty) :-
     ( number(Term) ->
         N = Term,
-        ty(Ty, Bits),
+        _/Bits = Ty,
         zcompare(Ordering, N, 0),
         inference_bit_ord(Ordering, N, Bits, Ty)
     ; atom(Term) ->
@@ -78,25 +77,24 @@ inference(_Tcx, #Term, Ty) :-
 % `#123/8/u` -> 8-bit unsigned integer
 % Note: `#9999999999999999/8` is invalid, cause the number doesn't fit in 8 bits.
 inference(Tcx, Expr/Term, Ty) :-
-    inference(Tcx, Expr, ETy),
+    inference(Tcx, Expr, EKind/EBits),
     ( integer(Term) ->
         Bits = Term,
         ( rval_consteval(Expr, #Number) ->
             (
-                (ETy = i/_ ; ETy = u/_),
+                member(EKind, [u, i]),
                 #Number #< 2 ^ #Bits
             ;
-                ETy = s/_,
+                EKind = s,
                 #Number #< 2 ^ (#Bits - 1),
                 #Number #>= -1 * 2 ^ (#Bits - 1)
             )
         ;
             true
         ),
-        ty_newsize(ETy, Bits, Ty)
+        Ty = EKind/Bits
     ; member(Term, [u, s, i]) ->
         IntType = Term,
-        ty(ETy, EBits),
         Ty = IntType/EBits
     ).
 
@@ -139,12 +137,12 @@ inference(Tcx, A xor B, TyA) :-
     TyA = TyB.
 inference(Tcx, A << B, TyA) :-
     inference(Tcx, A, TyA),
-    ty(TyA, TyABits),
+    _/TyABits = TyA,
     inference(Tcx, B, u/IdxBits),
     2 ^ #IdxBits #>= #TyABits.
 inference(Tcx, A >> B, TyA) :-
     inference(Tcx, A, TyA),
-    ty(TyA, TyABits),
+    _/TyABits = TyA,
     inference(Tcx, B, u/IdxBits),
     2 ^ #IdxBits #>= #TyABits.
 
@@ -176,7 +174,7 @@ inference(Tcx, attr(Path), Ty) :-
 
 inference(Tcx, b_pop(LVal), bool) :-
     inference(Tcx, LVal, Ty),
-    ty(Ty, _).
+    int_ty(Ty).
 
 inference(Tcx, zxt(Expr), i/ZxtBits) :-
     inference(Tcx, Expr, i/ExprBits),
@@ -197,27 +195,22 @@ inference(Tcx, zxt(Expr), _) :-
     inference(Tcx, Expr, s/_),
     throw(error('`zxt` cannot accept a `s/_` argument.'(expression(Expr)))).
 
-inference(Tcx, hi(X), Ty) :-
-    inference(Tcx, X, XTy),
-    ty(XTy, XTyBits),
-    XTyBits in 16 \/ 32 \/ 64,
-    #HalfBits #= #XTyBits div 2,
-    ty_newsize(XTy, HalfBits, Ty).
+inference(Tcx, hi(X), XKind/HalfBits) :-
+    inference(Tcx, X, XKind/XBits),
+    XBits in 16 \/ 32 \/ 64,
+    #HalfBits #= #XBits div 2.
 
-inference(Tcx, lo(X), Ty) :-
-    inference(Tcx, X, XTy),
-    ty(XTy, XTyBits),
-    XTyBits in 16 \/ 32 \/ 64,
-    #HalfBits #= #XTyBits div 2,
-    ty_newsize(XTy, HalfBits, Ty).
+inference(Tcx, lo(X), XKind/HalfBits) :-
+    inference(Tcx, X, XKind/XBits),
+    XBits in 16 \/ 32 \/ 64,
+    #HalfBits #= #XBits div 2.
 
-inference(Tcx, hi_lo(Hi, Lo), Ty) :-
+inference(Tcx, hi_lo(Hi, Lo), Kind/WholeBits) :-
     inference(Tcx, Hi, HiTy),
     inference(Tcx, Lo, LoTy),
     HiTy = LoTy,
-    ty(HiTy, Bits),
-    #WholeBits #= 2 * #Bits,
-    ty_newsize(HiTy, WholeBits, Ty).
+    Kind/Bits = HiTy,
+    #WholeBits #= 2 * #Bits.
 
 inference(Tcx, { Elements }, Ty) :-
     comma_list(Elements, EleList),
@@ -226,7 +219,7 @@ inference(Tcx, { Elements }, Ty) :-
 fold_concat_element_tys(_, [], i/0).
 fold_concat_element_tys(Tcx, [X | Xs], i/N) :-
     inference(Tcx, X, XTy),
-    ty(XTy, XBits),
+    _/XBits = XTy,
     #N #= #N0 + #XBits,
     fold_concat_element_tys(Tcx, Xs, i/N0).
     
@@ -234,20 +227,19 @@ fold_concat_element_tys(Tcx, [X | Xs], i/N) :-
 inference(Tcx, bit(LVal, Index), bool) :-
     inference(Tcx, Index, u/IndexBits),
     inference(Tcx, LVal, LValTy),
-    ty(LValTy, LValTyBits),
+    _/LValTyBits = LValTy,
     2 ^ #IndexBits #>= #LValTyBits.
 
-inference(Tcx, bitslice(LVal, HiExpr .. LoExpr), Ty) :-
+inference(Tcx, bitslice(LVal, HiExpr .. LoExpr), LValKind/NewSize) :-
     inference(Tcx, LVal, LValTy),
     inference(Tcx, HiExpr, u/IndexBits),
     inference(Tcx, LoExpr, u/IndexBits),
     rval_consteval(HiExpr, #Hi),
     rval_consteval(LoExpr, #Lo),
     #Hi #> #Lo,
-    ty(LValTy, LValTyBits),
-    2 ^ #IndexBits #> #LValTyBits,
-    #NewSize #= #Hi - #Lo,
-    ty_newsize(LValTy, NewSize, Ty).
+    LValKind/LValBits = LValTy,
+    2 ^ #IndexBits #> #LValBits,
+    #NewSize #= #Hi - #Lo.
 
 rval_consteval(#N, #N) :- integer(N).
 rval_consteval(#Sym, #N) :-
@@ -260,8 +252,11 @@ stmt_inference(Tcx, todo, Tcx).
 
 stmt_inference(Tcx, b_push(LVal, RVal), Tcx) :-
     inference(Tcx, LVal, LValTy),
-    inference(Tcx, RVal, bool),
-    ty(LValTy, _).
+    int_ty(LValTy),
+    inference(Tcx, RVal, RValTy),
+    ( RValTy = bool -> true
+    ; throw(error('`b_push` accepts a boolean as 2nd arg'(RVal/RValTy)))
+    ).
 
 stmt_inference(Tcx, if(Cond, Consq), Tcx) :-
     (inference(Tcx, Cond, bool) -> true ; throw(error('if condition must be type bool'(Cond)))),
