@@ -88,17 +88,47 @@ ty_newsize(i(_), N, i(N)) :- N in 1 .. sup.
 
 :- discontiguous inference/3.
 
-inference(_Tcx, #N, Ty) :-
-    number(N),
-    ty(Ty, Bits),
-    zcompare(Ordering, N, 0),
-    inference_bit_ord(Ordering, N, Bits, Ty).
+inference(_Tcx, #Term, Ty) :-
+    ( number(Term) ->
+        N = Term,
+        ty(Ty, Bits),
+        zcompare(Ordering, N, 0),
+        inference_bit_ord(Ordering, N, Bits, Ty)
+    ; atom(Term) ->
+        Constant = Term,
+        sem:def(#Constant, N),
+        zcompare(Ordering, N, 0),
+        inference_bit_ord(Ordering, N, _Bits, Ty)
+    ).
 
-inference(_Tcx, #Constant, Ty) :-
-    atom(Constant),
-    sem:def(#Constant, N),
-    zcompare(Ordering, N, 0),
-    inference_bit_ord(Ordering, N, _Bits, Ty).
+% Type coercion sytax.
+% `#123/9` -> 9-bit integer
+% `#123/s` -> signed integer
+% `#123/i/32` -> 32-bit bitvector
+% `#123/8/u` -> 8-bit unsigned integer
+% Note: `#9999999999999999/8` is invalid, cause the number doesn't fit in 8 bits.
+inference(Tcx, Expr/Term, Ty) :-
+    inference(Tcx, Expr, ETy),
+    ( integer(Term) ->
+        Bits = Term,
+        ( rval_consteval(Expr, #Number) ->
+            (
+                (ETy = i(_) ; ETy = u(_)),
+                #Number #< 2 ^ #Bits
+            ;
+                ETy = s(_),
+                #Number #< 2 ^ (#Bits - 1),
+                #Number #>= -1 * 2 ^ (#Bits - 1)
+            )
+        ;
+            true
+        ),
+        ty_newsize(ETy, Bits, Ty)
+    ; member(Term, [u, s, i]) ->
+        IntType = Term,
+        ty(ETy, EBits),
+        Ty =.. [IntType, EBits]
+    ).
 
 inference_bit_ord(>, N, Bits, u(Bits)) :- 2 ^ #Bits #> #N.
 inference_bit_ord(>, N, Bits, s(Bits)) :- 2 ^ (#Bits - 1) #> #N.
@@ -194,6 +224,40 @@ inference(Tcx, sxt(Expr), _) :-
 inference(Tcx, zxt(Expr), _) :-
     inference(Tcx, Expr, s(_)),
     throw(error('`zxt` cannot accept a `s(_)` argument.'(expression(Expr)))).
+
+inference(Tcx, hi(X), Ty) :-
+    inference(Tcx, X, XTy),
+    ty(XTy, XTyBits),
+    XTyBits in 16 \/ 32 \/ 64,
+    #HalfBits #= #XTyBits div 2,
+    ty_newsize(XTy, HalfBits, Ty).
+
+inference(Tcx, lo(X), Ty) :-
+    inference(Tcx, X, XTy),
+    ty(XTy, XTyBits),
+    XTyBits in 16 \/ 32 \/ 64,
+    #HalfBits #= #XTyBits div 2,
+    ty_newsize(XTy, HalfBits, Ty).
+
+inference(Tcx, hi_lo(Hi, Lo), Ty) :-
+    inference(Tcx, Hi, HiTy),
+    inference(Tcx, Lo, LoTy),
+    HiTy = LoTy,
+    ty(HiTy, Bits),
+    #WholeBits #= 2 * #Bits,
+    ty_newsize(HiTy, WholeBits, Ty).
+
+inference(Tcx, { Elements }, Ty) :-
+    comma_list(Elements, EleList),
+    fold_concat_element_tys(Tcx, EleList, Ty).
+
+fold_concat_element_tys(_, [], i(0)).
+fold_concat_element_tys(Tcx, [X | Xs], i(N)) :-
+    inference(Tcx, X, XTy),
+    ty(XTy, XBits),
+    #N #= #N0 + #XBits,
+    fold_concat_element_tys(Tcx, Xs, i(N0)).
+    
 
 inference(Tcx, bit(LVal, Index), Ty) :-
     inference(Tcx, Index, u(IndexBits)),

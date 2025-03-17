@@ -39,6 +39,7 @@ rval_(b_pop(LVal)) --> lval(LVal).
 rval_(zxt(RVal)) --> rval(RVal).
 rval_(sxt(RVal)) --> rval(RVal).
 rval_(compare(A, RelOp, B)) --> { relop(RelOp) }, rval(A), rval(B).
+rval_(RVal/Bits) --> rval(RVal), { Bits in 0 .. sup }.
 
 relop(<(IntTy)) :- int_ty(IntTy).
 relop(>(IntTy)) :- int_ty(IntTy).
@@ -61,6 +62,10 @@ lval(lo(RVal)) --> rval(RVal).
 lval(hi_lo(A, B)) --> rval(A), rval(B).
 lval(bitslice(LVal, Bound1 .. Bound2)) --> lval(LVal), rval(Bound1), rval(Bound2).
 lval(bit(LVal, Index)) --> lval(LVal), rval(Index).
+lval({ Elements }) --> { comma_list(Elements, EleList) }, all_lvals(EleList).
+
+all_lvals([]) --> [].
+all_lvals([X | Xs]) --> lval(X), all_lvals(Xs).
 
 path(Atom) --> { atom(Atom) }.
 path(Parent/Child) --> { atom(Child) }, path(Parent).
@@ -128,10 +133,10 @@ instr_info(lw, info{
 	title: 'Load Word',
 	descr: 'Load a word from memory into a register.',
 	ex: ['lw w, [sp+12]'],
-    operands: [imm(?simm), reg(?adr), reg(?rd)],
+    operands: [simm(?simm), reg(?adr), reg(?rd)],
 	sem: (
         ?ptr = (?adr + ?simm) and #0b1111111111111110;
-        ?rd <- hi_lo([?ptr + #1], [?ptr])
+        ?rd <- {[?ptr + #1], [?ptr]}
     )
 }).
 instr_info(sb, info{
