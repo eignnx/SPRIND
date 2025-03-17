@@ -111,9 +111,70 @@ inference(Tcx, A + B, TyA) :-
     inference(Tcx, A, TyA),
     inference(Tcx, B, TyB),
     TyA = TyB.
+inference(Tcx, A - B, TyA) :-
+    inference(Tcx, A, TyA),
+    inference(Tcx, B, TyB),
+    TyA = TyB.
+inference(Tcx, A == B, bool) :-
+    inference(Tcx, A, TyA),
+    inference(Tcx, B, TyB),
+    TyA = TyB.
+inference(Tcx, A \= B, bool) :-
+    inference(Tcx, A, TyA),
+    inference(Tcx, B, TyB),
+    TyA = TyB.
+inference(Tcx, A and B, TyA) :-
+    inference(Tcx, A, TyA),
+    inference(Tcx, B, TyB),
+    TyA = TyB.
+inference(Tcx, A or B, TyA) :-
+    inference(Tcx, A, TyA),
+    inference(Tcx, B, TyB),
+    TyA = TyB.
+inference(Tcx, A xor B, TyA) :-
+    inference(Tcx, A, TyA),
+    inference(Tcx, B, TyB),
+    TyA = TyB.
+inference(Tcx, A << B, TyA) :-
+    inference(Tcx, A, TyA),
+    ty(TyA, TyABits),
+    inference(Tcx, B, u(IdxBits)),
+    2 ^ #IdxBits #>= #TyABits.
+inference(Tcx, A >> B, TyA) :-
+    inference(Tcx, A, TyA),
+    ty(TyA, TyABits),
+    inference(Tcx, B, u(IdxBits)),
+    2 ^ #IdxBits #>= #TyABits.
+
+inference(Tcx, compare(A, <(Ty), B), bool) :-
+    inference(Tcx, A, Ty),
+    inference(Tcx, B, Ty).
+inference(Tcx, compare(A, >(Ty), B), bool) :-
+    inference(Tcx, A, Ty),
+    inference(Tcx, B, Ty).
+inference(Tcx, compare(A, <=(Ty), B), bool) :-
+    inference(Tcx, A, Ty),
+    inference(Tcx, B, Ty).
+inference(Tcx, compare(A, >=(Ty), B), bool) :-
+    inference(Tcx, A, Ty),
+    inference(Tcx, B, Ty).
 
 inference(Tcx, ?Symbol, Ty) :-
     member(Symbol-Ty, Tcx).
+inference(Tcx, [RVal], u(8)) :-
+    inference(Tcx, RVal, u(16)) -> true
+    ; throw(error('memory access must produce a `u(16)` address'(RVal))).
+inference(_, $Reg, i(Bits)) :- isa:regname_uses(Reg, _), isa:register_size(Bits).
+inference(_, $$SysReg, i(Bits)) :- isa:sysregname_name_size_description(SysReg, _, Bits, _).
+inference(Tcx, attr(Path), Ty) :-
+    sem:def(attr(Path), Value),
+    ( Value = signal -> Ty = i(1)
+    ; inference(Tcx, Value, Ty)
+    ).
+
+inference(Tcx, b_pop(LVal), bool) :-
+    inference(Tcx, LVal, Ty),
+    ty(Ty, _).
 
 inference(Tcx, zxt(Expr), i(ZxtBits)) :-
     inference(Tcx, Expr, i(ExprBits)),

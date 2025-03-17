@@ -38,13 +38,16 @@ rval_(A xor B) --> rval(A), rval(B).
 rval_(b_pop(LVal)) --> lval(LVal).
 rval_(zxt(RVal)) --> rval(RVal).
 rval_(sxt(RVal)) --> rval(RVal).
-rval_(compare(A, u16(RelOp), B)) --> { relop(RelOp) }, rval(A), rval(B).
-rval_(compare(A, s16(RelOp), B)) -->  { relop(RelOp) }, rval(A), rval(B).
+rval_(compare(A, RelOp, B)) --> { relop(RelOp) }, rval(A), rval(B).
 
-relop(<).
-relop(>).
-relop(<=).
-relop(>=).
+relop(<(IntTy)) :- int_ty(IntTy).
+relop(>(IntTy)) :- int_ty(IntTy).
+relop(<=(IntTy)) :- int_ty(IntTy).
+relop(>=(IntTy)) :- int_ty(IntTy).
+
+int_ty(u(_)).
+int_ty(s(_)).
+int_ty(i(_)).
 
 rval(RVal) --> rval_(RVal) -> [] ; [error(invalid_rval(RVal))].
 
@@ -262,28 +265,28 @@ instr_info(tli, info{
 	descr: 'Test if a register value is less than an immediate value.',
 	ex: ['tli x, -5'],
 	operands: [simm(?simm), reg(?rs)],
-	sem: b_push($$ts, compare(?rs, s16(<), sxt(?simm)))
+	sem: b_push($$ts, compare(?rs, <(s(16)), sxt(?simm)))
 }).
 instr_info(tgei, info{
 	title: 'Test Greater-than or Equal Immediate',
 	descr: 'Test if a register value is greater than or equal to an immediate value.',
 	ex: ['tgei x, -5'],
 	operands: [simm(?simm), reg(?rs)],
-	sem: b_push($$ts, compare(?rs, s16(>=), sxt(?simm)))
+	sem: b_push($$ts, compare(?rs, >=(s(16)), sxt(?simm)))
 }).
 instr_info(tbi, info{
 	title: 'Test Below Immediate',
 	descr: 'Test if a register value is below an immediate value.',
 	ex: ['tbi x, 10'],
 	operands: [imm(?imm), reg(?rs)],
-	sem: b_push($$ts, compare(?rs, u16(<), zxt(?imm)))
+	sem: b_push($$ts, compare(?rs, <(u(16)), zxt(?imm)))
 }).
 instr_info(taei, info{
 	title: 'Test Above or Equal',
 	descr: 'Test if a register value is above or equal to an immediate value.',
 	ex: ['taei x, 10'],
 	operands: [imm(?imm), reg(?rs)],
-	sem: b_push($$ts, compare(?rs, u16(>=), zxt(?imm)))
+	sem: b_push($$ts, compare(?rs, >=(u(16)), zxt(?imm)))
 }).
 instr_info(tnei, info{
 	title: 'Test Not Equal Immediate',
