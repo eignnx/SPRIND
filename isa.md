@@ -1,5 +1,5 @@
 
-> !!! validation_failed(tyck:incompatible bit sizes(instruction(sb),memory access must produce a `u(16)` address(?(adr)+ ?(simm))))
+> !!! validation_failed(tyck:incompatible bit sizes(instruction(sb),memory access must produce a `u/16` address(?(adr)+ ?(simm))))
 
 
 # SPRIND Instruction Set Architecture Specification
@@ -685,8 +685,8 @@ b_push($$ts,?rs >> bitslice(?bit_idx,#3..#0)  and  #1 == #1)
 
 ```
 [simm(?simm),reg(?rs)]
----------------------------------------------
-b_push($$ts,compare(?rs,<(s(16)),sxt(?simm)))
+--------------------------------------------
+b_push($$ts,compare(?rs,<(s/16),sxt(?simm)))
 ```
 
 --------------
@@ -714,8 +714,8 @@ b_push($$ts,compare(?rs,<(s(16)),sxt(?simm)))
 
 ```
 [simm(?simm),reg(?rs)]
-----------------------------------------------
-b_push($$ts,compare(?rs,>=(s(16)),sxt(?simm)))
+---------------------------------------------
+b_push($$ts,compare(?rs,>=(s/16),sxt(?simm)))
 ```
 
 --------------
@@ -743,8 +743,8 @@ b_push($$ts,compare(?rs,>=(s(16)),sxt(?simm)))
 
 ```
 [imm(?imm),reg(?rs)]
---------------------------------------------
-b_push($$ts,compare(?rs,<(u(16)),zxt(?imm)))
+-------------------------------------------
+b_push($$ts,compare(?rs,<(u/16),zxt(?imm)))
 ```
 
 --------------
@@ -772,8 +772,8 @@ b_push($$ts,compare(?rs,<(u(16)),zxt(?imm)))
 
 ```
 [imm(?imm),reg(?rs)]
----------------------------------------------
-b_push($$ts,compare(?rs,>=(u(16)),zxt(?imm)))
+--------------------------------------------
+b_push($$ts,compare(?rs,>=(u/16),zxt(?imm)))
 ```
 
 --------------
@@ -1413,8 +1413,8 @@ bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
 
 ```
 [reg(?r1),reg(?r2)]
---------------------------------------
-b_push($$ts,compare(?r1,<(s(16)),?r2))
+-------------------------------------
+b_push($$ts,compare(?r1,<(s/16),?r2))
 ```
 
 --------------
@@ -1442,8 +1442,8 @@ b_push($$ts,compare(?r1,<(s(16)),?r2))
 
 ```
 [reg(?r1),reg(?r2)]
----------------------------------------
-b_push($$ts,compare(?r1,>=(s(16)),?r2))
+--------------------------------------
+b_push($$ts,compare(?r1,>=(s/16),?r2))
 ```
 
 --------------
@@ -1471,8 +1471,8 @@ b_push($$ts,compare(?r1,>=(s(16)),?r2))
 
 ```
 [reg(?r1),reg(?r2)]
---------------------------------------
-b_push($$ts,compare(?r1,<(u(16)),?r2))
+-------------------------------------
+b_push($$ts,compare(?r1,<(u/16),?r2))
 ```
 
 --------------
@@ -1500,8 +1500,8 @@ b_push($$ts,compare(?r1,<(u(16)),?r2))
 
 ```
 [reg(?r1),reg(?r2)]
----------------------------------------
-b_push($$ts,compare(?r1,>=(u(16)),?r2))
+--------------------------------------
+b_push($$ts,compare(?r1,>=(u/16),?r2))
 ```
 
 --------------

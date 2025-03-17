@@ -40,23 +40,21 @@
         true
     ).
 
-operand_immbits_name_type(reg(?Name), _, Name, i(Bits)) :- isa:register_size(Bits).
-operand_immbits_name_type(imm(?Name), ImmBits, Name, u(ImmBits)).
-operand_immbits_name_type(simm(?Name), ImmBits, Name, s(ImmBits)).
+operand_immbits_name_type(reg(?Name), _, Name, i/Bits) :- isa:register_size(Bits).
+operand_immbits_name_type(imm(?Name), ImmBits, Name, u/ImmBits).
+operand_immbits_name_type(simm(?Name), ImmBits, Name, s/ImmBits).
 
-supertype_subtype(i(Bits), s(Bits)).
-supertype_subtype(i(Bits), u(Bits)).
+supertype_subtype(i/Bits, s/Bits).
+supertype_subtype(i/Bits, u/Bits).
 supertype_subtype(Ty, Ty).
-% supertype_subtype(u(A), u(B)) :- #A #>= #B.
-% supertype_subtype(s(A), s(B)) :- #A #>= #B.
 
-ty(u(N), N) :- N in 1 .. sup.
-ty(s(N), N) :- N in 1 .. sup.
-ty(i(N), N) :- N in 1 .. sup.
+ty(u/N, N) :- N in 1 .. sup.
+ty(s/N, N) :- N in 1 .. sup.
+ty(i/N, N) :- N in 1 .. sup.
 
-ty_newsize(u(_), N, u(N)) :- N in 1 .. sup.
-ty_newsize(s(_), N, s(N)) :- N in 1 .. sup.
-ty_newsize(i(_), N, i(N)) :- N in 1 .. sup.
+ty_newsize(u/_, N, u/N) :- N in 1 .. sup.
+ty_newsize(s/_, N, s/N) :- N in 1 .. sup.
+ty_newsize(i/_, N, i/N) :- N in 1 .. sup.
 
 :- discontiguous inference/3.
 
@@ -85,10 +83,10 @@ inference(Tcx, Expr/Term, Ty) :-
         Bits = Term,
         ( rval_consteval(Expr, #Number) ->
             (
-                (ETy = i(_) ; ETy = u(_)),
+                (ETy = i/_ ; ETy = u/_),
                 #Number #< 2 ^ #Bits
             ;
-                ETy = s(_),
+                ETy = s/_,
                 #Number #< 2 ^ (#Bits - 1),
                 #Number #>= -1 * 2 ^ (#Bits - 1)
             )
@@ -99,21 +97,21 @@ inference(Tcx, Expr/Term, Ty) :-
     ; member(Term, [u, s, i]) ->
         IntType = Term,
         ty(ETy, EBits),
-        Ty =.. [IntType, EBits]
+        Ty = IntType/EBits
     ).
 
-inference_bit_ord(>, N, Bits, u(Bits)) :- 2 ^ #Bits #> #N.
-inference_bit_ord(>, N, Bits, s(Bits)) :- 2 ^ (#Bits - 1) #> #N.
-inference_bit_ord(>, N, Bits, i(Bits)) :- 2 ^ #Bits #> #N.
-inference_bit_ord(<, N, Bits, s(Bits)) :- -1 * 2 ^ (#Bits - 1) #< #N.
-inference_bit_ord(<, N, Bits, i(Bits)) :- -1 * 2 ^ (#Bits - 1) #< #N.
+inference_bit_ord(>, N, Bits, u/Bits) :- 2 ^ #Bits #> #N.
+inference_bit_ord(>, N, Bits, s/Bits) :- 2 ^ (#Bits - 1) #> #N.
+inference_bit_ord(>, N, Bits, i/Bits) :- 2 ^ #Bits #> #N.
+inference_bit_ord(<, N, Bits, s/Bits) :- -1 * 2 ^ (#Bits - 1) #< #N.
+inference_bit_ord(<, N, Bits, i/Bits) :- -1 * 2 ^ (#Bits - 1) #< #N.
     
 
 inference(Tcx, A + B, TyA) :-
     inference(Tcx, A, TyA),
     inference(Tcx, B, TyB),
     (TyA = TyB -> true
-    ; throw(error('bad binop'(A-TyA + B-TyB)))
+    ; throw(error('bad binop'(A/TyA + B/TyB)))
     ).
 inference(Tcx, A - B, TyA) :-
     inference(Tcx, A, TyA),
@@ -142,12 +140,12 @@ inference(Tcx, A xor B, TyA) :-
 inference(Tcx, A << B, TyA) :-
     inference(Tcx, A, TyA),
     ty(TyA, TyABits),
-    inference(Tcx, B, u(IdxBits)),
+    inference(Tcx, B, u/IdxBits),
     2 ^ #IdxBits #>= #TyABits.
 inference(Tcx, A >> B, TyA) :-
     inference(Tcx, A, TyA),
     ty(TyA, TyABits),
-    inference(Tcx, B, u(IdxBits)),
+    inference(Tcx, B, u/IdxBits),
     2 ^ #IdxBits #>= #TyABits.
 
 inference(Tcx, compare(A, <(Ty), B), bool) :-
@@ -165,14 +163,14 @@ inference(Tcx, compare(A, >=(Ty), B), bool) :-
 
 inference(Tcx, ?Symbol, Ty) :-
     member(Symbol-Ty, Tcx).
-inference(Tcx, [RVal], u(8)) :-
-    inference(Tcx, RVal, u(16)) -> true
-    ; throw(error('memory access must produce a `u(16)` address'(RVal))).
-inference(_, $Reg, i(Bits)) :- isa:regname_uses(Reg, _), isa:register_size(Bits).
-inference(_, $$SysReg, i(Bits)) :- isa:sysregname_name_size_description(SysReg, _, Bits, _).
+inference(Tcx, [RVal], u/8) :-
+    inference(Tcx, RVal, u/16) -> true
+    ; throw(error('memory access must produce a `u/16` address'(RVal))).
+inference(_, $Reg, i/Bits) :- isa:regname_uses(Reg, _), isa:register_size(Bits).
+inference(_, $$SysReg, i/Bits) :- isa:sysregname_name_size_description(SysReg, _, Bits, _).
 inference(Tcx, attr(Path), Ty) :-
     sem:def(attr(Path), Value),
-    ( Value = signal -> Ty = i(1)
+    ( Value = signal -> Ty = i/1
     ; inference(Tcx, Value, Ty)
     ).
 
@@ -180,24 +178,24 @@ inference(Tcx, b_pop(LVal), bool) :-
     inference(Tcx, LVal, Ty),
     ty(Ty, _).
 
-inference(Tcx, zxt(Expr), i(ZxtBits)) :-
-    inference(Tcx, Expr, i(ExprBits)),
+inference(Tcx, zxt(Expr), i/ZxtBits) :-
+    inference(Tcx, Expr, i/ExprBits),
     #ZxtBits #>= #ExprBits.
-inference(Tcx, zxt(Expr), u(ZxtBits)) :-
-    inference(Tcx, Expr, u(ExprBits)),
+inference(Tcx, zxt(Expr), u/ZxtBits) :-
+    inference(Tcx, Expr, u/ExprBits),
     #ZxtBits #>= #ExprBits.
-inference(Tcx, sxt(Expr), i(SxtBits)) :-
-    inference(Tcx, Expr, i(ExprBits)),
+inference(Tcx, sxt(Expr), i/SxtBits) :-
+    inference(Tcx, Expr, i/ExprBits),
     #SxtBits #>= #ExprBits.
-inference(Tcx, sxt(Expr), s(SxtBits)) :-
-    inference(Tcx, Expr, s(ExprBits)),
+inference(Tcx, sxt(Expr), s/SxtBits) :-
+    inference(Tcx, Expr, s/ExprBits),
     #SxtBits #>= #ExprBits.
 inference(Tcx, sxt(Expr), _) :-
-    inference(Tcx, Expr, u(_)),
-    throw(error('`sxt` cannot accept a `u(_)` argument.'(expression(Expr)))).
+    inference(Tcx, Expr, u/_),
+    throw(error('`sxt` cannot accept a `u/_` argument.'(expression(Expr)))).
 inference(Tcx, zxt(Expr), _) :-
-    inference(Tcx, Expr, s(_)),
-    throw(error('`zxt` cannot accept a `s(_)` argument.'(expression(Expr)))).
+    inference(Tcx, Expr, s/_),
+    throw(error('`zxt` cannot accept a `s/_` argument.'(expression(Expr)))).
 
 inference(Tcx, hi(X), Ty) :-
     inference(Tcx, X, XTy),
@@ -225,25 +223,24 @@ inference(Tcx, { Elements }, Ty) :-
     comma_list(Elements, EleList),
     fold_concat_element_tys(Tcx, EleList, Ty).
 
-fold_concat_element_tys(_, [], i(0)).
-fold_concat_element_tys(Tcx, [X | Xs], i(N)) :-
+fold_concat_element_tys(_, [], i/0).
+fold_concat_element_tys(Tcx, [X | Xs], i/N) :-
     inference(Tcx, X, XTy),
     ty(XTy, XBits),
     #N #= #N0 + #XBits,
-    fold_concat_element_tys(Tcx, Xs, i(N0)).
+    fold_concat_element_tys(Tcx, Xs, i/N0).
     
 
-inference(Tcx, bit(LVal, Index), Ty) :-
-    inference(Tcx, Index, u(IndexBits)),
+inference(Tcx, bit(LVal, Index), bool) :-
+    inference(Tcx, Index, u/IndexBits),
     inference(Tcx, LVal, LValTy),
     ty(LValTy, LValTyBits),
-    2 ^ #IndexBits #>= #LValTyBits,
-    ty_newsize(LValTy, 1, Ty).
+    2 ^ #IndexBits #>= #LValTyBits.
 
 inference(Tcx, bitslice(LVal, HiExpr .. LoExpr), Ty) :-
     inference(Tcx, LVal, LValTy),
-    inference(Tcx, HiExpr, u(IndexBits)),
-    inference(Tcx, LoExpr, u(IndexBits)),
+    inference(Tcx, HiExpr, u/IndexBits),
+    inference(Tcx, LoExpr, u/IndexBits),
     rval_consteval(HiExpr, #Hi),
     rval_consteval(LoExpr, #Lo),
     #Hi #> #Lo,
@@ -267,11 +264,11 @@ stmt_inference(Tcx, b_push(LVal, RVal), Tcx) :-
     ty(LValTy, _).
 
 stmt_inference(Tcx, if(Cond, Consq), Tcx) :-
-    (inference(Tcx, Cond, bool) -> true ; throw(error('if condition must be type bool'))),
+    (inference(Tcx, Cond, bool) -> true ; throw(error('if condition must be type bool'(Cond)))),
     stmt_inference(Tcx, Consq, _).
 
 stmt_inference(Tcx, if(Cond, Consq, Alt), Tcx) :-
-    (inference(Tcx, Cond, bool) -> true ; throw(error('if condition must be type bool'))),
+    (inference(Tcx, Cond, bool) -> true ; throw(error('if condition must be type bool'(Cond)))),
     stmt_inference(Tcx, Consq, _),
     stmt_inference(Tcx, Alt, _).
 
@@ -289,7 +286,7 @@ stmt_inference(Tcx, Dst <- Src, Tcx) :-
     inference(Tcx, Dst, DstTy),
     inference(Tcx, Src, SrcTy),
     ( supertype_subtype(DstTy, SrcTy) -> true
-    ; throw(error('bad assignment stmt'(Dst-DstTy <- Src-SrcTy)))
+    ; throw(error('bad assignment stmt'(Dst/DstTy <- Src/SrcTy)))
     ).
 
 

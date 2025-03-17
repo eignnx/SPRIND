@@ -46,9 +46,9 @@ relop(>(IntTy)) :- int_ty(IntTy).
 relop(<=(IntTy)) :- int_ty(IntTy).
 relop(>=(IntTy)) :- int_ty(IntTy).
 
-int_ty(u(_)).
-int_ty(s(_)).
-int_ty(i(_)).
+int_ty(u/N) :- N in 1 .. sup.
+int_ty(s/N) :- N in 1 .. sup.
+int_ty(i/N) :- N in 1 .. sup.
 
 rval(RVal) --> rval_(RVal) -> [] ; [error(invalid_rval(RVal))].
 
@@ -273,28 +273,28 @@ instr_info(tli, info{
 	descr: 'Test if a register value is less than an immediate value.',
 	ex: ['tli x, -5'],
 	operands: [simm(?simm), reg(?rs)],
-	sem: b_push($$ts, compare(?rs, <(s(16)), sxt(?simm)))
+	sem: b_push($$ts, compare(?rs, <(s/16), sxt(?simm)))
 }).
 instr_info(tgei, info{
 	title: 'Test Greater-than or Equal Immediate',
 	descr: 'Test if a register value is greater than or equal to an immediate value.',
 	ex: ['tgei x, -5'],
 	operands: [simm(?simm), reg(?rs)],
-	sem: b_push($$ts, compare(?rs, >=(s(16)), sxt(?simm)))
+	sem: b_push($$ts, compare(?rs, >=(s/16), sxt(?simm)))
 }).
 instr_info(tbi, info{
 	title: 'Test Below Immediate',
 	descr: 'Test if a register value is below an immediate value.',
 	ex: ['tbi x, 10'],
 	operands: [imm(?imm), reg(?rs)],
-	sem: b_push($$ts, compare(?rs, <(u(16)), zxt(?imm)))
+	sem: b_push($$ts, compare(?rs, <(u/16), zxt(?imm)))
 }).
 instr_info(taei, info{
 	title: 'Test Above or Equal',
 	descr: 'Test if a register value is above or equal to an immediate value.',
 	ex: ['taei x, 10'],
 	operands: [imm(?imm), reg(?rs)],
-	sem: b_push($$ts, compare(?rs, >=(u(16)), zxt(?imm)))
+	sem: b_push($$ts, compare(?rs, >=(u/16), zxt(?imm)))
 }).
 instr_info(tnei, info{
 	title: 'Test Not Equal Immediate',
@@ -455,28 +455,28 @@ instr_info(tl, info{
 	descr: 'Test if the value of one register is less than another.',
 	ex: ['tl x, y'],
 	operands: [reg(?r1), reg(?r2)],
-	sem: b_push($$ts, compare(?r1, <(s(16)), ?r2))
+	sem: b_push($$ts, compare(?r1, <(s/16), ?r2))
 }).
 instr_info(tge, info{
 	title: 'Test Greater-than or Equal',
 	descr: 'Test if the value of one register is greater than or equal to another.',
 	ex: ['tge x, y'],
 	operands: [reg(?r1), reg(?r2)],
-	sem: b_push($$ts, compare(?r1, >=(s(16)), ?r2))
+	sem: b_push($$ts, compare(?r1, >=(s/16), ?r2))
 }).
 instr_info(tb, info{
 	title: 'Test Below',
 	descr: 'Test if the value of one register is below another.',
 	ex: ['tb x, y'],
 	operands: [reg(?r1), reg(?r2)],
-	sem: b_push($$ts, compare(?r1, <(u(16)), ?r2))
+	sem: b_push($$ts, compare(?r1, <(u/16), ?r2))
 }).
 instr_info(tae, info{
 	title: 'Test Above or Equal',
 	descr: 'Test if the value of one register is above or equal to another.',
 	ex: ['tae x, y'],
 	operands: [reg(?r1), reg(?r2)],
-	sem: b_push($$ts, compare(?r1, >=(u(16)), ?r2))
+	sem: b_push($$ts, compare(?r1, >=(u/16), ?r2))
 }).
 instr_info(tne, info{
 	title: 'Test Not Equal',
