@@ -58,17 +58,23 @@ int_ty(i/N) :- N in 1 .. sup.
 :- discontiguous inference/3.
 
 inference(_Tcx, #Term, Ty) :-
-    ( number(Term) ->
+    ( integer(Term) ->
         N = Term,
-        _/Bits = Ty,
         zcompare(Ordering, N, 0),
-        inference_bit_ord(Ordering, N, Bits, Ty)
+        ord_inference(Ordering, Ty, N)
     ; atom(Term) ->
         Constant = Term,
         sem:def(#Constant, N),
         zcompare(Ordering, N, 0),
-        inference_bit_ord(Ordering, N, _Bits, Ty)
+        ord_inference(Ordering, Ty, N)
     ).
+
+ord_inference(>, u/Bits, N) :- 2 ^ #Bits #> #N.
+ord_inference(>, s/Bits, N) :- 2 ^ (#Bits - 1) #> #N.
+ord_inference(>, i/Bits, N) :- 2 ^ #Bits #> #N.
+ord_inference(<, s/Bits, N) :- -1 * 2 ^ (#Bits - 1) #< #N.
+ord_inference(<, i/Bits, N) :- -1 * 2 ^ (#Bits - 1) #< #N.
+    
 
 % Type coercion sytax.
 % `#123/9` -> 9-bit integer
@@ -76,41 +82,14 @@ inference(_Tcx, #Term, Ty) :-
 % `#123/i/32` -> 32-bit bitvector
 % `#123/8/u` -> 8-bit unsigned integer
 % Note: `#9999999999999999/8` is invalid, cause the number doesn't fit in 8 bits.
-inference(Tcx, Expr/Term, Ty) :-
-    inference(Tcx, Expr, EKind/EBits),
-    ( integer(Term) ->
-        Bits = Term,
-        ( rval_consteval(Expr, #Number) ->
-            (
-                member(EKind, [u, i]),
-                #Number #< 2 ^ #Bits
-            ;
-                EKind = s,
-                #Number #< 2 ^ (#Bits - 1),
-                #Number #>= -1 * 2 ^ (#Bits - 1)
-            )
-        ;
-            true
-        ),
-        Ty = EKind/Bits
-    ; member(Term, [u, s, i]) ->
-        IntType = Term,
-        Ty = IntType/EBits
-    ).
+inference(Tcx, Expr/Bits, Kind/Bits) :- integer(Bits), inference(Tcx, Expr, Kind/_).
+inference(Tcx, Expr/u, u/Bits) :- inference(Tcx, Expr, u/Bits).
+inference(Tcx, Expr/s, s/Bits) :- inference(Tcx, Expr, s/Bits).
+inference(Tcx, Expr/i, i/Bits) :- inference(Tcx, Expr, i/Bits).
 
-inference_bit_ord(>, N, Bits, u/Bits) :- 2 ^ #Bits #> #N.
-inference_bit_ord(>, N, Bits, s/Bits) :- 2 ^ (#Bits - 1) #> #N.
-inference_bit_ord(>, N, Bits, i/Bits) :- 2 ^ #Bits #> #N.
-inference_bit_ord(<, N, Bits, s/Bits) :- -1 * 2 ^ (#Bits - 1) #< #N.
-inference_bit_ord(<, N, Bits, i/Bits) :- -1 * 2 ^ (#Bits - 1) #< #N.
-    
-
-inference(Tcx, A + B, TyA) :-
-    inference(Tcx, A, TyA),
-    inference(Tcx, B, TyB),
-    (TyA = TyB -> true
-    ; throw(error('bad binop'(A/TyA + B/TyB)))
-    ).
+inference(Tcx, A + B, Ty) :-
+    inference(Tcx, A, Ty),
+    inference(Tcx, B, Ty).
 inference(Tcx, A - B, TyA) :-
     inference(Tcx, A, TyA),
     inference(Tcx, B, TyB),
