@@ -21,6 +21,7 @@
 
 show_table :-
     catch(validate:run_validations, error(E), format('~n> !!! ~w~n~n', [E])),
+    % validate:run_validations,
     utils:warn_if_nondet(spec_gen:show_table_),
     true.
 
