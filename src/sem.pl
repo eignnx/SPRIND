@@ -39,7 +39,7 @@ rval_(b_pop(LVal)) --> lval(LVal).
 rval_(zxt(RVal)) --> rval(RVal).
 rval_(sxt(RVal)) --> rval(RVal).
 rval_(compare(A, RelOp, B)) --> { relop(RelOp) }, rval(A), rval(B).
-rval_(RVal/Bits) --> rval(RVal), { Bits in 0 .. sup }.
+rval_(RVal/Coersion) --> rval(RVal), { member(Coersion, [u, s, i]) ; integer(Coersion) }.
 
 relop(<(IntTy)) :- int_ty(IntTy).
 relop(>(IntTy)) :- int_ty(IntTy).
@@ -126,16 +126,19 @@ instr_info(lb, info{
 	title: 'Load Byte',
 	descr: 'Load a byte from memory into a register.',
     ex: ['lb w, [sp+12]'],
-    operands: [imm(?simm), reg(?adr), reg(?rd)],
-	sem: ?rd <- zxt([?adr + ?simm])
+    operands: [simm(?simm), reg(?rs), reg(?rd)],
+	sem: (
+        ?ptr = (?rs/s + sxt(?simm))/u;
+        ?rd <- zxt([?ptr])
+    )
 }).
 instr_info(lw, info{
 	title: 'Load Word',
 	descr: 'Load a word from memory into a register.',
 	ex: ['lw w, [sp+12]'],
-    operands: [simm(?simm), reg(?adr), reg(?rd)],
+    operands: [simm(?simm), reg(?rs), reg(?rd)],
 	sem: (
-        ?ptr = (?adr + ?simm) and #0b1111111111111110;
+        ?ptr = (?rs/s + sxt(?simm))/u and #0b1111111111111110;
         ?rd <- {[?ptr + #1], [?ptr]}
     )
 }).
@@ -452,28 +455,28 @@ instr_info(tl, info{
 	descr: 'Test if the value of one register is less than another.',
 	ex: ['tl x, y'],
 	operands: [reg(?r1), reg(?r2)],
-	sem: b_push($$ts, compare(?r1, s16(<), ?r2))
+	sem: b_push($$ts, compare(?r1, <(s(16)), ?r2))
 }).
 instr_info(tge, info{
 	title: 'Test Greater-than or Equal',
 	descr: 'Test if the value of one register is greater than or equal to another.',
 	ex: ['tge x, y'],
 	operands: [reg(?r1), reg(?r2)],
-	sem: b_push($$ts, compare(?r1, s16(>=), ?r2))
+	sem: b_push($$ts, compare(?r1, >=(s(16)), ?r2))
 }).
 instr_info(tb, info{
 	title: 'Test Below',
 	descr: 'Test if the value of one register is below another.',
 	ex: ['tb x, y'],
 	operands: [reg(?r1), reg(?r2)],
-	sem: b_push($$ts, compare(?r1, u16(<), ?r2))
+	sem: b_push($$ts, compare(?r1, <(u(16)), ?r2))
 }).
 instr_info(tae, info{
 	title: 'Test Above or Equal',
 	descr: 'Test if the value of one register is above or equal to another.',
 	ex: ['tae x, y'],
 	operands: [reg(?r1), reg(?r2)],
-	sem: b_push($$ts, compare(?r1, u16(>=), ?r2))
+	sem: b_push($$ts, compare(?r1, >=(u(16)), ?r2))
 }).
 instr_info(tne, info{
 	title: 'Test Not Equal',

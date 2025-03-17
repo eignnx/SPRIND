@@ -27,7 +27,7 @@ run_validations :-
     disprove('instr_info is not one-to-one with fmt_instr'(_)),
     disprove('ill-formed instruction semantics'(_, _)),
     disprove('undefined constant in semantic definition'(_, _)),
-    disprove('incompatible bit sizes'(_, _, _)),
+    disprove('incompatible bit sizes'(_, _)),
     true.
 
 disprove(NegativeCheck) :-
@@ -48,7 +48,7 @@ disprove(NegativeCheck) :-
 'ill-formed instruction semantics'(instruction(Instr), Errors) :-
     sem:instr_info(Instr, Info),
     phrase(sem:valid_semantics(Info.sem), Emissions),
-    include([error(E), E]>>true, Emissions, Errors),
+    convlist([error(E), E]>>true, Emissions, Errors),
     Errors = [_|_].
 
 'undefined constant in semantic definition'(instruction(Instr), undefined_constant(Constant)) :-
@@ -57,16 +57,23 @@ disprove(NegativeCheck) :-
     member(constant(Constant), Emissions),
     \+ sem:def(Constant, _).
 
-'incompatible bit sizes'(instruction(Instr), val1(_V1), val2(_V2)) :-
+'incompatible bit sizes'(instruction(Instr), Error) :-
     sem:instr_info(Instr, Info),
     isa:fmt_instr_title_description(Fmt, Instr, _, _),
     derive:fmt_opcodebits_immbits(Fmt, _, ImmBits),
     maplist(
         {ImmBits}/[Op, OpName-OpTy]>>operand_immbits_name_type(Op, ImmBits, OpName, OpTy),
         Info.operands,
-        _OpNamesOpTys
+        Tcx
     ),
-    false.
+    catch(
+        (
+            \+ stmt_inference(Tcx, Info.sem, _TcxOut),
+            Error = expression(Info.sem)
+        ),
+        error(Error),
+        true
+    ).
 
 operand_immbits_name_type(reg(?Name), _, Name, i(Bits)) :- isa:register_size(Bits).
 operand_immbits_name_type(imm(?Name), ImmBits, Name, u(ImmBits)).
@@ -140,7 +147,9 @@ inference_bit_ord(<, N, Bits, i(Bits)) :- -1 * 2 ^ (#Bits - 1) #< #N.
 inference(Tcx, A + B, TyA) :-
     inference(Tcx, A, TyA),
     inference(Tcx, B, TyB),
-    TyA = TyB.
+    (TyA = TyB -> true
+    ; throw(error('bad binop'(A-TyA + B-TyB)))
+    ).
 inference(Tcx, A - B, TyA) :-
     inference(Tcx, A, TyA),
     inference(Tcx, B, TyB),
@@ -314,7 +323,9 @@ stmt_inference(Tcx0, First ; Rest, Tcx) :-
 stmt_inference(Tcx, Dst <- Src, Tcx) :-
     inference(Tcx, Dst, DstTy),
     inference(Tcx, Src, SrcTy),
-    supertype_subtype(DstTy, SrcTy).
+    ( supertype_subtype(DstTy, SrcTy) -> true
+    ; throw(error('bad assignment stmt'(Dst-DstTy <- Src-SrcTy)))
+    ).
 
 
 
