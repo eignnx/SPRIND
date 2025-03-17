@@ -165,9 +165,10 @@
 ###### Semantics
 
 ```
-[imm(?simm),reg(?adr),reg(?rd)]
+[simm(?simm),reg(?rs),reg(?rd)]
 -------------------------------
-?rd <- zxt([?adr + ?simm])
+?ptr = ?rs/s + sxt(?simm)/u;
+?rd <- zxt([?ptr])
 ```
 
 --------------
@@ -194,10 +195,10 @@
 ###### Semantics
 
 ```
-[imm(?simm),reg(?adr),reg(?rd)]
----------------------------------
-?ptr = ?adr + ?simm  and  #65534;
-?rd <- hi_lo([?ptr + #1],[?ptr])
+[simm(?simm),reg(?rs),reg(?rd)]
+-----------------------------------------
+?ptr = ?rs/s + sxt(?simm)/u  and  #65534;
+?rd <- {[?ptr + #1],[?ptr]}
 ```
 
 --------------
@@ -1409,8 +1410,8 @@ bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
 
 ```
 [reg(?r1),reg(?r2)]
-------------------------------------
-b_push($$ts,compare(?r1,s16(<),?r2))
+--------------------------------------
+b_push($$ts,compare(?r1,<(s(16)),?r2))
 ```
 
 --------------
@@ -1438,8 +1439,8 @@ b_push($$ts,compare(?r1,s16(<),?r2))
 
 ```
 [reg(?r1),reg(?r2)]
--------------------------------------
-b_push($$ts,compare(?r1,s16(>=),?r2))
+---------------------------------------
+b_push($$ts,compare(?r1,>=(s(16)),?r2))
 ```
 
 --------------
@@ -1467,8 +1468,8 @@ b_push($$ts,compare(?r1,s16(>=),?r2))
 
 ```
 [reg(?r1),reg(?r2)]
-------------------------------------
-b_push($$ts,compare(?r1,u16(<),?r2))
+--------------------------------------
+b_push($$ts,compare(?r1,<(u(16)),?r2))
 ```
 
 --------------
@@ -1496,8 +1497,8 @@ b_push($$ts,compare(?r1,u16(<),?r2))
 
 ```
 [reg(?r1),reg(?r2)]
--------------------------------------
-b_push($$ts,compare(?r1,u16(>=),?r2))
+---------------------------------------
+b_push($$ts,compare(?r1,>=(u(16)),?r2))
 ```
 
 --------------
@@ -2549,3 +2550,6 @@ todo
 ```
 
 --------------
+
+> !!! validation_failed(incompatible bit sizes(instruction(sb),memory access must produce a `u(16)` address(?(adr)+ ?(simm))))
+
