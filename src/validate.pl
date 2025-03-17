@@ -20,6 +20,7 @@
 
 :- use_module(library(clpfd)).
 :- use_module(isa).
+:- use_module(derive).
 :- use_module(sem).
 
 run_validations :-
@@ -56,14 +57,14 @@ disprove(NegativeCheck) :-
     member(constant(Constant), Emissions),
     \+ sem:def(Constant, _).
 
-'incompatible bit sizes'(instruction(Instr), val1(V1), val2(V2)) :-
+'incompatible bit sizes'(instruction(Instr), val1(_V1), val2(_V2)) :-
     sem:instr_info(Instr, Info),
     isa:fmt_instr_title_description(Fmt, Instr, _, _),
     derive:fmt_opcodebits_immbits(Fmt, _, ImmBits),
     maplist(
         {ImmBits}/[Op, OpName-OpTy]>>operand_immbits_name_type(Op, ImmBits, OpName, OpTy),
         Info.operands,
-        OpNamesOpTys
+        _OpNamesOpTys
     ),
     false.
 
@@ -77,9 +78,13 @@ supertype_subtype(Ty, Ty).
 % supertype_subtype(u(A), u(B)) :- #A #>= #B.
 % supertype_subtype(s(A), s(B)) :- #A #>= #B.
 
-ty(u(N), N) :- N in 1 .. 32.
-ty(s(N), N) :- N in 1 .. 32.
-ty(i(N), N) :- N in 1 .. 32.
+ty(u(N), N) :- N in 1 .. sup.
+ty(s(N), N) :- N in 1 .. sup.
+ty(i(N), N) :- N in 1 .. sup.
+
+ty_newsize(u(_), N, u(N)) :- N in 1 .. sup.
+ty_newsize(s(_), N, s(N)) :- N in 1 .. sup.
+ty_newsize(i(_), N, i(N)) :- N in 1 .. sup.
 
 :- discontiguous inference/3.
 
@@ -89,6 +94,12 @@ inference(_Tcx, #N, Ty) :-
     zcompare(Ordering, N, 0),
     inference_bit_ord(Ordering, N, Bits, Ty).
 
+inference(_Tcx, #Constant, Ty) :-
+    atom(Constant),
+    sem:def(#Constant, N),
+    zcompare(Ordering, N, 0),
+    inference_bit_ord(Ordering, N, _Bits, Ty).
+
 inference_bit_ord(>, N, Bits, u(Bits)) :- 2 ^ #Bits #> #N.
 inference_bit_ord(>, N, Bits, s(Bits)) :- 2 ^ (#Bits - 1) #> #N.
 inference_bit_ord(>, N, Bits, i(Bits)) :- 2 ^ #Bits #> #N.
@@ -96,7 +107,7 @@ inference_bit_ord(<, N, Bits, s(Bits)) :- -1 * 2 ^ (#Bits - 1) #< #N.
 inference_bit_ord(<, N, Bits, i(Bits)) :- -1 * 2 ^ (#Bits - 1) #< #N.
     
 
-inference(Tcx, A + B, Ty) :-
+inference(Tcx, A + B, TyA) :-
     inference(Tcx, A, TyA),
     inference(Tcx, B, TyB),
     TyA = TyB.
@@ -117,16 +128,42 @@ inference(Tcx, sxt(Expr), s(SxtBits)) :-
     inference(Tcx, Expr, s(ExprBits)),
     #SxtBits #>= #ExprBits.
 inference(Tcx, sxt(Expr), _) :-
-    inference(Tcx, Expr, u(ExprBits)),
+    inference(Tcx, Expr, u(_)),
     throw(error('`sxt` cannot accept a `u(_)` argument.'(expression(Expr)))).
 inference(Tcx, zxt(Expr), _) :-
-    inference(Tcx, Expr, s(ExprBits)),
+    inference(Tcx, Expr, s(_)),
     throw(error('`zxt` cannot accept a `s(_)` argument.'(expression(Expr)))).
 
-stmt_inference(Tcx0, ?Var = Expr ; Rest0, Tcx) :-
+inference(Tcx, bit(LVal, Index), Ty) :-
+    inference(Tcx, Index, u(IndexBits)),
+    inference(Tcx, LVal, LValTy),
+    ty(LValTy, LValTyBits),
+    2 ^ #IndexBits #>= #LValTyBits,
+    ty_newsize(LValTy, 1, Ty).
+
+inference(Tcx, bitslice(LVal, HiExpr .. LoExpr), Ty) :-
+    inference(Tcx, LVal, LValTy),
+    inference(Tcx, HiExpr, u(IndexBits)),
+    inference(Tcx, LoExpr, u(IndexBits)),
+    rval_consteval(HiExpr, #Hi),
+    rval_consteval(LoExpr, #Lo),
+    #Hi #> #Lo,
+    ty(LValTy, LValTyBits),
+    2 ^ #IndexBits #> #LValTyBits,
+    #NewSize #= #Hi - #Lo,
+    ty_newsize(LValTy, NewSize, Ty).
+
+rval_consteval(#N, #N) :- integer(N).
+rval_consteval(#Sym, #N) :-
+    atom(Sym),
+    ( sem:def(#Sym, N) -> true
+    ; throw(error('undefined constant symbol'(#Sym)))
+    ).
+
+stmt_inference(Tcx0, ?Var = Expr ; Rest, Tcx) :-
     inference(Tcx0, Expr, ExprTy),
     TcxExt = [Var-ExprTy | Tcx0],
-    stmt_inference(TcxExt, Rest0, Rest, Tcx).
+    stmt_inference(TcxExt, Rest, Tcx).
 
 stmt_inference(Tcx, Dst <- Src, Tcx) :-
     inference(Tcx, Dst, DstTy),
