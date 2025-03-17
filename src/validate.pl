@@ -160,17 +160,37 @@ rval_consteval(#Sym, #N) :-
     ; throw(error('undefined constant symbol'(#Sym)))
     ).
 
-stmt_inference(Tcx0, ?Var = Expr ; Rest, Tcx) :-
-    inference(Tcx0, Expr, ExprTy),
-    TcxExt = [Var-ExprTy | Tcx0],
-    stmt_inference(TcxExt, Rest, Tcx).
+stmt_inference(Tcx, todo, Tcx).
+
+stmt_inference(Tcx, b_push(LVal, RVal), Tcx) :-
+    inference(Tcx, LVal, LValTy),
+    inference(Tcx, RVal, bool),
+    ty(LValTy, _).
+
+stmt_inference(Tcx, if(Cond, Consq), Tcx) :-
+    (inference(Tcx, Cond, bool) -> true ; throw(error('if condition must be type bool'))),
+    stmt_inference(Tcx, Consq, _).
+
+stmt_inference(Tcx, if(Cond, Consq, Alt), Tcx) :-
+    (inference(Tcx, Cond, bool) -> true ; throw(error('if condition must be type bool'))),
+    stmt_inference(Tcx, Consq, _),
+    stmt_inference(Tcx, Alt, _).
+
+stmt_inference(Tcx0, First ; Rest, Tcx) :-
+    ( First = (?Var = Expr) ->
+        inference(Tcx0, Expr, ExprTy),
+        TcxExt = [Var-ExprTy | Tcx0],
+        stmt_inference(TcxExt, Rest, Tcx)
+    ;
+        stmt_inference(Tcx0, First, Tcx1),
+        stmt_inference(Tcx1, Rest, Tcx)
+    ).
 
 stmt_inference(Tcx, Dst <- Src, Tcx) :-
     inference(Tcx, Dst, DstTy),
     inference(Tcx, Src, SrcTy),
     supertype_subtype(DstTy, SrcTy).
 
-stmt_inference(Tcx, todo, todo, Tcx).
 
 
 
