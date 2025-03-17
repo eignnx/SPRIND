@@ -146,18 +146,21 @@ instr_info(sb, info{
 	title: 'Store Byte',
 	descr: 'Store a byte from a register into memory.',
 	ex: ['sb [sp-20], x'],
-    operands: [imm(?simm), reg(?adr), reg(?rs)],
-	sem: [?adr + ?simm] <- ?rs
+    operands: [simm(?simm), reg(?rd), reg(?rs)],
+	sem: (
+        ?ptr = ?rd/s + sxt(?simm);
+        [?ptr/u] <- lo(?rs)
+    )
 }).
 instr_info(sw, info{
 	title: 'Store Word',
 	descr: 'Store a word from a register into memory.',
 	ex: ['sw [sp-20], x'],
-    operands: [imm(?simm), reg(?adr), reg(?rs)],
+    operands: [simm(?simm), reg(?rd), reg(?rs)],
 	sem: (
-        ?ptr = (?adr + ?simm) and #0b1111111111111110;
-        [?ptr] <- lo(?rs);
-        [?ptr + #1] <- hi(?rs)
+        ?ptr = (?rd + ?simm) and #0b1111111111111110;
+        [?ptr/u] <- lo(?rs);
+        [?ptr/u + #1] <- hi(?rs)
     )
 }).
 

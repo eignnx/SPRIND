@@ -34,7 +34,7 @@
     catch(
         (
             \+ stmt_inference(Tcx, Info.sem, _TcxOut),
-            Error = expression(Info.sem)
+            Error = stmt(Info.sem)
         ),
         error(Error),
         true
@@ -83,9 +83,9 @@ ord_inference(<, i/Bits, N) :- -1 * 2 ^ (#Bits - 1) #< #N.
 % `#123/8/u` -> 8-bit unsigned integer
 % Note: `#9999999999999999/8` is invalid, cause the number doesn't fit in 8 bits.
 inference(Tcx, Expr/Bits, Kind/Bits) :- integer(Bits), inference(Tcx, Expr, Kind/_).
-inference(Tcx, Expr/u, u/Bits) :- inference(Tcx, Expr, u/Bits).
-inference(Tcx, Expr/s, s/Bits) :- inference(Tcx, Expr, s/Bits).
-inference(Tcx, Expr/i, i/Bits) :- inference(Tcx, Expr, i/Bits).
+inference(Tcx, Expr/u, u/Bits) :- inference(Tcx, Expr, _/Bits).
+inference(Tcx, Expr/s, s/Bits) :- inference(Tcx, Expr, _/Bits).
+inference(Tcx, Expr/i, i/Bits) :- inference(Tcx, Expr, _/Bits).
 
 inference(Tcx, A + B, Ty) :-
     inference(Tcx, A, Ty),
@@ -102,18 +102,15 @@ inference(Tcx, A \= B, bool) :-
     inference(Tcx, A, TyA),
     inference(Tcx, B, TyB),
     TyA = TyB.
-inference(Tcx, A and B, TyA) :-
-    inference(Tcx, A, TyA),
-    inference(Tcx, B, TyB),
-    TyA = TyB.
-inference(Tcx, A or B, TyA) :-
-    inference(Tcx, A, TyA),
-    inference(Tcx, B, TyB),
-    TyA = TyB.
-inference(Tcx, A xor B, TyA) :-
-    inference(Tcx, A, TyA),
-    inference(Tcx, B, TyB),
-    TyA = TyB.
+inference(Tcx, A and B, i/Bits) :-
+    inference(Tcx, A, _/Bits),
+    inference(Tcx, B, _/Bits).
+inference(Tcx, A or B, i/Bits) :-
+    inference(Tcx, A, _/Bits),
+    inference(Tcx, B, _/Bits).
+inference(Tcx, A xor B, i/Bits) :-
+    inference(Tcx, A, _/Bits),
+    inference(Tcx, B, _/Bits).
 inference(Tcx, A << B, TyA) :-
     inference(Tcx, A, TyA),
     _/TyABits = TyA,
@@ -138,11 +135,13 @@ inference(Tcx, compare(A, >=(Ty), B), bool) :-
     inference(Tcx, A, Ty),
     inference(Tcx, B, Ty).
 
+
+inference(Tcx, [Address], _/8) :-
+    inference(Tcx, Address, u/16) -> true
+    ; throw(error('memory must be accessed with a `u/16` address'(Address))).
+
 inference(Tcx, ?Symbol, Ty) :-
     member(Symbol-Ty, Tcx).
-inference(Tcx, [RVal], u/8) :-
-    inference(Tcx, RVal, u/16) -> true
-    ; throw(error('memory access must produce a `u/16` address'(RVal))).
 inference(_, $Reg, i/Bits) :- isa:regname_uses(Reg, _), isa:register_size(Bits).
 inference(_, $$SysReg, i/Bits) :- isa:sysregname_name_size_description(SysReg, _, Bits, _).
 inference(Tcx, attr(Path), Ty) :-
@@ -161,12 +160,14 @@ inference(Tcx, zxt(Expr), i/ZxtBits) :-
 inference(Tcx, zxt(Expr), u/ZxtBits) :-
     inference(Tcx, Expr, u/ExprBits),
     #ZxtBits #>= #ExprBits.
+
 inference(Tcx, sxt(Expr), i/SxtBits) :-
     inference(Tcx, Expr, i/ExprBits),
     #SxtBits #>= #ExprBits.
 inference(Tcx, sxt(Expr), s/SxtBits) :-
     inference(Tcx, Expr, s/ExprBits),
     #SxtBits #>= #ExprBits.
+
 inference(Tcx, sxt(Expr), _) :-
     inference(Tcx, Expr, u/_),
     throw(error('`sxt` cannot accept a `u/_` argument.'(expression(Expr)))).
@@ -174,17 +175,17 @@ inference(Tcx, zxt(Expr), _) :-
     inference(Tcx, Expr, s/_),
     throw(error('`zxt` cannot accept a `s/_` argument.'(expression(Expr)))).
 
-inference(Tcx, hi(X), XKind/HalfBits) :-
-    inference(Tcx, X, XKind/XBits),
+inference(Tcx, hi(X), i/HalfBits) :-
+    inference(Tcx, X, _/XBits),
     XBits in 16 \/ 32 \/ 64,
     #HalfBits #= #XBits div 2.
 
-inference(Tcx, lo(X), XKind/HalfBits) :-
-    inference(Tcx, X, XKind/XBits),
+inference(Tcx, lo(X), i/HalfBits) :-
+    inference(Tcx, X, _/XBits),
     XBits in 16 \/ 32 \/ 64,
     #HalfBits #= #XBits div 2.
 
-inference(Tcx, hi_lo(Hi, Lo), Kind/WholeBits) :-
+inference(Tcx, hi_lo(Hi, Lo), i/WholeBits) :-
     inference(Tcx, Hi, HiTy),
     inference(Tcx, Lo, LoTy),
     HiTy = LoTy,
@@ -248,7 +249,9 @@ stmt_inference(Tcx, if(Cond, Consq, Alt), Tcx) :-
 
 stmt_inference(Tcx0, First ; Rest, Tcx) :-
     ( First = (?Var = Expr) ->
-        inference(Tcx0, Expr, ExprTy),
+        ( inference(Tcx0, Expr, ExprTy) -> true
+        ; throw(error('bad binding expression'(Expr)))
+        ),
         TcxExt = [Var-ExprTy | Tcx0],
         stmt_inference(TcxExt, Rest, Tcx)
     ;
