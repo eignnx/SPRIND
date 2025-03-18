@@ -110,12 +110,12 @@
 
 | Format | [Bit Pattern](#legend) | Opcodes Available | Assigned | Utilization | Range of Immediate |
 |:----|:---:|:---:|:---:|:---:|:---:|
-| `rri` | `00ooiiiiiisssrrr` | 4 | 4 | 100% | `imm6` in `[-32,31]` or `[0,63]` |
-| `subr` | `010iiiiiiiiiiiii` | 1 | 1 | 100% | `imm13` in `[-4096,4095]` or `[0,8191]` |
-| `b` | `0110ooiiiiiiiiii` | 4 | 3 | 75% | `imm10` in `[-512,511]` or `[0,1023]` |
-| `li` | `0111oiiiiiiiirrr` | 2 | 2 | 100% | `imm8` in `[-128,127]` or `[0,255]` |
-| `ri(1)` | `10oooooiiiiiirrr` | 32 | 22 | 69% | `imm6` in `[-32,31]` or `[0,63]` |
-| `ri(2)` | `110ooooiiiiiirrr` | 16 | 0 | 0% | `imm6` in `[-32,31]` or `[0,63]` |
+| `rri` | `00ooiiiiiisssrrr` | 4 | 4 | 100% | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `subr` | `010iiiiiiiiiiiii` | 1 | 1 | 100% | `imm13` in `[-4096, 4095]` or `[0, 8191]` |
+| `b` | `0110ooiiiiiiiiii` | 4 | 3 | 75% | `imm10` in `[-512, 511]` or `[0, 1023]` |
+| `li` | `0111oiiiiiiiirrr` | 2 | 2 | 100% | `imm8` in `[-128, 127]` or `[0, 255]` |
+| `ri(1)` | `10oooooiiiiiirrr` | 32 | 22 | 69% | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `ri(2)` | `110ooooiiiiiirrr` | 16 | 0 | 0% | `imm6` in `[-32, 31]` or `[0, 63]` |
 | `ext` | `1110oooooooooooo` | 4096 | 0 | 0% |  |
 | `rrr` | `11110ootttsssrrr` | 4 | 1 | 25% |  |
 | `rr(1)` | `111110oooosssrrr` | 16 | 8 | 50% |  |
@@ -163,15 +163,15 @@
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `0000iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `0000iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[simm(?simm),reg(?rs),reg(?rd)]
--------------------------------
-?ptr = ?rs\s + sxt(?simm)\u;
-?rd <- zxt([?ptr])
+[simm(simm), reg(rs), reg(rd)]
+------------------------------
+let ptr := rs\s+sxt(simm)\u;
+rd <- zxt([ptr])
 ```
 
 --------------
@@ -193,15 +193,15 @@
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `0001iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `0001iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[simm(?simm),reg(?rs),reg(?rd)]
------------------------------------------
-?ptr = ?rs\s + sxt(?simm)  and  #65534\u;
-?rd <- {[?ptr + #1],[?ptr]}
+[simm(simm), reg(rs), reg(rd)]
+----------------------------------------
+let ptr := and(rs\s+sxt(simm), 65534)\u;
+rd <- {[ptr+1], [ptr]}
 ```
 
 --------------
@@ -223,15 +223,15 @@
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `0010iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `0010iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[simm(?simm),reg(?rd),reg(?rs)]
--------------------------------
-?ptr = ?rd\s + sxt(?simm);
-[?ptr\u] <- lo(?rs)
+[simm(simm), reg(rd), reg(rs)]
+------------------------------
+let ptr := rd\s+sxt(simm);
+[ptr\u] <- lo(rs)
 ```
 
 --------------
@@ -253,16 +253,16 @@
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `0011iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `0011iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[simm(?simm),reg(?rd),reg(?rs)]
------------------------------------------
-?ptr = ?rd\s + sxt(?simm)  and  #65534\u;
-[?ptr] <- lo(?rs);
-[?ptr + #1] <- hi(?rs)
+[simm(simm), reg(rd), reg(rs)]
+----------------------------------------
+let ptr := and(rd\s+sxt(simm), 65534)\u;
+[ptr] <- lo(rs);
+[ptr+1] <- hi(rs)
 ```
 
 --------------
@@ -287,15 +287,15 @@
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `010iiiiiiiiiiiii` | 13 | `imm13` in `[-4096,4095]` or `[0,8191]` |
+| `010iiiiiiiiiiiii` | 13 | `imm13` in `[-4096, 4095]` or `[0, 8191]` |
 
 ###### Semantics
 
 ```
-[simm(?simm)]
--------------------------------------------
-$$pc <- $$pc\s + sxt(?simm) << #subr_align;
-$$ra <- $$pc + #2
+[simm(simm)]
+-----------------------------------
+$PC <- $PC\s+sxt(simm)<<subr_align;
+$RA <- $PC+2
 ```
 
 --------------
@@ -320,14 +320,14 @@ $$ra <- $$pc + #2
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `011000iiiiiiiiii` | 10 | `imm10` in `[-512,511]` or `[0,1023]` |
+| `011000iiiiiiiiii` | 10 | `imm10` in `[-512, 511]` or `[0, 1023]` |
 
 ###### Semantics
 
 ```
-[simm(?offset)]
------------------------------
-$$pc <- $$pc\s + sxt(?offset)
+[simm(offset)]
+------------------------
+$PC <- $PC\s+sxt(offset)
 ```
 
 --------------
@@ -349,15 +349,15 @@ $$pc <- $$pc\s + sxt(?offset)
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `011001iiiiiiiiii` | 10 | `imm10` in `[-512,511]` or `[0,1023]` |
+| `011001iiiiiiiiii` | 10 | `imm10` in `[-512, 511]` or `[0, 1023]` |
 
 ###### Semantics
 
 ```
-[simm(?offset)]
----------------------------------
-if b_pop($$ts) {
-    $$pc <- $$pc\s + sxt(?offset)
+[simm(offset)]
+----------------------------
+if b_pop($TS) {
+    $PC <- $PC\s+sxt(offset)
 }
 ```
 
@@ -380,15 +380,15 @@ if b_pop($$ts) {
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `011010iiiiiiiiii` | 10 | `imm10` in `[-512,511]` or `[0,1023]` |
+| `011010iiiiiiiiii` | 10 | `imm10` in `[-512, 511]` or `[0, 1023]` |
 
 ###### Semantics
 
 ```
-[simm(?offset)]
----------------------------------
-if !(b_pop($$ts)) {
-    $$pc <- $$pc\s + sxt(?offset)
+[simm(offset)]
+----------------------------
+if !(b_pop($TS)) {
+    $PC <- $PC\s+sxt(offset)
 }
 ```
 
@@ -414,14 +414,14 @@ if !(b_pop($$ts)) {
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `01110iiiiiiiirrr` | 8 | `imm8` in `[-128,127]` or `[0,255]` |
+| `01110iiiiiiiirrr` | 8 | `imm8` in `[-128, 127]` or `[0, 255]` |
 
 ###### Semantics
 
 ```
-[simm(?simm),reg(?rd)]
-----------------------
-?rd <- sxt(?simm)
+[simm(simm), reg(rd)]
+---------------------
+rd <- sxt(simm)
 ```
 
 --------------
@@ -443,14 +443,14 @@ if !(b_pop($$ts)) {
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `01111iiiiiiiirrr` | 8 | `imm8` in `[-128,127]` or `[0,255]` |
+| `01111iiiiiiiirrr` | 8 | `imm8` in `[-128, 127]` or `[0, 255]` |
 
 ###### Semantics
 
 ```
-[imm(?imm),reg(?rd)]
--------------------------------
-?rd <- ?rd << #8  or  zxt(?imm)
+[imm(imm), reg(rd)]
+-------------------------
+rd <- or(rd<<8, zxt(imm))
 ```
 
 --------------
@@ -475,14 +475,14 @@ if !(b_pop($$ts)) {
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1000000iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `1000000iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[imm(?disp),reg(?rd)]
----------------------------------
-?rd <- zxt([$$gp\u + zxt(?disp)])
+[imm(disp), reg(rd)]
+----------------------------
+rd <- zxt([$GP\u+zxt(disp)])
 ```
 
 --------------
@@ -504,15 +504,15 @@ if !(b_pop($$ts)) {
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1000001iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `1000001iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[imm(?disp),reg(?rd)]
-------------------------------------------
-?ptr = $$gp\u + zxt(?disp)  and  #65534\u;
-?rd <- {[?ptr + #1],[?ptr]}
+[imm(disp), reg(rd)]
+-----------------------------------------
+let ptr := and($GP\u+zxt(disp), 65534)\u;
+rd <- {[ptr+1], [ptr]}
 ```
 
 --------------
@@ -534,14 +534,14 @@ if !(b_pop($$ts)) {
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1000010iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `1000010iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[imm(?disp),reg(?rs)]
---------------------------------
-[$$gp\u + zxt(?disp)] <- lo(?rs)
+[imm(disp), reg(rs)]
+---------------------------
+[$GP\u+zxt(disp)] <- lo(rs)
 ```
 
 --------------
@@ -563,15 +563,15 @@ if !(b_pop($$ts)) {
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1000011iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `1000011iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[imm(?disp),reg(?rs)]
-------------------------------------------
-?ptr = $$gp\u + zxt(?disp)  and  #65534\u;
-{[?ptr + #1],[?ptr]} <- ?rs
+[imm(disp), reg(rs)]
+-----------------------------------------
+let ptr := and($GP\u+zxt(disp), 65534)\u;
+{[ptr+1], [ptr]} <- rs
 ```
 
 --------------
@@ -593,16 +593,16 @@ if !(b_pop($$ts)) {
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1000100iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `1000100iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[imm(?bit_idx),reg(?rs)]
------------------------------------
-?shamt = bitslice(?bit_idx,#3..#0);
-?bit = ?rs >> ?shamt\u  and  #1;
-b_push($$ts,?bit == #1)
+[imm(bit_idx), reg(rs)]
+-------------------------------------
+let shamt := bitslice(bit_idx, 3..0);
+let bit := and(rs>>shamt\u, 1);
+b_push($TS, bit==1)
 ```
 
 --------------
@@ -624,16 +624,16 @@ b_push($$ts,?bit == #1)
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1000101iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `1000101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[imm(?bit_idx),reg(?rd)]
------------------------------------
-?idx = bitslice(?bit_idx,#3..#0)\u;
-?mask = ~(#1 << ?idx);
-?rd <- ?rd  and  ?mask
+[imm(bit_idx), reg(rd)]
+-------------------------------------
+let idx := bitslice(bit_idx, 3..0)\u;
+let mask := ~(1<<idx);
+rd <- and(rd, mask)
 ```
 
 --------------
@@ -655,16 +655,16 @@ b_push($$ts,?bit == #1)
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1000110iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `1000110iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[imm(?bit_idx),reg(?rd)]
------------------------------------
-?idx = bitslice(?bit_idx,#3..#0)\u;
-?mask = ~(#1 << ?idx);
-?rd <- ?rd  or  ?mask
+[imm(bit_idx), reg(rd)]
+-------------------------------------
+let idx := bitslice(bit_idx, 3..0)\u;
+let mask := ~(1<<idx);
+rd <- or(rd, mask)
 ```
 
 --------------
@@ -686,14 +686,14 @@ b_push($$ts,?bit == #1)
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1000111iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `1000111iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[simm(?simm),reg(?rs)]
+[simm(simm), reg(rs)]
 ----------------------------------------------
-b_push($$ts,compare(?rs\s,<(s\16),sxt(?simm)))
+b_push($TS, compare(rs\s, <(s\16), sxt(simm)))
 ```
 
 --------------
@@ -715,14 +715,14 @@ b_push($$ts,compare(?rs\s,<(s\16),sxt(?simm)))
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1001000iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `1001000iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[simm(?simm),reg(?rs)]
+[simm(simm), reg(rs)]
 -----------------------------------------------
-b_push($$ts,compare(?rs\s,>=(s\16),sxt(?simm)))
+b_push($TS, compare(rs\s, >=(s\16), sxt(simm)))
 ```
 
 --------------
@@ -744,14 +744,14 @@ b_push($$ts,compare(?rs\s,>=(s\16),sxt(?simm)))
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1001001iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `1001001iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[imm(?imm),reg(?rs)]
+[imm(imm), reg(rs)]
 ---------------------------------------------
-b_push($$ts,compare(?rs\u,<(u\16),zxt(?imm)))
+b_push($TS, compare(rs\u, <(u\16), zxt(imm)))
 ```
 
 --------------
@@ -773,14 +773,14 @@ b_push($$ts,compare(?rs\u,<(u\16),zxt(?imm)))
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1001010iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `1001010iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[imm(?imm),reg(?rs)]
+[imm(imm), reg(rs)]
 ----------------------------------------------
-b_push($$ts,compare(?rs\u,>=(u\16),zxt(?imm)))
+b_push($TS, compare(rs\u, >=(u\16), zxt(imm)))
 ```
 
 --------------
@@ -802,14 +802,14 @@ b_push($$ts,compare(?rs\u,>=(u\16),zxt(?imm)))
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1001011iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `1001011iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[simm(?simm),reg(?rs)]
---------------------------------
-b_push($$ts,?rs\s != sxt(?simm))
+[simm(simm), reg(rs)]
+----------------------------
+b_push($TS, rs\s\=sxt(simm))
 ```
 
 --------------
@@ -831,14 +831,14 @@ b_push($$ts,?rs\s != sxt(?simm))
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1001100iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `1001100iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[simm(?simm),reg(?rs)]
---------------------------------
-b_push($$ts,?rs\s == sxt(?simm))
+[simm(simm), reg(rs)]
+----------------------------
+b_push($TS, rs\s==sxt(simm))
 ```
 
 --------------
@@ -860,14 +860,14 @@ b_push($$ts,?rs\s == sxt(?simm))
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1001101iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `1001101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[simm(?simm),reg(?rd)]
--------------------------
-?rd <- ?rd\s + sxt(?simm)
+[simm(simm), reg(rd)]
+---------------------
+rd <- rd\s+sxt(simm)
 ```
 
 --------------
@@ -889,14 +889,14 @@ b_push($$ts,?rs\s == sxt(?simm))
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1001110iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `1001110iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[simm(?simm),reg(?rd)]
----------------------------
-?rd <- ?rd  and  sxt(?simm)
+[simm(simm), reg(rd)]
+------------------------
+rd <- and(rd, sxt(simm))
 ```
 
 --------------
@@ -918,14 +918,14 @@ b_push($$ts,?rs\s == sxt(?simm))
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1001111iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `1001111iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[simm(?simm),reg(?rd)]
---------------------------
-?rd <- ?rd  or  sxt(?simm)
+[simm(simm), reg(rd)]
+-----------------------
+rd <- or(rd, sxt(simm))
 ```
 
 --------------
@@ -947,14 +947,14 @@ b_push($$ts,?rs\s == sxt(?simm))
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1010000iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `1010000iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[simm(?simm),reg(?rd)]
----------------------------
-?rd <- ?rd  xor  sxt(?simm)
+[simm(simm), reg(rd)]
+----------------------
+rd <- rd xor sxt(simm)
 ```
 
 --------------
@@ -976,16 +976,16 @@ b_push($$ts,?rs\s == sxt(?simm))
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1010001iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `1010001iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[simm(?simm),reg(?rd)]
------------------------------------------------------------
-?rd <- ?rd\s + sxt(?simm) + bit($$cc,#carry_flag_bit)\16\s;
-bit($$cc,#carry_flag_bit) <- attr(cpu/alu/carryout);
-bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
+[simm(simm), reg(rd)]
+-----------------------------------------------------
+rd <- rd\s+sxt(simm)+bit($CC, carry_flag_bit)\16\s;
+bit($CC, carry_flag_bit) <- attr(cpu/alu/carryout);
+bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 ```
 
 --------------
@@ -1007,16 +1007,16 @@ bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1010010iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `1010010iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[simm(?simm),reg(?rd)]
------------------------------------------------------------
-?rd <- ?rd\s - sxt(?simm) - bit($$cc,#carry_flag_bit)\16\s;
-bit($$cc,#carry_flag_bit) <- attr(cpu/alu/carryout);
-bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
+[simm(simm), reg(rd)]
+-----------------------------------------------------
+rd <- rd\s-sxt(simm)-bit($CC, carry_flag_bit)\16\s;
+bit($CC, carry_flag_bit) <- attr(cpu/alu/carryout);
+bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 ```
 
 --------------
@@ -1038,14 +1038,14 @@ bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1010011iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `1010011iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[imm(?imm),reg(?rd)]
---------------------
-?rd <- ?rd >> ?imm
+[imm(imm), reg(rd)]
+-------------------
+rd <- rd>>imm
 ```
 
 --------------
@@ -1067,14 +1067,14 @@ bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1010100iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `1010100iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[imm(?imm),reg(?rd)]
---------------------
-?rd <- ?rd << ?imm
+[imm(imm), reg(rd)]
+-------------------
+rd <- rd<<imm
 ```
 
 --------------
@@ -1096,15 +1096,15 @@ bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1010101iiiiiirrr` | 6 | `imm6` in `[-32,31]` or `[0,63]` |
+| `1010101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
 ```
-[imm(?imm),reg(?rd)]
-------------------------------------------------------------------
-?sign_extension = sxt(bit(?rd,#15) - #1) << #reg_size_bits - ?imm;
-?rd <- ?rd >> ?imm  or  ?sign_extension
+[imm(imm), reg(rd)]
+--------------------------------------------------------------
+let sign_extension := sxt(bit(rd, 15)-1)<<(reg_size_bits-imm);
+rd <- or(rd>>imm, sign_extension)
 ```
 
 --------------
@@ -1140,17 +1140,17 @@ bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
 ###### Semantics
 
 ```
-[reg(?multiplicand_hi),reg(?multiplicand_lo),reg(?multiplier)]
-------------------------------------------------------------------------
-?mask = ~(?multiplier  and  #1 - #1);
-?masked_multiplicand_lo <- ?multiplicand_lo  and  ?mask;
-?masked_multiplicand_hi <- ?multiplicand_hi  and  ?mask;
-lo($$mp) <- lo($$mp) + ?masked_multiplicand_lo;
-hi($$mp) <- hi($$mp) + ?masked_multiplicand_hi + attr(cpu/alu/carryout);
-?shift_cout = bit(?multiplicand_lo,#reg_size_bits - #1);
-?multiplicand_lo <- ?multiplicand_lo << #1;
-?multiplicand_hi <- ?multiplicand_hi << #1 + ?shift_cout;
-?multiplier <- ?multiplier >> #1
+[reg(multiplicand_hi), reg(multiplicand_lo), reg(multiplier)]
+-----------------------------------------------------------------
+let mask := ~(and(multiplier, 1)-1);
+masked_multiplicand_lo <- and(multiplicand_lo, mask);
+masked_multiplicand_hi <- and(multiplicand_hi, mask);
+lo($MP) <- lo($MP)+masked_multiplicand_lo;
+hi($MP) <- hi($MP)+masked_multiplicand_hi+attr(cpu/alu/carryout);
+let shift_cout := bit(multiplicand_lo, reg_size_bits-1);
+multiplicand_lo <- multiplicand_lo<<1;
+multiplicand_hi <- multiplicand_hi<<1+shift_cout;
+multiplier <- multiplier>>1
 ```
 
 --------------
@@ -1180,9 +1180,9 @@ hi($$mp) <- hi($$mp) + ?masked_multiplicand_hi + attr(cpu/alu/carryout);
 ###### Semantics
 
 ```
-[reg(?rs),reg(?rd)]
--------------------
-?rd <- ?rd + ?rs
+[reg(rs), reg(rd)]
+------------------
+rd <- rd+rs
 ```
 
 --------------
@@ -1209,9 +1209,9 @@ hi($$mp) <- hi($$mp) + ?masked_multiplicand_hi + attr(cpu/alu/carryout);
 ###### Semantics
 
 ```
-[reg(?rs),reg(?rd)]
--------------------
-?rd <- ?rd - ?rs
+[reg(rs), reg(rd)]
+------------------
+rd <- rd-rs
 ```
 
 --------------
@@ -1238,9 +1238,9 @@ hi($$mp) <- hi($$mp) + ?masked_multiplicand_hi + attr(cpu/alu/carryout);
 ###### Semantics
 
 ```
-[reg(?rs),reg(?rd)]
---------------------
-?rd <- ?rd  and  ?rs
+[reg(rs), reg(rd)]
+------------------
+rd <- and(rd, rs)
 ```
 
 --------------
@@ -1267,9 +1267,9 @@ hi($$mp) <- hi($$mp) + ?masked_multiplicand_hi + attr(cpu/alu/carryout);
 ###### Semantics
 
 ```
-[reg(?rs),reg(?rd)]
--------------------
-?rd <- ?rd  or  ?rs
+[reg(rs), reg(rd)]
+------------------
+rd <- or(rd, rs)
 ```
 
 --------------
@@ -1296,9 +1296,9 @@ hi($$mp) <- hi($$mp) + ?masked_multiplicand_hi + attr(cpu/alu/carryout);
 ###### Semantics
 
 ```
-[reg(?rs),reg(?rd)]
---------------------
-?rd <- ?rd  xor  ?rs
+[reg(rs), reg(rd)]
+------------------
+rd <- rd xor rs
 ```
 
 --------------
@@ -1325,9 +1325,9 @@ hi($$mp) <- hi($$mp) + ?masked_multiplicand_hi + attr(cpu/alu/carryout);
 ###### Semantics
 
 ```
-[reg(?rs),reg(?rd)]
--------------------
-?rd <- ?rs
+[reg(rs), reg(rd)]
+------------------
+rd <- rs
 ```
 
 --------------
@@ -1354,11 +1354,11 @@ hi($$mp) <- hi($$mp) + ?masked_multiplicand_hi + attr(cpu/alu/carryout);
 ###### Semantics
 
 ```
-[reg(?rs),reg(?rd)]
-------------------------------------------------------
-?rd <- ?rd + ?rs + bit($$cc,#carry_flag_bit)\16;
-bit($$cc,#carry_flag_bit) <- attr(cpu/alu/carryout);
-bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
+[reg(rs), reg(rd)]
+-----------------------------------------------------
+rd <- rd+rs+bit($CC, carry_flag_bit)\16;
+bit($CC, carry_flag_bit) <- attr(cpu/alu/carryout);
+bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 ```
 
 --------------
@@ -1385,11 +1385,11 @@ bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
 ###### Semantics
 
 ```
-[reg(?rs),reg(?rd)]
-------------------------------------------------------
-?rd <- ?rd - ?rs - bit($$cc,#carry_flag_bit)\16;
-bit($$cc,#carry_flag_bit) <- attr(cpu/alu/carryout);
-bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
+[reg(rs), reg(rd)]
+-----------------------------------------------------
+rd <- rd-rs-bit($CC, carry_flag_bit)\16;
+bit($CC, carry_flag_bit) <- attr(cpu/alu/carryout);
+bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 ```
 
 --------------
@@ -1419,9 +1419,9 @@ bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
 ###### Semantics
 
 ```
-[reg(?r1),reg(?r2)]
+[reg(r1), reg(r2)]
 -------------------------------------
-b_push($$ts,compare(?r1,<(s\16),?r2))
+b_push($TS, compare(r1, <(s\16), r2))
 ```
 
 --------------
@@ -1448,9 +1448,9 @@ b_push($$ts,compare(?r1,<(s\16),?r2))
 ###### Semantics
 
 ```
-[reg(?r1),reg(?r2)]
+[reg(r1), reg(r2)]
 --------------------------------------
-b_push($$ts,compare(?r1,>=(s\16),?r2))
+b_push($TS, compare(r1, >=(s\16), r2))
 ```
 
 --------------
@@ -1477,9 +1477,9 @@ b_push($$ts,compare(?r1,>=(s\16),?r2))
 ###### Semantics
 
 ```
-[reg(?r1),reg(?r2)]
+[reg(r1), reg(r2)]
 -------------------------------------
-b_push($$ts,compare(?r1,<(u\16),?r2))
+b_push($TS, compare(r1, <(u\16), r2))
 ```
 
 --------------
@@ -1506,9 +1506,9 @@ b_push($$ts,compare(?r1,<(u\16),?r2))
 ###### Semantics
 
 ```
-[reg(?r1),reg(?r2)]
+[reg(r1), reg(r2)]
 --------------------------------------
-b_push($$ts,compare(?r1,>=(u\16),?r2))
+b_push($TS, compare(r1, >=(u\16), r2))
 ```
 
 --------------
@@ -1538,9 +1538,9 @@ b_push($$ts,compare(?r1,>=(u\16),?r2))
 ###### Semantics
 
 ```
-[reg(?r1),reg(?r2)]
------------------------
-b_push($$ts,?r1 != ?r2)
+[reg(r1), reg(r2)]
+-------------------
+b_push($TS, r1\=r2)
 ```
 
 --------------
@@ -1567,9 +1567,9 @@ b_push($$ts,?r1 != ?r2)
 ###### Semantics
 
 ```
-[reg(?r1),reg(?r2)]
------------------------
-b_push($$ts,?r1 == ?r2)
+[reg(r1), reg(r2)]
+-------------------
+b_push($TS, r1==r2)
 ```
 
 --------------

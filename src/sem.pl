@@ -96,25 +96,29 @@ def(#subr_align, _).
 def(#reg_size_bits, Size) :- isa:register_size(Size).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+:- set_prolog_flag(print_write_options, [
+    portrayed(true),
+    spacing(next_argument)
+]).
 
 user:portray(Dst <- Src) :- print(Dst), format(' <- '), print(Src).
-user:portray(Dst = Src) :- print(Dst), format(' = '), print(Src).
+user:portray(Dst = Src) :- format('let '), print(Dst), format(' := '), print(Src).
 user:portray(A\B) :- print(A), format('\\'), print(B).
-user:portray(A + B) :- print(A), format(' + '), print(B).
-user:portray(A - B) :- print(A), format(' - '), print(B).
-user:portray(A == B) :- print(A), format(' == '), print(B).
-user:portray(A \= B) :- print(A), format(' != '), print(B).
-user:portray(A >> B) :- print(A), format(' >> '), print(B).
-user:portray(A << B) :- print(A), format(' << '), print(B).
-user:portray(A and B) :- print(A), format('  and  '), print(B).
-user:portray(A or B) :- print(A), format('  or  '), print(B).
-user:portray(A xor B) :- print(A), format('  xor  '), print(B).
+% user:portray(A + B) :- print(A), format(' + '), print(B).
+% user:portray(A - B) :- print(A), format(' - '), print(B).
+% user:portray(A == B) :- print(A), format(' == '), print(B).
+% user:portray(A \= B) :- print(A), format(' != '), print(B).
+% user:portray(A >> B) :- print(A), format(' >> '), print(B).
+% user:portray(A << B) :- print(A), format(' << '), print(B).
+% user:portray(A and B) :- write_term(A and B, [])
+% user:portray(A or B) :- print(A), format(' or '), print(B).
+% user:portray(A xor B) :- print(A), format(' xor '), print(B).
 user:portray(S1 ; S2) :- print(S1), format(';~n'), print(S2).
 user:portray(S1 .. S2) :- print(S1), format('..'), print(S2).
-user:portray(#X) :- format('#'), print(X).
+user:portray(#X) :- print(X).
 user:portray($X) :- format('$'), print(X).
-user:portray($$X) :- format('$$'), print(X).
-user:portray(?X) :- format('?'), print(X).
+user:portray($$X) :- upcase_atom(X, XUpper), format('$~w', [XUpper]).
+user:portray(?X) :- print(X).
 user:portray(if(Cond, Consq)) :-
     format('if ~p {~n', [Cond]),
     format(codes(ConsqCodes), '~p', [Consq]),
