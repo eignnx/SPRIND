@@ -169,8 +169,8 @@
 
 ```
 [simm(?simm),reg(?rs),reg(?rd)]
-----------------------------------
-?ptr = \(\(?rs,s) + sxt(?simm),u);
+-------------------------------
+?ptr = ?rs\s + sxt(?simm)\u;
 ?rd <- zxt([?ptr])
 ```
 
@@ -199,8 +199,8 @@
 
 ```
 [simm(?simm),reg(?rs),reg(?rd)]
------------------------------------------------
-?ptr = \(\(?rs,s) + sxt(?simm)  and  #65534,u);
+-----------------------------------------
+?ptr = ?rs\s + sxt(?simm)  and  #65534\u;
 ?rd <- {[?ptr + #1],[?ptr]}
 ```
 
@@ -230,8 +230,8 @@
 ```
 [simm(?simm),reg(?rd),reg(?rs)]
 -------------------------------
-?ptr = \(?rd,s) + sxt(?simm);
-[\(?ptr,u)] <- lo(?rs)
+?ptr = ?rd\s + sxt(?simm);
+[?ptr\u] <- lo(?rs)
 ```
 
 --------------
@@ -259,8 +259,8 @@
 
 ```
 [simm(?simm),reg(?rd),reg(?rs)]
------------------------------------------------
-?ptr = \(\(?rd,s) + sxt(?simm)  and  #65534,u);
+-----------------------------------------
+?ptr = ?rd\s + sxt(?simm)  and  #65534\u;
 [?ptr] <- lo(?rs);
 [?ptr + #1] <- hi(?rs)
 ```
@@ -293,8 +293,8 @@
 
 ```
 [simm(?simm)]
-----------------------------------------------
-$$pc <- \($$pc,s) + sxt(?simm) << #subr_align;
+-------------------------------------------
+$$pc <- $$pc\s + sxt(?simm) << #subr_align;
 $$ra <- $$pc + #2
 ```
 
@@ -326,8 +326,8 @@ $$ra <- $$pc + #2
 
 ```
 [simm(?offset)]
---------------------------------
-$$pc <- \($$pc,s) + sxt(?offset)
+-----------------------------
+$$pc <- $$pc\s + sxt(?offset)
 ```
 
 --------------
@@ -355,9 +355,9 @@ $$pc <- \($$pc,s) + sxt(?offset)
 
 ```
 [simm(?offset)]
-------------------------------------
+---------------------------------
 if b_pop($$ts) {
-    $$pc <- \($$pc,s) + sxt(?offset)
+    $$pc <- $$pc\s + sxt(?offset)
 }
 ```
 
@@ -386,9 +386,9 @@ if b_pop($$ts) {
 
 ```
 [simm(?offset)]
-------------------------------------
+---------------------------------
 if !(b_pop($$ts)) {
-    $$pc <- \($$pc,s) + sxt(?offset)
+    $$pc <- $$pc\s + sxt(?offset)
 }
 ```
 
@@ -481,8 +481,8 @@ if !(b_pop($$ts)) {
 
 ```
 [imm(?disp),reg(?rd)]
-------------------------------------
-?rd <- zxt([\($$gp,u) + zxt(?disp)])
+---------------------------------
+?rd <- zxt([$$gp\u + zxt(?disp)])
 ```
 
 --------------
@@ -510,8 +510,8 @@ if !(b_pop($$ts)) {
 
 ```
 [imm(?disp),reg(?rd)]
-------------------------------------------------
-?ptr = \(\($$gp,u) + zxt(?disp)  and  #65534,u);
+------------------------------------------
+?ptr = $$gp\u + zxt(?disp)  and  #65534\u;
 ?rd <- {[?ptr + #1],[?ptr]}
 ```
 
@@ -540,8 +540,8 @@ if !(b_pop($$ts)) {
 
 ```
 [imm(?disp),reg(?rs)]
------------------------------------
-[\($$gp,u) + zxt(?disp)] <- lo(?rs)
+--------------------------------
+[$$gp\u + zxt(?disp)] <- lo(?rs)
 ```
 
 --------------
@@ -569,8 +569,8 @@ if !(b_pop($$ts)) {
 
 ```
 [imm(?disp),reg(?rs)]
-------------------------------------------------
-?ptr = \(\($$gp,u) + zxt(?disp)  and  #65534,u);
+------------------------------------------
+?ptr = $$gp\u + zxt(?disp)  and  #65534\u;
 {[?ptr + #1],[?ptr]} <- ?rs
 ```
 
@@ -601,7 +601,7 @@ if !(b_pop($$ts)) {
 [imm(?bit_idx),reg(?rs)]
 -----------------------------------
 ?shamt = bitslice(?bit_idx,#3..#0);
-?bit = ?rs >> \(?shamt,u)  and  #1;
+?bit = ?rs >> ?shamt\u  and  #1;
 b_push($$ts,?bit == #1)
 ```
 
@@ -630,8 +630,8 @@ b_push($$ts,?bit == #1)
 
 ```
 [imm(?bit_idx),reg(?rd)]
---------------------------------------
-?idx = \(bitslice(?bit_idx,#3..#0),u);
+-----------------------------------
+?idx = bitslice(?bit_idx,#3..#0)\u;
 ?mask = ~(#1 << ?idx);
 ?rd <- ?rd  and  ?mask
 ```
@@ -661,8 +661,8 @@ b_push($$ts,?bit == #1)
 
 ```
 [imm(?bit_idx),reg(?rd)]
---------------------------------------
-?idx = \(bitslice(?bit_idx,#3..#0),u);
+-----------------------------------
+?idx = bitslice(?bit_idx,#3..#0)\u;
 ?mask = ~(#1 << ?idx);
 ?rd <- ?rd  or  ?mask
 ```
@@ -692,8 +692,8 @@ b_push($$ts,?bit == #1)
 
 ```
 [simm(?simm),reg(?rs)]
-----------------------------------------------------
-b_push($$ts,compare(\(?rs,s),<(\(s,16)),sxt(?simm)))
+----------------------------------------------
+b_push($$ts,compare(?rs\s,<(s\16),sxt(?simm)))
 ```
 
 --------------
@@ -721,8 +721,8 @@ b_push($$ts,compare(\(?rs,s),<(\(s,16)),sxt(?simm)))
 
 ```
 [simm(?simm),reg(?rs)]
------------------------------------------------------
-b_push($$ts,compare(\(?rs,s),>=(\(s,16)),sxt(?simm)))
+-----------------------------------------------
+b_push($$ts,compare(?rs\s,>=(s\16),sxt(?simm)))
 ```
 
 --------------
@@ -750,8 +750,8 @@ b_push($$ts,compare(\(?rs,s),>=(\(s,16)),sxt(?simm)))
 
 ```
 [imm(?imm),reg(?rs)]
----------------------------------------------------
-b_push($$ts,compare(\(?rs,u),<(\(u,16)),zxt(?imm)))
+---------------------------------------------
+b_push($$ts,compare(?rs\u,<(u\16),zxt(?imm)))
 ```
 
 --------------
@@ -779,8 +779,8 @@ b_push($$ts,compare(\(?rs,u),<(\(u,16)),zxt(?imm)))
 
 ```
 [imm(?imm),reg(?rs)]
-----------------------------------------------------
-b_push($$ts,compare(\(?rs,u),>=(\(u,16)),zxt(?imm)))
+----------------------------------------------
+b_push($$ts,compare(?rs\u,>=(u\16),zxt(?imm)))
 ```
 
 --------------
@@ -808,8 +808,8 @@ b_push($$ts,compare(\(?rs,u),>=(\(u,16)),zxt(?imm)))
 
 ```
 [simm(?simm),reg(?rs)]
------------------------------------
-b_push($$ts,\(?rs,s) != sxt(?simm))
+--------------------------------
+b_push($$ts,?rs\s != sxt(?simm))
 ```
 
 --------------
@@ -837,8 +837,8 @@ b_push($$ts,\(?rs,s) != sxt(?simm))
 
 ```
 [simm(?simm),reg(?rs)]
------------------------------------
-b_push($$ts,\(?rs,s) == sxt(?simm))
+--------------------------------
+b_push($$ts,?rs\s == sxt(?simm))
 ```
 
 --------------
@@ -866,8 +866,8 @@ b_push($$ts,\(?rs,s) == sxt(?simm))
 
 ```
 [simm(?simm),reg(?rd)]
-----------------------------
-?rd <- \(?rd,s) + sxt(?simm)
+-------------------------
+?rd <- ?rd\s + sxt(?simm)
 ```
 
 --------------
@@ -982,8 +982,8 @@ b_push($$ts,\(?rs,s) == sxt(?simm))
 
 ```
 [simm(?simm),reg(?rd)]
---------------------------------------------------------------------
-?rd <- \(?rd,s) + sxt(?simm) + \(\(bit($$cc,#carry_flag_bit),16),s);
+-----------------------------------------------------------
+?rd <- ?rd\s + sxt(?simm) + bit($$cc,#carry_flag_bit)\16\s;
 bit($$cc,#carry_flag_bit) <- attr(cpu/alu/carryout);
 bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
 ```
@@ -1013,8 +1013,8 @@ bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
 
 ```
 [simm(?simm),reg(?rd)]
---------------------------------------------------------------------
-?rd <- \(?rd,s) - sxt(?simm) - \(\(bit($$cc,#carry_flag_bit),16),s);
+-----------------------------------------------------------
+?rd <- ?rd\s - sxt(?simm) - bit($$cc,#carry_flag_bit)\16\s;
 bit($$cc,#carry_flag_bit) <- attr(cpu/alu/carryout);
 bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
 ```
@@ -1356,7 +1356,7 @@ hi($$mp) <- hi($$mp) + ?masked_multiplicand_hi + attr(cpu/alu/carryout);
 ```
 [reg(?rs),reg(?rd)]
 ------------------------------------------------------
-?rd <- ?rd + ?rs + \(bit($$cc,#carry_flag_bit),16);
+?rd <- ?rd + ?rs + bit($$cc,#carry_flag_bit)\16;
 bit($$cc,#carry_flag_bit) <- attr(cpu/alu/carryout);
 bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
 ```
@@ -1387,7 +1387,7 @@ bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
 ```
 [reg(?rs),reg(?rd)]
 ------------------------------------------------------
-?rd <- ?rd - ?rs - \(bit($$cc,#carry_flag_bit),16);
+?rd <- ?rd - ?rs - bit($$cc,#carry_flag_bit)\16;
 bit($$cc,#carry_flag_bit) <- attr(cpu/alu/carryout);
 bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
 ```
@@ -1420,8 +1420,8 @@ bit($$cc,#overflow_flag_bit) <- attr(cpu/alu/overflow)
 
 ```
 [reg(?r1),reg(?r2)]
-----------------------------------------
-b_push($$ts,compare(?r1,<(\(s,16)),?r2))
+-------------------------------------
+b_push($$ts,compare(?r1,<(s\16),?r2))
 ```
 
 --------------
@@ -1449,8 +1449,8 @@ b_push($$ts,compare(?r1,<(\(s,16)),?r2))
 
 ```
 [reg(?r1),reg(?r2)]
------------------------------------------
-b_push($$ts,compare(?r1,>=(\(s,16)),?r2))
+--------------------------------------
+b_push($$ts,compare(?r1,>=(s\16),?r2))
 ```
 
 --------------
@@ -1478,8 +1478,8 @@ b_push($$ts,compare(?r1,>=(\(s,16)),?r2))
 
 ```
 [reg(?r1),reg(?r2)]
-----------------------------------------
-b_push($$ts,compare(?r1,<(\(u,16)),?r2))
+-------------------------------------
+b_push($$ts,compare(?r1,<(u\16),?r2))
 ```
 
 --------------
@@ -1507,8 +1507,8 @@ b_push($$ts,compare(?r1,<(\(u,16)),?r2))
 
 ```
 [reg(?r1),reg(?r2)]
------------------------------------------
-b_push($$ts,compare(?r1,>=(\(u,16)),?r2))
+--------------------------------------
+b_push($$ts,compare(?r1,>=(u\16),?r2))
 ```
 
 --------------

@@ -99,6 +99,7 @@ def(#reg_size_bits, Size) :- isa:register_size(Size).
 
 user:portray(Dst <- Src) :- print(Dst), format(' <- '), print(Src).
 user:portray(Dst = Src) :- print(Dst), format(' = '), print(Src).
+user:portray(A\B) :- print(A), format('\\'), print(B).
 user:portray(A + B) :- print(A), format(' + '), print(B).
 user:portray(A - B) :- print(A), format(' - '), print(B).
 user:portray(A == B) :- print(A), format(' == '), print(B).
