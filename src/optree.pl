@@ -4,7 +4,9 @@
 %% generic instruction format.
 %%
 :- module(optree, [
-    print_report/0
+    print_report/0,
+    print_dottrees/0,
+    print_dottree/1
 ]).
 
 :- use_module(isa, [
@@ -14,6 +16,11 @@
     instr_info/2
 ]).
 
+instr_tag(Instr, Tag) :-
+    instr_info(Instr, Info),
+    member(Tag, [instr(Instr) | Info.tags]).
+
+tag_instr(Tag, Instr) :- instr_tag(Instr, Tag).
 
 fmt_instr_tag(Fmt, Instr, Tag) :-
     fmt_instr(Fmt, Instr),
@@ -106,6 +113,112 @@ print_scores :-
             format('~n')
         )
     ).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+fmt_tree(Fmt, Tree) :-
+    fmt_all_instrs(Fmt, Pool),
+    instrpool_tree(Pool, Tree).
+
+instrpool_tree([], '$ERROR') :- throw(error('cannot construct tree from empty pool')).
+instrpool_tree([Instr], leaf(Instr)).
+instrpool_tree([I0, I1 | Is], node(LeftTree, SplitTag, RightTree)) :-
+    Pool = [I0, I1 | Is],
+    pool_all_tags(Pool, Tags),
+    maplist({Pool}/[Tag, Score-Tag]>>(
+        pool_tag_score(Pool, Tag, Score)
+    ), Tags, ScoresTags),
+    predsort(cmp_score_ascending, ScoresTags, SortedScoresTags),
+    member(_SplitScore-SplitTag, SortedScoresTags), % Generate many solns here...
+    partition(tag_instr(SplitTag), Pool, RightPool, LeftPool),
+    LeftPool \= Pool, RightPool \= Pool, % ...because some split tags may need to be skipped.
+    instrpool_tree(LeftPool, LeftTree),
+    instrpool_tree(RightPool, RightTree).
+
+
+cmp_score_ascending(Ord, Score1-Tag1, Score2-Tag2) :-
+    Score1 > Score2 ->
+        Ord = '<'
+    ; Tag1 @> Tag2 ->
+        Ord = '<'
+    ;
+        Ord = '>'.
+
+
+print_tree(Tree) :- 
+    format('~`-t~40|~n'),
+    print_tree(Tree, 0, ``),
+    format('~`-t~40|~n').
+
+print_tree(leaf(Instr), Lvl, Prefix) :-
+    length(Prefix, PLen),
+    format('~t~*|~k = 0b~s`~d~n', [Lvl, Instr, Prefix, PLen]).
+print_tree(node(Left, Split, Right), Lvl, Prefix) :-
+    format(codes(SplitLine), '~t~*|~k?', [Lvl, Split]),
+    length(SplitLine, Indent),
+    NextLvl is Indent + 1,
+
+    append(Prefix, `0`, LeftPrefix),
+    append(Prefix, `1`, RightPrefix),
+
+    print_tree(Left, NextLvl, LeftPrefix),
+    format('~s~n', [SplitLine]),
+    print_tree(Right, NextLvl, RightPrefix).
+
+
+dotprint_tree(Fmt, Tree) :-
+    format('digraph "Format ~k" {~n', [Fmt]),
+    dotprint_tree_(Tree, ``),
+    format('}~n').
+
+dotprint_tree_(leaf(Instr), Prefix) :-
+    node_id_label(leaf(Instr), Id, Label),
+    format('  ~w [label = ~w];~n', [Id, Label]),
+    length(Prefix, PLen),
+    format('  ~w -> "0b~s`~d"~n', [Id, Prefix, PLen]).
+dotprint_tree_(node(Left, Split, Right), Prefix) :-
+    node_id_label(node(Left, Split, Right), Id, Label),
+    node_id_label(Left, LeftId, _),
+    node_id_label(Right, RightId, _),
+    format('  ~w [label = ~w, shape = diamond];~n', [Id, Label]),
+    format('  ~w -> ~w [label = "0"];~n', [Id, LeftId]),
+    format('  ~w -> ~w [label = "1"];~n', [Id, RightId]),
+    append(Prefix, `0`, LeftPrefix),
+    append(Prefix, `1`, RightPrefix),
+    dotprint_tree_(Left, LeftPrefix),
+    dotprint_tree_(Right, RightPrefix).
+
+node_id_label(leaf(Instr), Id, Label) :-
+    term_hash(leaf(Instr), Hash),
+    format(atom(Id), '"~k_~d"', [Instr, Hash]),
+    format(atom(Label), '"~k"', [Instr]).
+node_id_label(node(Left, Split, Right), Id, Label) :-
+    term_hash(node(Left, Split, Right), Hash),
+    format(atom(Id), '"~k_~d"', [Split, Hash]),
+    format(atom(Label), '"~k?"', [Split]).
+
+print_dottree(Fmt) :-
+    once(fmt_tree(Fmt, Tree)),
+    dotprint_tree(Fmt, Tree).
+
+print_dottrees :-
+    foreach(
+        (
+            isa:gfmt(Fmt),
+            Fmt \= ext,
+            format(atom(Path), 'src/graphs/~k.dot', [Fmt])
+        ),
+        print_dottree_to_file(Fmt, Path)
+    ).
+
+print_dottree_to_file(Fmt, Path) :-
+    setup_call_cleanup(
+        open(Path, write, S, [create([read, write])]),
+        with_output_to(S, print_dottree(Fmt)),
+        close(S)
+    ).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 print_report :-
     print_scores,

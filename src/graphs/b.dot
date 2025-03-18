@@ -1,0 +1,14 @@
+digraph "Format b" {
+  "cond_15537093" [label = "cond?", shape = diamond];
+  "cond_15537093" -> "b_5886451" [label = "0"];
+  "cond_15537093" -> "instr(bt)_2981130" [label = "1"];
+  "b_5886451" [label = "b"];
+  "b_5886451" -> "0b0`1"
+  "instr(bt)_2981130" [label = "instr(bt)?", shape = diamond];
+  "instr(bt)_2981130" -> "bf_8755250" [label = "0"];
+  "instr(bt)_2981130" -> "bt_15089679" [label = "1"];
+  "bf_8755250" [label = "bf"];
+  "bf_8755250" -> "0b10`2"
+  "bt_15089679" [label = "bt"];
+  "bt_15089679" -> "0b11`2"
+}

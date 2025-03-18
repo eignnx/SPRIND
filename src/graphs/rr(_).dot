@@ -1,0 +1,69 @@
+digraph "Format rr(_)" {
+  "ts_15468535" [label = "ts?", shape = diamond];
+  "ts_15468535" -> "arith_11854115" [label = "0"];
+  "ts_15468535" -> "strict_555480" [label = "1"];
+  "arith_11854115" [label = "arith?", shape = diamond];
+  "arith_11854115" -> "xor_2619008" [label = "0"];
+  "arith_11854115" -> "carry_8195802" [label = "1"];
+  "xor_2619008" [label = "xor?", shape = diamond];
+  "xor_2619008" -> "logical_6897678" [label = "0"];
+  "xor_2619008" -> "xor_16442135" [label = "1"];
+  "logical_6897678" [label = "logical?", shape = diamond];
+  "logical_6897678" -> "mov_8131765" [label = "0"];
+  "logical_6897678" -> "and_9224350" [label = "1"];
+  "mov_8131765" [label = "mov"];
+  "mov_8131765" -> "0b0000`4"
+  "and_9224350" [label = "and?", shape = diamond];
+  "and_9224350" -> "or_13437499" [label = "0"];
+  "and_9224350" -> "and_14333479" [label = "1"];
+  "or_13437499" [label = "or"];
+  "or_13437499" -> "0b00010`5"
+  "and_14333479" [label = "and"];
+  "and_14333479" -> "0b00011`5"
+  "xor_16442135" [label = "xor"];
+  "xor_16442135" -> "0b001`3"
+  "carry_8195802" [label = "carry?", shape = diamond];
+  "carry_8195802" -> "add_1118135" [label = "0"];
+  "carry_8195802" -> "add_1627692" [label = "1"];
+  "add_1118135" [label = "add?", shape = diamond];
+  "add_1118135" -> "sub_2133549" [label = "0"];
+  "add_1118135" -> "add_13179919" [label = "1"];
+  "sub_2133549" [label = "sub"];
+  "sub_2133549" -> "0b0100`4"
+  "add_13179919" [label = "add"];
+  "add_13179919" -> "0b0101`4"
+  "add_1627692" [label = "add?", shape = diamond];
+  "add_1627692" -> "subcy_4746204" [label = "0"];
+  "add_1627692" -> "addcy_9991314" [label = "1"];
+  "subcy_4746204" [label = "subcy"];
+  "subcy_4746204" -> "0b0110`4"
+  "addcy_9991314" [label = "addcy"];
+  "addcy_9991314" -> "0b0111`4"
+  "strict_555480" [label = "strict?", shape = diamond];
+  "strict_555480" -> "eq_13984211" [label = "0"];
+  "strict_555480" -> "unsigned_15854941" [label = "1"];
+  "eq_13984211" [label = "eq?", shape = diamond];
+  "eq_13984211" -> "tge_289938" [label = "0"];
+  "eq_13984211" -> "instr(tne)_15436207" [label = "1"];
+  "tge_289938" [label = "tge"];
+  "tge_289938" -> "0b100`3"
+  "instr(tne)_15436207" [label = "instr(tne)?", shape = diamond];
+  "instr(tne)_15436207" -> "teq_6366130" [label = "0"];
+  "instr(tne)_15436207" -> "tne_9691690" [label = "1"];
+  "teq_6366130" [label = "teq"];
+  "teq_6366130" -> "0b1010`4"
+  "tne_9691690" [label = "tne"];
+  "tne_9691690" -> "0b1011`4"
+  "unsigned_15854941" [label = "unsigned?", shape = diamond];
+  "unsigned_15854941" -> "tl_8913108" [label = "0"];
+  "unsigned_15854941" -> "instr(tb)_6620893" [label = "1"];
+  "tl_8913108" [label = "tl"];
+  "tl_8913108" -> "0b110`3"
+  "instr(tb)_6620893" [label = "instr(tb)?", shape = diamond];
+  "instr(tb)_6620893" -> "tae_6900673" [label = "0"];
+  "instr(tb)_6620893" -> "tb_7020844" [label = "1"];
+  "tae_6900673" [label = "tae"];
+  "tae_6900673" -> "0b1110`4"
+  "tb_7020844" [label = "tb"];
+  "tb_7020844" -> "0b1111`4"
+}

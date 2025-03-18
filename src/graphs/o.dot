@@ -1,0 +1,134 @@
+digraph "Format o" {
+  "ts_7740448" [label = "ts?", shape = diamond];
+  "ts_7740448" -> "sp_11454861" [label = "0"];
+  "ts_7740448" -> "data_4436317" [label = "1"];
+  "sp_11454861" [label = "sp?", shape = diamond];
+  "sp_11454861" -> "exc_10785502" [label = "0"];
+  "sp_11454861" -> "rstr_14043542" [label = "1"];
+  "exc_10785502" [label = "exc?", shape = diamond];
+  "exc_10785502" -> "wr_2398349" [label = "0"];
+  "exc_10785502" -> "dbg_16198459" [label = "1"];
+  "wr_2398349" [label = "wr?", shape = diamond];
+  "wr_2398349" -> "ret_15011896" [label = "0"];
+  "wr_2398349" -> "instr('set.cy')_2186464" [label = "1"];
+  "ret_15011896" [label = "ret?", shape = diamond];
+  "ret_15011896" -> "kcall_5951590" [label = "0"];
+  "ret_15011896" -> "ra_8747536" [label = "1"];
+  "kcall_5951590" [label = "kcall"];
+  "kcall_5951590" -> "0b00000`5"
+  "ra_8747536" [label = "ra?", shape = diamond];
+  "ra_8747536" -> "kret_6365154" [label = "0"];
+  "ra_8747536" -> "ret_11021990" [label = "1"];
+  "kret_6365154" [label = "kret"];
+  "kret_6365154" -> "0b000010`6"
+  "ret_11021990" [label = "ret"];
+  "ret_11021990" -> "0b000011`6"
+  "instr('set.cy')_2186464" [label = "instr('set.cy')?", shape = diamond];
+  "instr('set.cy')_2186464" -> "'clr.cy'_14719063" [label = "0"];
+  "instr('set.cy')_2186464" -> "'set.cy'_4073820" [label = "1"];
+  "'clr.cy'_14719063" [label = "'clr.cy'"];
+  "'clr.cy'_14719063" -> "0b00010`5"
+  "'set.cy'_4073820" [label = "'set.cy'"];
+  "'set.cy'_4073820" -> "0b00011`5"
+  "dbg_16198459" [label = "dbg?", shape = diamond];
+  "dbg_16198459" -> "cmd_9200811" [label = "0"];
+  "dbg_16198459" -> "instr('UNIMPL')_7737361" [label = "1"];
+  "cmd_9200811" [label = "cmd?", shape = diamond];
+  "cmd_9200811" -> "'NONEXE1'_14538439" [label = "0"];
+  "cmd_9200811" -> "'HALT'_5047438" [label = "1"];
+  "'NONEXE1'_14538439" [label = "'NONEXE1'"];
+  "'NONEXE1'_14538439" -> "0b00100`5"
+  "'HALT'_5047438" [label = "'HALT'"];
+  "'HALT'_5047438" -> "0b00101`5"
+  "instr('UNIMPL')_7737361" [label = "instr('UNIMPL')?", shape = diamond];
+  "instr('UNIMPL')_7737361" -> "'BREAK'_2863401" [label = "0"];
+  "instr('UNIMPL')_7737361" -> "'UNIMPL'_242126" [label = "1"];
+  "'BREAK'_2863401" [label = "'BREAK'"];
+  "'BREAK'_2863401" -> "0b00110`5"
+  "'UNIMPL'_242126" [label = "'UNIMPL'"];
+  "'UNIMPL'_242126" -> "0b00111`5"
+  "rstr_14043542" [label = "rstr?", shape = diamond];
+  "rstr_14043542" -> "ra_5439766" [label = "0"];
+  "rstr_14043542" -> "ra_11697259" [label = "1"];
+  "ra_5439766" [label = "ra?", shape = diamond];
+  "ra_5439766" -> "mp_14735186" [label = "0"];
+  "ra_5439766" -> "'prsv.ra'_11219602" [label = "1"];
+  "mp_14735186" [label = "mp?", shape = diamond];
+  "mp_14735186" -> "gp_5770640" [label = "0"];
+  "mp_14735186" -> "'prsv.mp'_12023555" [label = "1"];
+  "gp_5770640" [label = "gp?", shape = diamond];
+  "gp_5770640" -> "'prsv.cc'_7656682" [label = "0"];
+  "gp_5770640" -> "'prsv.gp'_4829802" [label = "1"];
+  "'prsv.cc'_7656682" [label = "'prsv.cc'"];
+  "'prsv.cc'_7656682" -> "0b010000`6"
+  "'prsv.gp'_4829802" [label = "'prsv.gp'"];
+  "'prsv.gp'_4829802" -> "0b010001`6"
+  "'prsv.mp'_12023555" [label = "'prsv.mp'"];
+  "'prsv.mp'_12023555" -> "0b01001`5"
+  "'prsv.ra'_11219602" [label = "'prsv.ra'"];
+  "'prsv.ra'_11219602" -> "0b0101`4"
+  "ra_11697259" [label = "ra?", shape = diamond];
+  "ra_11697259" -> "mp_5968125" [label = "0"];
+  "ra_11697259" -> "'rstr.ra'_14990000" [label = "1"];
+  "mp_5968125" [label = "mp?", shape = diamond];
+  "mp_5968125" -> "gp_995846" [label = "0"];
+  "mp_5968125" -> "'rstr.mp'_10653791" [label = "1"];
+  "gp_995846" [label = "gp?", shape = diamond];
+  "gp_995846" -> "'rstr.cc'_3226942" [label = "0"];
+  "gp_995846" -> "'rstr.gp'_14554136" [label = "1"];
+  "'rstr.cc'_3226942" [label = "'rstr.cc'"];
+  "'rstr.cc'_3226942" -> "0b011000`6"
+  "'rstr.gp'_14554136" [label = "'rstr.gp'"];
+  "'rstr.gp'_14554136" -> "0b011001`6"
+  "'rstr.mp'_10653791" [label = "'rstr.mp'"];
+  "'rstr.mp'_10653791" -> "0b01101`5"
+  "'rstr.ra'_14990000" [label = "'rstr.ra'"];
+  "'rstr.ra'_14990000" -> "0b0111`4"
+  "data_4436317" [label = "data?", shape = diamond];
+  "data_4436317" -> "boolean_13225208" [label = "0"];
+  "data_4436317" -> "push_2437001" [label = "1"];
+  "boolean_13225208" [label = "boolean?", shape = diamond];
+  "boolean_13225208" -> "sp_11927802" [label = "0"];
+  "boolean_13225208" -> "instr(tor)_15792127" [label = "1"];
+  "sp_11927802" [label = "sp?", shape = diamond];
+  "sp_11927802" -> "ov_12237183" [label = "0"];
+  "sp_11927802" -> "rstr_7748698" [label = "1"];
+  "ov_12237183" [label = "ov?", shape = diamond];
+  "ov_12237183" -> "tcy_2523867" [label = "0"];
+  "ov_12237183" -> "tov_12931519" [label = "1"];
+  "tcy_2523867" [label = "tcy"];
+  "tcy_2523867" -> "0b10000`5"
+  "tov_12931519" [label = "tov"];
+  "tov_12931519" -> "0b10001`5"
+  "rstr_7748698" [label = "rstr?", shape = diamond];
+  "rstr_7748698" -> "'prsv.ts'_2474688" [label = "0"];
+  "rstr_7748698" -> "'rstr.ts'_8107659" [label = "1"];
+  "'prsv.ts'_2474688" [label = "'prsv.ts'"];
+  "'prsv.ts'_2474688" -> "0b10010`5"
+  "'rstr.ts'_8107659" [label = "'rstr.ts'"];
+  "'rstr.ts'_8107659" -> "0b10011`5"
+  "instr(tor)_15792127" [label = "instr(tor)?", shape = diamond];
+  "instr(tor)_15792127" -> "instr(tnot)_14822141" [label = "0"];
+  "instr(tor)_15792127" -> "tor_1243182" [label = "1"];
+  "instr(tnot)_14822141" [label = "instr(tnot)?", shape = diamond];
+  "instr(tnot)_14822141" -> "tand_15469294" [label = "0"];
+  "instr(tnot)_14822141" -> "tnot_4060624" [label = "1"];
+  "tand_15469294" [label = "tand"];
+  "tand_15469294" -> "0b10100`5"
+  "tnot_4060624" [label = "tnot"];
+  "tnot_4060624" -> "0b10101`5"
+  "tor_1243182" [label = "tor"];
+  "tor_1243182" -> "0b1011`4"
+  "push_2437001" [label = "push?", shape = diamond];
+  "push_2437001" -> "tdup_15487713" [label = "0"];
+  "push_2437001" -> "instr(tpush1)_9804295" [label = "1"];
+  "tdup_15487713" [label = "tdup"];
+  "tdup_15487713" -> "0b110`3"
+  "instr(tpush1)_9804295" [label = "instr(tpush1)?", shape = diamond];
+  "instr(tpush1)_9804295" -> "tpush0_14509953" [label = "0"];
+  "instr(tpush1)_9804295" -> "tpush1_12806233" [label = "1"];
+  "tpush0_14509953" [label = "tpush0"];
+  "tpush0_14509953" -> "0b1110`4"
+  "tpush1_12806233" [label = "tpush1"];
+  "tpush1_12806233" -> "0b1111`4"
+}

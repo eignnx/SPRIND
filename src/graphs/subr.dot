@@ -1,0 +1,4 @@
+digraph "Format subr" {
+  "call_16130939" [label = "call"];
+  "call_16130939" -> "0b`0"
+}

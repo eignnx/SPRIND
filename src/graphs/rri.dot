@@ -1,0 +1,19 @@
+digraph "Format rri" {
+  "word_1019694" [label = "word?", shape = diamond];
+  "word_1019694" -> "store_3203235" [label = "0"];
+  "word_1019694" -> "store_888754" [label = "1"];
+  "store_3203235" [label = "store?", shape = diamond];
+  "store_3203235" -> "lb_1820023" [label = "0"];
+  "store_3203235" -> "sb_10225307" [label = "1"];
+  "lb_1820023" [label = "lb"];
+  "lb_1820023" -> "0b00`2"
+  "sb_10225307" [label = "sb"];
+  "sb_10225307" -> "0b01`2"
+  "store_888754" [label = "store?", shape = diamond];
+  "store_888754" -> "lw_13753362" [label = "0"];
+  "store_888754" -> "sw_14565502" [label = "1"];
+  "lw_13753362" [label = "lw"];
+  "lw_13753362" -> "0b10`2"
+  "sw_14565502" [label = "sw"];
+  "sw_14565502" -> "0b11`2"
+}

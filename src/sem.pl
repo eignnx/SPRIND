@@ -294,7 +294,7 @@ instr_info(cbit, info{
         ?mask = ~(#1 << ?idx);
         ?rd <- ?rd and ?mask
     ),
-    tags: [bit, bitwise]
+    tags: [bit, bitwise, clear]
 }).
 instr_info(sbit, info{
 	title: 'Set Bit',
@@ -306,7 +306,7 @@ instr_info(sbit, info{
         ?mask = ~(#1 << ?idx);
         ?rd <- ?rd or ?mask
     ),
-    tags: [bit, bitwise]
+    tags: [bit, bitwise, set]
 }).
 instr_info(tli, info{
 	title: 'Test Less-than Immediate',
@@ -370,7 +370,7 @@ instr_info(andi, info{
 	ex: ['andi x, 3'],
 	operands: [simm(?simm), reg(?rd)],
 	sem: ?rd <- ?rd and sxt(?simm),
-    tags: [logical, boolean, bitwise]
+    tags: [logical, boolean, bitwise, and]
 }).
 instr_info(ori, info{
 	title: 'OR Immediate',
@@ -387,7 +387,7 @@ instr_info(xori, info{
 	ex: ['xori x, 3'],
 	operands: [simm(?simm), reg(?rd)],
 	sem: ?rd <- ?rd xor sxt(?simm),
-    tags: [logical, boolean, bitwise]
+    tags: [logical, boolean, bitwise, xor]
 }).
 instr_info(addicy, info{
 	title: 'Add Immediate with Carry',
@@ -399,7 +399,7 @@ instr_info(addicy, info{
         bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
         bit($$cc, #overflow_flag_bit) <- attr(cpu/alu/overflow)
     ),
-    tags: [arith, carry]
+    tags: [arith, carry, add]
 }).
 instr_info(subicy, info{
 	title: 'Subtract Immediate with Carry',
@@ -427,7 +427,7 @@ instr_info(lsl, info{
 	ex: ['lsl x, 8'],
 	operands: [imm(?imm), reg(?rd)],
 	sem: ?rd <- ?rd << ?imm,
-    tags: [logical, bitwise, shift]
+    tags: [logical, bitwise, shift, right]
 }).
 instr_info(asr, info{
 	title: 'Arithmetic Shift Right',
@@ -438,7 +438,7 @@ instr_info(asr, info{
         ?sign_extension = (sxt(bit(?rd, #15) - #1)) << (#reg_size_bits - ?imm);
         ?rd <- (?rd >> ?imm) or ?sign_extension 
     ),
-    tags: [arith, bitwise, shift]
+    tags: [arith, bitwise, shift, right]
 }).
 
 instr_info(add, info{
@@ -447,7 +447,7 @@ instr_info(add, info{
 	ex: ['add x, y'],
 	operands: [reg(?rs), reg(?rd)],
 	sem: ?rd <- ?rd + ?rs,
-    tags: [arith]
+    tags: [arith, add]
 }).
 instr_info(sub, info{
 	title: 'Subtract',
@@ -463,7 +463,7 @@ instr_info(and, info{
 	ex: ['and x, y'],
 	operands: [reg(?rs), reg(?rd)],
 	sem: ?rd <- ?rd and ?rs,
-    tags: [logical, boolean, bitwise]
+    tags: [logical, boolean, bitwise, and]
 }).
 instr_info(or, info{
 	title: 'OR',
@@ -479,7 +479,7 @@ instr_info(xor, info{
 	ex: ['xor x, y'],
 	operands: [reg(?rs), reg(?rd)],
 	sem: ?rd <- ?rd xor ?rs,
-    tags: [logical, boolean, bitwise]
+    tags: [logical, boolean, bitwise, xor]
 }).
 instr_info(mov, info{
 	title: 'Move',
@@ -499,7 +499,7 @@ instr_info(addcy, info{
         bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
         bit($$cc, #overflow_flag_bit) <- attr(cpu/alu/overflow)
     ),
-    tags: [arith, carry]
+    tags: [arith, carry, add]
 }).
 instr_info(subcy, info{
 	title: 'Subtract with Carry',
