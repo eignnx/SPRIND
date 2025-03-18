@@ -11,8 +11,10 @@
     reguse_description/2,
     sysregname_name_size_description/4,
     instr/1,
+    gfmt/1,
     gprreg/1,
-    sysreg/1
+    sysreg/1,
+    fmt_instr/2
 ]).
 
 :- set_prolog_flag(double_quotes, chars).
@@ -26,8 +28,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% USER EDITABLE SECTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%% Instructions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-:- det(fmt_operands_description/3).
 
 fmt_operands_description(rri,   [i, s, r], 'Register-register-immediate').
 fmt_operands_description(subr,  [i],       'Subroutine Call').        
@@ -264,7 +264,10 @@ addrsize_maxalignment(Bits, MaxAlign) :-
     2 ^ #Bits #>= (2 ^ #InstrSizeBits) div #MaxAlign.
 
 instr(Instr) :- fmt_instr_title_description(_, Instr, _, _).
+gfmt(GFmt) :- fmt_operands_description(GFmt, _, _).
 
 gprreg(R) :- regname_uses(R, _).
 sysreg(Name) :- sysregname_name_size_description(Name, _, _, _).
+
+fmt_instr(Fmt, Instr) :- fmt_instr_title_description(Fmt, Instr, _, _).
 

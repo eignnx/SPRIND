@@ -2,37 +2,65 @@
 
 ]).
 
-:- use_module(sem).
+:- use_module(isa, [
+    fmt_instr/2
+]).
+:- use_module(sem, [
+    instr_info/2
+]).
 
-instr_tag(Instr, Tag) :-
-    sem:instr_info(Instr, Info),
-    member(Tag, Info.tags).
 
-all_tags(Tags) :-
-    aggregate_all(set(Tag), instr_tag(_, Tag), Tags).
+fmt_instr_tag(Fmt, Instr, Tag) :-
+    fmt_instr(Fmt, Instr),
+    instr_info(Instr, Info),
+    member(Tag, [instr(Instr) | Info.tags]).
 
-tag_occurrances(Tag, Count) :-
-    aggregate_all(count, instr_tag(_, Tag), Count).
+fmt_all_tags(Fmt, Tags) :-
+    aggregate_all(set(Tag), fmt_instr_tag(Fmt, _Instr, Tag), Tags).
 
-total_instr_count(Count) :-
-    aggregate_all(count, sem:instr_info(_, _), Count).
+fmt_all_instrs(Fmt, Instrs) :-
+    aggregate_all(bag(Instr), fmt_instr(Fmt, Instr), Instrs).
 
-tag_frequency(Tag, Freq) :-
-    tag_occurrances(Tag, TagCount),
-    total_instr_count(TotalCount),
+
+fmt_tag_occurrances(Fmt, Tag, Count) :-
+    aggregate_all(count, fmt_instr_tag(Fmt, _Instr, Tag), Count).
+
+
+fmt_total_instr_count(Fmt, Count) :-
+    aggregate_all(count, fmt_instr(Fmt, _Instr), Count).
+
+
+fmt_tag_frequency(Fmt, Tag, Freq) :-
+    fmt_tag_occurrances(Fmt, Tag, TagCount),
+    fmt_total_instr_count(Fmt, TotalCount),
     Freq is TagCount / TotalCount.
 
-tag_splitability(Tag, Score) :-
-    tag_frequency(Tag, Freq),
-    Score is 1.0 - 2.0 * abs(0.5 - Freq).
+
+fmt_tag_splittability(Fmt, Tag, Score) :-
+    fmt_tag_frequency(Fmt, Tag, Freq),
+    ( fmt_instr(Fmt, Tag) -> Factor = 0.75 ; Factor = 1.0 ),
+    Score is (1.0 - 2.0 * abs(0.5 - Freq)) * Factor.
+
+print_scores(Fmt) :-
+    fmt_all_tags(Fmt, Tags),
+    maplist([Tag, Score-Tag]>>(
+        fmt_tag_splittability(Fmt, Tag, S),
+        Score is 100 * S
+    ), Tags, TagsScores0),
+    sort(0, @>, TagsScores0, TagsScores),
+    maplist([Score-Tag]>>(
+        BarLength is ceil(Score),
+        format('~p~t~0f%~20|  ~|~`#t~*+~n', [Tag, Score, BarLength])
+    ), TagsScores).
 
 print_scores :-
-    all_tags(Tags),
-    maplist([Tag, Score-Tag]>>(
-        tag_splitability(Tag, S),
-        Score is 100 * S
-    ), Tags, TagsScores),
-    sort(TagsScores, TagsScoresSort),
-    maplist([Score-Tag]>>(
-        format('~p~t~0f%~15|~n', [Tag, Score])
-    ), TagsScoresSort).
+    foreach(
+        isa:gfmt(Fmt),
+        (
+            format('-------------------~n'),
+            format('| ~k~n', [Fmt]),
+            format('-------------------~n'),
+            print_scores(Fmt),
+            format('~n')
+        )
+    ).

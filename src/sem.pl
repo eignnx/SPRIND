@@ -173,7 +173,7 @@ instr_info(sw, info{
         [?ptr] <- lo(?rs);
         [?ptr + #1] <- hi(?rs)
     ),
-    tags: [mem, store, byte]
+    tags: [mem, store, word]
 }).
 
 instr_info(call, info{
