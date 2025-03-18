@@ -820,7 +820,7 @@ instr_info('prsv.mp', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [sp, prsv, mp]
+    tags: [sp, prsv_rstr, prsv, mp]
 }).
 instr_info('rstr.mp', info{
 	title: 'Restore $MP',
@@ -828,7 +828,7 @@ instr_info('rstr.mp', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [sp, rstr, mp]
+    tags: [sp, prsv_rstr, rstr, mp]
 }).
 instr_info('prsv.ts', info{
 	title: 'Preserve $TS',
@@ -836,7 +836,7 @@ instr_info('prsv.ts', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [sp, prsv, ts]
+    tags: [sp, prsv_rstr, prsv, ts]
 }).
 instr_info('rstr.ts', info{
 	title: 'Restore $TS',
@@ -844,7 +844,7 @@ instr_info('rstr.ts', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [sp, rstr, ts]
+    tags: [sp, prsv_rstr, rstr, ts]
 }).
 instr_info('prsv.ra', info{
 	title: 'Preserve $RA',
@@ -852,7 +852,7 @@ instr_info('prsv.ra', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [sp, prsv, ra]
+    tags: [sp, prsv_rstr, prsv, ra]
 }).
 instr_info('rstr.ra', info{
 	title: 'Restore $RA',
@@ -860,7 +860,7 @@ instr_info('rstr.ra', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [sp, rstr, ra]
+    tags: [sp, prsv_rstr, rstr, ra]
 }).
 instr_info('prsv.gp', info{
 	title: 'Preserve $GP',
@@ -868,7 +868,7 @@ instr_info('prsv.gp', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [sp, prsv, gp]
+    tags: [sp, prsv_rstr, prsv, gp]
 }).
 instr_info('rstr.gp', info{
 	title: 'Restore $GP',
@@ -876,7 +876,7 @@ instr_info('rstr.gp', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [sp, rstr, gp]
+    tags: [sp, prsv_rstr, rstr, gp]
 }).
 instr_info('prsv.cc', info{
 	title: 'Preserve $CC',
@@ -884,7 +884,7 @@ instr_info('prsv.cc', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [sp, prsv, cc]
+    tags: [sp, prsv_rstr, prsv, cc]
 }).
 instr_info('rstr.cc', info{
 	title: 'Restore $CC',
@@ -892,5 +892,5 @@ instr_info('rstr.cc', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [sp, rstr, cc]
+    tags: [sp, prsv_rstr, rstr, cc]
 }).
