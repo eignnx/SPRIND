@@ -1,5 +1,10 @@
+%%
+%% Builds a decision tree to categorize by tag instructions within a generic 
+%% instruction format. Uses the decision tree to assign opcodes within a
+%% generic instruction format.
+%%
 :- module(optree, [
-
+    print_report/0
 ]).
 
 :- use_module(isa, [
@@ -49,8 +54,45 @@ print_scores(Fmt) :-
     ), Tags, TagsScores0),
     sort(0, @>, TagsScores0, TagsScores),
     maplist([Score-Tag]>>(
-        BarLength is ceil(Score),
+        BarLength is round(Score),
         format('~p~t~0f%~20|  ~|~`#t~*+~n', [Tag, Score, BarLength])
+    ), TagsScores).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+pool_instr_tag(Pool, Instr, Tag) :-
+    member(Instr, Pool),
+    instr_info(Instr, Info),
+    member(Tag, [instr(Instr) | Info.tags]).
+
+pool_all_tags(Pool, Tags) :-
+    aggregate_all(set(Tag), pool_instr_tag(Pool, _Instr, Tag), Tags).
+
+pool_tag_occurrances(Pool, Tag, Occurrances) :-
+    aggregate_all(count, pool_instr_tag(Pool, _Instr, Tag), Occurrances).
+
+pool_tag_frequency(Pool, Tag, Freq) :-
+    pool_tag_occurrances(Pool, Tag, Occurrances),
+    length(Pool, PoolSize),
+    Freq is Occurrances / PoolSize.
+
+pool_tag_score(Pool, Tag, Score) :-
+    pool_tag_frequency(Pool, Tag, Freq),
+    ( Tag = instr(_) -> Factor = 0.75 ; Factor = 1.0 ),
+    Score is (1.0 - 2.0 * abs(0.5 - Freq)) * Factor.
+
+print_scores_pooled(Fmt) :-
+    fmt_all_instrs(Fmt, Pool),
+    pool_all_tags(Pool, Tags),
+    maplist({Pool}/[Tag, Score-Tag]>>(
+        pool_tag_score(Pool, Tag, Score)
+    ), Tags, TagsScores0),
+    sort(0, @>, TagsScores0, TagsScores),
+    catch(tty_size(_Rows, Cols), _, Cols = 80), 
+    maplist({Cols}/[Score-Tag]>>(
+        BarLength is floor((Cols - 25) * Score),
+        Pct is Score * 100,
+        format('~p~t~0f%~20|  ~|~`#t~*+~n', [Tag, Pct, BarLength])
     ), TagsScores).
 
 print_scores :-
@@ -60,7 +102,11 @@ print_scores :-
             format('-------------------~n'),
             format('| ~k~n', [Fmt]),
             format('-------------------~n'),
-            print_scores(Fmt),
+            print_scores_pooled(Fmt),
             format('~n')
         )
     ).
+
+print_report :-
+    print_scores,
+    true.
