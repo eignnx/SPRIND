@@ -172,21 +172,22 @@ dotprint_tree(Fmt, Tree) :-
     format('}~n').
 
 dotprint_tree_(leaf(Instr), Prefix) :-
-    node_id_label(leaf(Instr), Id, Label),
-    format('  ~w [label = ~w];~n', [Id, Label]),
+    node_id_label(leaf(Instr), Id, _),
+    instr_info(Instr, Info),
     length(Prefix, PLen),
-    format('  ~w -> "0b~s`~d"~n', [Id, Prefix, PLen]).
+    format(atom(Label), '~k~n~w~n0b~s`~d', [Instr, Info.title, Prefix, PLen]),
+    format('  ~w [label = "~w", shape = rectangle];~n', [Id, Label]).
 dotprint_tree_(node(Left, Split, Right), Prefix) :-
     node_id_label(node(Left, Split, Right), Id, Label),
     node_id_label(Left, LeftId, _),
     node_id_label(Right, RightId, _),
-    format('  ~w [label = ~w, shape = diamond];~n', [Id, Label]),
-    format('  ~w -> ~w [label = "0"];~n', [Id, LeftId]),
+    format('  ~w [label = ~w, shape = ellipse];~n', [Id, Label]),
     format('  ~w -> ~w [label = "1"];~n', [Id, RightId]),
+    format('  ~w -> ~w [label = "0"];~n', [Id, LeftId]),
     append(Prefix, `0`, LeftPrefix),
     append(Prefix, `1`, RightPrefix),
-    dotprint_tree_(Left, LeftPrefix),
-    dotprint_tree_(Right, RightPrefix).
+    dotprint_tree_(Right, RightPrefix),
+    dotprint_tree_(Left, LeftPrefix).
 
 node_id_label(leaf(Instr), Id, Label) :-
     term_hash(leaf(Instr), Hash),
@@ -222,4 +223,5 @@ print_dottree_to_file(Fmt, Path) :-
 
 print_report :-
     print_scores,
+    print_report,
     true.

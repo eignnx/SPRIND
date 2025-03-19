@@ -1,4 +1,5 @@
 digraph "Format subr" {
-  "call_16130939" [label = "call"];
-  "call_16130939" -> "0b`0"
+  "call_16130939" [label = "call
+Call Subroutine
+0b`0", shape = rectangle];
 }

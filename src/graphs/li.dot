@@ -1,9 +1,11 @@
 digraph "Format li" {
-  "zxt_6558408" [label = "zxt?", shape = diamond];
-  "zxt_6558408" -> "li_6973931" [label = "0"];
+  "zxt_6558408" [label = "zxt?", shape = ellipse];
   "zxt_6558408" -> "szi_5158144" [label = "1"];
-  "li_6973931" [label = "li"];
-  "li_6973931" -> "0b0`1"
-  "szi_5158144" [label = "szi"];
-  "szi_5158144" -> "0b1`1"
+  "zxt_6558408" -> "li_6973931" [label = "0"];
+  "szi_5158144" [label = "szi
+Shift Zero-extended Immediate
+0b1`1", shape = rectangle];
+  "li_6973931" [label = "li
+Load Immediate
+0b0`1", shape = rectangle];
 }
