@@ -419,7 +419,7 @@ instr_info(lsr, info{
 	ex: ['lsr x, 15'],
 	operands: [imm(?imm), reg(?rd)],
 	sem: ?rd <- ?rd >> ?imm,
-    tags: [logical, bitwise, shift]
+    tags: [logical, bitwise, shift, right]
 }).
 instr_info(lsl, info{
 	title: 'Logical Shift Left',
@@ -427,7 +427,7 @@ instr_info(lsl, info{
 	ex: ['lsl x, 8'],
 	operands: [imm(?imm), reg(?rd)],
 	sem: ?rd <- ?rd << ?imm,
-    tags: [logical, bitwise, shift, right]
+    tags: [logical, bitwise, shift]
 }).
 instr_info(asr, info{
 	title: 'Arithmetic Shift Right',
