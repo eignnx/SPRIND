@@ -1,11 +1,10 @@
 digraph "Format li" {
+  graph [dpi = 300, bgcolor="white"];
+  node [fontname = "Courier-Bold", fontsize="10pt"];
+  edge [fontname = "Courier-Bold"];
   "zxt_6558408" [label = "zxt?", shape = ellipse];
   "zxt_6558408" -> "szi_5158144" [label = "1"];
   "zxt_6558408" -> "li_6973931" [label = "0"];
-  "szi_5158144" [label = "szi
-Shift Zero-extended Immediate
-0b1`1", shape = rectangle];
-  "li_6973931" [label = "li
-Load Immediate
-0b0`1", shape = rectangle];
+  "szi_5158144" [label = "szi\nShift Zero-extended Immediate\n0b1`1", shape = rectangle];
+  "li_6973931" [label = "li\nLoad Immediate\n0b0`1", shape = rectangle];
 }

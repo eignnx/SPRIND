@@ -1,5 +1,6 @@
 digraph "Format rrr" {
-  "mulstep_13462336" [label = "mulstep
-Unsigned Multiplication Step
-0b`0", shape = rectangle];
+  graph [dpi = 300, bgcolor="white"];
+  node [fontname = "Courier-Bold", fontsize="10pt"];
+  edge [fontname = "Courier-Bold"];
+  "mulstep_13462336" [label = "mulstep\nUnsigned Multiplication Step\n0b`0", shape = rectangle];
 }

@@ -1,23 +1,18 @@
 digraph "Format rri" {
+  graph [dpi = 300, bgcolor="white"];
+  node [fontname = "Courier-Bold", fontsize="10pt"];
+  edge [fontname = "Courier-Bold"];
   "word_1019694" [label = "word?", shape = ellipse];
   "word_1019694" -> "store_888754" [label = "1"];
   "word_1019694" -> "store_3203235" [label = "0"];
   "store_888754" [label = "store?", shape = ellipse];
   "store_888754" -> "sw_14565502" [label = "1"];
   "store_888754" -> "lw_13753362" [label = "0"];
-  "sw_14565502" [label = "sw
-Store Word
-0b11`2", shape = rectangle];
-  "lw_13753362" [label = "lw
-Load Word
-0b10`2", shape = rectangle];
+  "sw_14565502" [label = "sw\nStore Word\n0b11`2", shape = rectangle];
+  "lw_13753362" [label = "lw\nLoad Word\n0b10`2", shape = rectangle];
   "store_3203235" [label = "store?", shape = ellipse];
   "store_3203235" -> "sb_10225307" [label = "1"];
   "store_3203235" -> "lb_1820023" [label = "0"];
-  "sb_10225307" [label = "sb
-Store Byte
-0b01`2", shape = rectangle];
-  "lb_1820023" [label = "lb
-Load Byte
-0b00`2", shape = rectangle];
+  "sb_10225307" [label = "sb\nStore Byte\n0b01`2", shape = rectangle];
+  "lb_1820023" [label = "lb\nLoad Byte\n0b00`2", shape = rectangle];
 }

@@ -1,4 +1,7 @@
 digraph "Format r(_)" {
+  graph [dpi = 300, bgcolor="white"];
+  node [fontname = "Courier-Bold", fontsize="10pt"];
+  edge [fontname = "Courier-Bold"];
   "sp_4114254" [label = "sp?", shape = ellipse];
   "sp_4114254" -> "word_16344652" [label = "1"];
   "sp_4114254" -> "data_8521026" [label = "0"];
@@ -8,21 +11,13 @@ digraph "Format r(_)" {
   "push_16362597" [label = "push?", shape = ellipse];
   "push_16362597" -> "pushw_9011362" [label = "1"];
   "push_16362597" -> "popw_1825455" [label = "0"];
-  "pushw_9011362" [label = "pushw
-Push Word
-0b111`3", shape = rectangle];
-  "popw_1825455" [label = "popw
-Pop Word
-0b110`3", shape = rectangle];
+  "pushw_9011362" [label = "pushw\nPush Word\n0b111`3", shape = rectangle];
+  "popw_1825455" [label = "popw\nPop Word\n0b110`3", shape = rectangle];
   "push_6658631" [label = "push?", shape = ellipse];
   "push_6658631" -> "pushb_7132072" [label = "1"];
   "push_6658631" -> "popb_9607987" [label = "0"];
-  "pushb_7132072" [label = "pushb
-Push Byte
-0b101`3", shape = rectangle];
-  "popb_9607987" [label = "popb
-Pop Byte
-0b100`3", shape = rectangle];
+  "pushb_7132072" [label = "pushb\nPush Byte\n0b101`3", shape = rectangle];
+  "popb_9607987" [label = "popb\nPop Byte\n0b100`3", shape = rectangle];
   "data_8521026" [label = "data?", shape = ellipse];
   "data_8521026" -> "mp_7826541" [label = "1"];
   "data_8521026" -> "pc_3994631" [label = "0"];
@@ -32,40 +27,24 @@ Pop Byte
   "instr('rd.mp.lo')_304513" [label = "instr('rd.mp.lo')?", shape = ellipse];
   "instr('rd.mp.lo')_304513" -> "'rd.mp.lo'_9626836" [label = "1"];
   "instr('rd.mp.lo')_304513" -> "'rd.mp.hi'_6753187" [label = "0"];
-  "'rd.mp.lo'_9626836" [label = "'rd.mp.lo'
-Read $MP.lo
-0b0111`4", shape = rectangle];
-  "'rd.mp.hi'_6753187" [label = "'rd.mp.hi'
-Read $MP.hi
-0b0110`4", shape = rectangle];
+  "'rd.mp.lo'_9626836" [label = "'rd.mp.lo'\nRead $MP.lo\n0b0111`4", shape = rectangle];
+  "'rd.mp.hi'_6753187" [label = "'rd.mp.hi'\nRead $MP.hi\n0b0110`4", shape = rectangle];
   "wr_16207493" [label = "wr?", shape = ellipse];
   "wr_16207493" -> "'wr.gp'_5110024" [label = "1"];
   "wr_16207493" -> "'rd.gp'_7170807" [label = "0"];
-  "'wr.gp'_5110024" [label = "'wr.gp'
-Write $GP
-0b0101`4", shape = rectangle];
-  "'rd.gp'_7170807" [label = "'rd.gp'
-Read $GP
-0b0100`4", shape = rectangle];
+  "'wr.gp'_5110024" [label = "'wr.gp'\nWrite $GP\n0b0101`4", shape = rectangle];
+  "'rd.gp'_7170807" [label = "'rd.gp'\nRead $GP\n0b0100`4", shape = rectangle];
   "pc_3994631" [label = "pc?", shape = ellipse];
   "pc_3994631" -> "ra_11984613" [label = "1"];
   "pc_3994631" -> "sxt_1516934" [label = "0"];
   "ra_11984613" [label = "ra?", shape = ellipse];
   "ra_11984613" -> "callr_11085822" [label = "1"];
   "ra_11984613" -> "jr_14350230" [label = "0"];
-  "callr_11085822" [label = "callr
-Call Register
-0b0011`4", shape = rectangle];
-  "jr_14350230" [label = "jr
-Jump Register
-0b0010`4", shape = rectangle];
+  "callr_11085822" [label = "callr\nCall Register\n0b0011`4", shape = rectangle];
+  "jr_14350230" [label = "jr\nJump Register\n0b0010`4", shape = rectangle];
   "sxt_1516934" [label = "sxt?", shape = ellipse];
   "sxt_1516934" -> "seb_8359608" [label = "1"];
   "sxt_1516934" -> "neg_298820" [label = "0"];
-  "seb_8359608" [label = "seb
-Sign Extend Byte
-0b0001`4", shape = rectangle];
-  "neg_298820" [label = "neg
-Negate
-0b0000`4", shape = rectangle];
+  "seb_8359608" [label = "seb\nSign Extend Byte\n0b0001`4", shape = rectangle];
+  "neg_298820" [label = "neg\nNegate\n0b0000`4", shape = rectangle];
 }

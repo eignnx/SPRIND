@@ -165,6 +165,9 @@ print_tree(node(Left, Split, Right), Lvl, Prefix) :-
 
 dotprint_tree(Fmt, Tree) :-
     format('digraph "Format ~k" {~n', [Fmt]),
+    format('  graph [dpi = 300, bgcolor="white"];~n'),
+    format('  node [fontname = "Courier-Bold", fontsize="10pt"];~n'),
+    format('  edge [fontname = "Courier-Bold"];~n'),
     dotprint_tree_(Tree, ``),
     format('}~n').
 
@@ -172,7 +175,7 @@ dotprint_tree_(leaf(Instr), Prefix) :-
     node_id_label(leaf(Instr), Id, _),
     instr_info(Instr, Info),
     length(Prefix, PLen),
-    format(atom(Label), '~k~n~w~n0b~s`~d', [Instr, Info.title, Prefix, PLen]),
+    format(atom(Label), '~k\\n~w\\n0b~s`~d', [Instr, Info.title, Prefix, PLen]),
     format('  ~w [label = "~w", shape = rectangle];~n', [Id, Label]).
 dotprint_tree_(node(Left, Split, Right), Prefix) :-
     node_id_label(node(Left, Split, Right), Id, Label),

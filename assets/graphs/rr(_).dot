@@ -1,4 +1,7 @@
 digraph "Format rr(_)" {
+  graph [dpi = 300, bgcolor="white"];
+  node [fontname = "Courier-Bold", fontsize="10pt"];
+  edge [fontname = "Courier-Bold"];
   "ts_15468535" [label = "ts?", shape = ellipse];
   "ts_15468535" -> "strict_555480" [label = "1"];
   "ts_15468535" -> "arith_11854115" [label = "0"];
@@ -11,30 +14,18 @@ digraph "Format rr(_)" {
   "instr(tb)_6620893" [label = "instr(tb)?", shape = ellipse];
   "instr(tb)_6620893" -> "tb_7020844" [label = "1"];
   "instr(tb)_6620893" -> "tae_6900673" [label = "0"];
-  "tb_7020844" [label = "tb
-Test Below
-0b1111`4", shape = rectangle];
-  "tae_6900673" [label = "tae
-Test Above or Equal
-0b1110`4", shape = rectangle];
-  "tl_8913108" [label = "tl
-Test Less-than
-0b110`3", shape = rectangle];
+  "tb_7020844" [label = "tb\nTest Below\n0b1111`4", shape = rectangle];
+  "tae_6900673" [label = "tae\nTest Above or Equal\n0b1110`4", shape = rectangle];
+  "tl_8913108" [label = "tl\nTest Less-than\n0b110`3", shape = rectangle];
   "eq_13984211" [label = "eq?", shape = ellipse];
   "eq_13984211" -> "instr(tne)_15436207" [label = "1"];
   "eq_13984211" -> "tge_289938" [label = "0"];
   "instr(tne)_15436207" [label = "instr(tne)?", shape = ellipse];
   "instr(tne)_15436207" -> "tne_9691690" [label = "1"];
   "instr(tne)_15436207" -> "teq_6366130" [label = "0"];
-  "tne_9691690" [label = "tne
-Test Not Equal
-0b1011`4", shape = rectangle];
-  "teq_6366130" [label = "teq
-Test Equal
-0b1010`4", shape = rectangle];
-  "tge_289938" [label = "tge
-Test Greater-than or Equal
-0b100`3", shape = rectangle];
+  "tne_9691690" [label = "tne\nTest Not Equal\n0b1011`4", shape = rectangle];
+  "teq_6366130" [label = "teq\nTest Equal\n0b1010`4", shape = rectangle];
+  "tge_289938" [label = "tge\nTest Greater-than or Equal\n0b100`3", shape = rectangle];
   "arith_11854115" [label = "arith?", shape = ellipse];
   "arith_11854115" -> "carry_8195802" [label = "1"];
   "arith_11854115" -> "xor_2619008" [label = "0"];
@@ -44,40 +35,24 @@ Test Greater-than or Equal
   "add_1627692" [label = "add?", shape = ellipse];
   "add_1627692" -> "addcy_9991314" [label = "1"];
   "add_1627692" -> "subcy_4746204" [label = "0"];
-  "addcy_9991314" [label = "addcy
-Add with Carry
-0b0111`4", shape = rectangle];
-  "subcy_4746204" [label = "subcy
-Subtract with Carry
-0b0110`4", shape = rectangle];
+  "addcy_9991314" [label = "addcy\nAdd with Carry\n0b0111`4", shape = rectangle];
+  "subcy_4746204" [label = "subcy\nSubtract with Carry\n0b0110`4", shape = rectangle];
   "add_1118135" [label = "add?", shape = ellipse];
   "add_1118135" -> "add_13179919" [label = "1"];
   "add_1118135" -> "sub_2133549" [label = "0"];
-  "add_13179919" [label = "add
-Add
-0b0101`4", shape = rectangle];
-  "sub_2133549" [label = "sub
-Subtract
-0b0100`4", shape = rectangle];
+  "add_13179919" [label = "add\nAdd\n0b0101`4", shape = rectangle];
+  "sub_2133549" [label = "sub\nSubtract\n0b0100`4", shape = rectangle];
   "xor_2619008" [label = "xor?", shape = ellipse];
   "xor_2619008" -> "xor_16442135" [label = "1"];
   "xor_2619008" -> "logical_6897678" [label = "0"];
-  "xor_16442135" [label = "xor
-XOR
-0b001`3", shape = rectangle];
+  "xor_16442135" [label = "xor\nXOR\n0b001`3", shape = rectangle];
   "logical_6897678" [label = "logical?", shape = ellipse];
   "logical_6897678" -> "and_9224350" [label = "1"];
   "logical_6897678" -> "mov_8131765" [label = "0"];
   "and_9224350" [label = "and?", shape = ellipse];
   "and_9224350" -> "and_14333479" [label = "1"];
   "and_9224350" -> "or_13437499" [label = "0"];
-  "and_14333479" [label = "and
-AND
-0b00011`5", shape = rectangle];
-  "or_13437499" [label = "or
-OR
-0b00010`5", shape = rectangle];
-  "mov_8131765" [label = "mov
-Move
-0b0000`4", shape = rectangle];
+  "and_14333479" [label = "and\nAND\n0b00011`5", shape = rectangle];
+  "or_13437499" [label = "or\nOR\n0b00010`5", shape = rectangle];
+  "mov_8131765" [label = "mov\nMove\n0b0000`4", shape = rectangle];
 }

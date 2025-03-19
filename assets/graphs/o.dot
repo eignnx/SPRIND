@@ -1,4 +1,7 @@
 digraph "Format o" {
+  graph [dpi = 300, bgcolor="white"];
+  node [fontname = "Courier-Bold", fontsize="10pt"];
+  edge [fontname = "Courier-Bold"];
   "ts_7740448" [label = "ts?", shape = ellipse];
   "ts_7740448" -> "data_4436317" [label = "1"];
   "ts_7740448" -> "sp_11454861" [label = "0"];
@@ -11,54 +14,34 @@ digraph "Format o" {
   "instr(tpush1)_9804295" [label = "instr(tpush1)?", shape = ellipse];
   "instr(tpush1)_9804295" -> "tpush1_12806233" [label = "1"];
   "instr(tpush1)_9804295" -> "tpush0_14509953" [label = "0"];
-  "tpush1_12806233" [label = "tpush1
-Teststack Push 1
-0b1111`4", shape = rectangle];
-  "tpush0_14509953" [label = "tpush0
-Teststack Push 0
-0b1110`4", shape = rectangle];
-  "tdup_15487713" [label = "tdup
-Teststack Duplicate
-0b110`3", shape = rectangle];
+  "tpush1_12806233" [label = "tpush1\nTeststack Push 1\n0b1111`4", shape = rectangle];
+  "tpush0_14509953" [label = "tpush0\nTeststack Push 0\n0b1110`4", shape = rectangle];
+  "tdup_15487713" [label = "tdup\nTeststack Duplicate\n0b110`3", shape = rectangle];
   "boolean_13225208" [label = "boolean?", shape = ellipse];
   "boolean_13225208" -> "instr(tor)_15792127" [label = "1"];
   "boolean_13225208" -> "sp_11927802" [label = "0"];
   "instr(tor)_15792127" [label = "instr(tor)?", shape = ellipse];
   "instr(tor)_15792127" -> "tor_1243182" [label = "1"];
   "instr(tor)_15792127" -> "instr(tnot)_14822141" [label = "0"];
-  "tor_1243182" [label = "tor
-Teststack OR
-0b1011`4", shape = rectangle];
+  "tor_1243182" [label = "tor\nTeststack OR\n0b1011`4", shape = rectangle];
   "instr(tnot)_14822141" [label = "instr(tnot)?", shape = ellipse];
   "instr(tnot)_14822141" -> "tnot_4060624" [label = "1"];
   "instr(tnot)_14822141" -> "tand_15469294" [label = "0"];
-  "tnot_4060624" [label = "tnot
-Teststack NOT
-0b10101`5", shape = rectangle];
-  "tand_15469294" [label = "tand
-Teststack AND
-0b10100`5", shape = rectangle];
+  "tnot_4060624" [label = "tnot\nTeststack NOT\n0b10101`5", shape = rectangle];
+  "tand_15469294" [label = "tand\nTeststack AND\n0b10100`5", shape = rectangle];
   "sp_11927802" [label = "sp?", shape = ellipse];
   "sp_11927802" -> "rstr_7748698" [label = "1"];
   "sp_11927802" -> "ov_12237183" [label = "0"];
   "rstr_7748698" [label = "rstr?", shape = ellipse];
   "rstr_7748698" -> "'rstr.ts'_8107659" [label = "1"];
   "rstr_7748698" -> "'prsv.ts'_2474688" [label = "0"];
-  "'rstr.ts'_8107659" [label = "'rstr.ts'
-Restore $TS
-0b10011`5", shape = rectangle];
-  "'prsv.ts'_2474688" [label = "'prsv.ts'
-Preserve $TS
-0b10010`5", shape = rectangle];
+  "'rstr.ts'_8107659" [label = "'rstr.ts'\nRestore $TS\n0b10011`5", shape = rectangle];
+  "'prsv.ts'_2474688" [label = "'prsv.ts'\nPreserve $TS\n0b10010`5", shape = rectangle];
   "ov_12237183" [label = "ov?", shape = ellipse];
   "ov_12237183" -> "tov_12931519" [label = "1"];
   "ov_12237183" -> "tcy_2523867" [label = "0"];
-  "tov_12931519" [label = "tov
-Test Overflow
-0b10001`5", shape = rectangle];
-  "tcy_2523867" [label = "tcy
-Test Carry
-0b10000`5", shape = rectangle];
+  "tov_12931519" [label = "tov\nTest Overflow\n0b10001`5", shape = rectangle];
+  "tcy_2523867" [label = "tcy\nTest Carry\n0b10000`5", shape = rectangle];
   "sp_11454861" [label = "sp?", shape = ellipse];
   "sp_11454861" -> "rstr_14043542" [label = "1"];
   "sp_11454861" -> "exc_10785502" [label = "0"];
@@ -68,45 +51,29 @@ Test Carry
   "ra_11697259" [label = "ra?", shape = ellipse];
   "ra_11697259" -> "'rstr.ra'_14990000" [label = "1"];
   "ra_11697259" -> "mp_5968125" [label = "0"];
-  "'rstr.ra'_14990000" [label = "'rstr.ra'
-Restore $RA
-0b0111`4", shape = rectangle];
+  "'rstr.ra'_14990000" [label = "'rstr.ra'\nRestore $RA\n0b0111`4", shape = rectangle];
   "mp_5968125" [label = "mp?", shape = ellipse];
   "mp_5968125" -> "'rstr.mp'_10653791" [label = "1"];
   "mp_5968125" -> "gp_995846" [label = "0"];
-  "'rstr.mp'_10653791" [label = "'rstr.mp'
-Restore $MP
-0b01101`5", shape = rectangle];
+  "'rstr.mp'_10653791" [label = "'rstr.mp'\nRestore $MP\n0b01101`5", shape = rectangle];
   "gp_995846" [label = "gp?", shape = ellipse];
   "gp_995846" -> "'rstr.gp'_14554136" [label = "1"];
   "gp_995846" -> "'rstr.cc'_3226942" [label = "0"];
-  "'rstr.gp'_14554136" [label = "'rstr.gp'
-Restore $GP
-0b011001`6", shape = rectangle];
-  "'rstr.cc'_3226942" [label = "'rstr.cc'
-Restore $CC
-0b011000`6", shape = rectangle];
+  "'rstr.gp'_14554136" [label = "'rstr.gp'\nRestore $GP\n0b011001`6", shape = rectangle];
+  "'rstr.cc'_3226942" [label = "'rstr.cc'\nRestore $CC\n0b011000`6", shape = rectangle];
   "ra_5439766" [label = "ra?", shape = ellipse];
   "ra_5439766" -> "'prsv.ra'_11219602" [label = "1"];
   "ra_5439766" -> "mp_14735186" [label = "0"];
-  "'prsv.ra'_11219602" [label = "'prsv.ra'
-Preserve $RA
-0b0101`4", shape = rectangle];
+  "'prsv.ra'_11219602" [label = "'prsv.ra'\nPreserve $RA\n0b0101`4", shape = rectangle];
   "mp_14735186" [label = "mp?", shape = ellipse];
   "mp_14735186" -> "'prsv.mp'_12023555" [label = "1"];
   "mp_14735186" -> "gp_5770640" [label = "0"];
-  "'prsv.mp'_12023555" [label = "'prsv.mp'
-Preserve $MP
-0b01001`5", shape = rectangle];
+  "'prsv.mp'_12023555" [label = "'prsv.mp'\nPreserve $MP\n0b01001`5", shape = rectangle];
   "gp_5770640" [label = "gp?", shape = ellipse];
   "gp_5770640" -> "'prsv.gp'_4829802" [label = "1"];
   "gp_5770640" -> "'prsv.cc'_7656682" [label = "0"];
-  "'prsv.gp'_4829802" [label = "'prsv.gp'
-Preserve $GP
-0b010001`6", shape = rectangle];
-  "'prsv.cc'_7656682" [label = "'prsv.cc'
-Preserve $CC
-0b010000`6", shape = rectangle];
+  "'prsv.gp'_4829802" [label = "'prsv.gp'\nPreserve $GP\n0b010001`6", shape = rectangle];
+  "'prsv.cc'_7656682" [label = "'prsv.cc'\nPreserve $CC\n0b010000`6", shape = rectangle];
   "exc_10785502" [label = "exc?", shape = ellipse];
   "exc_10785502" -> "dbg_16198459" [label = "1"];
   "exc_10785502" -> "wr_2398349" [label = "0"];
@@ -116,46 +83,28 @@ Preserve $CC
   "instr('UNIMPL')_7737361" [label = "instr('UNIMPL')?", shape = ellipse];
   "instr('UNIMPL')_7737361" -> "'UNIMPL'_242126" [label = "1"];
   "instr('UNIMPL')_7737361" -> "'BREAK'_2863401" [label = "0"];
-  "'UNIMPL'_242126" [label = "'UNIMPL'
-Unimplemented
-0b00111`5", shape = rectangle];
-  "'BREAK'_2863401" [label = "'BREAK'
-Breakpoint
-0b00110`5", shape = rectangle];
+  "'UNIMPL'_242126" [label = "'UNIMPL'\nUnimplemented\n0b00111`5", shape = rectangle];
+  "'BREAK'_2863401" [label = "'BREAK'\nBreakpoint\n0b00110`5", shape = rectangle];
   "cmd_9200811" [label = "cmd?", shape = ellipse];
   "cmd_9200811" -> "'HALT'_5047438" [label = "1"];
   "cmd_9200811" -> "'NONEXE1'_14538439" [label = "0"];
-  "'HALT'_5047438" [label = "'HALT'
-Halt
-0b00101`5", shape = rectangle];
-  "'NONEXE1'_14538439" [label = "'NONEXE1'
-Non-executable (1s Version)
-0b00100`5", shape = rectangle];
+  "'HALT'_5047438" [label = "'HALT'\nHalt\n0b00101`5", shape = rectangle];
+  "'NONEXE1'_14538439" [label = "'NONEXE1'\nNon-executable (1s Version)\n0b00100`5", shape = rectangle];
   "wr_2398349" [label = "wr?", shape = ellipse];
   "wr_2398349" -> "instr('set.cy')_2186464" [label = "1"];
   "wr_2398349" -> "ret_15011896" [label = "0"];
   "instr('set.cy')_2186464" [label = "instr('set.cy')?", shape = ellipse];
   "instr('set.cy')_2186464" -> "'set.cy'_4073820" [label = "1"];
   "instr('set.cy')_2186464" -> "'clr.cy'_14719063" [label = "0"];
-  "'set.cy'_4073820" [label = "'set.cy'
-Set Carry
-0b00011`5", shape = rectangle];
-  "'clr.cy'_14719063" [label = "'clr.cy'
-Clear Carry
-0b00010`5", shape = rectangle];
+  "'set.cy'_4073820" [label = "'set.cy'\nSet Carry\n0b00011`5", shape = rectangle];
+  "'clr.cy'_14719063" [label = "'clr.cy'\nClear Carry\n0b00010`5", shape = rectangle];
   "ret_15011896" [label = "ret?", shape = ellipse];
   "ret_15011896" -> "ra_8747536" [label = "1"];
   "ret_15011896" -> "kcall_5951590" [label = "0"];
   "ra_8747536" [label = "ra?", shape = ellipse];
   "ra_8747536" -> "ret_11021990" [label = "1"];
   "ra_8747536" -> "kret_6365154" [label = "0"];
-  "ret_11021990" [label = "ret
-Return
-0b000011`6", shape = rectangle];
-  "kret_6365154" [label = "kret
-Kernel Return
-0b000010`6", shape = rectangle];
-  "kcall_5951590" [label = "kcall
-Kernel Call
-0b00000`5", shape = rectangle];
+  "ret_11021990" [label = "ret\nReturn\n0b000011`6", shape = rectangle];
+  "kret_6365154" [label = "kret\nKernel Return\n0b000010`6", shape = rectangle];
+  "kcall_5951590" [label = "kcall\nKernel Call\n0b00000`5", shape = rectangle];
 }

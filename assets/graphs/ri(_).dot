@@ -1,4 +1,7 @@
 digraph "Format ri(_)" {
+  graph [dpi = 300, bgcolor="white"];
+  node [fontname = "Courier-Bold", fontsize="10pt"];
+  edge [fontname = "Courier-Bold"];
   "bitwise_4696981" [label = "bitwise?", shape = ellipse];
   "bitwise_4696981" -> "logical_14885677" [label = "1"];
   "bitwise_4696981" -> "ts_12450932" [label = "0"];
@@ -11,48 +14,30 @@ digraph "Format ri(_)" {
   "right_9450710" [label = "right?", shape = ellipse];
   "right_9450710" -> "lsr_5551459" [label = "1"];
   "right_9450710" -> "lsl_933506" [label = "0"];
-  "lsr_5551459" [label = "lsr
-Logical Shift Right
-0b1111`4", shape = rectangle];
-  "lsl_933506" [label = "lsl
-Logical Shift Left
-0b1110`4", shape = rectangle];
+  "lsr_5551459" [label = "lsr\nLogical Shift Right\n0b1111`4", shape = rectangle];
+  "lsl_933506" [label = "lsl\nLogical Shift Left\n0b1110`4", shape = rectangle];
   "xor_893094" [label = "xor?", shape = ellipse];
   "xor_893094" -> "xori_1004432" [label = "1"];
   "xor_893094" -> "and_9270733" [label = "0"];
-  "xori_1004432" [label = "xori
-XOR Immediate
-0b1101`4", shape = rectangle];
+  "xori_1004432" [label = "xori\nXOR Immediate\n0b1101`4", shape = rectangle];
   "and_9270733" [label = "and?", shape = ellipse];
   "and_9270733" -> "andi_12159617" [label = "1"];
   "and_9270733" -> "ori_10741780" [label = "0"];
-  "andi_12159617" [label = "andi
-AND Immediate
-0b11001`5", shape = rectangle];
-  "ori_10741780" [label = "ori
-OR Immediate
-0b11000`5", shape = rectangle];
+  "andi_12159617" [label = "andi\nAND Immediate\n0b11001`5", shape = rectangle];
+  "ori_10741780" [label = "ori\nOR Immediate\n0b11000`5", shape = rectangle];
   "ts_9829234" [label = "ts?", shape = ellipse];
   "ts_9829234" -> "tbit_5372373" [label = "1"];
   "ts_9829234" -> "bit_8224027" [label = "0"];
-  "tbit_5372373" [label = "tbit
-Test Bit
-0b101`3", shape = rectangle];
+  "tbit_5372373" [label = "tbit\nTest Bit\n0b101`3", shape = rectangle];
   "bit_8224027" [label = "bit?", shape = ellipse];
   "bit_8224027" -> "set_3704032" [label = "1"];
   "bit_8224027" -> "asr_4658712" [label = "0"];
   "set_3704032" [label = "set?", shape = ellipse];
   "set_3704032" -> "sbit_16738776" [label = "1"];
   "set_3704032" -> "cbit_262815" [label = "0"];
-  "sbit_16738776" [label = "sbit
-Set Bit
-0b10011`5", shape = rectangle];
-  "cbit_262815" [label = "cbit
-Clear Bit
-0b10010`5", shape = rectangle];
-  "asr_4658712" [label = "asr
-Arithmetic Shift Right
-0b1000`4", shape = rectangle];
+  "sbit_16738776" [label = "sbit\nSet Bit\n0b10011`5", shape = rectangle];
+  "cbit_262815" [label = "cbit\nClear Bit\n0b10010`5", shape = rectangle];
+  "asr_4658712" [label = "asr\nArithmetic Shift Right\n0b1000`4", shape = rectangle];
   "ts_12450932" [label = "ts?", shape = ellipse];
   "ts_12450932" -> "strict_16455406" [label = "1"];
   "ts_12450932" -> "mem_14389800" [label = "0"];
@@ -65,30 +50,18 @@ Arithmetic Shift Right
   "instr(tbi)_2834915" [label = "instr(tbi)?", shape = ellipse];
   "instr(tbi)_2834915" -> "tbi_7859922" [label = "1"];
   "instr(tbi)_2834915" -> "taei_9511866" [label = "0"];
-  "tbi_7859922" [label = "tbi
-Test Below Immediate
-0b01111`5", shape = rectangle];
-  "taei_9511866" [label = "taei
-Test Above or Equal
-0b01110`5", shape = rectangle];
-  "tli_650505" [label = "tli
-Test Less-than Immediate
-0b0110`4", shape = rectangle];
+  "tbi_7859922" [label = "tbi\nTest Below Immediate\n0b01111`5", shape = rectangle];
+  "taei_9511866" [label = "taei\nTest Above or Equal\n0b01110`5", shape = rectangle];
+  "tli_650505" [label = "tli\nTest Less-than Immediate\n0b0110`4", shape = rectangle];
   "eq_5066476" [label = "eq?", shape = ellipse];
   "eq_5066476" -> "instr(tnei)_12460298" [label = "1"];
   "eq_5066476" -> "tgei_4329480" [label = "0"];
   "instr(tnei)_12460298" [label = "instr(tnei)?", shape = ellipse];
   "instr(tnei)_12460298" -> "tnei_12469607" [label = "1"];
   "instr(tnei)_12460298" -> "teqi_10456661" [label = "0"];
-  "tnei_12469607" [label = "tnei
-Test Not Equal Immediate
-0b01011`5", shape = rectangle];
-  "teqi_10456661" [label = "teqi
-Test Equal Immediate
-0b01010`5", shape = rectangle];
-  "tgei_4329480" [label = "tgei
-Test Greater-than or Equal Immediate
-0b0100`4", shape = rectangle];
+  "tnei_12469607" [label = "tnei\nTest Not Equal Immediate\n0b01011`5", shape = rectangle];
+  "teqi_10456661" [label = "teqi\nTest Equal Immediate\n0b01010`5", shape = rectangle];
+  "tgei_4329480" [label = "tgei\nTest Greater-than or Equal Immediate\n0b0100`4", shape = rectangle];
   "mem_14389800" [label = "mem?", shape = ellipse];
   "mem_14389800" -> "word_12344914" [label = "1"];
   "mem_14389800" -> "carry_3117734" [label = "0"];
@@ -98,34 +71,20 @@ Test Greater-than or Equal Immediate
   "store_746487" [label = "store?", shape = ellipse];
   "store_746487" -> "sgw_3934115" [label = "1"];
   "store_746487" -> "lgw_5872715" [label = "0"];
-  "sgw_3934115" [label = "sgw
-Store Global Word
-0b00111`5", shape = rectangle];
-  "lgw_5872715" [label = "lgw
-Load Global Word
-0b00110`5", shape = rectangle];
+  "sgw_3934115" [label = "sgw\nStore Global Word\n0b00111`5", shape = rectangle];
+  "lgw_5872715" [label = "lgw\nLoad Global Word\n0b00110`5", shape = rectangle];
   "store_301838" [label = "store?", shape = ellipse];
   "store_301838" -> "sgb_13623431" [label = "1"];
   "store_301838" -> "lgb_856797" [label = "0"];
-  "sgb_13623431" [label = "sgb
-Store Global Byte
-0b00101`5", shape = rectangle];
-  "lgb_856797" [label = "lgb
-Load Global Byte
-0b00100`5", shape = rectangle];
+  "sgb_13623431" [label = "sgb\nStore Global Byte\n0b00101`5", shape = rectangle];
+  "lgb_856797" [label = "lgb\nLoad Global Byte\n0b00100`5", shape = rectangle];
   "carry_3117734" [label = "carry?", shape = ellipse];
   "carry_3117734" -> "add_2468223" [label = "1"];
   "carry_3117734" -> "addi_9690679" [label = "0"];
   "add_2468223" [label = "add?", shape = ellipse];
   "add_2468223" -> "addicy_12315327" [label = "1"];
   "add_2468223" -> "subicy_2944954" [label = "0"];
-  "addicy_12315327" [label = "addicy
-Add Immediate with Carry
-0b00011`5", shape = rectangle];
-  "subicy_2944954" [label = "subicy
-Subtract Immediate with Carry
-0b00010`5", shape = rectangle];
-  "addi_9690679" [label = "addi
-Add Immediate
-0b0000`4", shape = rectangle];
+  "addicy_12315327" [label = "addicy\nAdd Immediate with Carry\n0b00011`5", shape = rectangle];
+  "subicy_2944954" [label = "subicy\nSubtract Immediate with Carry\n0b00010`5", shape = rectangle];
+  "addi_9690679" [label = "addi\nAdd Immediate\n0b0000`4", shape = rectangle];
 }

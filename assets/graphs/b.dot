@@ -1,17 +1,14 @@
 digraph "Format b" {
+  graph [dpi = 300, bgcolor="white"];
+  node [fontname = "Courier-Bold", fontsize="10pt"];
+  edge [fontname = "Courier-Bold"];
   "cond_15537093" [label = "cond?", shape = ellipse];
   "cond_15537093" -> "instr(bt)_2981130" [label = "1"];
   "cond_15537093" -> "b_5886451" [label = "0"];
   "instr(bt)_2981130" [label = "instr(bt)?", shape = ellipse];
   "instr(bt)_2981130" -> "bt_15089679" [label = "1"];
   "instr(bt)_2981130" -> "bf_8755250" [label = "0"];
-  "bt_15089679" [label = "bt
-Branch If True
-0b11`2", shape = rectangle];
-  "bf_8755250" [label = "bf
-Branch If False
-0b10`2", shape = rectangle];
-  "b_5886451" [label = "b
-Branch
-0b0`1", shape = rectangle];
+  "bt_15089679" [label = "bt\nBranch If True\n0b11`2", shape = rectangle];
+  "bf_8755250" [label = "bf\nBranch If False\n0b10`2", shape = rectangle];
+  "b_5886451" [label = "b\nBranch\n0b0`1", shape = rectangle];
 }
