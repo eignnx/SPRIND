@@ -8,15 +8,23 @@
 :- use_module(utils).
 :- use_module(library(dcg/basics)).
 :- use_module(library(dcg/high_order)).
+:- use_module(library(clpfd)).
 
 :- op(500, xfy, ++).
+:- op(20, fx, #).
 
-emit_heading(Level, Content) :-
-    emit_heading(Level, '~w', [Content]).
-emit_heading(Level, FString, FParams) :-
+emit_heading(PeanoLevel, Content) :-
+    emit_heading(PeanoLevel, '~w', [Content]).
+emit_heading(PeanoLevel, FString, FParams) :-
+    peano_decimal(PeanoLevel, Level),
     utils:item_count_replication('#', Level, Hashes),
     format(atom(Content), FString, FParams),
     format('~n~s ~w~n~n', [Hashes, Content]).
+
+peano_decimal(z, 0).
+peano_decimal(s(P), N) :-
+    peano_decimal(P, N0),
+    #N #= #N0 + 1.
 
 emit_table_header(ColSpecs) :-
     maplist([Spec, Name, Align]>>(
