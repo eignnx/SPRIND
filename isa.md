@@ -1,5 +1,5 @@
 
-> !!! validation_failed(tyck:incompatible bit sizes(instruction(tl),`compare` operand type doesn't match operator type(compare(\(?(r1),\(i,16)),<(\(s,16)),\(?(r2),_56108)))))
+> !!! validation_failed(tyck:incompatible bit sizes(instruction(tl),`compare` operand type doesn't match operator type(compare(\(?(r1),\(i,16)),<(\(s,16)),\(?(r2),_62578)))))
 
 
 # SPRIND Instruction Set Architecture Specification
@@ -74,33 +74,33 @@
 
 | `rri` | `subr` | `b` | `li` | `ri(_)` | `rrr` | `rr(_)` | `r(_)` | `o` |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| [`lb`](#the-lb-instruction) | [`call`](#the-call-instruction) | [`b`](#the-b-instruction) | [`li`](#the-li-instruction) | [`lgb`](#the-lgb-instruction) | [`mulstep`](#the-mulstep-instruction) | [`add`](#the-add-instruction) | [`pushb`](#the-pushb-instruction) | [`NONEXE1`](#the-NONEXE1-instruction) |
-| [`lw`](#the-lw-instruction) |  | [`bt`](#the-bt-instruction) | [`szi`](#the-szi-instruction) | [`lgw`](#the-lgw-instruction) |  | [`sub`](#the-sub-instruction) | [`pushw`](#the-pushw-instruction) | [`BREAK`](#the-BREAK-instruction) |
-| [`sb`](#the-sb-instruction) |  | [`bf`](#the-bf-instruction) |  | [`sgb`](#the-sgb-instruction) |  | [`and`](#the-and-instruction) | [`popb`](#the-popb-instruction) | [`HALT`](#the-HALT-instruction) |
-| [`sw`](#the-sw-instruction) |  |  |  | [`sgw`](#the-sgw-instruction) |  | [`or`](#the-or-instruction) | [`popw`](#the-popw-instruction) | [`UNIMPL`](#the-UNIMPL-instruction) |
-|  |  |  |  | [`tbit`](#the-tbit-instruction) |  | [`xor`](#the-xor-instruction) | [`callr`](#the-callr-instruction) | [`kret`](#the-kret-instruction) |
-|  |  |  |  | [`cbit`](#the-cbit-instruction) |  | [`mov`](#the-mov-instruction) | [`jr`](#the-jr-instruction) | [`kcall`](#the-kcall-instruction) |
-|  |  |  |  | [`sbit`](#the-sbit-instruction) |  | [`addcy`](#the-addcy-instruction) | [`neg`](#the-neg-instruction) | [`ret`](#the-ret-instruction) |
-|  |  |  |  | [`tli`](#the-tli-instruction) |  | [`subcy`](#the-subcy-instruction) | [`seb`](#the-seb-instruction) | [`tov`](#the-tov-instruction) |
-|  |  |  |  | [`tgei`](#the-tgei-instruction) |  | [`tl`](#the-tl-instruction) | [`rd.mp.lo`](#the-rd.mp.lo-instruction) | [`tcy`](#the-tcy-instruction) |
-|  |  |  |  | [`tbi`](#the-tbi-instruction) |  | [`tge`](#the-tge-instruction) | [`rd.mp.hi`](#the-rd.mp.hi-instruction) | [`clr.cy`](#the-clr.cy-instruction) |
-|  |  |  |  | [`taei`](#the-taei-instruction) |  | [`tb`](#the-tb-instruction) | [`rd.gp`](#the-rd.gp-instruction) | [`set.cy`](#the-set.cy-instruction) |
-|  |  |  |  | [`tnei`](#the-tnei-instruction) |  | [`tae`](#the-tae-instruction) | [`wr.gp`](#the-wr.gp-instruction) | [`tpush0`](#the-tpush0-instruction) |
-|  |  |  |  | [`teqi`](#the-teqi-instruction) |  | [`tne`](#the-tne-instruction) |  | [`tpush1`](#the-tpush1-instruction) |
-|  |  |  |  | [`addi`](#the-addi-instruction) |  | [`teq`](#the-teq-instruction) |  | [`tnot`](#the-tnot-instruction) |
-|  |  |  |  | [`andi`](#the-andi-instruction) |  |  |  | [`tand`](#the-tand-instruction) |
-|  |  |  |  | [`ori`](#the-ori-instruction) |  |  |  | [`tor`](#the-tor-instruction) |
-|  |  |  |  | [`xori`](#the-xori-instruction) |  |  |  | [`tdup`](#the-tdup-instruction) |
-|  |  |  |  | [`addicy`](#the-addicy-instruction) |  |  |  | [`prsv.mp`](#the-prsv.mp-instruction) |
-|  |  |  |  | [`subicy`](#the-subicy-instruction) |  |  |  | [`rstr.mp`](#the-rstr.mp-instruction) |
-|  |  |  |  | [`lsr`](#the-lsr-instruction) |  |  |  | [`prsv.ts`](#the-prsv.ts-instruction) |
-|  |  |  |  | [`lsl`](#the-lsl-instruction) |  |  |  | [`rstr.ts`](#the-rstr.ts-instruction) |
-|  |  |  |  | [`asr`](#the-asr-instruction) |  |  |  | [`prsv.ra`](#the-prsv.ra-instruction) |
-|  |  |  |  |  |  |  |  | [`rstr.ra`](#the-rstr.ra-instruction) |
-|  |  |  |  |  |  |  |  | [`prsv.gp`](#the-prsv.gp-instruction) |
-|  |  |  |  |  |  |  |  | [`rstr.gp`](#the-rstr.gp-instruction) |
-|  |  |  |  |  |  |  |  | [`prsv.cc`](#the-prsv.cc-instruction) |
+| [`lb`](#the-lb-instruction) | [`call`](#the-call-instruction) | [`b`](#the-b-instruction) | [`li`](#the-li-instruction) | [`lgb`](#the-lgb-instruction) | [`mulstep`](#the-mulstep-instruction) | [`add`](#the-add-instruction) | [`pushb`](#the-pushb-instruction) | [`kret`](#the-kret-instruction) |
+| [`lw`](#the-lw-instruction) |  | [`bt`](#the-bt-instruction) | [`szi`](#the-szi-instruction) | [`lgw`](#the-lgw-instruction) |  | [`sub`](#the-sub-instruction) | [`pushw`](#the-pushw-instruction) | [`kcall`](#the-kcall-instruction) |
+| [`sb`](#the-sb-instruction) |  | [`bf`](#the-bf-instruction) |  | [`sgb`](#the-sgb-instruction) |  | [`and`](#the-and-instruction) | [`popb`](#the-popb-instruction) | [`ret`](#the-ret-instruction) |
+| [`sw`](#the-sw-instruction) |  |  |  | [`sgw`](#the-sgw-instruction) |  | [`or`](#the-or-instruction) | [`popw`](#the-popw-instruction) | [`tov`](#the-tov-instruction) |
+|  |  |  |  | [`tbit`](#the-tbit-instruction) |  | [`xor`](#the-xor-instruction) | [`callr`](#the-callr-instruction) | [`tcy`](#the-tcy-instruction) |
+|  |  |  |  | [`cbit`](#the-cbit-instruction) |  | [`mov`](#the-mov-instruction) | [`jr`](#the-jr-instruction) | [`clr.cy`](#the-clr.cy-instruction) |
+|  |  |  |  | [`sbit`](#the-sbit-instruction) |  | [`addcy`](#the-addcy-instruction) | [`neg`](#the-neg-instruction) | [`set.cy`](#the-set.cy-instruction) |
+|  |  |  |  | [`tli`](#the-tli-instruction) |  | [`subcy`](#the-subcy-instruction) | [`seb`](#the-seb-instruction) | [`tpush0`](#the-tpush0-instruction) |
+|  |  |  |  | [`tgei`](#the-tgei-instruction) |  | [`tl`](#the-tl-instruction) | [`rd.mp.lo`](#the-rd.mp.lo-instruction) | [`tpush1`](#the-tpush1-instruction) |
+|  |  |  |  | [`tbi`](#the-tbi-instruction) |  | [`tge`](#the-tge-instruction) | [`rd.mp.hi`](#the-rd.mp.hi-instruction) | [`tnot`](#the-tnot-instruction) |
+|  |  |  |  | [`taei`](#the-taei-instruction) |  | [`tb`](#the-tb-instruction) | [`rd.gp`](#the-rd.gp-instruction) | [`tand`](#the-tand-instruction) |
+|  |  |  |  | [`tnei`](#the-tnei-instruction) |  | [`tae`](#the-tae-instruction) | [`wr.gp`](#the-wr.gp-instruction) | [`tor`](#the-tor-instruction) |
+|  |  |  |  | [`teqi`](#the-teqi-instruction) |  | [`tne`](#the-tne-instruction) |  | [`tdup`](#the-tdup-instruction) |
+|  |  |  |  | [`addi`](#the-addi-instruction) |  | [`teq`](#the-teq-instruction) |  | [`prsv.mp`](#the-prsv.mp-instruction) |
+|  |  |  |  | [`andi`](#the-andi-instruction) |  |  |  | [`rstr.mp`](#the-rstr.mp-instruction) |
+|  |  |  |  | [`ori`](#the-ori-instruction) |  |  |  | [`prsv.ts`](#the-prsv.ts-instruction) |
+|  |  |  |  | [`xori`](#the-xori-instruction) |  |  |  | [`rstr.ts`](#the-rstr.ts-instruction) |
+|  |  |  |  | [`addicy`](#the-addicy-instruction) |  |  |  | [`prsv.ra`](#the-prsv.ra-instruction) |
+|  |  |  |  | [`subicy`](#the-subicy-instruction) |  |  |  | [`rstr.ra`](#the-rstr.ra-instruction) |
+|  |  |  |  | [`lsr`](#the-lsr-instruction) |  |  |  | [`prsv.gp`](#the-prsv.gp-instruction) |
+|  |  |  |  | [`lsl`](#the-lsl-instruction) |  |  |  | [`rstr.gp`](#the-rstr.gp-instruction) |
+|  |  |  |  | [`asr`](#the-asr-instruction) |  |  |  | [`prsv.cc`](#the-prsv.cc-instruction) |
 |  |  |  |  |  |  |  |  | [`rstr.cc`](#the-rstr.cc-instruction) |
+|  |  |  |  |  |  |  |  | [`BREAK`](#the-BREAK-instruction) |
+|  |  |  |  |  |  |  |  | [`HALT`](#the-HALT-instruction) |
+|  |  |  |  |  |  |  |  | [`UNIMPL`](#the-UNIMPL-instruction) |
+|  |  |  |  |  |  |  |  | [`NONEXE1`](#the-NONEXE1-instruction) |
 
 ### Instruction Format Breakdown
 
@@ -1886,9 +1886,9 @@ todo
 #### Instruction Format `o`
 
 
-##### The `NONEXE1` Instruction
+##### The `kret` Instruction
 
-**Non-executable (1s Version)** --- Triggers a "non-executable instruction" exception. The entire instruction is 16 `1`s.
+**Kernel Return** --- Return from kernel mode.
 
 ###### Layout
 
@@ -1911,9 +1911,9 @@ todo
 
 --------------
 
-##### The `BREAK` Instruction
+##### The `kcall` Instruction
 
-**Breakpoint** --- Trigger a breakpoint.
+**Kernel Call** --- Call a kernel function.
 
 ###### Layout
 
@@ -1936,9 +1936,9 @@ todo
 
 --------------
 
-##### The `HALT` Instruction
+##### The `ret` Instruction
 
-**Halt** --- Halt the processor.
+**Return** --- Return from a subroutine.
 
 ###### Layout
 
@@ -1961,9 +1961,9 @@ todo
 
 --------------
 
-##### The `UNIMPL` Instruction
+##### The `tov` Instruction
 
-**Unimplemented** --- Unimplemented instruction.
+**Test Overflow** --- Test for overflow.
 
 ###### Layout
 
@@ -1986,9 +1986,9 @@ todo
 
 --------------
 
-##### The `kret` Instruction
+##### The `tcy` Instruction
 
-**Kernel Return** --- Return from kernel mode.
+**Test Carry** --- Test for carry.
 
 ###### Layout
 
@@ -2011,9 +2011,9 @@ todo
 
 --------------
 
-##### The `kcall` Instruction
+##### The `clr.cy` Instruction
 
-**Kernel Call** --- Call a kernel function.
+**Clear Carry** --- Clear the carry flag.
 
 ###### Layout
 
@@ -2036,9 +2036,9 @@ todo
 
 --------------
 
-##### The `ret` Instruction
+##### The `set.cy` Instruction
 
-**Return** --- Return from a subroutine.
+**Set Carry** --- Set the carry flag.
 
 ###### Layout
 
@@ -2061,9 +2061,9 @@ todo
 
 --------------
 
-##### The `tov` Instruction
+##### The `tpush0` Instruction
 
-**Test Overflow** --- Test for overflow.
+**Teststack Push 0** --- Push 0 onto the test stack.
 
 ###### Layout
 
@@ -2086,9 +2086,9 @@ todo
 
 --------------
 
-##### The `tcy` Instruction
+##### The `tpush1` Instruction
 
-**Test Carry** --- Test for carry.
+**Teststack Push 1** --- Push 1 onto the test stack.
 
 ###### Layout
 
@@ -2111,9 +2111,9 @@ todo
 
 --------------
 
-##### The `clr.cy` Instruction
+##### The `tnot` Instruction
 
-**Clear Carry** --- Clear the carry flag.
+**Teststack NOT** --- Perform a NOT operation on the test stack.
 
 ###### Layout
 
@@ -2136,9 +2136,9 @@ todo
 
 --------------
 
-##### The `set.cy` Instruction
+##### The `tand` Instruction
 
-**Set Carry** --- Set the carry flag.
+**Teststack AND** --- Perform an AND operation on the test stack.
 
 ###### Layout
 
@@ -2161,9 +2161,9 @@ todo
 
 --------------
 
-##### The `tpush0` Instruction
+##### The `tor` Instruction
 
-**Teststack Push 0** --- Push 0 onto the test stack.
+**Teststack OR** --- Perform an OR operation on the test stack.
 
 ###### Layout
 
@@ -2186,9 +2186,9 @@ todo
 
 --------------
 
-##### The `tpush1` Instruction
+##### The `tdup` Instruction
 
-**Teststack Push 1** --- Push 1 onto the test stack.
+**Teststack Duplicate** --- Duplicate the top value on the test stack.
 
 ###### Layout
 
@@ -2211,9 +2211,9 @@ todo
 
 --------------
 
-##### The `tnot` Instruction
+##### The `prsv.mp` Instruction
 
-**Teststack NOT** --- Perform a NOT operation on the test stack.
+**Preserve $MP** --- Preserve the value of the `$MP` register onto the stack.
 
 ###### Layout
 
@@ -2236,9 +2236,9 @@ todo
 
 --------------
 
-##### The `tand` Instruction
+##### The `rstr.mp` Instruction
 
-**Teststack AND** --- Perform an AND operation on the test stack.
+**Restore $MP** --- Restore the value of the `$MP` register from the stack.
 
 ###### Layout
 
@@ -2261,9 +2261,9 @@ todo
 
 --------------
 
-##### The `tor` Instruction
+##### The `prsv.ts` Instruction
 
-**Teststack OR** --- Perform an OR operation on the test stack.
+**Preserve $TS** --- Preserve the value of the `$TS` register onto the stack.
 
 ###### Layout
 
@@ -2286,9 +2286,9 @@ todo
 
 --------------
 
-##### The `tdup` Instruction
+##### The `rstr.ts` Instruction
 
-**Teststack Duplicate** --- Duplicate the top value on the test stack.
+**Restore $TS** --- Restore the value of the `$TS` register from the stack.
 
 ###### Layout
 
@@ -2311,9 +2311,9 @@ todo
 
 --------------
 
-##### The `prsv.mp` Instruction
+##### The `prsv.ra` Instruction
 
-**Preserve $MP** --- Preserve the value of the `$MP` register onto the stack.
+**Preserve $RA** --- Preserve the value of the `$RA` register onto the stack.
 
 ###### Layout
 
@@ -2336,9 +2336,9 @@ todo
 
 --------------
 
-##### The `rstr.mp` Instruction
+##### The `rstr.ra` Instruction
 
-**Restore $MP** --- Restore the value of the `$MP` register from the stack.
+**Restore $RA** --- Restore the value of the `$RA` register from the stack.
 
 ###### Layout
 
@@ -2361,9 +2361,9 @@ todo
 
 --------------
 
-##### The `prsv.ts` Instruction
+##### The `prsv.gp` Instruction
 
-**Preserve $TS** --- Preserve the value of the `$TS` register onto the stack.
+**Preserve $GP** --- Preserve the value of the `$GP` register onto the stack.
 
 ###### Layout
 
@@ -2386,9 +2386,9 @@ todo
 
 --------------
 
-##### The `rstr.ts` Instruction
+##### The `rstr.gp` Instruction
 
-**Restore $TS** --- Restore the value of the `$TS` register from the stack.
+**Restore $GP** --- Restore the value of the `$GP` register from the stack.
 
 ###### Layout
 
@@ -2411,9 +2411,9 @@ todo
 
 --------------
 
-##### The `prsv.ra` Instruction
+##### The `prsv.cc` Instruction
 
-**Preserve $RA** --- Preserve the value of the `$RA` register onto the stack.
+**Preserve $CC** --- Preserve the value of the `$CC` register onto the stack.
 
 ###### Layout
 
@@ -2436,9 +2436,9 @@ todo
 
 --------------
 
-##### The `rstr.ra` Instruction
+##### The `rstr.cc` Instruction
 
-**Restore $RA** --- Restore the value of the `$RA` register from the stack.
+**Restore $CC** --- Restore the value of the `$CC` register from the stack.
 
 ###### Layout
 
@@ -2461,9 +2461,9 @@ todo
 
 --------------
 
-##### The `prsv.gp` Instruction
+##### The `BREAK` Instruction
 
-**Preserve $GP** --- Preserve the value of the `$GP` register onto the stack.
+**Breakpoint** --- Trigger a breakpoint.
 
 ###### Layout
 
@@ -2486,9 +2486,9 @@ todo
 
 --------------
 
-##### The `rstr.gp` Instruction
+##### The `HALT` Instruction
 
-**Restore $GP** --- Restore the value of the `$GP` register from the stack.
+**Halt** --- Halt the processor.
 
 ###### Layout
 
@@ -2511,9 +2511,9 @@ todo
 
 --------------
 
-##### The `prsv.cc` Instruction
+##### The `UNIMPL` Instruction
 
-**Preserve $CC** --- Preserve the value of the `$CC` register onto the stack.
+**Unimplemented** --- Unimplemented instruction.
 
 ###### Layout
 
@@ -2536,9 +2536,9 @@ todo
 
 --------------
 
-##### The `rstr.cc` Instruction
+##### The `NONEXE1` Instruction
 
-**Restore $CC** --- Restore the value of the `$CC` register from the stack.
+**Non-executable (1s Version)** --- Triggers a "non-executable instruction" exception. The entire instruction is 16 `1`s.
 
 ###### Layout
 

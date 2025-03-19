@@ -3,6 +3,7 @@
     list_item_occurrances/3,
     warn_if_nondet/1,
     nzip_longest/3,
+    peano_decimal/2,
     output_to_file/2
 ]).
 
@@ -62,6 +63,13 @@ gt_list_padded([X | Xs0], [X | Xs], N0, Fill) :-
     #N #= #N0 - 1,
     zcompare(RelOp, N, 0),
     relop_list_padded(RelOp, Xs0, Xs, N, Fill).
+
+
+peano_decimal(z, 0).
+peano_decimal(s(P), N) :-
+    N in 0 .. sup,
+    #N #= #N0 + 1,
+    peano_decimal(P, N0).
 
 
 output_to_file(Goal, Path) :-
