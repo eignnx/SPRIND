@@ -15,6 +15,7 @@ end.
 
 generate_spec_ :-
     utils:peano_decimal(LvlOne, 1),
+
     markdown:emit_heading(LvlOne, 'SPRIND Instruction Set Architecture Specification'),
     gen_machine_overview_report(s(LvlOne)),
     gen_instr_listing_report(s(LvlOne)),

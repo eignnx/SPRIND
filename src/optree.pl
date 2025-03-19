@@ -204,7 +204,7 @@ print_dottrees :-
         (
             isa:gfmt(Fmt),
             Fmt \= ext,
-            format(atom(Path), 'src/graphs/~k.dot', [Fmt])
+            format(atom(Path), 'assets/graphs/~k.dot', [Fmt])
         ),
         utils:output_to_file(print_dottree(Fmt), Path)
     ).
