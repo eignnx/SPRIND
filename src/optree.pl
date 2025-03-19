@@ -9,12 +9,9 @@
     print_dottree/1
 ]).
 
-:- use_module(isa, [
-    fmt_instr/2
-]).
-:- use_module(sem, [
-    instr_info/2
-]).
+:- use_module(isa, [fmt_instr/2]).
+:- use_module(sem, [instr_info/2]).
+:- use_module(utils).
 
 instr_tag(Instr, Tag) :-
     instr_info(Instr, Info),
@@ -209,19 +206,12 @@ print_dottrees :-
             Fmt \= ext,
             format(atom(Path), 'src/graphs/~k.dot', [Fmt])
         ),
-        print_dottree_to_file(Fmt, Path)
-    ).
-
-print_dottree_to_file(Fmt, Path) :-
-    setup_call_cleanup(
-        open(Path, write, S, [create([read, write])]),
-        with_output_to(S, print_dottree(Fmt)),
-        close(S)
+        utils:output_to_file(print_dottree(Fmt), Path)
     ).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 print_report :-
     print_scores,
-    print_report,
+    print_dottrees,
     true.

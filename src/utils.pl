@@ -2,7 +2,8 @@
     item_count_replication/3,
     list_item_occurrances/3,
     warn_if_nondet/1,
-    nzip_longest/3
+    nzip_longest/3,
+    output_to_file/2
 ]).
 
 :- use_module(library(clpfd)).
@@ -63,3 +64,10 @@ gt_list_padded([X | Xs0], [X | Xs], N0, Fill) :-
     relop_list_padded(RelOp, Xs0, Xs, N, Fill).
 
 
+output_to_file(Goal, Path) :-
+    ( atom(Path) -> true ; type_error('a file path as an atom', Path) ),
+    setup_call_cleanup(
+        open(Path, write, S, [create([read, write])]),
+        with_output_to(S, Goal),
+        close(S)
+    ).

@@ -19,13 +19,13 @@
 :- encoding(utf8).
 
 
-show_table :-
+generate_spec :-
     catch(validate:run_validations, error(E), format('~n> !!! ~w~n~n', [E])),
     % validate:run_validations,
-    utils:warn_if_nondet(spec_gen:show_table_),
+    utils:warn_if_nondet(spec_gen:generate_spec_),
     true.
 
-show_table_ :-
+generate_spec_ :-
     emit_heading(1, 'SPRIND Instruction Set Architecture Specification'),
     display_machine_overview,
     display_instructions_spec,
