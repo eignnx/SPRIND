@@ -4,7 +4,6 @@
 :- module(derive, [
     genericfmt/1,
     fmt/1,
-    fmt_instr/2,
     fmt_prefix/2,
     fmt_operands/2,
     fmt_instr_title/3,
@@ -50,19 +49,18 @@ fmt_operands(Fmt, Operands) :-
 
 
 fmt_instr_title(Fmt, Instr, Title) :- isa:fmt_instr_title_description(Fmt, Instr, Title, _).
-fmt_instr(Fmt, Instr) :- fmt_instr_title(Fmt, Instr, _).
 
 fmt_assignedinstrcount(Fmt, AssignedCount) :-
     fmt_assignedinstrcount(Fmt, AssignedCount, _ReservedCount).
 fmt_assignedinstrcount(Fmt, AssignedCount, ReservedCount) :-
     aggregate_all(count, (
-            fmt_instr(Fmt, Instr),
+            isa:fmt_instr(Fmt, Instr),
             dif(Instr, ???) % For spacing out instructions in opcode space.
         ),
         AssignedCount
     ),
     aggregate_all(count, (
-            fmt_instr(Fmt, ???) % For spacing out instructions in opcode space.
+            isa:fmt_instr(Fmt, ???) % For spacing out instructions in opcode space.
         ),
         ReservedCount
     ).
