@@ -177,10 +177,6 @@ fmt_instr_title_description(r(2), 'rd.mp.hi', 'Read $MP.hi', 'Read the high word
 fmt_instr_title_description(r(2), 'rd.gp', 'Read $GP', 'Read the value of the system `$GP` register into a general purpose register.').
 fmt_instr_title_description(r(3), 'wr.gp', 'Write $GP', 'Write a value to the system `$GP` register from a general purpose register.').
 
-fmt_instr_title_description(o, 'NONEXE1', 'Non-executable (1''s Version)', 'Triggers a "non-executable instruction" exception. The entire instruction is 16 `1`s.').
-fmt_instr_title_description(o, 'BREAK', 'Breakpoint', 'Trigger a breakpoint.').
-fmt_instr_title_description(o, 'HALT', 'Halt', 'Halt the processor.').
-fmt_instr_title_description(o, 'UNIMPL', 'Unimplemented', 'Unimplemented instruction.').
 fmt_instr_title_description(o, kret, 'Kernel Return', 'Return from kernel mode.').
 fmt_instr_title_description(o, kcall, 'Kernel Call', 'Call a kernel function.').
 fmt_instr_title_description(o, ret, 'Return', 'Return from a subroutine.').
@@ -204,6 +200,10 @@ fmt_instr_title_description(o, 'prsv.gp', 'Preserve $GP', 'Preserve the value of
 fmt_instr_title_description(o, 'rstr.gp', 'Restore $GP', 'Restore the value of the `$GP` register from the stack.').
 fmt_instr_title_description(o, 'prsv.cc', 'Preserve $CC', 'Preserve the value of the `$CC` register onto the stack.').
 fmt_instr_title_description(o, 'rstr.cc', 'Restore $CC', 'Restore the value of the `$CC` register from the stack.').
+fmt_instr_title_description(o, 'BREAK', 'Breakpoint', 'Trigger a breakpoint.').
+fmt_instr_title_description(o, 'HALT', 'Halt', 'Halt the processor.').
+fmt_instr_title_description(o, 'UNIMPL', 'Unimplemented', 'Unimplemented instruction.').
+fmt_instr_title_description(o, 'NONEXE1', 'Non-executable (1''s Version)', 'Triggers a "non-executable instruction" exception. The entire instruction is 16 `1`s.').
 
 %%%%%%%%%%%%%%%%%%%%%%%%% Synthetic Instructions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
