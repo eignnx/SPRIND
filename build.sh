@@ -3,7 +3,7 @@
 set -e
 
 echo "Generating 'isa.md'..."
-swipl --quiet --on-error=halt -t generate_spec src/spec_gen.pl > isa.md
+swipl --quiet --on-error=halt -t generate_spec src/gen_spec.pl > isa.md
 
 echo "Generating opcode tree graphs..."
 swipl --quiet --on-error=halt -t print_dottrees src/optree.pl

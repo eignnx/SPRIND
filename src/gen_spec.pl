@@ -1,4 +1,4 @@
-:- module(spec_gen, [generate_spec/0]).
+:- module(gen_spec, [generate_spec/0]).
 
 :- use_module(validate).
 :- use_module(utils).
@@ -10,7 +10,7 @@
 generate_spec :-
     catch(validate:run_validations, error(E), format('~n> !!! ~w~n~n', [E])),
     % validate:run_validations,
-    utils:warn_if_nondet(spec_gen:generate_spec_),
+    utils:warn_if_nondet(gen_spec:generate_spec_),
 end.
 
 generate_spec_ :-
