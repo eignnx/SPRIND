@@ -135,12 +135,20 @@ bitformatchar_description('1', 'A literal `1` embedded in the instruction.').
 display_instr_specifications(Lvl) :-
     markdown:emit_heading(Lvl, 'Instruction Specifications'),
     forall(
-        fmt(Fmt),
+        derive:genericfmt(GFmt),
+        display_instr_specification_under_gfmt(s(Lvl), GFmt)
+    ).
+
+display_instr_specification_under_gfmt(Lvl, GFmt) :-
+    markdown:emit_heading(Lvl, 'Instruction Format `~k`', [GFmt]),
+    markdown:emit_image('assets/~k.svg', [GFmt]),
+    forall(
+        isa:fmt_genericfmt(Fmt, GFmt),
         display_instr_specification_under_fmt(s(Lvl), Fmt)
     ).
 
 display_instr_specification_under_fmt(Lvl, Fmt) :-
-    markdown:emit_heading(Lvl, 'Instruction Format `~k`', [Fmt]),
+    markdown:emit_heading(Lvl, 'Format `~k`', [Fmt]),
     forall(
         isa:fmt_instr(Fmt, Instr),
         display_instr_specification(s(Lvl), Fmt, Instr)

@@ -3,7 +3,6 @@
 %
 :- module(derive, [
     genericfmt/1,
-    fmt/1,
     fmt_prefix/2,
     fmt_operands/2,
     fmt_instr_title/3,
@@ -26,12 +25,8 @@
 :- op(20, fx, #).
 
 
-fmt(Fmt) :- 
-    isa:fmt_huffman_enc(Tree),
-    tree_leaf(Tree, Fmt).
-
 genericfmt(GFmt) :-
-    bagof(Fmt, fmt(Fmt), Fmts),
+    bagof(Fmt, isa:fmt(Fmt), Fmts),
     maplist([Fmt, Functor-Arity]>>(
         Fmt =.. [Functor | Args],
         length(Args, Arity)

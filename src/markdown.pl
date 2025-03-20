@@ -2,7 +2,8 @@
     op(500, xfy, ++),
     emit_heading/2,
     emit_table_header/1,
-    emit_table_row/1
+    emit_table_row/1,
+    emit_image/2
 ]).
 
 :- use_module(utils).
@@ -36,6 +37,10 @@ emit_table_header(ColSpecs) :-
 emit_table_row(ColumnData) :-
     phrase(sequence(`| `, variant_type, ` | `, ` |`, ColumnData), RowText),
     format('~s~n', [RowText]).
+
+emit_image(PathFmt, FmtArgs) :-
+    format(chars(Chars), PathFmt, FmtArgs),
+    format('~n![~s](~s)~n', [Chars, Chars]).
 
 
 :- det(variant_type//1).

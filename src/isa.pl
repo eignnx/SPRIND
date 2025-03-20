@@ -12,9 +12,11 @@
     sysregname_name_size_description/4,
     instr/1,
     gfmt/1,
+    fmt/1,
     gprreg/1,
     sysreg/1,
-    fmt_instr/2
+    fmt_instr/2,
+    fmt_genericfmt/2
 ]).
 
 :- set_prolog_flag(double_quotes, chars).
@@ -264,10 +266,22 @@ addrsize_maxalignment(Bits, MaxAlign) :-
     2 ^ #Bits #>= (2 ^ #InstrSizeBits) div #MaxAlign.
 
 instr(Instr) :- fmt_instr_title_description(_, Instr, _, _).
-gfmt(GFmt) :- fmt_operands_description(GFmt, _, _).
+fmt(Fmt) :-
+    fmt_huffman_enc(Tree),
+    tree_leaf(Tree, Fmt).
+
+tree_leaf([A | B], X) :- !, ( tree_leaf(A, X) ; tree_leaf(B, X) ).
+tree_leaf(Atom, Atom).
+
+gfmt(GFmt) :- fmt_genericfmt(_Fmt, GFmt).
 
 gprreg(R) :- regname_uses(R, _).
 sysreg(Name) :- sysregname_name_size_description(Name, _, _, _).
 
 fmt_instr(Fmt, Instr) :- fmt_instr_title_description(Fmt, Instr, _, _).
 
+fmt_genericfmt(Fmt, GFmt) :-
+    fmt(Fmt),
+    Fmt =.. [Functor | Args],
+    same_length(Args, FreeArgs),
+    GFmt =.. [Functor | FreeArgs].
