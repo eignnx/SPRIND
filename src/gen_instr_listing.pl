@@ -48,7 +48,7 @@ display_genericfmt_instr_count(GFmt) :-
         bagof(Opcodes, GFmt^(
             genericfmt_opcodes(GFmt, Opcodes),
             labeling([up, bisect], [Opcodes])
-        ), Counts) -> true ; throw(error(could_not_solve))
+        ), Counts) -> true ; throw(error(could_not_solve, _))
     ),
     genericfmt_description(GFmt, Descr),
 
