@@ -209,7 +209,7 @@ print_dottrees :-
             Fmt \= ext,
             format(atom(Path), 'assets/graphs/~k.dot', [Fmt])
         ),
-        utils:output_to_file(print_dottree(Fmt), Path)
+        utils:output_to_file(Path, print_dottree(Fmt))
     ).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

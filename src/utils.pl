@@ -72,7 +72,9 @@ peano_decimal(s(P), N) :-
     peano_decimal(P, N0).
 
 
-output_to_file(Goal, Path) :-
+:- meta_predicate output_to_file(?, 0).
+
+output_to_file(Path, Goal) :-
     ( atom(Path) -> true ; type_error('a file path as an atom', Path) ),
     setup_call_cleanup(
         open(Path, write, S, [create([read, write])]),

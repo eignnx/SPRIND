@@ -7,7 +7,7 @@
 
 
 report(Lvl) :-
-    markdown:emit_heading(Lvl, 'Machine Overview'),
+    markdown:emit_heading(Lvl, 'SPRIND Abstract Machine Overview'),
     display_gprs(s(Lvl)),
     display_register_uses(s(Lvl)),
     display_sysregs(s(Lvl)),
