@@ -165,7 +165,7 @@ print_tree(node(Left, Split, Right), Lvl, Prefix) :-
 
 dotprint_tree(Fmt, Tree) :-
     format('digraph "Format ~k" {~n', [Fmt]),
-    format('  graph [dpi = 300, bgcolor="white"];~n'),
+    format('  graph [bgcolor="white"];~n'),
     format('  node [fontname = "Courier-Bold", fontsize="10pt"];~n'),
     format('  edge [fontname = "Courier-Bold"];~n'),
     dotprint_tree_(Tree, ``),

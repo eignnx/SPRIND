@@ -1,5 +1,5 @@
 digraph "Format ri(_)" {
-  graph [dpi = 300, bgcolor="white"];
+  graph [bgcolor="white"];
   node [fontname = "Courier-Bold", fontsize="10pt"];
   edge [fontname = "Courier-Bold"];
   "bitwise_4696981" [label = "bitwise?", shape = ellipse];

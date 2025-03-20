@@ -1,5 +1,5 @@
 digraph "Format subr" {
-  graph [dpi = 300, bgcolor="white"];
+  graph [bgcolor="white"];
   node [fontname = "Courier-Bold", fontsize="10pt"];
   edge [fontname = "Courier-Bold"];
   "call_16130939" [label = "call\nCall Subroutine\n0b`0", shape = rectangle];

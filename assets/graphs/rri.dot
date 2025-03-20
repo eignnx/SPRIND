@@ -1,5 +1,5 @@
 digraph "Format rri" {
-  graph [dpi = 300, bgcolor="white"];
+  graph [bgcolor="white"];
   node [fontname = "Courier-Bold", fontsize="10pt"];
   edge [fontname = "Courier-Bold"];
   "word_1019694" [label = "word?", shape = ellipse];

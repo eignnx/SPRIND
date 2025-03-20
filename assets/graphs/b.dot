@@ -1,5 +1,5 @@
 digraph "Format b" {
-  graph [dpi = 300, bgcolor="white"];
+  graph [bgcolor="white"];
   node [fontname = "Courier-Bold", fontsize="10pt"];
   edge [fontname = "Courier-Bold"];
   "cond_15537093" [label = "cond?", shape = ellipse];

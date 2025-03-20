@@ -1,5 +1,5 @@
 digraph "Format rr(_)" {
-  graph [dpi = 300, bgcolor="white"];
+  graph [bgcolor="white"];
   node [fontname = "Courier-Bold", fontsize="10pt"];
   edge [fontname = "Courier-Bold"];
   "ts_15468535" [label = "ts?", shape = ellipse];
