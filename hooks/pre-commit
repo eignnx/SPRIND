@@ -5,3 +5,4 @@ REPO_ROOT="$(git rev-parse --show-toplevel)"
 
 bash "$REPO_ROOT/build.sh"
 git add "$REPO_ROOT/docs"
+git add "$REPO_ROOT/assets"
