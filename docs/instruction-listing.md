@@ -98,7 +98,7 @@
 ### Instruction Format `rri`
 
 
-![assets/rri.svg](assets/rri.svg)
+![../assets/rri.svg](../assets/rri.svg)
 
 #### Format `rri`
 
@@ -227,7 +227,7 @@ let ptr := and(rd\s+sxt(simm), 65534)\u;
 ### Instruction Format `subr`
 
 
-![assets/subr.svg](assets/subr.svg)
+![../assets/subr.svg](../assets/subr.svg)
 
 #### Format `subr`
 
@@ -265,7 +265,7 @@ $RA <- $PC+2
 ### Instruction Format `b`
 
 
-![assets/b.svg](assets/b.svg)
+![../assets/b.svg](../assets/b.svg)
 
 #### Format `b`
 
@@ -364,7 +364,7 @@ if !(b_pop($TS)) {
 ### Instruction Format `li`
 
 
-![assets/li.svg](assets/li.svg)
+![../assets/li.svg](../assets/li.svg)
 
 #### Format `li`
 
@@ -430,7 +430,7 @@ rd <- or(rd<<8, zxt(imm))
 ### Instruction Format `ri(_)`
 
 
-![assets/ri(_).svg](assets/ri(_).svg)
+![../assets/ri(_).svg](../assets/ri(_).svg)
 
 #### Format `ri(1)`
 
@@ -1092,7 +1092,7 @@ rd <- or(rd>>imm, sign_extension)
 ### Instruction Format `ext`
 
 
-![assets/ext.svg](assets/ext.svg)
+![../assets/ext.svg](../assets/ext.svg)
 
 #### Format `ext`
 
@@ -1100,7 +1100,7 @@ rd <- or(rd>>imm, sign_extension)
 ### Instruction Format `rrr`
 
 
-![assets/rrr.svg](assets/rrr.svg)
+![../assets/rrr.svg](../assets/rrr.svg)
 
 #### Format `rrr`
 
@@ -1145,7 +1145,7 @@ multiplier <- multiplier>>1
 ### Instruction Format `rr(_)`
 
 
-![assets/rr(_).svg](assets/rr(_).svg)
+![../assets/rr(_).svg](../assets/rr(_).svg)
 
 #### Format `rr(1)`
 
@@ -1569,7 +1569,7 @@ b_push($TS, r1==r2)
 ### Instruction Format `r(_)`
 
 
-![assets/r(_).svg](assets/r(_).svg)
+![../assets/r(_).svg](../assets/r(_).svg)
 
 #### Format `r(1)`
 
@@ -1883,7 +1883,7 @@ todo
 ### Instruction Format `o`
 
 
-![assets/o.svg](assets/o.svg)
+![../assets/o.svg](../assets/o.svg)
 
 #### Format `o`
 

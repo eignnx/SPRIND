@@ -141,7 +141,7 @@ display_instr_specifications(Lvl) :-
 
 display_instr_specification_under_gfmt(Lvl, GFmt) :-
     markdown:emit_heading(Lvl, 'Instruction Format `~k`', [GFmt]),
-    markdown:emit_image('assets/~k.svg', [GFmt]),
+    markdown:emit_image('../assets/~k.svg', [GFmt]),
     forall(
         isa:fmt_genericfmt(Fmt, GFmt),
         display_instr_specification_under_fmt(s(Lvl), Fmt)
