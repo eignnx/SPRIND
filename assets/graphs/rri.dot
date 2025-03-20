@@ -1,7 +1,7 @@
 digraph "Format rri" {
-  graph [bgcolor="white"];
-  node [fontname = "Courier-Bold", fontsize="10pt"];
-  edge [fontname = "Courier-Bold"];
+  graph [dpi = 100, bgcolor="white"];
+  node [fontname = "Courier", fontsize="15pt"];
+  edge [fontname = "Courier"];
   "word_1019694" [label = "word?", shape = ellipse];
   "word_1019694" -> "store_888754" [label = "1"];
   "word_1019694" -> "store_3203235" [label = "0"];

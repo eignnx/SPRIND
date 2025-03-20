@@ -1,6 +1,6 @@
 digraph "Format rrr" {
-  graph [bgcolor="white"];
-  node [fontname = "Courier-Bold", fontsize="10pt"];
-  edge [fontname = "Courier-Bold"];
+  graph [dpi = 100, bgcolor="white"];
+  node [fontname = "Courier", fontsize="15pt"];
+  edge [fontname = "Courier"];
   "mulstep_13462336" [label = "mulstep\nUnsigned Multiplication Step\n0b`0", shape = rectangle];
 }

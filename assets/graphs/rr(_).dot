@@ -1,7 +1,7 @@
 digraph "Format rr(_)" {
-  graph [bgcolor="white"];
-  node [fontname = "Courier-Bold", fontsize="10pt"];
-  edge [fontname = "Courier-Bold"];
+  graph [dpi = 100, bgcolor="white"];
+  node [fontname = "Courier", fontsize="15pt"];
+  edge [fontname = "Courier"];
   "ts_15468535" [label = "ts?", shape = ellipse];
   "ts_15468535" -> "strict_555480" [label = "1"];
   "ts_15468535" -> "arith_11854115" [label = "0"];

@@ -1,7 +1,7 @@
 digraph "Format b" {
-  graph [bgcolor="white"];
-  node [fontname = "Courier-Bold", fontsize="10pt"];
-  edge [fontname = "Courier-Bold"];
+  graph [dpi = 100, bgcolor="white"];
+  node [fontname = "Courier", fontsize="15pt"];
+  edge [fontname = "Courier"];
   "cond_15537093" [label = "cond?", shape = ellipse];
   "cond_15537093" -> "instr(bt)_2981130" [label = "1"];
   "cond_15537093" -> "b_5886451" [label = "0"];
