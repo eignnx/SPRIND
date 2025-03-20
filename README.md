@@ -7,7 +7,9 @@ A silly little instruction set architechture.
 - Boolean stack operations (via bit shifting)
 
 ## Specification
-[Read the spec here](isa.md)
+- [Specification Outline](docs/spec-outline.md)
+- [Machine Overview](docs/machine-overview.md)
+- [Instruction Listing](docs/instruction-listing.md)
 
 ## Motivation
 I've automated the ISA design process as much as possible because:
