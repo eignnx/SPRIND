@@ -94,7 +94,7 @@ atom_slugified(Atom, Slug) :-
         Chars0,
         Chars1
     ),
-    include([Ch]>>(char_type(Ch, alnum) ; Ch = '-'), Chars1, Chars2),
+    include([Ch]>>(char_type(Ch, alnum) ; Ch = '-' ; Ch = '_'), Chars1, Chars2),
     atom_chars(Slug, Chars2),
 end.
 

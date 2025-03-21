@@ -11,11 +11,11 @@
 | [`subr`](#instruction-format-subr) | Subroutine Call | 1 | 1 | 100% |
 | [`b`](#instruction-format-b) | Branch | 4 | 3 | 75% |
 | [`li`](#instruction-format-li) | Load Immediate | 2 | 2 | 100% |
-| [`ri(_)`](#instruction-format-ri) | Register-immediate | 48 | 22 | 46% |
+| [`ri(_)`](#instruction-format-ri_) | Register-immediate | 48 | 22 | 46% |
 | [`ext`](#instruction-format-ext) | Reserved for Extension | 4096 | 0 | 0% |
 | [`rrr`](#instruction-format-rrr) | Register-register-register | 4 | 1 | 25% |
-| [`rr(_)`](#instruction-format-rr) | Register-register | 28 | 14 | 50% |
-| [`r(_)`](#instruction-format-r) | Register | 28 | 12 | 43% |
+| [`rr(_)`](#instruction-format-rr_) | Register-register | 28 | 14 | 50% |
+| [`r(_)`](#instruction-format-r_) | Register | 28 | 12 | 43% |
 | [`o`](#instruction-format-o) | Opcode | 32 | 27 | 84% |
 |  | **Totals (excluding `ext`)** | **151** | **86** | **57%** |
 
