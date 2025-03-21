@@ -152,8 +152,8 @@ optree_instr_prefix(Tree, Instr, Prefix) :-
 
 optree_instr_prefix_(leaf(Instr), Instr) --> [].
 optree_instr_prefix_(node(Left, _SplitTag, Right), Instr) -->
-    ( optree_instr_prefix_(Left, Instr) -> ['1']
-    ; optree_instr_prefix_(Right, Instr) -> ['0']
+    ( optree_instr_prefix_(Left, Instr) -> ['0']
+    ; optree_instr_prefix_(Right, Instr) -> ['1']
     ).
 
 

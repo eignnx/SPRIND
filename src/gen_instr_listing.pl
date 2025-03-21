@@ -82,7 +82,7 @@ display_instruction_listing(Lvl) :-
     maplist(
         [GF, Instrs]>>(
             findall(
-                (fmt('[`~w`]', Instr)+fmt('(#the-~w-instruction)', Instr)),
+                sectionlink(fmt('`~w`', Instr), fmt('The `~w` Instruction', Instr)),
                 isa:fmt_instr(GF, Instr),
                 Instrs
             )

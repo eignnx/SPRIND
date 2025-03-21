@@ -684,7 +684,7 @@ instr_info('NONEXE0', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [exc]
+    tags: [] % Giving this no tags ensures it gets sorted into the 0-most branch of the optree.
 }).
 instr_info('BREAK', info{
 	title: 'Breakpoint',
