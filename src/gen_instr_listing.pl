@@ -200,25 +200,13 @@ display_instr_specification(Lvl, Fmt, Instr, OpTree) :-
         Opcode = 'NONE'
     ),
 
-    markdown:emit_table_header(['Format Prefix', 'Opcode']),
-
-    derive:fmt_opcodebits_immbits(Fmt, OBits, _),
-    label([OBits]),
-    (
-        OBits > 0 ->
-            format(atom(OpcodeBin), '0b~s', [Opcode])
-        ;
-            OpcodeBin = 'NONE'
-    ),
-    markdown:emit_table_row([fmt('`~q`', Fmt)++a(=)++fmt('0b~s', Prefix), a(OpcodeBin)]),
-
     ( derive:fmt_operands(Fmt, Operands), member(i, Operands) ->
         MaybeImmRange = ['Immediate Bits', 'Immediate Range']
     ;
         MaybeImmRange = []
     ),
 
-    markdown:emit_table_header(['Bit Layout' | MaybeImmRange]),
+    markdown:emit_table_header(['Format Prefix', 'Opcode', 'Bit Layout' | MaybeImmRange]),
 
     foreach(
         derive:fmt_layout(Fmt, Layout),
@@ -253,6 +241,13 @@ display_detailed_instr_layout(Fmt, Prefix, Opcode, Layout) :-
     ),
     format(atom(RenderedLayout), '`~s~w~s`', [Prefix, OpcodeBits, OperandsBits]),
 
+    (
+        OBits > 0 ->
+            format(atom(OpcodeBin), '0b~s', [Opcode])
+        ;
+            OpcodeBin = 'NONE'
+    ),
+
     ( fmt_operands(Fmt, Operands), member(i, Operands) ->
         immbits_immdescription(IBits, ImmRange),
         MaybeImmRange = [d(IBits), a(ImmRange)]
@@ -260,7 +255,13 @@ display_detailed_instr_layout(Fmt, Prefix, Opcode, Layout) :-
         MaybeImmRange = []
     ),
 
-    markdown:emit_table_row([fmt('~w', RenderedLayout) | MaybeImmRange]).
+    markdown:emit_table_row([
+        fmt('`~q` = 0b~s', Fmt, Prefix),
+        a(OpcodeBin),
+        fmt('~w', RenderedLayout)
+        | MaybeImmRange
+    ]),
+end.
 
 
 bitlayout_operands(BitLayout, Operands) :-
