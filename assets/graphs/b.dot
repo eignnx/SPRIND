@@ -1,13 +1,13 @@
 digraph "Format b" {
-  graph [dpi = 100, bgcolor="white"];
-  node [fontname = "Courier", fontsize="15pt"];
-  edge [fontname = "Courier"];
+  graph [dpi = 100, bgcolor="#111", fontcolor="white", rankdir=LR, pad="0.25"];
+  node [fontname = "Courier", fontsize="15pt", color="white", fontcolor="white"];
+  edge [fontname = "Courier", color="white", fontcolor="white"];
   "cond_15537093" [label = "cond?", shape = ellipse];
-  "cond_15537093" -> "instr(bt)_2981130" [label = "1"];
-  "cond_15537093" -> "b_5886451" [label = "0"];
+  "cond_15537093":e -> "instr(bt)_2981130":w [label = "1"];
+  "cond_15537093":e -> "b_5886451":w [label = "0"];
   "instr(bt)_2981130" [label = "instr(bt)?", shape = ellipse];
-  "instr(bt)_2981130" -> "bt_15089679" [label = "1"];
-  "instr(bt)_2981130" -> "bf_8755250" [label = "0"];
+  "instr(bt)_2981130":e -> "bt_15089679":w [label = "1"];
+  "instr(bt)_2981130":e -> "bf_8755250":w [label = "0"];
   "bt_15089679" [label = "bt\nBranch If True\n0b11`2", shape = rectangle];
   "bf_8755250" [label = "bf\nBranch If False\n0b10`2", shape = rectangle];
   "b_5886451" [label = "b\nBranch\n0b0`1", shape = rectangle];

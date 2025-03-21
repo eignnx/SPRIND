@@ -180,9 +180,9 @@ print_tree(node(Left, Split, Right), Lvl, Prefix) :-
 
 dotprint_tree(Fmt, Tree) :-
     format('digraph "Format ~k" {~n', [Fmt]),
-    format('  graph [dpi = 100, bgcolor="white"];~n'),
-    format('  node [fontname = "Courier", fontsize="15pt"];~n'),
-    format('  edge [fontname = "Courier"];~n'),
+    format('  graph [dpi = 100, bgcolor="#111", fontcolor="white", rankdir=LR, pad="0.25"];~n'),
+    format('  node [fontname = "Courier", fontsize="15pt", color="white", fontcolor="white"];~n'),
+    format('  edge [fontname = "Courier", color="white", fontcolor="white"];~n'),
     dotprint_tree_(Tree, ``),
     format('}~n').
 
@@ -197,8 +197,8 @@ dotprint_tree_(node(Left, Split, Right), Prefix) :-
     node_id_label(Left, LeftId, _),
     node_id_label(Right, RightId, _),
     format('  ~w [label = ~w, shape = ellipse];~n', [Id, Label]),
-    format('  ~w -> ~w [label = "1"];~n', [Id, RightId]),
-    format('  ~w -> ~w [label = "0"];~n', [Id, LeftId]),
+    format('  ~w:e -> ~w:w [label = "1"];~n', [Id, RightId]),
+    format('  ~w:e -> ~w:w [label = "0"];~n', [Id, LeftId]),
     append(Prefix, `0`, LeftPrefix),
     append(Prefix, `1`, RightPrefix),
     dotprint_tree_(Right, RightPrefix),
