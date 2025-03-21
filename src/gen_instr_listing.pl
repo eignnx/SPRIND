@@ -59,7 +59,10 @@ display_genericfmt_instr_count(GFmt) :-
     ), Assigned),
     ( [Available] = Counts -> true ; throw(error(non_unique_availableopcodecount(GFmt, Counts)))),
     Utilization is 100 * Assigned / Available,
-    markdown:emit_table_row([code(fmt('~k', GFmt)), a(Descr), d(Available), d(Assigned), fmt('~0f%', Utilization)]).
+    format(atom(Link), 'Instruction Format `~k`', [GFmt]),
+    atom_slugified(Link, LinkSlug),
+    markdown:emit_table_row([fmt('[`~k`](#~w)', GFmt, LinkSlug), a(Descr), d(Available), d(Assigned), fmt('~0f%', Utilization)]),
+end.
 
 
 
@@ -111,7 +114,10 @@ format_layout_row(Fmt, Layout) :-
     derive:fmt_assignedinstrcount(Fmt, AssignedCount, _ReservedCount),
     derive:fmt_maxopcodes(Fmt, MaxAvail),
     UsagePct is 100 * AssignedCount / MaxAvail,
-    markdown:emit_table_row([code(a(Fmt)), code(chars(Layout)), d(MaxAvail), d(AssignedCount), fmt('~0f%', UsagePct), a(ImmDescr)]).
+    format(atom(FmtSectionTitle), 'Format `~k`', [Fmt]),
+    utils:atom_slugified(FmtSectionTitle, Fragment),
+    markdown:emit_table_row([fmt('[`~k`](#~w)', Fmt, Fragment), code(chars(Layout)), d(MaxAvail), d(AssignedCount), fmt('~0f%', UsagePct), a(ImmDescr)]),
+end.
 
 
 display_bitformat_legend(Lvl) :-
@@ -136,7 +142,7 @@ bitformatchar_description('1', 'A literal `1` embedded in the instruction.').
 display_instr_specifications(Lvl) :-
     markdown:emit_heading(Lvl, 'Instruction Specifications'),
     forall(
-        derive:genericfmt(GFmt),
+        ( derive:genericfmt(GFmt), GFmt \= ext ),
         display_instr_specification_under_gfmt(s(Lvl), GFmt)
     ).
 

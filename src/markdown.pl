@@ -18,7 +18,8 @@ emit_heading(PeanoLevel, FString, FParams) :-
     utils:peano_decimal(PeanoLevel, Level),
     utils:item_count_replication('#', Level, Hashes),
     format(atom(Content), FString, FParams),
-    format('~n~s ~w~n~n', [Hashes, Content]).
+    format('~n~s ~w~n~n', [Hashes, Content]),
+end.
 
 
 emit_table_header(ColSpecs) :-
@@ -74,3 +75,5 @@ variant_type(fmt(FormatString, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6)) --> !,
     atom(Formatted).
 
 variant_type(Other) --> { throw(error(unknown_format_command(Other))) }.
+
+end.

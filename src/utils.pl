@@ -4,7 +4,8 @@
     warn_if_nondet/1,
     nzip_longest/3,
     peano_decimal/2,
-    output_to_file/2
+    output_to_file/2,
+    atom_slugified/2
 ]).
 
 :- use_module(library(clpfd)).
@@ -81,3 +82,21 @@ output_to_file(Path, Goal) :-
         with_output_to(S, Goal),
         close(S)
     ).
+
+
+atom_slugified(Atom, Slug) :-
+    downcase_atom(Atom, AtomDown),
+    atom_chars(AtomDown, Chars0),
+    maplist([In, Out]>>(
+        In = ' ' -> Out = '-'
+        ; Out = In
+    ),
+        Chars0,
+        Chars1
+    ),
+    include([Ch]>>(char_type(Ch, alnum) ; Ch = '-'), Chars1, Chars2),
+    atom_chars(Slug, Chars2),
+end.
+
+
+end.
