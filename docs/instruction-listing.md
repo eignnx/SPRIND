@@ -116,11 +116,11 @@
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `rri` = 0b00 | 0b00 |
+| `rri` = 0b00 | 0b11 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `0000iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `0011iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -146,11 +146,11 @@ rd <- zxt([ptr])
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `rri` = 0b00 | 0b01 |
+| `rri` = 0b00 | 0b10 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `0001iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `0010iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -176,11 +176,11 @@ rd <- {[ptr+1], [ptr]}
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `rri` = 0b00 | 0b10 |
+| `rri` = 0b00 | 0b01 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `0010iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `0001iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -206,11 +206,11 @@ let ptr := rd\s+sxt(simm);
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `rri` = 0b00 | 0b11 |
+| `rri` = 0b00 | 0b00 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `0011iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `0000iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -283,11 +283,11 @@ $RA <- $PC+2
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `b` = 0b0110 | 0b00 |
+| `b` = 0b0110 | 0b1 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `011000iiiiiiiiii` | 10 | `imm10` in `[-512, 511]` or `[0, 1023]` |
+| `01101iiiiiiiiii` | 10 | `imm10` in `[-512, 511]` or `[0, 1023]` |
 
 ###### Semantics
 
@@ -312,11 +312,11 @@ $PC <- $PC\s+sxt(offset)
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `b` = 0b0110 | 0b01 |
+| `b` = 0b0110 | 0b00 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `011001iiiiiiiiii` | 10 | `imm10` in `[-512, 511]` or `[0, 1023]` |
+| `011000iiiiiiiiii` | 10 | `imm10` in `[-512, 511]` or `[0, 1023]` |
 
 ###### Semantics
 
@@ -382,11 +382,11 @@ if !(b_pop($TS)) {
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `li` = 0b0111 | 0b0 |
+| `li` = 0b0111 | 0b1 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `01110iiiiiiiirrr` | 8 | `imm8` in `[-128, 127]` or `[0, 255]` |
+| `01111iiiiiiiirrr` | 8 | `imm8` in `[-128, 127]` or `[0, 255]` |
 
 ###### Semantics
 
@@ -411,11 +411,11 @@ rd <- sxt(simm)
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `li` = 0b0111 | 0b1 |
+| `li` = 0b0111 | 0b0 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `01111iiiiiiiirrr` | 8 | `imm8` in `[-128, 127]` or `[0, 255]` |
+| `01110iiiiiiiirrr` | 8 | `imm8` in `[-128, 127]` or `[0, 255]` |
 
 ###### Semantics
 
@@ -448,11 +448,11 @@ rd <- or(rd<<8, zxt(imm))
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b00000 |
+| `ri(1)` = 0b10 | 0b11011 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1000000iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `1011011iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -477,11 +477,11 @@ rd <- zxt([$GP\u+zxt(disp)])
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b00001 |
+| `ri(1)` = 0b10 | 0b10011 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1000001iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `1010011iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -507,11 +507,11 @@ rd <- {[ptr+1], [ptr]}
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b00010 |
+| `ri(1)` = 0b10 | 0b01011 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1000010iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `1001011iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -566,11 +566,11 @@ let ptr := and($GP\u+zxt(disp), 65534)\u;
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b00100 |
+| `ri(1)` = 0b10 | 0b010 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1000100iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `10010iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -597,11 +597,11 @@ b_push($TS, bit==1)
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b00101 |
+| `ri(1)` = 0b10 | 0b10110 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1000101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `1010110iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -659,11 +659,11 @@ rd <- or(rd, mask)
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b00111 |
+| `ri(1)` = 0b10 | 0b1001 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1000111iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `101001iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -688,11 +688,11 @@ b_push($TS, compare(rs\s, <(s\16), sxt(simm)))
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b01000 |
+| `ri(1)` = 0b10 | 0b1101 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1001000iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `101101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -717,11 +717,11 @@ b_push($TS, compare(rs\s, >=(s\16), sxt(simm)))
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b01001 |
+| `ri(1)` = 0b10 | 0b00001 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1001001iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `1000001iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -746,11 +746,11 @@ b_push($TS, compare(rs\u, <(u\16), zxt(imm)))
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b01010 |
+| `ri(1)` = 0b10 | 0b10001 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1001010iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `1010001iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -775,11 +775,11 @@ b_push($TS, compare(rs\u, >=(u\16), zxt(imm)))
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b01011 |
+| `ri(1)` = 0b10 | 0b00101 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1001011iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `1000101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -804,11 +804,11 @@ b_push($TS, rs\s\=sxt(simm))
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b01100 |
+| `ri(1)` = 0b10 | 0b10101 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1001100iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `1010101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -833,11 +833,11 @@ b_push($TS, rs\s==sxt(simm))
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b01101 |
+| `ri(1)` = 0b10 | 0b1111 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1001101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `101111iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -862,11 +862,11 @@ rd <- rd\s+sxt(simm)
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b01110 |
+| `ri(1)` = 0b10 | 0b01100 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1001110iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `1001100iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -891,11 +891,11 @@ rd <- and(rd, sxt(simm))
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b01111 |
+| `ri(1)` = 0b10 | 0b11100 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1001111iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `1011100iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -920,11 +920,11 @@ rd <- or(rd, sxt(simm))
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b10000 |
+| `ri(1)` = 0b10 | 0b0100 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1010000iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `100100iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -949,11 +949,11 @@ rd <- rd xor sxt(simm)
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b10001 |
+| `ri(1)` = 0b10 | 0b00111 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1010001iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `1000111iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -980,11 +980,11 @@ bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b10010 |
+| `ri(1)` = 0b10 | 0b10111 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1010010iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `1010111iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -1011,11 +1011,11 @@ bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b10011 |
+| `ri(1)` = 0b10 | 0b0000 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1010011iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `100000iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -1040,11 +1040,11 @@ rd <- rd>>imm
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b10100 |
+| `ri(1)` = 0b10 | 0b1000 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1010100iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `101000iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -1069,11 +1069,11 @@ rd <- rd<<imm
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b10101 |
+| `ri(1)` = 0b10 | 0b1110 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1010101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `101110iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -1093,1472 +1093,3 @@ rd <- or(rd>>imm, sign_extension)
 
 
 ![../assets/ext.svg](../assets/ext.svg)
-
-#### Format `ext`
-
-
-### Instruction Format `rrr`
-
-
-![../assets/rrr.svg](../assets/rrr.svg)
-
-#### Format `rrr`
-
-
-##### The `mulstep` Instruction
-
-**Unsigned Multiplication Step** --- Computes one step in a full 16-bit by 16-bit unsigned multiplication.
-
-###### Examples
-
-- `mulstep x:y, z`
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `rrr` = 0b11110 | 0b00 |
-
-| Bit Layout |
-|:---:|
-| `1111000rrr` |
-
-###### Semantics
-
-```
-[reg(multiplicand_hi), reg(multiplicand_lo), reg(multiplier)]
------------------------------------------------------------------
-let mask := ~(and(multiplier, 1)-1);
-masked_multiplicand_lo <- and(multiplicand_lo, mask);
-masked_multiplicand_hi <- and(multiplicand_hi, mask);
-lo($MP) <- lo($MP)+masked_multiplicand_lo;
-hi($MP) <- hi($MP)+masked_multiplicand_hi+attr(cpu/alu/carryout);
-let shift_cout := bit(multiplicand_lo, reg_size_bits-1);
-multiplicand_lo <- multiplicand_lo<<1;
-multiplicand_hi <- multiplicand_hi<<1+shift_cout;
-multiplier <- multiplier>>1
-```
-
---------------
-
-### Instruction Format `rr(_)`
-
-
-![../assets/rr(_).svg](../assets/rr(_).svg)
-
-#### Format `rr(1)`
-
-
-##### The `add` Instruction
-
-**Add** --- Add the values of two registers.
-
-###### Examples
-
-- `add x, y`
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `rr(1)` = 0b111110 | 0b0000 |
-
-| Bit Layout |
-|:---:|
-| `1111100000rrr` |
-
-###### Semantics
-
-```
-[reg(rs), reg(rd)]
-------------------
-rd <- rd+rs
-```
-
---------------
-
-##### The `sub` Instruction
-
-**Subtract** --- Subtract the value of one register from another.
-
-###### Examples
-
-- `sub x, y`
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `rr(1)` = 0b111110 | 0b0001 |
-
-| Bit Layout |
-|:---:|
-| `1111100001rrr` |
-
-###### Semantics
-
-```
-[reg(rs), reg(rd)]
-------------------
-rd <- rd-rs
-```
-
---------------
-
-##### The `and` Instruction
-
-**AND** --- Perform a bitwise AND between two registers.
-
-###### Examples
-
-- `and x, y`
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `rr(1)` = 0b111110 | 0b0010 |
-
-| Bit Layout |
-|:---:|
-| `1111100010rrr` |
-
-###### Semantics
-
-```
-[reg(rs), reg(rd)]
-------------------
-rd <- and(rd, rs)
-```
-
---------------
-
-##### The `or` Instruction
-
-**OR** --- Perform a bitwise OR between two registers.
-
-###### Examples
-
-- `or x, y`
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `rr(1)` = 0b111110 | 0b0011 |
-
-| Bit Layout |
-|:---:|
-| `1111100011rrr` |
-
-###### Semantics
-
-```
-[reg(rs), reg(rd)]
-------------------
-rd <- or(rd, rs)
-```
-
---------------
-
-##### The `xor` Instruction
-
-**XOR** --- Perform a bitwise XOR between two registers.
-
-###### Examples
-
-- `xor x, y`
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `rr(1)` = 0b111110 | 0b0100 |
-
-| Bit Layout |
-|:---:|
-| `1111100100rrr` |
-
-###### Semantics
-
-```
-[reg(rs), reg(rd)]
-------------------
-rd <- rd xor rs
-```
-
---------------
-
-##### The `mov` Instruction
-
-**Move** --- Move the value from one register to another.
-
-###### Examples
-
-- `mov x, y`
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `rr(1)` = 0b111110 | 0b0101 |
-
-| Bit Layout |
-|:---:|
-| `1111100101rrr` |
-
-###### Semantics
-
-```
-[reg(rs), reg(rd)]
-------------------
-rd <- rs
-```
-
---------------
-
-##### The `addcy` Instruction
-
-**Add with Carry** --- Add the values of two registers with carry.
-
-###### Examples
-
-- `addcy x, y`
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `rr(1)` = 0b111110 | 0b0110 |
-
-| Bit Layout |
-|:---:|
-| `1111100110rrr` |
-
-###### Semantics
-
-```
-[reg(rs), reg(rd)]
------------------------------------------------------
-rd <- rd+rs+bit($CC, carry_flag_bit)\16;
-bit($CC, carry_flag_bit) <- attr(cpu/alu/carryout);
-bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
-```
-
---------------
-
-##### The `subcy` Instruction
-
-**Subtract with Carry** --- Subtract the value of one register from another with carry.
-
-###### Examples
-
-- `subcy x, y`
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `rr(1)` = 0b111110 | 0b0111 |
-
-| Bit Layout |
-|:---:|
-| `1111100111rrr` |
-
-###### Semantics
-
-```
-[reg(rs), reg(rd)]
------------------------------------------------------
-rd <- rd-rs-bit($CC, carry_flag_bit)\16;
-bit($CC, carry_flag_bit) <- attr(cpu/alu/carryout);
-bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
-```
-
---------------
-
-#### Format `rr(2)`
-
-
-##### The `tl` Instruction
-
-**Test Less-than** --- Test if the value of one register is less than another.
-
-###### Examples
-
-- `tl x, y`
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `rr(2)` = 0b1111110 | 0b000 |
-
-| Bit Layout |
-|:---:|
-| `1111110000rrr` |
-
-###### Semantics
-
-```
-[reg(r1), reg(r2)]
--------------------------------------
-b_push($TS, compare(r1, <(s\16), r2))
-```
-
---------------
-
-##### The `tge` Instruction
-
-**Test Greater-than or Equal** --- Test if the value of one register is greater than or equal to another.
-
-###### Examples
-
-- `tge x, y`
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `rr(2)` = 0b1111110 | 0b001 |
-
-| Bit Layout |
-|:---:|
-| `1111110001rrr` |
-
-###### Semantics
-
-```
-[reg(r1), reg(r2)]
---------------------------------------
-b_push($TS, compare(r1, >=(s\16), r2))
-```
-
---------------
-
-##### The `tb` Instruction
-
-**Test Below** --- Test if the value of one register is below another.
-
-###### Examples
-
-- `tb x, y`
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `rr(2)` = 0b1111110 | 0b010 |
-
-| Bit Layout |
-|:---:|
-| `1111110010rrr` |
-
-###### Semantics
-
-```
-[reg(r1), reg(r2)]
--------------------------------------
-b_push($TS, compare(r1, <(u\16), r2))
-```
-
---------------
-
-##### The `tae` Instruction
-
-**Test Above or Equal** --- Test if the value of one register is above or equal to another.
-
-###### Examples
-
-- `tae x, y`
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `rr(2)` = 0b1111110 | 0b011 |
-
-| Bit Layout |
-|:---:|
-| `1111110011rrr` |
-
-###### Semantics
-
-```
-[reg(r1), reg(r2)]
---------------------------------------
-b_push($TS, compare(r1, >=(u\16), r2))
-```
-
---------------
-
-#### Format `rr(3)`
-
-
-##### The `tne` Instruction
-
-**Test Not Equal** --- Test if the value of one register is not equal to another.
-
-###### Examples
-
-- `tne x, y`
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `rr(3)` = 0b11111110 | 0b00 |
-
-| Bit Layout |
-|:---:|
-| `1111111000rrr` |
-
-###### Semantics
-
-```
-[reg(r1), reg(r2)]
--------------------
-b_push($TS, r1\=r2)
-```
-
---------------
-
-##### The `teq` Instruction
-
-**Test Equal** --- Test if the value of one register is equal to another.
-
-###### Examples
-
-- `teq x, y`
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `rr(3)` = 0b11111110 | 0b01 |
-
-| Bit Layout |
-|:---:|
-| `1111111001rrr` |
-
-###### Semantics
-
-```
-[reg(r1), reg(r2)]
--------------------
-b_push($TS, r1==r2)
-```
-
---------------
-
-### Instruction Format `r(_)`
-
-
-![../assets/r(_).svg](../assets/r(_).svg)
-
-#### Format `r(1)`
-
-
-##### The `pushb` Instruction
-
-**Push Byte** --- Push a byte from a register onto the stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `r(1)` = 0b111111110 | 0b0000 |
-
-| Bit Layout |
-|:---:|
-| `1111111100000rrr` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `pushw` Instruction
-
-**Push Word** --- Push a word from a register onto the stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `r(1)` = 0b111111110 | 0b0001 |
-
-| Bit Layout |
-|:---:|
-| `1111111100001rrr` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `popb` Instruction
-
-**Pop Byte** --- Pop a byte from the stack into a register.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `r(1)` = 0b111111110 | 0b0010 |
-
-| Bit Layout |
-|:---:|
-| `1111111100010rrr` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `popw` Instruction
-
-**Pop Word** --- Pop a word from the stack into a register.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `r(1)` = 0b111111110 | 0b0011 |
-
-| Bit Layout |
-|:---:|
-| `1111111100011rrr` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `callr` Instruction
-
-**Call Register** --- Call a subroutine at the address in a register.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `r(1)` = 0b111111110 | 0b0100 |
-
-| Bit Layout |
-|:---:|
-| `1111111100100rrr` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `jr` Instruction
-
-**Jump Register** --- Jump to the address in a register.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `r(1)` = 0b111111110 | 0b0101 |
-
-| Bit Layout |
-|:---:|
-| `1111111100101rrr` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `neg` Instruction
-
-**Negate** --- Negate the value in a register.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `r(1)` = 0b111111110 | 0b0110 |
-
-| Bit Layout |
-|:---:|
-| `1111111100110rrr` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-#### Format `r(2)`
-
-
-##### The `seb` Instruction
-
-**Sign Extend Byte** --- Sign extend a byte in a register.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `r(2)` = 0b1111111110 | 0b000 |
-
-| Bit Layout |
-|:---:|
-| `1111111110000rrr` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `rd.mp.lo` Instruction
-
-**Read $MP.lo** --- Read the low word in the system `$MP` register into a general purpose register.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `r(2)` = 0b1111111110 | 0b001 |
-
-| Bit Layout |
-|:---:|
-| `1111111110001rrr` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `rd.mp.hi` Instruction
-
-**Read $MP.hi** --- Read the high word in the system `$MP` register into a general purpose register.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `r(2)` = 0b1111111110 | 0b010 |
-
-| Bit Layout |
-|:---:|
-| `1111111110010rrr` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `rd.gp` Instruction
-
-**Read $GP** --- Read the value of the system `$GP` register into a general purpose register.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `r(2)` = 0b1111111110 | 0b011 |
-
-| Bit Layout |
-|:---:|
-| `1111111110011rrr` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-#### Format `r(3)`
-
-
-##### The `wr.gp` Instruction
-
-**Write $GP** --- Write a value to the system `$GP` register from a general purpose register.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `r(3)` = 0b11111111110 | 0b00 |
-
-| Bit Layout |
-|:---:|
-| `1111111111000rrr` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-### Instruction Format `o`
-
-
-![../assets/o.svg](../assets/o.svg)
-
-#### Format `o`
-
-
-##### The `kret` Instruction
-
-**Kernel Return** --- Return from kernel mode.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b00000 |
-
-| Bit Layout |
-|:---:|
-| `1111111111100000` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `kcall` Instruction
-
-**Kernel Call** --- Call a kernel function.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b00001 |
-
-| Bit Layout |
-|:---:|
-| `1111111111100001` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `ret` Instruction
-
-**Return** --- Return from a subroutine.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b00010 |
-
-| Bit Layout |
-|:---:|
-| `1111111111100010` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `tov` Instruction
-
-**Test Overflow** --- Test for overflow.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b00011 |
-
-| Bit Layout |
-|:---:|
-| `1111111111100011` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `tcy` Instruction
-
-**Test Carry** --- Test for carry.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b00100 |
-
-| Bit Layout |
-|:---:|
-| `1111111111100100` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `clr.cy` Instruction
-
-**Clear Carry** --- Clear the carry flag.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b00101 |
-
-| Bit Layout |
-|:---:|
-| `1111111111100101` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `set.cy` Instruction
-
-**Set Carry** --- Set the carry flag.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b00110 |
-
-| Bit Layout |
-|:---:|
-| `1111111111100110` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `tpush0` Instruction
-
-**Teststack Push 0** --- Push 0 onto the test stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b00111 |
-
-| Bit Layout |
-|:---:|
-| `1111111111100111` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `tpush1` Instruction
-
-**Teststack Push 1** --- Push 1 onto the test stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b01000 |
-
-| Bit Layout |
-|:---:|
-| `1111111111101000` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `tnot` Instruction
-
-**Teststack NOT** --- Perform a NOT operation on the test stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b01001 |
-
-| Bit Layout |
-|:---:|
-| `1111111111101001` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `tand` Instruction
-
-**Teststack AND** --- Perform an AND operation on the test stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b01010 |
-
-| Bit Layout |
-|:---:|
-| `1111111111101010` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `tor` Instruction
-
-**Teststack OR** --- Perform an OR operation on the test stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b01011 |
-
-| Bit Layout |
-|:---:|
-| `1111111111101011` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `tdup` Instruction
-
-**Teststack Duplicate** --- Duplicate the top value on the test stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b01100 |
-
-| Bit Layout |
-|:---:|
-| `1111111111101100` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `prsv.mp` Instruction
-
-**Preserve $MP** --- Preserve the value of the `$MP` register onto the stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b01101 |
-
-| Bit Layout |
-|:---:|
-| `1111111111101101` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `rstr.mp` Instruction
-
-**Restore $MP** --- Restore the value of the `$MP` register from the stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b01110 |
-
-| Bit Layout |
-|:---:|
-| `1111111111101110` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `prsv.ts` Instruction
-
-**Preserve $TS** --- Preserve the value of the `$TS` register onto the stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b01111 |
-
-| Bit Layout |
-|:---:|
-| `1111111111101111` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `rstr.ts` Instruction
-
-**Restore $TS** --- Restore the value of the `$TS` register from the stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b10000 |
-
-| Bit Layout |
-|:---:|
-| `1111111111110000` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `prsv.ra` Instruction
-
-**Preserve $RA** --- Preserve the value of the `$RA` register onto the stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b10001 |
-
-| Bit Layout |
-|:---:|
-| `1111111111110001` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `rstr.ra` Instruction
-
-**Restore $RA** --- Restore the value of the `$RA` register from the stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b10010 |
-
-| Bit Layout |
-|:---:|
-| `1111111111110010` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `prsv.gp` Instruction
-
-**Preserve $GP** --- Preserve the value of the `$GP` register onto the stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b10011 |
-
-| Bit Layout |
-|:---:|
-| `1111111111110011` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `rstr.gp` Instruction
-
-**Restore $GP** --- Restore the value of the `$GP` register from the stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b10100 |
-
-| Bit Layout |
-|:---:|
-| `1111111111110100` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `prsv.cc` Instruction
-
-**Preserve $CC** --- Preserve the value of the `$CC` register onto the stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b10101 |
-
-| Bit Layout |
-|:---:|
-| `1111111111110101` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `rstr.cc` Instruction
-
-**Restore $CC** --- Restore the value of the `$CC` register from the stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b10110 |
-
-| Bit Layout |
-|:---:|
-| `1111111111110110` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `BREAK` Instruction
-
-**Breakpoint** --- Trigger a breakpoint.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b10111 |
-
-| Bit Layout |
-|:---:|
-| `1111111111110111` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `HALT` Instruction
-
-**Halt** --- Halt the processor.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b11000 |
-
-| Bit Layout |
-|:---:|
-| `1111111111111000` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `UNIMPL` Instruction
-
-**Unimplemented** --- Unimplemented instruction.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b11001 |
-
-| Bit Layout |
-|:---:|
-| `1111111111111001` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `NONEXE1` Instruction
-
-**Non-executable (1s Version)** --- Triggers a "non-executable instruction" exception. The entire instruction is 16 `1`s.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b11010 |
-
-| Bit Layout |
-|:---:|
-| `1111111111111010` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------

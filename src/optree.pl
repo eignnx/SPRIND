@@ -6,7 +6,9 @@
 :- module(optree, [
     print_report/0,
     print_dottrees/0,
-    print_dottree/1
+    print_dottree/1,
+    fmt_tree/2,
+    optree_instr_prefix/3
 ]).
 
 :- use_module(isa, [fmt_instr/2]).
@@ -115,9 +117,13 @@ print_scores :-
 
 fmt_tree(Fmt, Tree) :-
     fmt_all_instrs(Fmt, Pool),
-    instrpool_tree(Pool, Tree).
+    catch(
+        instrpool_tree(Pool, Tree),
+        error(E, _),
+        throw(error(while_building_optree_for_fmt(Fmt, E), _))
+    ).
 
-instrpool_tree([], '$ERROR') :- throw(error('cannot construct tree from empty pool')).
+instrpool_tree([], '$ERROR') :- throw(error('cannot construct tree from empty pool', _)).
 instrpool_tree([Instr], leaf(Instr)).
 instrpool_tree([I0, I1 | Is], node(LeftTree, SplitTag, RightTree)) :-
     Pool = [I0, I1 | Is],
@@ -140,6 +146,15 @@ cmp_score_ascending(Ord, Score1-Tag1, Score2-Tag2) :-
         Ord = '<'
     ;
         Ord = '>'.
+
+optree_instr_prefix(Tree, Instr, Prefix) :-
+    phrase(optree_instr_prefix_(Tree, Instr), Prefix).
+
+optree_instr_prefix_(leaf(Instr), Instr) --> [].
+optree_instr_prefix_(node(Left, _SplitTag, Right), Instr) -->
+    ( optree_instr_prefix_(Left, Instr) -> ['1']
+    ; optree_instr_prefix_(Right, Instr) -> ['0']
+    ).
 
 
 print_tree(Tree) :- 

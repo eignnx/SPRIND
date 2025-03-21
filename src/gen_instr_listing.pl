@@ -5,6 +5,7 @@
 :- use_module(sem).
 :- use_module(markdown).
 :- use_module(utils).
+:- use_module(optree).
 :- use_module(library(clpfd)).
 :- op(20, fx, #).
 
@@ -142,19 +143,23 @@ display_instr_specifications(Lvl) :-
 display_instr_specification_under_gfmt(Lvl, GFmt) :-
     markdown:emit_heading(Lvl, 'Instruction Format `~k`', [GFmt]),
     markdown:emit_image('../assets/~k.svg', [GFmt]),
+    
+    GFmt \= ext,
+    optree:fmt_tree(GFmt, OpTree), % Format being ext makes fmt_tree throw error about empty pool
+
     forall(
         isa:fmt_genericfmt(Fmt, GFmt),
-        display_instr_specification_under_fmt(s(Lvl), Fmt)
+        display_instr_specification_under_fmt(s(Lvl), Fmt, OpTree)
     ).
 
-display_instr_specification_under_fmt(Lvl, Fmt) :-
+display_instr_specification_under_fmt(Lvl, Fmt, OpTree) :-
     markdown:emit_heading(Lvl, 'Format `~k`', [Fmt]),
     forall(
         isa:fmt_instr(Fmt, Instr),
-        display_instr_specification(s(Lvl), Fmt, Instr)
+        display_instr_specification(s(Lvl), Fmt, Instr, OpTree)
     ).
 
-display_instr_specification(Lvl, Fmt, Instr) :-
+display_instr_specification(Lvl, Fmt, Instr, OpTree) :-
     sem:instr_info(Instr, Info),
 
     markdown:emit_heading(Lvl, 'The `~w` Instruction', [Instr]),
@@ -172,8 +177,13 @@ display_instr_specification(Lvl, Fmt, Instr) :-
 
     markdown:emit_heading(s(Lvl), 'Layout'),
     once(derive:fmt_prefix(Fmt, Prefix)),
-    bagof(I, Fmt^fmt_instr(Fmt, I), InstrsInFmt),
-    once(nth0(OpcodeIndex, InstrsInFmt, Instr)),
+    % bagof(I, Fmt^fmt_instr(Fmt, I), InstrsInFmt),
+    % once(nth0(OpcodeIndex, InstrsInFmt, Instr)),
+    ( Fmt \= ext ->
+        optree:optree_instr_prefix(OpTree, Instr, Opcode)
+    ;
+        Opcode = 'NONE'
+    ),
 
     markdown:emit_table_header(['Format Prefix', 'Opcode']),
 
@@ -181,7 +191,7 @@ display_instr_specification(Lvl, Fmt, Instr) :-
     label([OBits]),
     (
         OBits > 0 ->
-            format(atom(OpcodeBin), '0b~|~`0t~2r~*+', [OpcodeIndex, OBits])
+            format(atom(OpcodeBin), '0b~s', [Opcode])
         ;
             OpcodeBin = 'NONE'
     ),
@@ -197,7 +207,7 @@ display_instr_specification(Lvl, Fmt, Instr) :-
 
     foreach(
         derive:fmt_layout(Fmt, Layout),
-        display_detailed_instr_layout(Fmt, Prefix, OpcodeIndex, Layout)
+        display_detailed_instr_layout(Fmt, Prefix, Opcode, Layout)
     ),
 
     markdown:emit_heading(s(Lvl), 'Semantics'),
@@ -222,7 +232,7 @@ display_detailed_instr_layout(Fmt, Prefix, Opcode, Layout) :-
     bitlayout_immbits(Layout, IBits),
     bitlayout_operands(Layout, OperandsBits),
     ( #OBits #> 0 ->
-        format(atom(OpcodeBits), '~`0t~2r~*+', [Opcode, OBits])
+        format(atom(OpcodeBits), '~s', [Opcode])
     ;
         OpcodeBits = ''
     ),
