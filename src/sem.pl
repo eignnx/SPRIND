@@ -678,9 +678,9 @@ instr_info('wr.gp', info{
     tags: [wr, data, gp]
 }).
 
-instr_info('NONEXE1', info{
-	title: 'Non-executable (1s Version)',
-	descr: 'Triggers a "non-executable instruction" exception. The entire instruction is 16 `1`s.',
+instr_info('NONEXE0', info{
+	title: 'Non-executable (0s Version)',
+	descr: 'Triggers a "non-executable instruction" exception. The entire instruction is 16 `0`s.',
 	ex: [],
 	operands: [],
 	sem: todo,

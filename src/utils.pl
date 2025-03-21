@@ -5,7 +5,8 @@
     nzip_longest/3,
     peano_decimal/2,
     output_to_file/2,
-    atom_slugified/2
+    atom_slugified/2,
+    codes_slugified/2
 ]).
 
 :- use_module(library(clpfd)).
@@ -83,7 +84,6 @@ output_to_file(Path, Goal) :-
         close(S)
     ).
 
-
 atom_slugified(Atom, Slug) :-
     downcase_atom(Atom, AtomDown),
     atom_chars(AtomDown, Chars0),
@@ -96,6 +96,12 @@ atom_slugified(Atom, Slug) :-
     ),
     include([Ch]>>(char_type(Ch, alnum) ; Ch = '-'), Chars1, Chars2),
     atom_chars(Slug, Chars2),
+end.
+
+codes_slugified(Codes, Slug) :-
+    atom_codes(Atom, Codes),
+    atom_slugified(Atom, SlugAtom),
+    atom_codes(SlugAtom, Slug),
 end.
 
 

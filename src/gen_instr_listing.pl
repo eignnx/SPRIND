@@ -59,9 +59,13 @@ display_genericfmt_instr_count(GFmt) :-
     ), Assigned),
     ( [Available] = Counts -> true ; throw(error(non_unique_availableopcodecount(GFmt, Counts)))),
     Utilization is 100 * Assigned / Available,
-    format(atom(Link), 'Instruction Format `~k`', [GFmt]),
-    atom_slugified(Link, LinkSlug),
-    markdown:emit_table_row([fmt('[`~k`](#~w)', GFmt, LinkSlug), a(Descr), d(Available), d(Assigned), fmt('~0f%', Utilization)]),
+    markdown:emit_table_row([
+        sectionlink(fmt('`~k`', GFmt), fmt('Instruction Format `~k`', GFmt)),
+        a(Descr),
+        d(Available),
+        d(Assigned),
+        fmt('~0f%', Utilization)
+    ]),
 end.
 
 
@@ -114,9 +118,14 @@ format_layout_row(Fmt, Layout) :-
     derive:fmt_assignedinstrcount(Fmt, AssignedCount, _ReservedCount),
     derive:fmt_maxopcodes(Fmt, MaxAvail),
     UsagePct is 100 * AssignedCount / MaxAvail,
-    format(atom(FmtSectionTitle), 'Format `~k`', [Fmt]),
-    utils:atom_slugified(FmtSectionTitle, Fragment),
-    markdown:emit_table_row([fmt('[`~k`](#~w)', Fmt, Fragment), code(chars(Layout)), d(MaxAvail), d(AssignedCount), fmt('~0f%', UsagePct), a(ImmDescr)]),
+    markdown:emit_table_row([
+        sectionlink(fmt('`~k`', Fmt), fmt('Format `~k`', Fmt)),
+        code(chars(Layout)),
+        d(MaxAvail),
+        d(AssignedCount),
+        fmt('~0f%', UsagePct),
+        a(ImmDescr)
+    ]),
 end.
 
 

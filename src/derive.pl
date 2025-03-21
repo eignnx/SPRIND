@@ -80,9 +80,9 @@ validate_instr_assignments_or_throw(Fmt, AvailableCount) :-
 
 
 huffmantree_item_prefix(Fmt, Fmt, []).
-huffmantree_item_prefix([Left | _Right], Fmt, ['0' | Prefix]) :-
+huffmantree_item_prefix([Left | _Right], Fmt, ['1' | Prefix]) :-
     huffmantree_item_prefix(Left, Fmt, Prefix).
-huffmantree_item_prefix([_Left | Right], Fmt, ['1' | Prefix]) :-
+huffmantree_item_prefix([_Left | Right], Fmt, ['0' | Prefix]) :-
     huffmantree_item_prefix(Right, Fmt, Prefix).
 
 

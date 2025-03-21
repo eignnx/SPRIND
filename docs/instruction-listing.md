@@ -26,33 +26,33 @@
 
 | `rri` | `subr` | `b` | `li` | `ri(_)` | `rrr` | `rr(_)` | `r(_)` | `o` |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| [`lb`](#the-lb-instruction) | [`call`](#the-call-instruction) | [`b`](#the-b-instruction) | [`li`](#the-li-instruction) | [`lgb`](#the-lgb-instruction) | [`mulstep`](#the-mulstep-instruction) | [`add`](#the-add-instruction) | [`pushb`](#the-pushb-instruction) | [`kret`](#the-kret-instruction) |
-| [`lw`](#the-lw-instruction) |  | [`bt`](#the-bt-instruction) | [`szi`](#the-szi-instruction) | [`lgw`](#the-lgw-instruction) |  | [`sub`](#the-sub-instruction) | [`pushw`](#the-pushw-instruction) | [`kcall`](#the-kcall-instruction) |
-| [`sb`](#the-sb-instruction) |  | [`bf`](#the-bf-instruction) |  | [`sgb`](#the-sgb-instruction) |  | [`and`](#the-and-instruction) | [`popb`](#the-popb-instruction) | [`ret`](#the-ret-instruction) |
-| [`sw`](#the-sw-instruction) |  |  |  | [`sgw`](#the-sgw-instruction) |  | [`or`](#the-or-instruction) | [`popw`](#the-popw-instruction) | [`tov`](#the-tov-instruction) |
-|  |  |  |  | [`tbit`](#the-tbit-instruction) |  | [`xor`](#the-xor-instruction) | [`callr`](#the-callr-instruction) | [`tcy`](#the-tcy-instruction) |
-|  |  |  |  | [`cbit`](#the-cbit-instruction) |  | [`mov`](#the-mov-instruction) | [`jr`](#the-jr-instruction) | [`clr.cy`](#the-clr.cy-instruction) |
-|  |  |  |  | [`sbit`](#the-sbit-instruction) |  | [`addcy`](#the-addcy-instruction) | [`neg`](#the-neg-instruction) | [`set.cy`](#the-set.cy-instruction) |
-|  |  |  |  | [`tli`](#the-tli-instruction) |  | [`subcy`](#the-subcy-instruction) | [`seb`](#the-seb-instruction) | [`tpush0`](#the-tpush0-instruction) |
-|  |  |  |  | [`tgei`](#the-tgei-instruction) |  | [`tl`](#the-tl-instruction) | [`rd.mp.lo`](#the-rd.mp.lo-instruction) | [`tpush1`](#the-tpush1-instruction) |
-|  |  |  |  | [`tbi`](#the-tbi-instruction) |  | [`tge`](#the-tge-instruction) | [`rd.mp.hi`](#the-rd.mp.hi-instruction) | [`tnot`](#the-tnot-instruction) |
-|  |  |  |  | [`taei`](#the-taei-instruction) |  | [`tb`](#the-tb-instruction) | [`rd.gp`](#the-rd.gp-instruction) | [`tand`](#the-tand-instruction) |
-|  |  |  |  | [`tnei`](#the-tnei-instruction) |  | [`tae`](#the-tae-instruction) | [`wr.gp`](#the-wr.gp-instruction) | [`tor`](#the-tor-instruction) |
-|  |  |  |  | [`teqi`](#the-teqi-instruction) |  | [`tne`](#the-tne-instruction) |  | [`tdup`](#the-tdup-instruction) |
-|  |  |  |  | [`addi`](#the-addi-instruction) |  | [`teq`](#the-teq-instruction) |  | [`prsv.mp`](#the-prsv.mp-instruction) |
-|  |  |  |  | [`andi`](#the-andi-instruction) |  |  |  | [`rstr.mp`](#the-rstr.mp-instruction) |
-|  |  |  |  | [`ori`](#the-ori-instruction) |  |  |  | [`prsv.ts`](#the-prsv.ts-instruction) |
-|  |  |  |  | [`xori`](#the-xori-instruction) |  |  |  | [`rstr.ts`](#the-rstr.ts-instruction) |
-|  |  |  |  | [`addicy`](#the-addicy-instruction) |  |  |  | [`prsv.ra`](#the-prsv.ra-instruction) |
-|  |  |  |  | [`subicy`](#the-subicy-instruction) |  |  |  | [`rstr.ra`](#the-rstr.ra-instruction) |
-|  |  |  |  | [`lsr`](#the-lsr-instruction) |  |  |  | [`prsv.gp`](#the-prsv.gp-instruction) |
-|  |  |  |  | [`lsl`](#the-lsl-instruction) |  |  |  | [`rstr.gp`](#the-rstr.gp-instruction) |
-|  |  |  |  | [`asr`](#the-asr-instruction) |  |  |  | [`prsv.cc`](#the-prsv.cc-instruction) |
+| [`lb`](#the-lb-instruction) | [`call`](#the-call-instruction) | [`b`](#the-b-instruction) | [`li`](#the-li-instruction) | [`lgb`](#the-lgb-instruction) | [`mulstep`](#the-mulstep-instruction) | [`add`](#the-add-instruction) | [`pushb`](#the-pushb-instruction) | [`NONEXE0`](#the-NONEXE0-instruction) |
+| [`lw`](#the-lw-instruction) |  | [`bt`](#the-bt-instruction) | [`szi`](#the-szi-instruction) | [`lgw`](#the-lgw-instruction) |  | [`sub`](#the-sub-instruction) | [`pushw`](#the-pushw-instruction) | [`UNIMPL`](#the-UNIMPL-instruction) |
+| [`sb`](#the-sb-instruction) |  | [`bf`](#the-bf-instruction) |  | [`sgb`](#the-sgb-instruction) |  | [`and`](#the-and-instruction) | [`popb`](#the-popb-instruction) | [`HALT`](#the-HALT-instruction) |
+| [`sw`](#the-sw-instruction) |  |  |  | [`sgw`](#the-sgw-instruction) |  | [`or`](#the-or-instruction) | [`popw`](#the-popw-instruction) | [`BREAK`](#the-BREAK-instruction) |
+|  |  |  |  | [`tbit`](#the-tbit-instruction) |  | [`xor`](#the-xor-instruction) | [`callr`](#the-callr-instruction) | [`kret`](#the-kret-instruction) |
+|  |  |  |  | [`cbit`](#the-cbit-instruction) |  | [`mov`](#the-mov-instruction) | [`jr`](#the-jr-instruction) | [`kcall`](#the-kcall-instruction) |
+|  |  |  |  | [`sbit`](#the-sbit-instruction) |  | [`addcy`](#the-addcy-instruction) | [`neg`](#the-neg-instruction) | [`ret`](#the-ret-instruction) |
+|  |  |  |  | [`tli`](#the-tli-instruction) |  | [`subcy`](#the-subcy-instruction) | [`seb`](#the-seb-instruction) | [`tov`](#the-tov-instruction) |
+|  |  |  |  | [`tgei`](#the-tgei-instruction) |  | [`tl`](#the-tl-instruction) | [`rd.mp.lo`](#the-rd.mp.lo-instruction) | [`tcy`](#the-tcy-instruction) |
+|  |  |  |  | [`tbi`](#the-tbi-instruction) |  | [`tge`](#the-tge-instruction) | [`rd.mp.hi`](#the-rd.mp.hi-instruction) | [`clr.cy`](#the-clr.cy-instruction) |
+|  |  |  |  | [`taei`](#the-taei-instruction) |  | [`tb`](#the-tb-instruction) | [`rd.gp`](#the-rd.gp-instruction) | [`set.cy`](#the-set.cy-instruction) |
+|  |  |  |  | [`tnei`](#the-tnei-instruction) |  | [`tae`](#the-tae-instruction) | [`wr.gp`](#the-wr.gp-instruction) | [`tpush0`](#the-tpush0-instruction) |
+|  |  |  |  | [`teqi`](#the-teqi-instruction) |  | [`tne`](#the-tne-instruction) |  | [`tpush1`](#the-tpush1-instruction) |
+|  |  |  |  | [`addi`](#the-addi-instruction) |  | [`teq`](#the-teq-instruction) |  | [`tnot`](#the-tnot-instruction) |
+|  |  |  |  | [`andi`](#the-andi-instruction) |  |  |  | [`tand`](#the-tand-instruction) |
+|  |  |  |  | [`ori`](#the-ori-instruction) |  |  |  | [`tor`](#the-tor-instruction) |
+|  |  |  |  | [`xori`](#the-xori-instruction) |  |  |  | [`tdup`](#the-tdup-instruction) |
+|  |  |  |  | [`addicy`](#the-addicy-instruction) |  |  |  | [`prsv.mp`](#the-prsv.mp-instruction) |
+|  |  |  |  | [`subicy`](#the-subicy-instruction) |  |  |  | [`rstr.mp`](#the-rstr.mp-instruction) |
+|  |  |  |  | [`lsr`](#the-lsr-instruction) |  |  |  | [`prsv.ts`](#the-prsv.ts-instruction) |
+|  |  |  |  | [`lsl`](#the-lsl-instruction) |  |  |  | [`rstr.ts`](#the-rstr.ts-instruction) |
+|  |  |  |  | [`asr`](#the-asr-instruction) |  |  |  | [`prsv.ra`](#the-prsv.ra-instruction) |
+|  |  |  |  |  |  |  |  | [`rstr.ra`](#the-rstr.ra-instruction) |
+|  |  |  |  |  |  |  |  | [`prsv.gp`](#the-prsv.gp-instruction) |
+|  |  |  |  |  |  |  |  | [`rstr.gp`](#the-rstr.gp-instruction) |
+|  |  |  |  |  |  |  |  | [`prsv.cc`](#the-prsv.cc-instruction) |
 |  |  |  |  |  |  |  |  | [`rstr.cc`](#the-rstr.cc-instruction) |
-|  |  |  |  |  |  |  |  | [`BREAK`](#the-BREAK-instruction) |
-|  |  |  |  |  |  |  |  | [`HALT`](#the-HALT-instruction) |
-|  |  |  |  |  |  |  |  | [`UNIMPL`](#the-UNIMPL-instruction) |
-|  |  |  |  |  |  |  |  | [`NONEXE1`](#the-NONEXE1-instruction) |
 
 ## Instruction Format Breakdown
 
@@ -62,21 +62,21 @@
 
 | Format | [Bit Pattern](#legend) | Opcodes Available | Assigned | Utilization | Range of Immediate |
 |:----|:---:|:---:|:---:|:---:|:---:|
-| [`rri`](#format-rri) | `00ooiiiiiisssrrr` | 4 | 4 | 100% | `imm6` in `[-32, 31]` or `[0, 63]` |
-| [`subr`](#format-subr) | `010iiiiiiiiiiiii` | 1 | 1 | 100% | `imm13` in `[-4096, 4095]` or `[0, 8191]` |
-| [`b`](#format-b) | `0110ooiiiiiiiiii` | 4 | 3 | 75% | `imm10` in `[-512, 511]` or `[0, 1023]` |
-| [`li`](#format-li) | `0111oiiiiiiiirrr` | 2 | 2 | 100% | `imm8` in `[-128, 127]` or `[0, 255]` |
-| [`ri(1)`](#format-ri1) | `10oooooiiiiiirrr` | 32 | 22 | 69% | `imm6` in `[-32, 31]` or `[0, 63]` |
-| [`ri(2)`](#format-ri2) | `110ooooiiiiiirrr` | 16 | 0 | 0% | `imm6` in `[-32, 31]` or `[0, 63]` |
-| [`ext`](#format-ext) | `1110oooooooooooo` | 4096 | 0 | 0% |  |
-| [`rrr`](#format-rrr) | `11110ootttsssrrr` | 4 | 1 | 25% |  |
-| [`rr(1)`](#format-rr1) | `111110oooosssrrr` | 16 | 8 | 50% |  |
-| [`rr(2)`](#format-rr2) | `1111110ooosssrrr` | 8 | 4 | 50% |  |
-| [`rr(3)`](#format-rr3) | `11111110oosssrrr` | 4 | 2 | 50% |  |
-| [`r(1)`](#format-r1) | `111111110oooorrr` | 16 | 7 | 44% |  |
-| [`r(2)`](#format-r2) | `1111111110ooorrr` | 8 | 4 | 50% |  |
-| [`r(3)`](#format-r3) | `11111111110oorrr` | 4 | 1 | 25% |  |
-| [`o`](#format-o) | `11111111111ooooo` | 32 | 27 | 84% |  |
+| [`rri`](#format-rri) | `11ooiiiiiisssrrr` | 4 | 4 | 100% | `imm6` in `[-32, 31]` or `[0, 63]` |
+| [`subr`](#format-subr) | `101iiiiiiiiiiiii` | 1 | 1 | 100% | `imm13` in `[-4096, 4095]` or `[0, 8191]` |
+| [`b`](#format-b) | `1001ooiiiiiiiiii` | 4 | 3 | 75% | `imm10` in `[-512, 511]` or `[0, 1023]` |
+| [`li`](#format-li) | `1000oiiiiiiiirrr` | 2 | 2 | 100% | `imm8` in `[-128, 127]` or `[0, 255]` |
+| [`ri(1)`](#format-ri1) | `01oooooiiiiiirrr` | 32 | 22 | 69% | `imm6` in `[-32, 31]` or `[0, 63]` |
+| [`ri(2)`](#format-ri2) | `001ooooiiiiiirrr` | 16 | 0 | 0% | `imm6` in `[-32, 31]` or `[0, 63]` |
+| [`ext`](#format-ext) | `0001oooooooooooo` | 4096 | 0 | 0% |  |
+| [`rrr`](#format-rrr) | `00001ootttsssrrr` | 4 | 1 | 25% |  |
+| [`rr(1)`](#format-rr1) | `000001oooosssrrr` | 16 | 8 | 50% |  |
+| [`rr(2)`](#format-rr2) | `0000001ooosssrrr` | 8 | 4 | 50% |  |
+| [`rr(3)`](#format-rr3) | `00000001oosssrrr` | 4 | 2 | 50% |  |
+| [`r(1)`](#format-r1) | `000000001oooorrr` | 16 | 7 | 44% |  |
+| [`r(2)`](#format-r2) | `0000000001ooorrr` | 8 | 4 | 50% |  |
+| [`r(3)`](#format-r3) | `00000000001oorrr` | 4 | 1 | 25% |  |
+| [`o`](#format-o) | `00000000000ooooo` | 32 | 27 | 84% |  |
 
 ### Legend
 
@@ -116,11 +116,11 @@
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `rri` = 0b00 | 0b11 |
+| `rri` = 0b11 | 0b11 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `0011iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `1111iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -146,11 +146,11 @@ rd <- zxt([ptr])
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `rri` = 0b00 | 0b10 |
+| `rri` = 0b11 | 0b10 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `0010iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `1110iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -176,11 +176,11 @@ rd <- {[ptr+1], [ptr]}
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `rri` = 0b00 | 0b01 |
+| `rri` = 0b11 | 0b01 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `0001iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `1101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -206,11 +206,11 @@ let ptr := rd\s+sxt(simm);
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `rri` = 0b00 | 0b00 |
+| `rri` = 0b11 | 0b00 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `0000iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `1100iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -245,11 +245,11 @@ let ptr := and(rd\s+sxt(simm), 65534)\u;
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `subr` = 0b010 | NONE |
+| `subr` = 0b101 | NONE |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `010iiiiiiiiiiiii` | 13 | `imm13` in `[-4096, 4095]` or `[0, 8191]` |
+| `101iiiiiiiiiiiii` | 13 | `imm13` in `[-4096, 4095]` or `[0, 8191]` |
 
 ###### Semantics
 
@@ -283,11 +283,11 @@ $RA <- $PC+2
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `b` = 0b0110 | 0b1 |
+| `b` = 0b1001 | 0b1 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `01101iiiiiiiiii` | 10 | `imm10` in `[-512, 511]` or `[0, 1023]` |
+| `10011iiiiiiiiii` | 10 | `imm10` in `[-512, 511]` or `[0, 1023]` |
 
 ###### Semantics
 
@@ -312,11 +312,11 @@ $PC <- $PC\s+sxt(offset)
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `b` = 0b0110 | 0b00 |
+| `b` = 0b1001 | 0b00 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `011000iiiiiiiiii` | 10 | `imm10` in `[-512, 511]` or `[0, 1023]` |
+| `100100iiiiiiiiii` | 10 | `imm10` in `[-512, 511]` or `[0, 1023]` |
 
 ###### Semantics
 
@@ -343,11 +343,11 @@ if b_pop($TS) {
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `b` = 0b0110 | 0b10 |
+| `b` = 0b1001 | 0b10 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `011010iiiiiiiiii` | 10 | `imm10` in `[-512, 511]` or `[0, 1023]` |
+| `100110iiiiiiiiii` | 10 | `imm10` in `[-512, 511]` or `[0, 1023]` |
 
 ###### Semantics
 
@@ -382,11 +382,11 @@ if !(b_pop($TS)) {
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `li` = 0b0111 | 0b1 |
+| `li` = 0b1000 | 0b1 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `01111iiiiiiiirrr` | 8 | `imm8` in `[-128, 127]` or `[0, 255]` |
+| `10001iiiiiiiirrr` | 8 | `imm8` in `[-128, 127]` or `[0, 255]` |
 
 ###### Semantics
 
@@ -411,11 +411,11 @@ rd <- sxt(simm)
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `li` = 0b0111 | 0b0 |
+| `li` = 0b1000 | 0b0 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `01110iiiiiiiirrr` | 8 | `imm8` in `[-128, 127]` or `[0, 255]` |
+| `10000iiiiiiiirrr` | 8 | `imm8` in `[-128, 127]` or `[0, 255]` |
 
 ###### Semantics
 
@@ -448,11 +448,11 @@ rd <- or(rd<<8, zxt(imm))
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b11011 |
+| `ri(1)` = 0b01 | 0b11011 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1011011iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `0111011iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -477,11 +477,11 @@ rd <- zxt([$GP\u+zxt(disp)])
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b10011 |
+| `ri(1)` = 0b01 | 0b10011 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1010011iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `0110011iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -507,11 +507,11 @@ rd <- {[ptr+1], [ptr]}
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b01011 |
+| `ri(1)` = 0b01 | 0b01011 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1001011iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `0101011iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -536,11 +536,11 @@ rd <- {[ptr+1], [ptr]}
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b00011 |
+| `ri(1)` = 0b01 | 0b00011 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1000011iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `0100011iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -566,11 +566,11 @@ let ptr := and($GP\u+zxt(disp), 65534)\u;
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b010 |
+| `ri(1)` = 0b01 | 0b010 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `10010iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `01010iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -597,11 +597,11 @@ b_push($TS, bit==1)
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b10110 |
+| `ri(1)` = 0b01 | 0b10110 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1010110iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `0110110iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -628,11 +628,11 @@ rd <- and(rd, mask)
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b00110 |
+| `ri(1)` = 0b01 | 0b00110 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1000110iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `0100110iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -659,11 +659,11 @@ rd <- or(rd, mask)
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b1001 |
+| `ri(1)` = 0b01 | 0b1001 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `101001iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `011001iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -688,11 +688,11 @@ b_push($TS, compare(rs\s, <(s\16), sxt(simm)))
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b1101 |
+| `ri(1)` = 0b01 | 0b1101 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `101101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `011101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -717,11 +717,11 @@ b_push($TS, compare(rs\s, >=(s\16), sxt(simm)))
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b00001 |
+| `ri(1)` = 0b01 | 0b00001 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1000001iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `0100001iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -746,11 +746,11 @@ b_push($TS, compare(rs\u, <(u\16), zxt(imm)))
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b10001 |
+| `ri(1)` = 0b01 | 0b10001 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1010001iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `0110001iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -775,11 +775,11 @@ b_push($TS, compare(rs\u, >=(u\16), zxt(imm)))
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b00101 |
+| `ri(1)` = 0b01 | 0b00101 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1000101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `0100101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -804,11 +804,11 @@ b_push($TS, rs\s\=sxt(simm))
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b10101 |
+| `ri(1)` = 0b01 | 0b10101 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1010101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `0110101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -833,11 +833,11 @@ b_push($TS, rs\s==sxt(simm))
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b1111 |
+| `ri(1)` = 0b01 | 0b1111 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `101111iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `011111iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -862,11 +862,11 @@ rd <- rd\s+sxt(simm)
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b01100 |
+| `ri(1)` = 0b01 | 0b01100 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1001100iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `0101100iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -891,11 +891,11 @@ rd <- and(rd, sxt(simm))
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b11100 |
+| `ri(1)` = 0b01 | 0b11100 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1011100iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `0111100iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -920,11 +920,11 @@ rd <- or(rd, sxt(simm))
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b0100 |
+| `ri(1)` = 0b01 | 0b0100 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `100100iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `010100iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -949,11 +949,11 @@ rd <- rd xor sxt(simm)
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b00111 |
+| `ri(1)` = 0b01 | 0b00111 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1000111iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `0100111iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -980,11 +980,11 @@ bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b10111 |
+| `ri(1)` = 0b01 | 0b10111 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `1010111iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `0110111iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -1011,11 +1011,11 @@ bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b0000 |
+| `ri(1)` = 0b01 | 0b0000 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `100000iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `010000iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -1040,11 +1040,11 @@ rd <- rd>>imm
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b1000 |
+| `ri(1)` = 0b01 | 0b1000 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `101000iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `011000iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -1069,11 +1069,11 @@ rd <- rd<<imm
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `ri(1)` = 0b10 | 0b1110 |
+| `ri(1)` = 0b01 | 0b1110 |
 
 | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|
-| `101110iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `011110iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -1110,11 +1110,11 @@ rd <- or(rd>>imm, sign_extension)
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `rrr` = 0b11110 | 0b |
+| `rrr` = 0b00001 | 0b |
 
 | Bit Layout |
 |:---:|
-| `11110rrr` |
+| `00001rrr` |
 
 ###### Semantics
 
@@ -1155,11 +1155,11 @@ multiplier <- multiplier>>1
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `rr(1)` = 0b111110 | 0b0101 |
+| `rr(1)` = 0b000001 | 0b0101 |
 
 | Bit Layout |
 |:---:|
-| `1111100101rrr` |
+| `0000010101rrr` |
 
 ###### Semantics
 
@@ -1184,11 +1184,11 @@ rd <- rd+rs
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `rr(1)` = 0b111110 | 0b1101 |
+| `rr(1)` = 0b000001 | 0b1101 |
 
 | Bit Layout |
 |:---:|
-| `1111101101rrr` |
+| `0000011101rrr` |
 
 ###### Semantics
 
@@ -1213,11 +1213,11 @@ rd <- rd-rs
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `rr(1)` = 0b111110 | 0b00111 |
+| `rr(1)` = 0b000001 | 0b00111 |
 
 | Bit Layout |
 |:---:|
-| `11111000111rrr` |
+| `00000100111rrr` |
 
 ###### Semantics
 
@@ -1242,11 +1242,11 @@ rd <- and(rd, rs)
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `rr(1)` = 0b111110 | 0b10111 |
+| `rr(1)` = 0b000001 | 0b10111 |
 
 | Bit Layout |
 |:---:|
-| `11111010111rrr` |
+| `00000110111rrr` |
 
 ###### Semantics
 
@@ -1271,11 +1271,11 @@ rd <- or(rd, rs)
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `rr(1)` = 0b111110 | 0b011 |
+| `rr(1)` = 0b000001 | 0b011 |
 
 | Bit Layout |
 |:---:|
-| `111110011rrr` |
+| `000001011rrr` |
 
 ###### Semantics
 
@@ -1300,11 +1300,11 @@ rd <- rd xor rs
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `rr(1)` = 0b111110 | 0b1111 |
+| `rr(1)` = 0b000001 | 0b1111 |
 
 | Bit Layout |
 |:---:|
-| `1111101111rrr` |
+| `0000011111rrr` |
 
 ###### Semantics
 
@@ -1329,11 +1329,11 @@ rd <- rs
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `rr(1)` = 0b111110 | 0b0001 |
+| `rr(1)` = 0b000001 | 0b0001 |
 
 | Bit Layout |
 |:---:|
-| `1111100001rrr` |
+| `0000010001rrr` |
 
 ###### Semantics
 
@@ -1360,11 +1360,11 @@ bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `rr(1)` = 0b111110 | 0b1001 |
+| `rr(1)` = 0b000001 | 0b1001 |
 
 | Bit Layout |
 |:---:|
-| `1111101001rrr` |
+| `0000011001rrr` |
 
 ###### Semantics
 
@@ -1394,11 +1394,11 @@ bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `rr(2)` = 0b1111110 | 0b100 |
+| `rr(2)` = 0b0000001 | 0b100 |
 
 | Bit Layout |
 |:---:|
-| `1111110100rrr` |
+| `0000001100rrr` |
 
 ###### Semantics
 
@@ -1423,11 +1423,11 @@ b_push($TS, compare(r1, <(s\16), r2))
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `rr(2)` = 0b1111110 | 0b110 |
+| `rr(2)` = 0b0000001 | 0b110 |
 
 | Bit Layout |
 |:---:|
-| `1111110110rrr` |
+| `0000001110rrr` |
 
 ###### Semantics
 
@@ -1452,11 +1452,11 @@ b_push($TS, compare(r1, >=(s\16), r2))
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `rr(2)` = 0b1111110 | 0b0000 |
+| `rr(2)` = 0b0000001 | 0b0000 |
 
 | Bit Layout |
 |:---:|
-| `11111100000rrr` |
+| `00000010000rrr` |
 
 ###### Semantics
 
@@ -1481,11 +1481,11 @@ b_push($TS, compare(r1, <(u\16), r2))
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `rr(2)` = 0b1111110 | 0b1000 |
+| `rr(2)` = 0b0000001 | 0b1000 |
 
 | Bit Layout |
 |:---:|
-| `11111101000rrr` |
+| `00000011000rrr` |
 
 ###### Semantics
 
@@ -1513,11 +1513,11 @@ b_push($TS, compare(r1, >=(u\16), r2))
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `rr(3)` = 0b11111110 | 0b0010 |
+| `rr(3)` = 0b00000001 | 0b0010 |
 
 | Bit Layout |
 |:---:|
-| `111111100010rrr` |
+| `000000010010rrr` |
 
 ###### Semantics
 
@@ -1542,11 +1542,11 @@ b_push($TS, r1\=r2)
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `rr(3)` = 0b11111110 | 0b1010 |
+| `rr(3)` = 0b00000001 | 0b1010 |
 
 | Bit Layout |
 |:---:|
-| `111111101010rrr` |
+| `000000011010rrr` |
 
 ###### Semantics
 
@@ -1575,11 +1575,11 @@ b_push($TS, r1==r2)
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `r(1)` = 0b111111110 | 0b010 |
+| `r(1)` = 0b000000001 | 0b010 |
 
 | Bit Layout |
 |:---:|
-| `111111110010rrr` |
+| `000000001010rrr` |
 
 ###### Semantics
 
@@ -1600,11 +1600,11 @@ todo
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `r(1)` = 0b111111110 | 0b000 |
+| `r(1)` = 0b000000001 | 0b000 |
 
 | Bit Layout |
 |:---:|
-| `111111110000rrr` |
+| `000000001000rrr` |
 
 ###### Semantics
 
@@ -1625,11 +1625,11 @@ todo
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `r(1)` = 0b111111110 | 0b110 |
+| `r(1)` = 0b000000001 | 0b110 |
 
 | Bit Layout |
 |:---:|
-| `111111110110rrr` |
+| `000000001110rrr` |
 
 ###### Semantics
 
@@ -1650,11 +1650,11 @@ todo
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `r(1)` = 0b111111110 | 0b100 |
+| `r(1)` = 0b000000001 | 0b100 |
 
 | Bit Layout |
 |:---:|
-| `111111110100rrr` |
+| `000000001100rrr` |
 
 ###### Semantics
 
@@ -1675,11 +1675,11 @@ todo
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `r(1)` = 0b111111110 | 0b0011 |
+| `r(1)` = 0b000000001 | 0b0011 |
 
 | Bit Layout |
 |:---:|
-| `1111111100011rrr` |
+| `0000000010011rrr` |
 
 ###### Semantics
 
@@ -1700,11 +1700,11 @@ todo
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `r(1)` = 0b111111110 | 0b1011 |
+| `r(1)` = 0b000000001 | 0b1011 |
 
 | Bit Layout |
 |:---:|
-| `1111111101011rrr` |
+| `0000000011011rrr` |
 
 ###### Semantics
 
@@ -1725,11 +1725,11 @@ todo
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `r(1)` = 0b111111110 | 0b1111 |
+| `r(1)` = 0b000000001 | 0b1111 |
 
 | Bit Layout |
 |:---:|
-| `1111111101111rrr` |
+| `0000000011111rrr` |
 
 ###### Semantics
 
@@ -1753,11 +1753,11 @@ todo
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `r(2)` = 0b1111111110 | 0b0111 |
+| `r(2)` = 0b0000000001 | 0b0111 |
 
 | Bit Layout |
 |:---:|
-| `11111111100111rrr` |
+| `00000000010111rrr` |
 
 ###### Semantics
 
@@ -1778,11 +1778,11 @@ todo
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `r(2)` = 0b1111111110 | 0b0001 |
+| `r(2)` = 0b0000000001 | 0b0001 |
 
 | Bit Layout |
 |:---:|
-| `11111111100001rrr` |
+| `00000000010001rrr` |
 
 ###### Semantics
 
@@ -1803,11 +1803,11 @@ todo
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `r(2)` = 0b1111111110 | 0b1001 |
+| `r(2)` = 0b0000000001 | 0b1001 |
 
 | Bit Layout |
 |:---:|
-| `11111111101001rrr` |
+| `00000000011001rrr` |
 
 ###### Semantics
 
@@ -1828,11 +1828,11 @@ todo
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `r(2)` = 0b1111111110 | 0b1101 |
+| `r(2)` = 0b0000000001 | 0b1101 |
 
 | Bit Layout |
 |:---:|
-| `11111111101101rrr` |
+| `00000000011101rrr` |
 
 ###### Semantics
 
@@ -1856,11 +1856,11 @@ todo
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `r(3)` = 0b11111111110 | 0b0101 |
+| `r(3)` = 0b00000000001 | 0b0101 |
 
 | Bit Layout |
 |:---:|
-| `111111111100101rrr` |
+| `000000000010101rrr` |
 
 ###### Semantics
 
@@ -1880,620 +1880,20 @@ todo
 #### Format `o`
 
 
-##### The `kret` Instruction
+##### The `NONEXE0` Instruction
 
-**Kernel Return** --- Return from kernel mode.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b101111 |
-
-| Bit Layout |
-|:---:|
-| `11111111111101111` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `kcall` Instruction
-
-**Kernel Call** --- Call a kernel function.
+**Non-executable (0s Version)** --- Triggers a "non-executable instruction" exception. The entire instruction is 16 `0`s.
 
 ###### Layout
 
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `o` = 0b11111111111 | 0b11111 |
+| `o` = 0b00000000000 | 0b11011 |
 
 | Bit Layout |
 |:---:|
-| `1111111111111111` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `ret` Instruction
-
-**Return** --- Return from a subroutine.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b001111 |
-
-| Bit Layout |
-|:---:|
-| `11111111111001111` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `tov` Instruction
-
-**Test Overflow** --- Test for overflow.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b01110 |
-
-| Bit Layout |
-|:---:|
-| `1111111111101110` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `tcy` Instruction
-
-**Test Carry** --- Test for carry.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b11110 |
-
-| Bit Layout |
-|:---:|
-| `1111111111111110` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `clr.cy` Instruction
-
-**Clear Carry** --- Clear the carry flag.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b10111 |
-
-| Bit Layout |
-|:---:|
-| `1111111111110111` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `set.cy` Instruction
-
-**Set Carry** --- Set the carry flag.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b00111 |
-
-| Bit Layout |
-|:---:|
-| `1111111111100111` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `tpush0` Instruction
-
-**Teststack Push 0** --- Push 0 onto the test stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b1000 |
-
-| Bit Layout |
-|:---:|
-| `111111111111000` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `tpush1` Instruction
-
-**Teststack Push 1** --- Push 1 onto the test stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b0000 |
-
-| Bit Layout |
-|:---:|
-| `111111111110000` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `tnot` Instruction
-
-**Teststack NOT** --- Perform a NOT operation on the test stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b01010 |
-
-| Bit Layout |
-|:---:|
-| `1111111111101010` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `tand` Instruction
-
-**Teststack AND** --- Perform an AND operation on the test stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b11010 |
-
-| Bit Layout |
-|:---:|
-| `1111111111111010` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `tor` Instruction
-
-**Teststack OR** --- Perform an OR operation on the test stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b0010 |
-
-| Bit Layout |
-|:---:|
-| `111111111110010` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `tdup` Instruction
-
-**Teststack Duplicate** --- Duplicate the top value on the test stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b100 |
-
-| Bit Layout |
-|:---:|
-| `11111111111100` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `prsv.mp` Instruction
-
-**Preserve $MP** --- Preserve the value of the `$MP` register onto the stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b01101 |
-
-| Bit Layout |
-|:---:|
-| `1111111111101101` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `rstr.mp` Instruction
-
-**Restore $MP** --- Restore the value of the `$MP` register from the stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b01001 |
-
-| Bit Layout |
-|:---:|
-| `1111111111101001` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `prsv.ts` Instruction
-
-**Preserve $TS** --- Preserve the value of the `$TS` register onto the stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b10110 |
-
-| Bit Layout |
-|:---:|
-| `1111111111110110` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `rstr.ts` Instruction
-
-**Restore $TS** --- Restore the value of the `$TS` register from the stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b00110 |
-
-| Bit Layout |
-|:---:|
-| `1111111111100110` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `prsv.ra` Instruction
-
-**Preserve $RA** --- Preserve the value of the `$RA` register onto the stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b0101 |
-
-| Bit Layout |
-|:---:|
-| `111111111110101` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `rstr.ra` Instruction
-
-**Restore $RA** --- Restore the value of the `$RA` register from the stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b0001 |
-
-| Bit Layout |
-|:---:|
-| `111111111110001` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `prsv.gp` Instruction
-
-**Preserve $GP** --- Preserve the value of the `$GP` register onto the stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b011101 |
-
-| Bit Layout |
-|:---:|
-| `11111111111011101` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `rstr.gp` Instruction
-
-**Restore $GP** --- Restore the value of the `$GP` register from the stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b011001 |
-
-| Bit Layout |
-|:---:|
-| `11111111111011001` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `prsv.cc` Instruction
-
-**Preserve $CC** --- Preserve the value of the `$CC` register onto the stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b111101 |
-
-| Bit Layout |
-|:---:|
-| `11111111111111101` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `rstr.cc` Instruction
-
-**Restore $CC** --- Restore the value of the `$CC` register from the stack.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b111001 |
-
-| Bit Layout |
-|:---:|
-| `11111111111111001` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `BREAK` Instruction
-
-**Breakpoint** --- Trigger a breakpoint.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b10011 |
-
-| Bit Layout |
-|:---:|
-| `1111111111110011` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
---------------
-
-##### The `HALT` Instruction
-
-**Halt** --- Halt the processor.
-
-###### Layout
-
-
-| Format Prefix | Opcode |
-|:---:|:---:|
-| `o` = 0b11111111111 | 0b01011 |
-
-| Bit Layout |
-|:---:|
-| `1111111111101011` |
+| `0000000000011011` |
 
 ###### Semantics
 
@@ -2514,11 +1914,11 @@ todo
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `o` = 0b11111111111 | 0b00011 |
+| `o` = 0b00000000000 | 0b00011 |
 
 | Bit Layout |
 |:---:|
-| `1111111111100011` |
+| `0000000000000011` |
 
 ###### Semantics
 
@@ -2530,20 +1930,620 @@ todo
 
 --------------
 
-##### The `NONEXE1` Instruction
+##### The `HALT` Instruction
 
-**Non-executable (1s Version)** --- Triggers a "non-executable instruction" exception. The entire instruction is 16 `1`s.
+**Halt** --- Halt the processor.
 
 ###### Layout
 
 
 | Format Prefix | Opcode |
 |:---:|:---:|
-| `o` = 0b11111111111 | 0b11011 |
+| `o` = 0b00000000000 | 0b01011 |
 
 | Bit Layout |
 |:---:|
-| `1111111111111011` |
+| `0000000000001011` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `BREAK` Instruction
+
+**Breakpoint** --- Trigger a breakpoint.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `o` = 0b00000000000 | 0b10011 |
+
+| Bit Layout |
+|:---:|
+| `0000000000010011` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `kret` Instruction
+
+**Kernel Return** --- Return from kernel mode.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `o` = 0b00000000000 | 0b101111 |
+
+| Bit Layout |
+|:---:|
+| `00000000000101111` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `kcall` Instruction
+
+**Kernel Call** --- Call a kernel function.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `o` = 0b00000000000 | 0b11111 |
+
+| Bit Layout |
+|:---:|
+| `0000000000011111` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `ret` Instruction
+
+**Return** --- Return from a subroutine.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `o` = 0b00000000000 | 0b001111 |
+
+| Bit Layout |
+|:---:|
+| `00000000000001111` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `tov` Instruction
+
+**Test Overflow** --- Test for overflow.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `o` = 0b00000000000 | 0b01110 |
+
+| Bit Layout |
+|:---:|
+| `0000000000001110` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `tcy` Instruction
+
+**Test Carry** --- Test for carry.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `o` = 0b00000000000 | 0b11110 |
+
+| Bit Layout |
+|:---:|
+| `0000000000011110` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `clr.cy` Instruction
+
+**Clear Carry** --- Clear the carry flag.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `o` = 0b00000000000 | 0b10111 |
+
+| Bit Layout |
+|:---:|
+| `0000000000010111` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `set.cy` Instruction
+
+**Set Carry** --- Set the carry flag.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `o` = 0b00000000000 | 0b00111 |
+
+| Bit Layout |
+|:---:|
+| `0000000000000111` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `tpush0` Instruction
+
+**Teststack Push 0** --- Push 0 onto the test stack.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `o` = 0b00000000000 | 0b1000 |
+
+| Bit Layout |
+|:---:|
+| `000000000001000` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `tpush1` Instruction
+
+**Teststack Push 1** --- Push 1 onto the test stack.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `o` = 0b00000000000 | 0b0000 |
+
+| Bit Layout |
+|:---:|
+| `000000000000000` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `tnot` Instruction
+
+**Teststack NOT** --- Perform a NOT operation on the test stack.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `o` = 0b00000000000 | 0b01010 |
+
+| Bit Layout |
+|:---:|
+| `0000000000001010` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `tand` Instruction
+
+**Teststack AND** --- Perform an AND operation on the test stack.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `o` = 0b00000000000 | 0b11010 |
+
+| Bit Layout |
+|:---:|
+| `0000000000011010` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `tor` Instruction
+
+**Teststack OR** --- Perform an OR operation on the test stack.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `o` = 0b00000000000 | 0b0010 |
+
+| Bit Layout |
+|:---:|
+| `000000000000010` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `tdup` Instruction
+
+**Teststack Duplicate** --- Duplicate the top value on the test stack.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `o` = 0b00000000000 | 0b100 |
+
+| Bit Layout |
+|:---:|
+| `00000000000100` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `prsv.mp` Instruction
+
+**Preserve $MP** --- Preserve the value of the `$MP` register onto the stack.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `o` = 0b00000000000 | 0b01101 |
+
+| Bit Layout |
+|:---:|
+| `0000000000001101` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `rstr.mp` Instruction
+
+**Restore $MP** --- Restore the value of the `$MP` register from the stack.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `o` = 0b00000000000 | 0b01001 |
+
+| Bit Layout |
+|:---:|
+| `0000000000001001` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `prsv.ts` Instruction
+
+**Preserve $TS** --- Preserve the value of the `$TS` register onto the stack.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `o` = 0b00000000000 | 0b10110 |
+
+| Bit Layout |
+|:---:|
+| `0000000000010110` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `rstr.ts` Instruction
+
+**Restore $TS** --- Restore the value of the `$TS` register from the stack.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `o` = 0b00000000000 | 0b00110 |
+
+| Bit Layout |
+|:---:|
+| `0000000000000110` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `prsv.ra` Instruction
+
+**Preserve $RA** --- Preserve the value of the `$RA` register onto the stack.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `o` = 0b00000000000 | 0b0101 |
+
+| Bit Layout |
+|:---:|
+| `000000000000101` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `rstr.ra` Instruction
+
+**Restore $RA** --- Restore the value of the `$RA` register from the stack.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `o` = 0b00000000000 | 0b0001 |
+
+| Bit Layout |
+|:---:|
+| `000000000000001` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `prsv.gp` Instruction
+
+**Preserve $GP** --- Preserve the value of the `$GP` register onto the stack.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `o` = 0b00000000000 | 0b011101 |
+
+| Bit Layout |
+|:---:|
+| `00000000000011101` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `rstr.gp` Instruction
+
+**Restore $GP** --- Restore the value of the `$GP` register from the stack.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `o` = 0b00000000000 | 0b011001 |
+
+| Bit Layout |
+|:---:|
+| `00000000000011001` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `prsv.cc` Instruction
+
+**Preserve $CC** --- Preserve the value of the `$CC` register onto the stack.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `o` = 0b00000000000 | 0b111101 |
+
+| Bit Layout |
+|:---:|
+| `00000000000111101` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `rstr.cc` Instruction
+
+**Restore $CC** --- Restore the value of the `$CC` register from the stack.
+
+###### Layout
+
+
+| Format Prefix | Opcode |
+|:---:|:---:|
+| `o` = 0b00000000000 | 0b111001 |
+
+| Bit Layout |
+|:---:|
+| `00000000000111001` |
 
 ###### Semantics
 

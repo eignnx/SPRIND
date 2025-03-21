@@ -36,7 +36,7 @@ emit_table_header(ColSpecs) :-
     format('~s~n', [HorizontalRule]).
 
 emit_table_row(ColumnData) :-
-    phrase(sequence(`| `, variant_type, ` | `, ` |`, ColumnData), RowText),
+    phrase(sequence(`| `, interpolation_cmd, ` | `, ` |`, ColumnData), RowText),
     format('~s~n', [RowText]).
 
 emit_image(PathFmt, FmtArgs) :-
@@ -44,36 +44,42 @@ emit_image(PathFmt, FmtArgs) :-
     format('~n![~s](~s)~n', [Chars, Chars]).
 
 
-:- det(variant_type//1).
+:- det(interpolation_cmd//1).
 
-variant_type(s(Content)) --> !, string(Content).
-variant_type(chars(Content)) --> !, { format(codes(Codes), '~s', [Content]) }, Codes.
-variant_type(a(Content)) --> !, atom(Content).
-variant_type(d(Content)) --> !, integer(Content).
-variant_type(code(Inner)) --> !, `\``, variant_type(Inner), `\``.
-variant_type(bold(Inner)) --> !, `**`, variant_type(Inner), `**`.
-variant_type(First + Second) --> !, variant_type(First), variant_type(Second).
-variant_type(First ++ Second) --> !, variant_type(First), ` `, variant_type(Second).
+interpolation_cmd(s(Content)) --> !, string(Content).
+interpolation_cmd(chars(Content)) --> !, { format(codes(Codes), '~s', [Content]) }, Codes.
+interpolation_cmd(a(Content)) --> !, atom(Content).
+interpolation_cmd(d(Content)) --> !, integer(Content).
+interpolation_cmd(code(Inner)) --> !, `\``, interpolation_cmd(Inner), `\``.
+interpolation_cmd(bold(Inner)) --> !, `**`, interpolation_cmd(Inner), `**`.
+interpolation_cmd(First + Second) --> !, interpolation_cmd(First), interpolation_cmd(Second).
+interpolation_cmd(First ++ Second) --> !, interpolation_cmd(First), ` `, interpolation_cmd(Second).
 
-variant_type(fmt(FormatString, Arg1)) --> !,
+interpolation_cmd(sectionlink(SectionName)) --> !, interpolation_cmd(sectionlink(SectionName, SectionName)).
+interpolation_cmd(sectionlink(Content, SectionName)) --> !,
+    { phrase(interpolation_cmd(SectionName), SectionNameRendered) },
+    { utils:codes_slugified(SectionNameRendered, Slug) },
+    `[`, interpolation_cmd(Content), `](#`, Slug, `)`.
+
+interpolation_cmd(fmt(FormatString, Arg1)) --> !,
     { format(atom(Formatted), FormatString, [Arg1]) },
     atom(Formatted).
-variant_type(fmt(FormatString, Arg1, Arg2)) --> !,
+interpolation_cmd(fmt(FormatString, Arg1, Arg2)) --> !,
     { format(atom(Formatted), FormatString, [Arg1, Arg2]) },
     atom(Formatted).
-variant_type(fmt(FormatString, Arg1, Arg2, Arg3)) --> !,
+interpolation_cmd(fmt(FormatString, Arg1, Arg2, Arg3)) --> !,
     { format(atom(Formatted), FormatString, [Arg1, Arg2, Arg3]) },
     atom(Formatted).
-variant_type(fmt(FormatString, Arg1, Arg2, Arg3, Arg4)) --> !,
+interpolation_cmd(fmt(FormatString, Arg1, Arg2, Arg3, Arg4)) --> !,
     { format(atom(Formatted), FormatString, [Arg1, Arg2, Arg3, Arg4]) },
     atom(Formatted).
-variant_type(fmt(FormatString, Arg1, Arg2, Arg3, Arg4, Arg5)) --> !,
+interpolation_cmd(fmt(FormatString, Arg1, Arg2, Arg3, Arg4, Arg5)) --> !,
     { format(atom(Formatted), FormatString, [Arg1, Arg2, Arg3, Arg4, Arg5]) },
     atom(Formatted).
-variant_type(fmt(FormatString, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6)) --> !,
+interpolation_cmd(fmt(FormatString, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6)) --> !,
     { format(atom(Formatted), FormatString, [Arg1, Arg2, Arg3, Arg4, Arg5, Arg6]) },
     atom(Formatted).
 
-variant_type(Other) --> { throw(error(unknown_format_command(Other))) }.
+interpolation_cmd(Other) --> { throw(error(unknown_format_command(Other))) }.
 
 end.
