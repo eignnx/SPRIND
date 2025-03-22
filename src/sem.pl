@@ -1,7 +1,8 @@
 :- module(sem, [
     instr_info/2,
     valid_semantics//1,
-    def/2
+    def/2,
+	emit_semantics_codeblock/1
 ]).
 
 :- set_prolog_flag(double_quotes, chars).
@@ -12,11 +13,14 @@
 :- op(20, fx, #).
 :- op(20, fx, $$).
 :- op(20, fx, ?).
+:- op(200, fx, ~).
 :- op(1050, xfx, <-).
-:- op(400, yfx, xor).
-:- op(400, yfx, and).
-:- op(400, yfx, or).
-:- op(250, yfx, \).
+:- op(600, yfx, xor).
+:- op(600, yfx, and).
+:- op(600, yfx, or).
+:- op(600, yfx, <<).
+:- op(600, yfx, >>).
+:- op(150, yfx, \).
 
 
 valid_semantics(Stmt) --> stmt(Stmt).
@@ -103,7 +107,7 @@ def(#reg_size_bits, Size) :- isa:register_size(Size).
 
 user:portray(Dst <- Src) :- print(Dst), format(' <- '), print(Src).
 user:portray(Dst = Src) :- format('let '), print(Dst), format(' := '), print(Src).
-user:portray(A\B) :- print(A), format('\\'), print(B).
+% user:portray(A\B) :- print(A), format('\\'), print(B).
 % user:portray(A + B) :- print(A), format(' + '), print(B).
 % user:portray(A - B) :- print(A), format(' - '), print(B).
 % user:portray(A == B) :- print(A), format(' == '), print(B).
@@ -126,6 +130,27 @@ user:portray(if(Cond, Consq)) :-
     format('~w~n', [ConsqIndented]),
     format('}').
 
+emit_semantics_codeblock(Info) :-
+	op(200, fx, ~),
+	op(1050, xfx, <-),
+	op(600, yfx, xor),
+	op(600, yfx, and),
+	op(600, yfx, or),
+	op(600, yfx, <<),
+	op(600, yfx, >>),
+	op(150, yfx, \),
+
+    format(codes(OperandsCodes), '~p', [Info.operands]),
+    length(OperandsCodes, OLen),
+    format(codes(SemanticsCodes), '~p', [Info.sem]),
+    string_lines(SemanticsCodes, SLines),
+    maplist(string_length, SLines, SLens),
+    max_member(MaxLen, [OLen | SLens]),
+    format('```~n'),
+    format('~s~n', [OperandsCodes]),
+    format('~`-t~*|~n', [MaxLen]),
+    format('~s~n', [SemanticsCodes]),
+    format('```~n').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -147,7 +172,7 @@ instr_info(lw, info{
 	ex: ['lw w, [sp+12]'],
     operands: [simm(?simm), reg(?rs), reg(?rd)],
 	sem: (
-        ?ptr = ((?rs\s + sxt(?simm)) and #0b1111111111111110)\u;
+        ?ptr = ((?rs\s + sxt(?simm)) and #(-2)\16)\u;
         ?rd <- {[?ptr + #1], [?ptr]}
     ),
     tags: [mem, load, word]

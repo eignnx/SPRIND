@@ -123,7 +123,7 @@
 ```
 [simm(simm), reg(rs), reg(rd)]
 ------------------------------
-let ptr := rs\s+sxt(simm)\u;
+let ptr := (rs\s+sxt(simm))\u;
 rd <- zxt([ptr])
 ```
 
@@ -148,8 +148,8 @@ rd <- zxt([ptr])
 
 ```
 [simm(simm), reg(rs), reg(rd)]
-----------------------------------------
-let ptr := and(rs\s+sxt(simm), 65534)\u;
+--------------------------------------
+let ptr := (rs\s+sxt(simm)and-2\16)\u;
 rd <- {[ptr+1], [ptr]}
 ```
 
@@ -200,8 +200,8 @@ let ptr := rd\s+sxt(simm);
 
 ```
 [simm(simm), reg(rd), reg(rs)]
-----------------------------------------
-let ptr := and(rd\s+sxt(simm), 65534)\u;
+--------------------------------------
+let ptr := (rd\s+sxt(simm)and65534)\u;
 [ptr] <- lo(rs);
 [ptr+1] <- hi(rs)
 ```
@@ -235,8 +235,8 @@ let ptr := and(rd\s+sxt(simm), 65534)\u;
 
 ```
 [simm(simm)]
------------------------------------
-$PC <- $PC\s+sxt(simm)<<subr_align;
+-------------------------------------
+$PC <- $PC\s+(sxt(simm)<<subr_align);
 $RA <- $PC+2
 ```
 
@@ -381,8 +381,8 @@ rd <- sxt(simm)
 
 ```
 [imm(imm), reg(rd)]
--------------------------
-rd <- or(rd<<8, zxt(imm))
+-----------------------
+rd <- rd<<8 or zxt(imm)
 ```
 
 --------------
@@ -439,8 +439,8 @@ rd <- zxt([$GP\u+zxt(disp)])
 
 ```
 [imm(disp), reg(rd)]
------------------------------------------
-let ptr := and($GP\u+zxt(disp), 65534)\u;
+---------------------------------------
+let ptr := ($GP\u+zxt(disp)and65534)\u;
 rd <- {[ptr+1], [ptr]}
 ```
 
@@ -490,8 +490,8 @@ rd <- {[ptr+1], [ptr]}
 
 ```
 [imm(disp), reg(rs)]
------------------------------------------
-let ptr := and($GP\u+zxt(disp), 65534)\u;
+---------------------------------------
+let ptr := ($GP\u+zxt(disp)and65534)\u;
 {[ptr+1], [ptr]} <- rs
 ```
 
@@ -518,7 +518,7 @@ let ptr := and($GP\u+zxt(disp), 65534)\u;
 [imm(bit_idx), reg(rs)]
 -------------------------------------
 let shamt := bitslice(bit_idx, 3..0);
-let bit := and(rs>>shamt\u, 1);
+let bit := rs>>shamt\u and 1;
 b_push($TS, bit==1)
 ```
 
@@ -545,8 +545,8 @@ b_push($TS, bit==1)
 [imm(bit_idx), reg(rd)]
 -------------------------------------
 let idx := bitslice(bit_idx, 3..0)\u;
-let mask := ~(1<<idx);
-rd <- and(rd, mask)
+let mask := ~ (1<<idx);
+rd <- rd and mask
 ```
 
 --------------
@@ -572,8 +572,8 @@ rd <- and(rd, mask)
 [imm(bit_idx), reg(rd)]
 -------------------------------------
 let idx := bitslice(bit_idx, 3..0)\u;
-let mask := ~(1<<idx);
-rd <- or(rd, mask)
+let mask := ~ (1<<idx);
+rd <- rd or mask
 ```
 
 --------------
@@ -772,8 +772,8 @@ rd <- rd\s+sxt(simm)
 
 ```
 [simm(simm), reg(rd)]
-------------------------
-rd <- and(rd, sxt(simm))
+----------------------
+rd <- rd and sxt(simm)
 ```
 
 --------------
@@ -797,8 +797,8 @@ rd <- and(rd, sxt(simm))
 
 ```
 [simm(simm), reg(rd)]
------------------------
-rd <- or(rd, sxt(simm))
+---------------------
+rd <- rd or sxt(simm)
 ```
 
 --------------
@@ -951,9 +951,9 @@ rd <- rd<<imm
 
 ```
 [imm(imm), reg(rd)]
---------------------------------------------------------------
-let sign_extension := sxt(bit(rd, 15)-1)<<(reg_size_bits-imm);
-rd <- or(rd>>imm, sign_extension)
+------------------------------------------------------------
+let sign_extension := sxt(bit(rd, 15)-1)<<reg_size_bits-imm;
+rd <- rd>>imm or sign_extension
 ```
 
 --------------
@@ -989,9 +989,9 @@ rd <- or(rd>>imm, sign_extension)
 ```
 [reg(multiplicand_hi), reg(multiplicand_lo), reg(multiplier)]
 -----------------------------------------------------------------
-let mask := ~(and(multiplier, 1)-1);
-let masked_multiplicand_lo := and(multiplicand_lo, mask);
-let masked_multiplicand_hi := and(multiplicand_hi, mask);
+let mask := ~ ((multiplier and 1)-1);
+let masked_multiplicand_lo := multiplicand_lo and mask;
+let masked_multiplicand_hi := multiplicand_hi and mask;
 lo($MP) <- lo($MP)+masked_multiplicand_lo;
 hi($MP) <- hi($MP)+masked_multiplicand_hi+attr(cpu/alu/carryout);
 let shift_cout := bit(multiplicand_lo, reg_size_bits-1);
@@ -1080,7 +1080,7 @@ rd <- rd-rs
 ```
 [reg(rs), reg(rd)]
 ------------------
-rd <- and(rd, rs)
+rd <- rd and rs
 ```
 
 --------------
@@ -1105,7 +1105,7 @@ rd <- and(rd, rs)
 ```
 [reg(rs), reg(rd)]
 ------------------
-rd <- or(rd, rs)
+rd <- rd or rs
 ```
 
 --------------

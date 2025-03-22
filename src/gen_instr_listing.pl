@@ -219,19 +219,7 @@ display_instr_specification(Lvl, Fmt, Instr, OpTree) :-
     ),
 
     markdown:emit_heading(s(Lvl), 'Semantics'),
-
-    format(codes(OperandsCodes), '~p', [Info.operands]),
-    length(OperandsCodes, OLen),
-    format(codes(SemanticsCodes), '~p', [Info.sem]),
-    string_lines(SemanticsCodes, SLines),
-    maplist(string_length, SLines, SLens),
-    max_member(MaxLen, [OLen | SLens]),
-
-    format('```~n'),
-    format('~s~n', [OperandsCodes]),
-    format('~`-t~*|~n', [MaxLen]),
-    format('~s~n', [SemanticsCodes]),
-    format('```~n'),
+    sem:emit_semantics_codeblock(Info),
 
     format('~n--------------~n').
 
