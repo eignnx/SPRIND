@@ -569,8 +569,8 @@ instr_info(mulstep, info{
 	operands: [reg(?multiplicand_hi), reg(?multiplicand_lo), reg(?multiplier)],
 	sem: (
         ?mask = ~((?multiplier and #1) - #1);
-        ?masked_multiplicand_lo <- ?multiplicand_lo and ?mask;
-        ?masked_multiplicand_hi <- ?multiplicand_hi and ?mask;
+        ?masked_multiplicand_lo = ?multiplicand_lo and ?mask;
+        ?masked_multiplicand_hi = ?multiplicand_hi and ?mask;
         lo($$mp) <- lo($$mp) + ?masked_multiplicand_lo;
         hi($$mp) <- hi($$mp) + ?masked_multiplicand_hi + attr(cpu/alu/carryout);
         ?shift_cout = bit(?multiplicand_lo, (#reg_size_bits - #1));

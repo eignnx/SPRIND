@@ -990,8 +990,8 @@ rd <- or(rd>>imm, sign_extension)
 [reg(multiplicand_hi), reg(multiplicand_lo), reg(multiplier)]
 -----------------------------------------------------------------
 let mask := ~(and(multiplier, 1)-1);
-masked_multiplicand_lo <- and(multiplicand_lo, mask);
-masked_multiplicand_hi <- and(multiplicand_hi, mask);
+let masked_multiplicand_lo := and(multiplicand_lo, mask);
+let masked_multiplicand_hi := and(multiplicand_hi, mask);
 lo($MP) <- lo($MP)+masked_multiplicand_lo;
 hi($MP) <- hi($MP)+masked_multiplicand_hi+attr(cpu/alu/carryout);
 let shift_cout := bit(multiplicand_lo, reg_size_bits-1);
