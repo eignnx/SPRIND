@@ -6,6 +6,7 @@
 
 :- use_module(gen_machine_overview, [report/1 as gen_machine_overview_report]).
 :- use_module(gen_instr_listing, [report/1 as gen_instr_listing_report]).
+:- use_module(gen_asm_spec, [report/0 as gen_asm_spec_report]).
 
 generate_spec :-
     call_time(
@@ -20,6 +21,7 @@ generate_spec_ :-
     output_to_file('docs/spec-outline.md', gen_spec_outline(LvlOne)),
     output_to_file('docs/machine-overview.md', gen_machine_overview_report(LvlOne)),
     output_to_file('docs/instruction-listing.md', gen_instr_listing_report(LvlOne)),
+    output_to_file('SPRIND.customasm', gen_asm_spec_report),
 end.
 
 gen_spec_outline(Lvl) :-

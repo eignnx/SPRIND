@@ -1,5 +1,5 @@
 
-> !!! validation_failed(tyck:incompatible bit sizes(instruction(tl),`compare` operand type doesn't match operator type(compare(\(?(r1),\(i,16)),<(\(s,16)),\(?(r2),_69212)))))
+> !!! validation_failed(tyck:incompatible bit sizes(instruction(tl),`compare` operand type doesn't match operator type(compare(\(?(r1),\(i,16)),<(\(s,16)),\(?(r2),_71150)))))
 
 
 # SPRIND Instruction Set Architecture Specification

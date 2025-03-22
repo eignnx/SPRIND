@@ -1,3 +1,25 @@
+:- module(gen_asm_spec, [report/0]).
+
+:- use_module(isa).
+
+report :-
+    format(';~n'),
+    format('; SPRIND ISA Assembly Language Specification~n'),
+    format(';~n~n'),
+    format('#once~n~n'),
+    isa:version(VMajor, VMinor, VPatch),
+    format('#const ISA_VERSION = "~d.~d.~d"~n~n', [VMajor, VMinor, VPatch]),
+
+    ruledef('Reg', []),
+end.
+
+ruledef(RuleName, []) :-
+    format('#ruledef ~w {~n', [RuleName]),
+    format('  ; TODO~n'),
+    format('}~n~n'),
+end.
+
+/*
 #once
 
 #const ISA_VERSION = "0.7"
@@ -166,3 +188,6 @@
 }
 
 #const SPRIND_SUBR_ALIGN = 4
+*/
+
+end.
