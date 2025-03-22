@@ -147,6 +147,11 @@ bitformatchar_description(t, 'A bit in a third register specifier.').
 bitformatchar_description('0', 'A literal `0` embedded in the instruction.').
 bitformatchar_description('1', 'A literal `1` embedded in the instruction.').
 
+operandchar(i).
+operandchar(r).
+operandchar(s).
+operandchar(t).
+
 
 display_instr_specifications(Lvl) :-
     markdown:emit_heading(Lvl, 'Instruction Specifications'),
@@ -265,7 +270,7 @@ end.
 
 
 bitlayout_operands(BitLayout, Operands) :-
-    partition([Bit]>>memberchk(Bit, [i, r, 'R']), BitLayout, Operands, _NonOperands).
+    include(operandchar, BitLayout, Operands).
 
 bitlayout_immbits(BitLayout, Count) :-
     include(=(i), BitLayout, ImmBits),
