@@ -240,7 +240,7 @@ display_detailed_instr_layout(Fmt, Prefix, Opcode, Layout) :-
     bitlayout_immbits(Layout, IBits),
     bitlayout_operands(Layout, OperandsBits),
     ( #OBits #> 0 ->
-        format(atom(OpcodeBits), '~s', [Opcode])
+        format(atom(OpcodeBits), '~`0t~s~*|', [Opcode, OBits])
     ;
         OpcodeBits = ''
     ),
@@ -248,7 +248,7 @@ display_detailed_instr_layout(Fmt, Prefix, Opcode, Layout) :-
 
     (
         OBits > 0 ->
-            format(atom(OpcodeBin), '0b~s', [Opcode])
+            format(atom(OpcodeBin), '0b~|~`0t~s~*+', [Opcode, OBits])
         ;
             OpcodeBin = 'NONE'
     ),
