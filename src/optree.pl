@@ -218,14 +218,18 @@ print_dottree(Fmt) :-
     dotprint_tree(Fmt, Tree).
 
 print_dottrees :-
-    foreach(
-        (
-            isa:gfmt(Fmt),
-            Fmt \= ext,
-            format(atom(Path), 'assets/graphs/~k.dot', [Fmt])
+    call_time(
+        foreach(
+            (
+                isa:gfmt(Fmt),
+                Fmt \= ext,
+                format(atom(Path), 'assets/graphs/~k.dot', [Fmt])
+            ),
+            utils:output_to_file(Path, print_dottree(Fmt))
         ),
-        utils:output_to_file(Path, print_dottree(Fmt))
-    ).
+        Time
+    ),
+    format('[`print_dottrees` ran in ~3fs]~n', Time.wall).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

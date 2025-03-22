@@ -8,7 +8,11 @@
 :- use_module(gen_instr_listing, [report/1 as gen_instr_listing_report]).
 
 generate_spec :-
-    utils:warn_if_nondet(gen_spec:generate_spec_),
+    call_time(
+        utils:warn_if_nondet(gen_spec:generate_spec_),
+        Time
+    ),
+    format('[`gen_spec` ran in ~3fs]~n', [Time.wall]),
 end.
 
 generate_spec_ :-

@@ -79,8 +79,14 @@ peano_decimal(s(P), N) :-
 output_to_file(Path, Goal) :-
     ( atom(Path) -> true ; type_error('a file path as an atom', Path) ),
     setup_call_cleanup(
-        open(Path, write, S, [create([read, write])]),
-        with_output_to(S, Goal),
+        (
+            format('Writing to `~w`...', [Path]),
+            open(Path, write, S, [create([read, write])])
+        ),
+        (
+            call_time(with_output_to(S, Goal), Time),
+            format(' Done. (~3fs)~n', [Time.wall])
+        ),
         close(S)
     ).
 
