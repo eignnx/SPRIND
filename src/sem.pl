@@ -339,7 +339,7 @@ instr_info(tli, info{
 	ex: ['tli x, -5'],
 	operands: [simm(?simm), reg(?rs)],
 	sem: b_push($$ts, compare(?rs\s, <(s\16), sxt(?simm))),
-    tags: [ts, cmp, strict, signed]
+    tags: [ts, cmp, inequality, signed, '<']
 }).
 instr_info(tgei, info{
 	title: 'Test Greater-than or Equal Immediate',
@@ -347,7 +347,7 @@ instr_info(tgei, info{
 	ex: ['tgei x, -5'],
 	operands: [simm(?simm), reg(?rs)],
 	sem: b_push($$ts, compare(?rs\s, >=(s\16), sxt(?simm))),
-    tags: [ts, cmp, oreq, signed]
+    tags: [ts, cmp, inequality, signed, '>=']
 }).
 instr_info(tbi, info{
 	title: 'Test Below Immediate',
@@ -355,7 +355,7 @@ instr_info(tbi, info{
 	ex: ['tbi x, 10'],
 	operands: [imm(?imm), reg(?rs)],
 	sem: b_push($$ts, compare(?rs\u, <(u\16), zxt(?imm))),
-    tags: [ts, cmp, strict, unsigned]
+    tags: [ts, cmp, inequality, unsigned, '<']
 }).
 instr_info(taei, info{
 	title: 'Test Above or Equal',
@@ -363,7 +363,7 @@ instr_info(taei, info{
 	ex: ['taei x, 10'],
 	operands: [imm(?imm), reg(?rs)],
 	sem: b_push($$ts, compare(?rs\u, >=(u\16), zxt(?imm))),
-    tags: [ts, cmp, strict, unsigned]
+    tags: [ts, cmp, inequality, unsigned, '>=']
 }).
 instr_info(tnei, info{
 	title: 'Test Not Equal Immediate',
@@ -371,7 +371,7 @@ instr_info(tnei, info{
 	ex: ['tnei x, 0'],
 	operands: [simm(?simm), reg(?rs)],
 	sem: b_push($$ts, ?rs\s \= sxt(?simm)),
-    tags: [ts, cmp, eq]
+    tags: [ts, cmp, equality, not]
 }).
 instr_info(teqi, info{
 	title: 'Test Equal Immediate',
@@ -379,7 +379,7 @@ instr_info(teqi, info{
 	ex: ['teqi x, -5'],
 	operands: [simm(?simm), reg(?rs)],
 	sem: b_push($$ts, ?rs\s == sxt(?simm)),
-    tags: [ts, cmp, eq]
+    tags: [ts, cmp, equality]
 }).
 instr_info(addi, info{
 	title: 'Add Immediate',
@@ -444,7 +444,7 @@ instr_info(lsr, info{
 	ex: ['lsr x, 15'],
 	operands: [imm(?imm), reg(?rd)],
 	sem: ?rd <- ?rd >> ?imm,
-    tags: [logical, bitwise, shift, right]
+    tags: [bitwise, shift, right]
 }).
 instr_info(lsl, info{
 	title: 'Logical Shift Left',
@@ -452,7 +452,7 @@ instr_info(lsl, info{
 	ex: ['lsl x, 8'],
 	operands: [imm(?imm), reg(?rd)],
 	sem: ?rd <- ?rd << ?imm,
-    tags: [logical, bitwise, shift]
+    tags: [zxt, bitwise, shift, left]
 }).
 instr_info(asr, info{
 	title: 'Arithmetic Shift Right',
@@ -463,7 +463,7 @@ instr_info(asr, info{
         ?sign_extension = (sxt(bit(?rd, #15) - #1)) << (#reg_size_bits - ?imm);
         ?rd <- (?rd >> ?imm) or ?sign_extension 
     ),
-    tags: [arith, bitwise, shift, right]
+    tags: [sxt, bitwise, shift, right]
 }).
 
 instr_info(add, info{
@@ -544,7 +544,7 @@ instr_info(tl, info{
 	ex: ['tl x, y'],
 	operands: [reg(?r1), reg(?r2)],
 	sem: b_push($$ts, compare(?r1, <(s\16), ?r2)),
-    tags: [ts, cmp, strict, signed]
+    tags: [ts, cmp, inequality, signed, '<']
 }).
 instr_info(tge, info{
 	title: 'Test Greater-than or Equal',
@@ -552,7 +552,7 @@ instr_info(tge, info{
 	ex: ['tge x, y'],
 	operands: [reg(?r1), reg(?r2)],
 	sem: b_push($$ts, compare(?r1, >=(s\16), ?r2)),
-    tags: [ts, cmp, oreq, signed]
+    tags: [ts, cmp, inequality, signed, '>=']
 }).
 instr_info(tb, info{
 	title: 'Test Below',
@@ -560,7 +560,7 @@ instr_info(tb, info{
 	ex: ['tb x, y'],
 	operands: [reg(?r1), reg(?r2)],
 	sem: b_push($$ts, compare(?r1, <(u\16), ?r2)),
-    tags: [ts, cmp, strict, unsigned]
+    tags: [ts, cmp, inequality, unsigned, '<']
 }).
 instr_info(tae, info{
 	title: 'Test Above or Equal',
@@ -568,7 +568,7 @@ instr_info(tae, info{
 	ex: ['tae x, y'],
 	operands: [reg(?r1), reg(?r2)],
 	sem: b_push($$ts, compare(?r1, >=(u\16), ?r2)),
-    tags: [ts, cmp, strict, unsigned]
+    tags: [ts, cmp, inequality, unsigned, '>=']
 }).
 instr_info(tne, info{
 	title: 'Test Not Equal',
@@ -576,7 +576,7 @@ instr_info(tne, info{
 	ex: ['tne x, y'],
 	operands: [reg(?r1), reg(?r2)],
 	sem: b_push($$ts, ?r1 \= ?r2),
-    tags: [ts, cmp, eq]
+    tags: [ts, cmp, equality, not]
 }).
 instr_info(teq, info{
 	title: 'Test Equal',
@@ -584,7 +584,7 @@ instr_info(teq, info{
 	ex: ['teq x, y'],
 	operands: [reg(?r1), reg(?r2)],
 	sem: b_push($$ts, ?r1 == ?r2),
-    tags: [ts, cmp, eq]
+    tags: [ts, cmp, equality]
 }).
 
 instr_info(mulstep, info{
@@ -676,7 +676,7 @@ instr_info('rd.mp.lo', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [rd, data, mp]
+    tags: [rd, data, mp, lo]
 }).
 instr_info('rd.mp.hi', info{
 	title: 'Read $MP.hi',
@@ -684,7 +684,7 @@ instr_info('rd.mp.hi', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [rd, data, mp]
+    tags: [rd, data, mp, hi]
 }).
 instr_info('rd.gp', info{
 	title: 'Read $GP',
@@ -781,7 +781,7 @@ instr_info('clr.cy', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [wr, data, cy]
+    tags: [wr, cy]
 }).
 instr_info('set.cy', info{
 	title: 'Set Carry',
@@ -789,7 +789,7 @@ instr_info('set.cy', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [wr, data, cy]
+    tags: [wr, cy]
 }).
 instr_info(tpush0, info{
 	title: 'Teststack Push 0',
@@ -797,7 +797,7 @@ instr_info(tpush0, info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [ts, push, data]
+    tags: [ts, push]
 }).
 instr_info(tpush1, info{
 	title: 'Teststack Push 1',
@@ -805,7 +805,7 @@ instr_info(tpush1, info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [ts, push, data]
+    tags: [ts, push]
 }).
 instr_info(tnot, info{
 	title: 'Teststack NOT',
