@@ -15,7 +15,7 @@ report :-
     format('#ruledef Reg {~n'),
     maplist({Regs}/[Reg]>>(
       nth0(Idx, Regs, Reg),
-      format('  ~|~t~w~4+ => 0b~|~`0t~2r~3+~n', [Reg, Idx])
+      format('  ~|~w~t~3+=> 0b~|~`0t~2r~3+~n', [Reg, Idx])
     ), Regs),
     format('}~n~n'),
 
@@ -31,17 +31,6 @@ ruledef(RuleName, Rules) :-
 end.
 
 /*
-
-#ruledef Reg {
-      sp => 0b000
-      w  => 0b001
-      x  => 0b010
-      y  => 0b011
-      z  => 0b100
-      a  => 0b101
-      b  => 0b110
-      c  => 0b111
-}
 
 
 #ruledef Instruction {
