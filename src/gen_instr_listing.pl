@@ -14,6 +14,7 @@ report(Lvl) :-
     markdown:emit_heading(Lvl, 'Instructions'),
     display_instruction_counts_by_format(s(Lvl)),
     display_instruction_listing(s(Lvl)),
+    display_synthetic_instrutruction_listing(s(Lvl)),
     display_instr_format_breakdown(s(Lvl)),
     display_instr_specifications(s(Lvl)),
 end.
@@ -68,6 +69,37 @@ display_genericfmt_instr_count(GFmt) :-
     ]),
 end.
 
+
+display_synthetic_instrutruction_listing(Lvl) :-
+    markdown:emit_heading(Lvl, 'Synthetic Instructions'),
+    markdown:emit_table_header(['Synth. Instr.', 'Description', 'Expansion', 'Reversability']),
+    foreach(
+        isa:synthinstr_descr_expansion_reversability(Instr, Descr, Expansion, Rev),
+        synth_instr_row(Instr, Descr, Expansion, Rev)
+    ),
+end.
+
+synth_instr_row(Instr, Descr, Expansion, Rev) :-
+    Instr =.. [InstrName | InstrArgs],
+    Expansion =.. [ExpName | ExpArgs],
+    markdown:emit_table_row([
+        code(fmt('~w', InstrName)++sequence{
+            element: fmt('~w'),
+            sep: a(', '),
+            list: InstrArgs
+        }),
+
+        a(Descr),
+
+        code(fmt('~w', ExpName)++sequence{
+            element: fmt('~w'),
+            sep: a(', '),
+            list: ExpArgs
+        }),
+
+        snakecase_to_titlecase(a(Rev))
+    ]),
+end.
 
 
 display_instruction_listing(Lvl) :-

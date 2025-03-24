@@ -212,16 +212,16 @@ fmt_instr_title_description(o, 'rstr.cc', 'Restore $CC', 'Restore the value of t
 
 %%%%%%%%%%%%%%%%%%%%%%%%% Synthetic Instructions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-synthinstr_descr_expansion_reversability(clr(Reg),    'Clear a register',               xor(Reg, Reg),  reversible).
-synthinstr_descr_expansion_reversability(nop,         'The no-op instruction',          ori(sp, 0),     reversible).
-synthinstr_descr_expansion_reversability(incr(Reg),   'Increment a register',           addi(Reg, 1),   reversible).
-synthinstr_descr_expansion_reversability(decr(Reg),   'Increment a register',           subi(Reg, 1),   reversible).
-synthinstr_descr_expansion_reversability(inv(Reg),    'Bitwise inversion (complement)', xori(Reg, -1),  reversible).
-synthinstr_descr_expansion_reversability(not(Reg),    'Invert a boolean (0 or 1)',      xori(Reg, 1),   reversible).
-synthinstr_descr_expansion_reversability(tg(R1, R2),  'Test greater-than',              tl(R2, R1),     one_way).
-synthinstr_descr_expansion_reversability(tle(R1, R2), 'Test Less-than or Equal',        tge(R2, R1),    one_way).
-synthinstr_descr_expansion_reversability(ta(R1, R2),  'Test Above',                     ta(R2, R1),     one_way).
-synthinstr_descr_expansion_reversability(tbe(R1, R2), 'Test Below or Equal',            tae(R2, R1),    one_way).
+synthinstr_descr_expansion_reversability(clr(r),      'Clear a register',               xor(r, r),   reversible).
+synthinstr_descr_expansion_reversability(nop,         'The no-op instruction',          ori('$sp', 0),  reversible).
+synthinstr_descr_expansion_reversability(incr(r),     'Increment a register',           addi(r, 1),  reversible).
+synthinstr_descr_expansion_reversability(decr(r),     'Increment a register',           subi(r, 1),  reversible).
+synthinstr_descr_expansion_reversability(inv(r),      'Bitwise inversion (complement)', xori(r, -1), reversible).
+synthinstr_descr_expansion_reversability(not(r),      'Invert a boolean (0 or 1)',      xori(r, 1),  reversible).
+synthinstr_descr_expansion_reversability(tg(r1, r2),  'Test greater-than',              tl(r2, r1),  one_way).
+synthinstr_descr_expansion_reversability(tle(r1, r2), 'Test Less-than or Equal',        tge(r2, r1), one_way).
+synthinstr_descr_expansion_reversability(ta(r1, r2),  'Test Above',                     ta(r2, r1),  one_way).
+synthinstr_descr_expansion_reversability(tbe(r1, r2), 'Test Below or Equal',            tae(r2, r1), one_way).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Registers %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
