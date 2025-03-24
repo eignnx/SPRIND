@@ -89,9 +89,9 @@
 | [`rr(1)`](#format-rr1) | `000001oooosssrrr` | 16 | 8 | 50% |  |
 | [`rr(2)`](#format-rr2) | `0000001ooosssrrr` | 8 | 4 | 50% |  |
 | [`rr(3)`](#format-rr3) | `00000001oosssrrr` | 4 | 2 | 50% |  |
-| [`r(1)`](#format-r1) | `000000001oooorrr` | 16 | 7 | 44% |  |
+| [`r(1)`](#format-r1) | `000000001oooorrr` | 16 | 8 | 50% |  |
 | [`r(2)`](#format-r2) | `0000000001ooorrr` | 8 | 4 | 50% |  |
-| [`r(3)`](#format-r3) | `00000000001oorrr` | 4 | 1 | 25% |  |
+| [`r(3)`](#format-r3) | `00000000001oorrr` | 4 | 0 | 0% |  |
 | [`o`](#format-o) | `00000000000ooooo` | 32 | 27 | 84% |  |
 
 ### Legend
@@ -1547,11 +1547,6 @@ todo
 
 --------------
 
-#### Format `r(2)`
-
-
-![../assets/r(2).svg](../assets/r(2).svg)
-
 ##### The `seb` Instruction
 
 **Sign Extend Byte** --- Sign extend a byte in a register.
@@ -1561,7 +1556,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `r(2)` = 0b0000000001 | 0b0011 | `00000000010011rrr` |
+| `r(1)` = 0b000000001 | 0b0011 | `0000000010011rrr` |
 
 ###### Semantics
 
@@ -1572,6 +1567,11 @@ todo
 ```
 
 --------------
+
+#### Format `r(2)`
+
+
+![../assets/r(2).svg](../assets/r(2).svg)
 
 ##### The `rd.mp.lo` Instruction
 
@@ -1636,11 +1636,6 @@ todo
 
 --------------
 
-#### Format `r(3)`
-
-
-![../assets/r(3).svg](../assets/r(3).svg)
-
 ##### The `wr.gp` Instruction
 
 **Write $GP** --- Write a value to the system `$GP` register from a general purpose register.
@@ -1650,7 +1645,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `r(3)` = 0b00000000001 | 0b110 | `00000000001110rrr` |
+| `r(2)` = 0b0000000001 | 0b110 | `0000000001110rrr` |
 
 ###### Semantics
 
@@ -1661,6 +1656,11 @@ todo
 ```
 
 --------------
+
+#### Format `r(3)`
+
+
+![../assets/r(3).svg](../assets/r(3).svg)
 
 ### Instruction Format `o`
 

@@ -177,11 +177,11 @@ fmt_instr_title_description(r(1), popw, 'Pop Word', 'Pop a word from the stack i
 fmt_instr_title_description(r(1), callr, 'Call Register', 'Call a subroutine at the address in a register.').
 fmt_instr_title_description(r(1), jr, 'Jump Register', 'Jump to the address in a register.').
 fmt_instr_title_description(r(1), neg, 'Negate', 'Negate the value in a register.').
-fmt_instr_title_description(r(2), seb, 'Sign Extend Byte', 'Sign extend a byte in a register.').
+fmt_instr_title_description(r(1), seb, 'Sign Extend Byte', 'Sign extend a byte in a register.').
 fmt_instr_title_description(r(2), 'rd.mp.lo', 'Read $MP.lo', 'Read the low word in the system `$MP` register into a general purpose register.').
 fmt_instr_title_description(r(2), 'rd.mp.hi', 'Read $MP.hi', 'Read the high word in the system `$MP` register into a general purpose register.').
 fmt_instr_title_description(r(2), 'rd.gp', 'Read $GP', 'Read the value of the system `$GP` register into a general purpose register.').
-fmt_instr_title_description(r(3), 'wr.gp', 'Write $GP', 'Write a value to the system `$GP` register from a general purpose register.').
+fmt_instr_title_description(r(2), 'wr.gp', 'Write $GP', 'Write a value to the system `$GP` register from a general purpose register.').
 
 fmt_instr_title_description(o, 'NONEXE0', 'Non-executable (0''s Version)', 'Triggers a "non-executable instruction" exception. The entire instruction is 16 `0`s.').
 fmt_instr_title_description(o, 'UNIMPL', 'Unimplemented', 'Unimplemented instruction.').
