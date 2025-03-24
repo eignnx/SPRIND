@@ -140,12 +140,15 @@ instrpool_tree([I0, I1 | Is], node(LeftTree, SplitTag, RightTree)) :-
 
 
 cmp_score_ascending(Ord, Score1-Tag1, Score2-Tag2) :-
-    Score1 > Score2 ->
+    ( Score1 > Score2 ->
         Ord = '<'
-    ; Tag1 @> Tag2 ->
+    ; Score1 < Score2 ->
+        Ord = '>'
+    ; Tag1 @< Tag2 ->
         Ord = '<'
     ;
-        Ord = '>'.
+        Ord = '>'
+    ).
 
 optree_instr_prefix(Tree, Instr, Prefix) :-
     phrase(optree_instr_prefix_(Tree, Instr), Prefix).

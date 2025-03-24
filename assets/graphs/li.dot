@@ -2,9 +2,9 @@ digraph "Format li" {
   graph [dpi = 100, bgcolor="#111", fontcolor="white", rankdir=LR, pad="0.25"];
   node [fontname = "Courier", fontsize="15pt", color="white", fontcolor="white"];
   edge [fontname = "Courier", color="white", fontcolor="white"];
-  "zxt_6558408" [label = "zxt?", shape = ellipse];
-  "zxt_6558408":e -> "szi_5158144":w [label = "1"];
-  "zxt_6558408":e -> "li_6973931":w [label = "0"];
+  "shift_2927729" [label = "shift?", shape = ellipse];
+  "shift_2927729":e -> "szi_5158144":w [label = "1"];
+  "shift_2927729":e -> "li_6973931":w [label = "0"];
   "szi_5158144" [label = "szi\nShift Zero-extended Immediate\n0b1`1", shape = rectangle];
   "li_6973931" [label = "li\nLoad Immediate\n0b0`1", shape = rectangle];
 }

@@ -116,7 +116,7 @@
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `rri` = 0b11 | 0b00 | `1100iiiiiisssrrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `rri` = 0b11 | 0b11 | `1111iiiiiisssrrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -142,7 +142,7 @@ rd <- zxt([ptr])
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `rri` = 0b11 | 0b10 | `1110iiiiiisssrrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `rri` = 0b11 | 0b01 | `1101iiiiiisssrrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -168,7 +168,7 @@ rd <- {[ptr+1], [ptr]}
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `rri` = 0b11 | 0b01 | `1101iiiiiisssrrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `rri` = 0b11 | 0b10 | `1110iiiiiisssrrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -194,7 +194,7 @@ let ptr := rd\s+sxt(simm);
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `rri` = 0b11 | 0b11 | `1111iiiiiisssrrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `rri` = 0b11 | 0b00 | `1100iiiiiisssrrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -288,7 +288,7 @@ $PC <- $PC\s+sxt(offset)
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `b` = 0b1001 | 0b11 | `100111iiiiiiiiii` | 10 | `imm10` in `[-512, 511]` or `[0, 1023]` |
+| `b` = 0b1001 | 0b10 | `100110iiiiiiiiii` | 10 | `imm10` in `[-512, 511]` or `[0, 1023]` |
 
 ###### Semantics
 
@@ -315,7 +315,7 @@ if b_pop($TS) {
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `b` = 0b1001 | 0b10 | `100110iiiiiiiiii` | 10 | `imm10` in `[-512, 511]` or `[0, 1023]` |
+| `b` = 0b1001 | 0b11 | `100111iiiiiiiiii` | 10 | `imm10` in `[-512, 511]` or `[0, 1023]` |
 
 ###### Semantics
 
@@ -408,7 +408,7 @@ rd <- rd<<8 or zxt(imm)
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b00100 | `0100100iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `ri(1)` = 0b01 | 0b00111 | `0100111iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -433,7 +433,7 @@ rd <- zxt([$GP\u+zxt(disp)])
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b00110 | `0100110iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `ri(1)` = 0b01 | 0b00101 | `0100101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -459,7 +459,7 @@ rd <- {[ptr+1], [ptr]}
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b00101 | `0100101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `ri(1)` = 0b01 | 0b00110 | `0100110iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -484,7 +484,7 @@ rd <- {[ptr+1], [ptr]}
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b00111 | `0100111iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `ri(1)` = 0b01 | 0b00100 | `0100100iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -510,7 +510,7 @@ let ptr := ($GP\u+zxt(disp)and65534)\u;
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b00101 | `0100101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `ri(1)` = 0b01 | 0b10000 | `0110000iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -537,7 +537,7 @@ b_push($TS, bit==1)
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b10010 | `0110010iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `ri(1)` = 0b01 | 0b01001 | `0101001iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -564,7 +564,7 @@ rd <- rd and mask
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b10011 | `0110011iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `ri(1)` = 0b01 | 0b10001 | `0110001iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -641,7 +641,7 @@ b_push($TS, compare(rs\s, >=(s\16), sxt(simm)))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b01111 | `0101111iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `ri(1)` = 0b01 | 0b01110 | `0101110iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -666,7 +666,7 @@ b_push($TS, compare(rs\u, <(u\16), zxt(imm)))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b01110 | `0101110iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `ri(1)` = 0b01 | 0b01111 | `0101111iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -691,7 +691,7 @@ b_push($TS, compare(rs\u, >=(u\16), zxt(imm)))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b01011 | `0101011iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `ri(1)` = 0b01 | 0b01010 | `0101010iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -716,7 +716,7 @@ b_push($TS, rs\s\=sxt(simm))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b01010 | `0101010iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `ri(1)` = 0b01 | 0b01011 | `0101011iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -766,7 +766,7 @@ rd <- rd\s+sxt(simm)
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b11001 | `0111001iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `ri(1)` = 0b01 | 0b01111 | `0101111iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -791,7 +791,7 @@ rd <- rd and sxt(simm)
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b11000 | `0111000iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `ri(1)` = 0b01 | 0b11100 | `0111100iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -816,7 +816,7 @@ rd <- rd or sxt(simm)
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b01101 | `0101101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `ri(1)` = 0b01 | 0b11101 | `0111101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -895,7 +895,7 @@ bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b01111 | `0101111iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `ri(1)` = 0b01 | 0b01101 | `0101101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -920,7 +920,7 @@ rd <- rd>>imm
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b01110 | `0101110iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `ri(1)` = 0b01 | 0b01100 | `0101100iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -945,7 +945,7 @@ rd <- rd<<imm
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b01000 | `0101000iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `ri(1)` = 0b01 | 0b00101 | `0100101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -1023,7 +1023,7 @@ multiplier <- multiplier>>1
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `rr(1)` = 0b000001 | 0b0101 | `0000010101sssrrr` |
+| `rr(1)` = 0b000001 | 0b0110 | `0000010110sssrrr` |
 
 ###### Semantics
 
@@ -1073,7 +1073,7 @@ rd <- rd-rs
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `rr(1)` = 0b000001 | 0b00011 | `00000100011sssrrr` |
+| `rr(1)` = 0b000001 | 0b0001 | `0000010001sssrrr` |
 
 ###### Semantics
 
@@ -1123,7 +1123,7 @@ rd <- rd or rs
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `rr(1)` = 0b000001 | 0b0001 | `0000010001sssrrr` |
+| `rr(1)` = 0b000001 | 0b00011 | `00000100011sssrrr` |
 
 ###### Semantics
 
@@ -1200,7 +1200,7 @@ bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `rr(1)` = 0b000001 | 0b0110 | `0000010110sssrrr` |
+| `rr(1)` = 0b000001 | 0b0101 | `0000010101sssrrr` |
 
 ###### Semantics
 
@@ -1280,7 +1280,7 @@ b_push($TS, compare(r1, >=(s\16), r2))
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `rr(2)` = 0b0000001 | 0b1111 | `00000011111sssrrr` |
+| `rr(2)` = 0b0000001 | 0b1110 | `00000011110sssrrr` |
 
 ###### Semantics
 
@@ -1305,7 +1305,7 @@ b_push($TS, compare(r1, <(u\16), r2))
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `rr(2)` = 0b0000001 | 0b1110 | `00000011110sssrrr` |
+| `rr(2)` = 0b0000001 | 0b1111 | `00000011111sssrrr` |
 
 ###### Semantics
 
@@ -1333,7 +1333,7 @@ b_push($TS, compare(r1, >=(u\16), r2))
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `rr(3)` = 0b00000001 | 0b1011 | `000000011011sssrrr` |
+| `rr(3)` = 0b00000001 | 0b1010 | `000000011010sssrrr` |
 
 ###### Semantics
 
@@ -1358,7 +1358,7 @@ b_push($TS, r1\=r2)
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `rr(3)` = 0b00000001 | 0b1010 | `000000011010sssrrr` |
+| `rr(3)` = 0b00000001 | 0b1011 | `000000011011sssrrr` |
 
 ###### Semantics
 
@@ -1387,7 +1387,7 @@ b_push($TS, r1==r2)
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `r(1)` = 0b000000001 | 0b0101 | `0000000010101rrr` |
+| `r(1)` = 0b000000001 | 0b0110 | `0000000010110rrr` |
 
 ###### Semantics
 
@@ -1408,7 +1408,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `r(1)` = 0b000000001 | 0b0111 | `0000000010111rrr` |
+| `r(1)` = 0b000000001 | 0b0100 | `0000000010100rrr` |
 
 ###### Semantics
 
@@ -1429,7 +1429,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `r(1)` = 0b000000001 | 0b0100 | `0000000010100rrr` |
+| `r(1)` = 0b000000001 | 0b0111 | `0000000010111rrr` |
 
 ###### Semantics
 
@@ -1450,7 +1450,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `r(1)` = 0b000000001 | 0b0110 | `0000000010110rrr` |
+| `r(1)` = 0b000000001 | 0b0101 | `0000000010101rrr` |
 
 ###### Semantics
 
@@ -1471,7 +1471,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `r(1)` = 0b000000001 | 0b0011 | `0000000010011rrr` |
+| `r(1)` = 0b000000001 | 0b0001 | `0000000010001rrr` |
 
 ###### Semantics
 
@@ -1492,7 +1492,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `r(1)` = 0b000000001 | 0b0010 | `0000000010010rrr` |
+| `r(1)` = 0b000000001 | 0b0000 | `0000000010000rrr` |
 
 ###### Semantics
 
@@ -1513,7 +1513,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `r(1)` = 0b000000001 | 0b0000 | `0000000010000rrr` |
+| `r(1)` = 0b000000001 | 0b0010 | `0000000010010rrr` |
 
 ###### Semantics
 
@@ -1537,7 +1537,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `r(2)` = 0b0000000001 | 0b0001 | `00000000010001rrr` |
+| `r(2)` = 0b0000000001 | 0b0011 | `00000000010011rrr` |
 
 ###### Semantics
 
@@ -1558,7 +1558,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `r(2)` = 0b0000000001 | 0b0111 | `00000000010111rrr` |
+| `r(2)` = 0b0000000001 | 0b100 | `0000000001100rrr` |
 
 ###### Semantics
 
@@ -1579,7 +1579,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `r(2)` = 0b0000000001 | 0b0110 | `00000000010110rrr` |
+| `r(2)` = 0b0000000001 | 0b101 | `0000000001101rrr` |
 
 ###### Semantics
 
@@ -1600,7 +1600,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `r(2)` = 0b0000000001 | 0b0100 | `00000000010100rrr` |
+| `r(2)` = 0b0000000001 | 0b111 | `0000000001111rrr` |
 
 ###### Semantics
 
@@ -1624,7 +1624,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `r(3)` = 0b00000000001 | 0b0101 | `000000000010101rrr` |
+| `r(3)` = 0b00000000001 | 0b110 | `00000000001110rrr` |
 
 ###### Semantics
 
@@ -1674,7 +1674,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b000111 | `00000000000000111` |
+| `o` = 0b00000000000 | 0b00110 | `0000000000000110` |
 
 ###### Semantics
 
@@ -1716,7 +1716,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b000110 | `00000000000000110` |
+| `o` = 0b00000000000 | 0b00111 | `0000000000000111` |
 
 ###### Semantics
 
@@ -1737,7 +1737,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b00110 | `0000000000000110` |
+| `o` = 0b00000000000 | 0b000110 | `00000000000000110` |
 
 ###### Semantics
 
@@ -1758,7 +1758,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b00010 | `0000000000000010` |
+| `o` = 0b00000000000 | 0b000111 | `00000000000000111` |
 
 ###### Semantics
 
@@ -1779,7 +1779,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b00111 | `0000000000000111` |
+| `o` = 0b00000000000 | 0b00010 | `0000000000000010` |
 
 ###### Semantics
 
@@ -1800,7 +1800,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b10001 | `0000000000010001` |
+| `o` = 0b00000000000 | 0b01010 | `0000000000001010` |
 
 ###### Semantics
 
@@ -1821,7 +1821,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b10000 | `0000000000010000` |
+| `o` = 0b00000000000 | 0b01011 | `0000000000001011` |
 
 ###### Semantics
 
@@ -1842,7 +1842,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b000010 | `00000000000000010` |
+| `o` = 0b00000000000 | 0b000011 | `00000000000000011` |
 
 ###### Semantics
 
@@ -1863,7 +1863,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b000011 | `00000000000000011` |
+| `o` = 0b00000000000 | 0b000010 | `00000000000000010` |
 
 ###### Semantics
 
@@ -1884,7 +1884,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b01110 | `0000000000001110` |
+| `o` = 0b00000000000 | 0b010011 | `00000000000010011` |
 
 ###### Semantics
 
@@ -1905,7 +1905,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b01111 | `0000000000001111` |
+| `o` = 0b00000000000 | 0b010010 | `00000000000010010` |
 
 ###### Semantics
 
@@ -1926,7 +1926,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b10101 | `0000000000010101` |
+| `o` = 0b00000000000 | 0b01101 | `0000000000001101` |
 
 ###### Semantics
 
@@ -1947,7 +1947,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b10100 | `0000000000010100` |
+| `o` = 0b00000000000 | 0b00111 | `0000000000000111` |
 
 ###### Semantics
 
@@ -1968,7 +1968,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b01011 | `0000000000001011` |
+| `o` = 0b00000000000 | 0b01100 | `0000000000001100` |
 
 ###### Semantics
 
@@ -1989,7 +1989,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b00110 | `0000000000000110` |
+| `o` = 0b00000000000 | 0b01000 | `0000000000001000` |
 
 ###### Semantics
 
@@ -2010,7 +2010,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b01001 | `0000000000001001` |
+| `o` = 0b00000000000 | 0b11001 | `0000000000011001` |
 
 ###### Semantics
 
@@ -2031,7 +2031,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b01101 | `0000000000001101` |
+| `o` = 0b00000000000 | 0b10001 | `0000000000010001` |
 
 ###### Semantics
 
@@ -2052,7 +2052,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b10010 | `0000000000010010` |
+| `o` = 0b00000000000 | 0b110000 | `00000000000110000` |
 
 ###### Semantics
 
@@ -2073,7 +2073,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b10011 | `0000000000010011` |
+| `o` = 0b00000000000 | 0b100000 | `00000000000100000` |
 
 ###### Semantics
 
@@ -2094,7 +2094,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b00101 | `0000000000000101` |
+| `o` = 0b00000000000 | 0b110001 | `00000000000110001` |
 
 ###### Semantics
 
@@ -2115,7 +2115,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b00111 | `0000000000000111` |
+| `o` = 0b00000000000 | 0b100001 | `00000000000100001` |
 
 ###### Semantics
 
@@ -2136,7 +2136,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b010001 | `00000000000010001` |
+| `o` = 0b00000000000 | 0b01101 | `0000000000001101` |
 
 ###### Semantics
 
@@ -2157,7 +2157,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b011001 | `00000000000011001` |
+| `o` = 0b00000000000 | 0b01001 | `0000000000001001` |
 
 ###### Semantics
 
@@ -2178,7 +2178,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b010000 | `00000000000010000` |
+| `o` = 0b00000000000 | 0b00111 | `0000000000000111` |
 
 ###### Semantics
 
@@ -2199,7 +2199,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b011000 | `00000000000011000` |
+| `o` = 0b00000000000 | 0b00101 | `0000000000000101` |
 
 ###### Semantics
 
