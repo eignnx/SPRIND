@@ -114,10 +114,10 @@
 ### Instruction Format `rri`
 
 
-![../assets/rri.svg](../assets/rri.svg)
-
 #### Format `rri`
 
+
+![../assets/rri.svg](../assets/rri.svg)
 
 ##### The `lb` Instruction
 
@@ -227,10 +227,10 @@ let ptr := (rd\s+sxt(simm)and65534)\u;
 ### Instruction Format `subr`
 
 
-![../assets/subr.svg](../assets/subr.svg)
-
 #### Format `subr`
 
+
+![../assets/subr.svg](../assets/subr.svg)
 
 ##### The `call` Instruction
 
@@ -261,10 +261,10 @@ $RA <- $PC+2
 ### Instruction Format `b`
 
 
-![../assets/b.svg](../assets/b.svg)
-
 #### Format `b`
 
+
+![../assets/b.svg](../assets/b.svg)
 
 ##### The `b` Instruction
 
@@ -348,10 +348,10 @@ if !(b_pop($TS)) {
 ### Instruction Format `li`
 
 
-![../assets/li.svg](../assets/li.svg)
-
 #### Format `li`
 
+
+![../assets/li.svg](../assets/li.svg)
 
 ##### The `li` Instruction
 
@@ -406,10 +406,10 @@ rd <- rd<<8 or zxt(imm)
 ### Instruction Format `ri(_)`
 
 
-![../assets/ri(_).svg](../assets/ri(_).svg)
-
 #### Format `ri(1)`
 
+
+![../assets/ri(1).svg](../assets/ri(1).svg)
 
 ##### The `lgb` Instruction
 
@@ -977,13 +977,15 @@ rd <- rd>>imm or sign_extension
 #### Format `ri(2)`
 
 
+![../assets/ri(2).svg](../assets/ri(2).svg)
+
 ### Instruction Format `rrr`
 
 
-![../assets/rrr.svg](../assets/rrr.svg)
-
 #### Format `rrr`
 
+
+![../assets/rrr.svg](../assets/rrr.svg)
 
 ##### The `mulstep` Instruction
 
@@ -1021,10 +1023,10 @@ multiplier <- multiplier>>1
 ### Instruction Format `rr(_)`
 
 
-![../assets/rr(_).svg](../assets/rr(_).svg)
-
 #### Format `rr(1)`
 
+
+![../assets/rr(1).svg](../assets/rr(1).svg)
 
 ##### The `add` Instruction
 
@@ -1233,6 +1235,8 @@ bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 #### Format `rr(2)`
 
 
+![../assets/rr(2).svg](../assets/rr(2).svg)
+
 ##### The `tl` Instruction
 
 **Test Less-than** --- Test if the value of one register is less than another.
@@ -1336,6 +1340,8 @@ b_push($TS, compare(r1, >=(u\16), r2))
 #### Format `rr(3)`
 
 
+![../assets/rr(3).svg](../assets/rr(3).svg)
+
 ##### The `tne` Instruction
 
 **Test Not Equal** --- Test if the value of one register is not equal to another.
@@ -1389,10 +1395,10 @@ b_push($TS, r1==r2)
 ### Instruction Format `r(_)`
 
 
-![../assets/r(_).svg](../assets/r(_).svg)
-
 #### Format `r(1)`
 
+
+![../assets/r(1).svg](../assets/r(1).svg)
 
 ##### The `pushb` Instruction
 
@@ -1544,6 +1550,8 @@ todo
 #### Format `r(2)`
 
 
+![../assets/r(2).svg](../assets/r(2).svg)
+
 ##### The `seb` Instruction
 
 **Sign Extend Byte** --- Sign extend a byte in a register.
@@ -1631,6 +1639,8 @@ todo
 #### Format `r(3)`
 
 
+![../assets/r(3).svg](../assets/r(3).svg)
+
 ##### The `wr.gp` Instruction
 
 **Write $GP** --- Write a value to the system `$GP` register from a general purpose register.
@@ -1655,10 +1665,10 @@ todo
 ### Instruction Format `o`
 
 
-![../assets/o.svg](../assets/o.svg)
-
 #### Format `o`
 
+
+![../assets/o.svg](../assets/o.svg)
 
 ##### The `NONEXE0` Instruction
 

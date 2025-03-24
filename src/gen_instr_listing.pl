@@ -194,7 +194,6 @@ display_instr_specifications(Lvl) :-
 
 display_instr_specification_under_gfmt(Lvl, GFmt) :-
     markdown:emit_heading(Lvl, 'Instruction Format `~k`', [GFmt]),
-    markdown:emit_image('../assets/~k.svg', [GFmt]),
     
     GFmt \= ext,
     optree:fmt_tree(GFmt, OpTree), % Format being ext makes fmt_tree throw error about empty pool
@@ -206,6 +205,7 @@ display_instr_specification_under_gfmt(Lvl, GFmt) :-
 
 display_instr_specification_under_fmt(Lvl, Fmt, OpTree) :-
     markdown:emit_heading(Lvl, 'Format `~k`', [Fmt]),
+    markdown:emit_image('../assets/~k.svg', [Fmt]),
     forall(
         isa:fmt_instr(Fmt, Instr),
         display_instr_specification(s(Lvl), Fmt, Instr, OpTree)
