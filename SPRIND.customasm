@@ -7,7 +7,14 @@
 #const ISA_VERSION = "0.2.0"
 
 #ruledef Reg {
-  ; TODO
+    sp => 0b000
+     x => 0b001
+     y => 0b010
+     z => 0b011
+     w => 0b100
+     v => 0b101
+     a => 0b110
+     b => 0b111
 }
 
 #const SPRIND_SUBR_ALIGN = 4

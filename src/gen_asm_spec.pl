@@ -11,7 +11,13 @@ report :-
     isa:version(VMajor, VMinor, VPatch),
     format('#const ISA_VERSION = "~d.~d.~d"~n~n', [VMajor, VMinor, VPatch]),
 
-    ruledef('Reg', []),
+    findall(Reg, isa:regname_uses(Reg, _), Regs),
+    format('#ruledef Reg {~n'),
+    maplist({Regs}/[Reg]>>(
+      nth0(Idx, Regs, Reg),
+      format('  ~|~t~w~4+ => 0b~|~`0t~2r~3+~n', [Reg, Idx])
+    ), Regs),
+    format('}~n~n'),
 
 
     derive:subr_byte_alignment(SubrAlign),
@@ -20,7 +26,7 @@ end.
 
 ruledef(RuleName, Rules) :-
     format('#ruledef ~w {~n', [RuleName]),
-    format('  ; TODO~n'),
+    maplist([Lhs-Rhs]>>format('  ~w => ~w~n', [Lhs, Rhs]), Rules),
     format('}~n~n'),
 end.
 
