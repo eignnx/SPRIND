@@ -1,0 +1,18 @@
+digraph "Format rr(2)" {
+  graph [dpi = 100, bgcolor="#111", fontcolor="white", rankdir=LR, pad="0.25"];
+  node [fontname = "Courier", fontsize="15pt", color="white", fontcolor="white"];
+  edge [fontname = "Courier", color="white", fontcolor="white"];
+  "<_4417663" [label = "<?", shape = ellipse];
+  "<_4417663":e -> "signed_5200454":w [label = "1"];
+  "<_4417663":e -> "signed_9666543":w [label = "0"];
+  "signed_5200454" [label = "signed?", shape = ellipse];
+  "signed_5200454":e -> "tl_8913108":w [label = "1"];
+  "signed_5200454":e -> "tb_7020844":w [label = "0"];
+  "tl_8913108" [label = "tl\nTest Less-than\n0b11`2", shape = rectangle];
+  "tb_7020844" [label = "tb\nTest Below\n0b10`2", shape = rectangle];
+  "signed_9666543" [label = "signed?", shape = ellipse];
+  "signed_9666543":e -> "tge_289938":w [label = "1"];
+  "signed_9666543":e -> "tae_6900673":w [label = "0"];
+  "tge_289938" [label = "tge\nTest Greater-than or Equal\n0b01`2", shape = rectangle];
+  "tae_6900673" [label = "tae\nTest Above or Equal\n0b00`2", shape = rectangle];
+}

@@ -1,0 +1,10 @@
+digraph "Format rr(3)" {
+  graph [dpi = 100, bgcolor="#111", fontcolor="white", rankdir=LR, pad="0.25"];
+  node [fontname = "Courier", fontsize="15pt", color="white", fontcolor="white"];
+  edge [fontname = "Courier", color="white", fontcolor="white"];
+  "not_10056146" [label = "not?", shape = ellipse];
+  "not_10056146":e -> "tne_9691690":w [label = "1"];
+  "not_10056146":e -> "teq_6366130":w [label = "0"];
+  "tne_9691690" [label = "tne\nTest Not Equal\n0b1`1", shape = rectangle];
+  "teq_6366130" [label = "teq\nTest Equal\n0b0`1", shape = rectangle];
+}

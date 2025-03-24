@@ -186,7 +186,7 @@ dotprint_tree(Fmt, Tree) :-
     format('  graph [dpi = 100, bgcolor="#111", fontcolor="white", rankdir=LR, pad="0.25"];~n'),
     format('  node [fontname = "Courier", fontsize="15pt", color="white", fontcolor="white"];~n'),
     format('  edge [fontname = "Courier", color="white", fontcolor="white"];~n'),
-    dotprint_tree_(Tree, ``),
+    ( Tree \= empty -> dotprint_tree_(Tree, ``) ; format('// Empty Tree~n') ),
     format('}~n').
 
 dotprint_tree_(leaf(Instr), Prefix) :-
@@ -217,14 +217,18 @@ node_id_label(node(Left, Split, Right), Id, Label) :-
     format(atom(Label), '"~k?"', [Split]).
 
 print_dottree(Fmt) :-
-    once(fmt_tree(Fmt, Tree)),
+    catch(
+        once(fmt_tree(Fmt, Tree)),
+        error(while_building_optree_for_fmt(_, _), _),
+        Tree = empty
+    ),
     dotprint_tree(Fmt, Tree).
 
 print_dottrees :-
     call_time(
         foreach(
             (
-                isa:gfmt(Fmt),
+                isa:fmt(Fmt),
                 Fmt \= ext,
                 format(atom(Path), 'assets/graphs/~k.dot', [Fmt])
             ),
