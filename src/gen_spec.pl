@@ -25,7 +25,12 @@ generate_spec_ :-
 end.
 
 gen_spec_outline(Lvl) :-
-    catch(validate:run_validations, error(E), format('~n> !!! ~w~n~n', [E])), % validate:run_validations,
+    catch(validate:run_validations, error(E), (
+        format('~n> !!! '),
+        numbervars(E),
+        write_term(E, [numbervars(true)]),
+        format('~n~n')
+    )), % validate:run_validations,
     markdown:emit_heading(Lvl, 'SPRIND Instruction Set Architecture Specification'),
     markdown:emit_heading(s(Lvl), 'Outline'),
     format('- [Machine Overview](machine-overview.md): Describes registers and instruction formats.~n'),

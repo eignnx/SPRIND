@@ -25,6 +25,7 @@
 :- op(20, fx, #).
 
 :- use_module(library(clpfd)).
+:- use_module(library(solution_sequences)).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -276,7 +277,12 @@ fmt(Fmt) :-
 tree_leaf([A | B], X) :- !, ( tree_leaf(A, X) ; tree_leaf(B, X) ).
 tree_leaf(Atom, Atom).
 
-gfmt(GFmt) :- fmt_genericfmt(_Fmt, GFmt).
+gfmt(GFmt) :-
+    solution_sequences:reduced(
+        GFmt,
+        isa:fmt_genericfmt(_Fmt, GFmt),
+        [size_limit(32)]
+    ).
 
 gprreg(R) :- regname_uses(R, _).
 sysreg(Name) :- sysregname_name_size_description(Name, _, _, _).
