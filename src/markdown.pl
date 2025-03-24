@@ -123,6 +123,6 @@ interpolation_cmd(apply(Cmd0, Arg)) --> !,
     { Cmd =.. [Functor | Args] },
     interpolation_cmd(Cmd).
 
-interpolation_cmd(Other) --> { throw(error(unknown_format_command(Other))) }.
+interpolation_cmd(Other) --> { throw(error(unknown_interpolation_command(Other), _)) }.
 
 end.
