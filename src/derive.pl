@@ -13,7 +13,10 @@
     fmt_assignedinstrcount/2,
     fmt_assignedinstrcount/3,
     validate_instr_assignments_or_throw/2,
-    fmt_opcodebits_immbits/3
+    fmt_opcodebits_immbits/3,
+    fmt_labelledimmbits/2,
+    fmt_labelledopcodebits/2,
+    subr_byte_alignment/1
 ]).
 
 :- set_prolog_flag(double_quotes, chars).
@@ -119,6 +122,18 @@ fmt_opcodebits_immbits(Fmt, OpcodeBits, ImmBits) :-
     ( isa:fmt_opcodesizeconstraint(Fmt, OpcodeBits) -> true ; true ),
     sum(Sizes, #=, #OperandsTotalSize),
     #PrefixLen + #OpcodeBits + #OperandsTotalSize #= InstrSize.
+
+fmt_labelledimmbits(Fmt, ImmBits) :-
+    fmt_opcodebits_immbits(Fmt, _, ImmBits),
+    label([ImmBits]).
+
+fmt_labelledopcodebits(Fmt, OpcodeBits) :-
+    fmt_opcodebits_immbits(Fmt, OpcodeBits, _),
+    label([OpcodeBits]).
+
+subr_byte_alignment(ByteAlignment) :-
+    fmt_labelledimmbits(subr, ImmBits),
+    #ByteAlignment #= 2 ^ (16 - #ImmBits - 1).
 
 
 fmt_maxopcodes(Fmt, MaxOpcodes) :-

@@ -1,6 +1,7 @@
 :- module(gen_asm_spec, [report/0]).
 
 :- use_module(isa).
+:- use_module(derive).
 
 report :-
     format(';~n'),
@@ -11,18 +12,19 @@ report :-
     format('#const ISA_VERSION = "~d.~d.~d"~n~n', [VMajor, VMinor, VPatch]),
 
     ruledef('Reg', []),
+
+
+    derive:subr_byte_alignment(SubrAlign),
+    format('#const SPRIND_SUBR_ALIGN = ~d~n~n', SubrAlign),
 end.
 
-ruledef(RuleName, []) :-
+ruledef(RuleName, Rules) :-
     format('#ruledef ~w {~n', [RuleName]),
     format('  ; TODO~n'),
     format('}~n~n'),
 end.
 
 /*
-#once
-
-#const ISA_VERSION = "0.7"
 
 #ruledef Reg {
       sp => 0b000
@@ -34,12 +36,6 @@ end.
       b  => 0b110
       c  => 0b111
 }
-
-#ruledef AdrReg {
-      sp => 0b0
-      w  => 0b1
-}
-
 
 
 #ruledef Instruction {
