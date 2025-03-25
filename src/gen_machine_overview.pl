@@ -38,6 +38,9 @@ display_sysregs(Lvl) :-
     markdown:emit_heading(Lvl, 'System Registers'),
     markdown:emit_table_header(['Register', 'Register Name', 'Size', left('Description')]),
     foreach(
-        isa:sysregname_name_size_description(Reg, Name, Size, Descr),
-        markdown:emit_table_row([code(fmt('$~w', Reg)), a(Name), fmt('~d-bits', Size), a(Descr)])
+        (
+            isa:sysregname_name_size_description(Reg, Name, Size, Descr),
+            upcase_atom(Reg, RegUpcase)
+        ),
+        markdown:emit_table_row([code(fmt('$~w', RegUpcase)), a(Name), fmt('~d-bits', Size), a(Descr)])
     ).

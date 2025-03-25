@@ -234,17 +234,16 @@ register_size(16).
 gpr_count_bits(3).
 addr_reg_count_bits(2).
 
-regname_uses(sp, [stack_ptr, addr]).
-regname_uses(x,  [temp, arg(1), addr]).
-regname_uses(y,  [temp, arg(2), addr]).
-regname_uses(z,  [temp, arg(3), addr]).
+regname_uses(sp, [stack_ptr]).
+regname_uses(x,  [temp, arg(1)]).
+regname_uses(y,  [temp, arg(2)]).
+regname_uses(z,  [temp, arg(3)]).
 regname_uses(w,  [temp, arg(4)]).
 regname_uses(v,  [temp, retval]).
 regname_uses(a,  [saved]).
 regname_uses(b,  [saved]).
 
 reguse_description(stack_ptr, 'Register serves as the stack pointer.').
-reguse_description(addr,      'Only some of the registers can be used as the address in a load/store instruction.').
 reguse_description(temp,      'Register may be used to hold temporary values without restriction.').
 reguse_description(arg(_),    'Register is used as the Nth argument to a subroutine.').
 reguse_description(retval,    'A subroutine''s return value is passed in this register.').
