@@ -77,8 +77,7 @@ fmt_huffman_enc([
         rr(2),
         rr(3),
         r(1),
-        r(2),
-        r(3)
+        r(2)
     |
         o
     ]
@@ -145,13 +144,15 @@ fmt_instr_title_description(ri(1), teqi, 'Test Equal Immediate', 'Test if a regi
 fmt_instr_title_description(ri(1), addi, 'Add Immediate', 'Add an immediate value to a register.').
 fmt_instr_title_description(ri(1), andi, 'AND Immediate', 'Perform a bitwise AND between a register and an immediate value.').
 fmt_instr_title_description(ri(1), ori, 'OR Immediate', 'Perform a bitwise OR between a register and an immediate value.').
-
 fmt_instr_title_description(ri(1), xori, 'XOR Immediate', 'Perform a bitwise XOR between a register and an immediate value.').
 fmt_instr_title_description(ri(1), addicy, 'Add Immediate with Carry', 'Add an immediate value and the carry bit to a register.').
 fmt_instr_title_description(ri(1), subicy, 'Subtract Immediate with Carry', 'Sutract an immediate value and the carry bit from a register.').
 fmt_instr_title_description(ri(1), lsr, 'Logical Shift Right', 'Perform a logical shift right on a register by an immediate value.').
 fmt_instr_title_description(ri(1), lsl, 'Logical Shift Left', 'Perform a logical shift left on a register by an immediate value.').
 fmt_instr_title_description(ri(1), asr, 'Arithmetic Shift Right', 'Perform an arithmetic shift right on a register by an immediate value.').
+fmt_instr_title_description(ri(1), tbitm, '', '').
+fmt_instr_title_description(ri(1), cbitm, '', '').
+fmt_instr_title_description(ri(1), sbitm, '', '').
 
 fmt_instr_title_description(rr(1), add, 'Add', 'Add the values of two registers.').
 fmt_instr_title_description(rr(1), sub, 'Subtract', 'Subtract the value of one register from another.').
@@ -210,6 +211,8 @@ fmt_instr_title_description(o, 'prsv.gp', 'Preserve $GP', 'Preserve the value of
 fmt_instr_title_description(o, 'rstr.gp', 'Restore $GP', 'Restore the value of the `$GP` register from the stack.').
 fmt_instr_title_description(o, 'prsv.cc', 'Preserve $CC', 'Preserve the value of the `$CC` register onto the stack.').
 fmt_instr_title_description(o, 'rstr.cc', 'Restore $CC', 'Restore the value of the `$CC` register from the stack.').
+fmt_instr_title_description(o, sleep, 'Sleep', 'Puts processor into low-power sleep mode.').
+fmt_instr_title_description(o, vijt, 'Valid Indirect Jump Target', 'When `$CC.jt` is `1`, the `callr` and `jr` instructions must jump to one of these instructions or an exception is raised.').
 
 %%%%%%%%%%%%%%%%%%%%%%%%% Synthetic Instructions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -257,6 +260,15 @@ sysregname_name_size_description(kr, 'Kernel Return',   16, 'Holds the value of 
 % I considered having two 32-bit system registers for doing multiplication, but instead I'd like to just use one.
 % You could eliminate this one too, but `mulstep` would become a 4-register instruction (i.e. `mulstep x:y, w:v`).
 sysregname_name_size_description(mp, 'Multiplication Product', 32, 'Holds the accumulating product during a multiplication.').
+
+conditioncode_info(cy, info{
+    title: 'Carry',
+    descr: 'After an `addcy` or `subcy` instruction, this flag is set if there was an arithmetic carry-out.'
+}).
+conditioncode_info(jt, info{
+    title: 'Jump Target Validation',
+    descr: 'When enabled, processor raises exception if an indirect jump does not land on a `vijt` instruction.'
+}).
 
 %%%%%%%%%%%%%%%%%%%%%%% Instruction Details %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

@@ -11,13 +11,13 @@
 | [`subr`](#instruction-format-subr) | Subroutine Call | 1 | 1 | 100% |
 | [`b`](#instruction-format-b) | Branch | 4 | 3 | 75% |
 | [`li`](#instruction-format-li) | Load Immediate | 2 | 2 | 100% |
-| [`ri(_)`](#instruction-format-ri_) | Register-immediate | 48 | 22 | 46% |
+| [`ri(_)`](#instruction-format-ri_) | Register-immediate | 48 | 25 | 52% |
 | [`ext`](#instruction-format-ext) | Reserved for Extension | 4096 | 0 | 0% |
 | [`rrr`](#instruction-format-rrr) | Register-register-register | 4 | 1 | 25% |
 | [`rr(_)`](#instruction-format-rr_) | Register-register | 28 | 14 | 50% |
-| [`r(_)`](#instruction-format-r_) | Register | 28 | 12 | 43% |
-| [`o`](#instruction-format-o) | Opcode | 32 | 27 | 84% |
-|  | **Totals (excluding `ext`)** | **151** | **86** | **57%** |
+| [`r(_)`](#instruction-format-r_) | Register | 24 | 12 | 50% |
+| [`o`](#instruction-format-o) | Opcode | 64 | 29 | 45% |
+|  | **Totals (excluding `ext`)** | **179** | **91** | **51%** |
 
 
 
@@ -48,11 +48,13 @@
 |  |  |  |  | [`lsr`](#the-lsr-instruction) |  |  |  | [`prsv.ts`](#the-prsvts-instruction) |
 |  |  |  |  | [`lsl`](#the-lsl-instruction) |  |  |  | [`rstr.ts`](#the-rstrts-instruction) |
 |  |  |  |  | [`asr`](#the-asr-instruction) |  |  |  | [`prsv.ra`](#the-prsvra-instruction) |
-|  |  |  |  |  |  |  |  | [`rstr.ra`](#the-rstrra-instruction) |
-|  |  |  |  |  |  |  |  | [`prsv.gp`](#the-prsvgp-instruction) |
-|  |  |  |  |  |  |  |  | [`rstr.gp`](#the-rstrgp-instruction) |
+|  |  |  |  | [`tbitm`](#the-tbitm-instruction) |  |  |  | [`rstr.ra`](#the-rstrra-instruction) |
+|  |  |  |  | [`cbitm`](#the-cbitm-instruction) |  |  |  | [`prsv.gp`](#the-prsvgp-instruction) |
+|  |  |  |  | [`sbitm`](#the-sbitm-instruction) |  |  |  | [`rstr.gp`](#the-rstrgp-instruction) |
 |  |  |  |  |  |  |  |  | [`prsv.cc`](#the-prsvcc-instruction) |
 |  |  |  |  |  |  |  |  | [`rstr.cc`](#the-rstrcc-instruction) |
+|  |  |  |  |  |  |  |  | [`sleep`](#the-sleep-instruction) |
+|  |  |  |  |  |  |  |  | [`vijt`](#the-vijt-instruction) |
 
 ## Synthetic Instructions
 
@@ -82,7 +84,7 @@
 | [`subr`](#format-subr) | `101iiiiiiiiiiiii` | 1 | 1 | 100% | `imm13` in `[-4096, 4095]` or `[0, 8191]` |
 | [`b`](#format-b) | `1001ooiiiiiiiiii` | 4 | 3 | 75% | `imm10` in `[-512, 511]` or `[0, 1023]` |
 | [`li`](#format-li) | `1000oiiiiiiiirrr` | 2 | 2 | 100% | `imm8` in `[-128, 127]` or `[0, 255]` |
-| [`ri(1)`](#format-ri1) | `01oooooiiiiiirrr` | 32 | 22 | 69% | `imm6` in `[-32, 31]` or `[0, 63]` |
+| [`ri(1)`](#format-ri1) | `01oooooiiiiiirrr` | 32 | 25 | 78% | `imm6` in `[-32, 31]` or `[0, 63]` |
 | [`ri(2)`](#format-ri2) | `001ooooiiiiiirrr` | 16 | 0 | 0% | `imm6` in `[-32, 31]` or `[0, 63]` |
 | [`ext`](#format-ext) | `0001oooooooooooo` | 4096 | 0 | 0% |  |
 | [`rrr`](#format-rrr) | `00001ootttsssrrr` | 4 | 1 | 25% |  |
@@ -91,8 +93,7 @@
 | [`rr(3)`](#format-rr3) | `00000001oosssrrr` | 4 | 2 | 50% |  |
 | [`r(1)`](#format-r1) | `000000001oooorrr` | 16 | 8 | 50% |  |
 | [`r(2)`](#format-r2) | `0000000001ooorrr` | 8 | 4 | 50% |  |
-| [`r(3)`](#format-r3) | `00000000001oorrr` | 4 | 0 | 0% |  |
-| [`o`](#format-o) | `00000000000ooooo` | 32 | 27 | 84% |  |
+| [`o`](#format-o) | `0000000000oooooo` | 64 | 29 | 45% |  |
 
 ### Legend
 
@@ -526,7 +527,7 @@ let ptr := ($GP\u+zxt(disp)and65534)\u;
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b01100 | `0101100iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `ri(1)` = 0b01 | 0b11000 | `0111000iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -553,7 +554,7 @@ b_push($TS, bit==1)
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b00111 | `0100111iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `ri(1)` = 0b01 | 0b01101 | `0101101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -580,7 +581,7 @@ rd <- rd and mask
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b01101 | `0101101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+| `ri(1)` = 0b01 | 0b11001 | `0111001iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
 
 ###### Semantics
 
@@ -970,6 +971,81 @@ rd <- rd<<imm
 ------------------------------------------------------------
 let sign_extension := sxt(bit(rd, 15)-1)<<reg_size_bits-imm;
 rd <- rd>>imm or sign_extension
+```
+
+--------------
+
+##### The `tbitm` Instruction
+
+**Test Bit in Memory** --- 
+
+###### Examples
+
+- `tbitm [x], 3`
+
+###### Layout
+
+
+| Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
+|:---:|:---:|:---:|:---:|:---:|
+| `ri(1)` = 0b01 | 0b11100 | `0111100iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+
+###### Semantics
+
+```
+[imm(imm), reg(rs)]
+-------------------
+todo
+```
+
+--------------
+
+##### The `cbitm` Instruction
+
+**Clear Bit in Memory** --- 
+
+###### Examples
+
+- `tbitm [x], 3`
+
+###### Layout
+
+
+| Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
+|:---:|:---:|:---:|:---:|:---:|
+| `ri(1)` = 0b01 | 0b01111 | `0101111iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+
+###### Semantics
+
+```
+[imm(imm), reg(rs)]
+-------------------
+todo
+```
+
+--------------
+
+##### The `sbitm` Instruction
+
+**Set Bit in Memory** --- 
+
+###### Examples
+
+- `tbitm [x], 3`
+
+###### Layout
+
+
+| Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
+|:---:|:---:|:---:|:---:|:---:|
+| `ri(1)` = 0b01 | 0b11101 | `0111101iiiiiirrr` | 6 | `imm6` in `[-32, 31]` or `[0, 63]` |
+
+###### Semantics
+
+```
+[imm(imm), reg(rs)]
+-------------------
+todo
 ```
 
 --------------
@@ -1657,11 +1733,6 @@ todo
 
 --------------
 
-#### Format `r(3)`
-
-
-![../assets/r(3).svg](../assets/r(3).svg)
-
 ### Instruction Format `o`
 
 
@@ -1679,7 +1750,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b00000 | `0000000000000000` |
+| `o` = 0b0000000000 | 0b000000 | `0000000000000000` |
 
 ###### Semantics
 
@@ -1700,7 +1771,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b00110 | `0000000000000110` |
+| `o` = 0b0000000000 | 0b000110 | `0000000000000110` |
 
 ###### Semantics
 
@@ -1721,7 +1792,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b00010 | `0000000000000010` |
+| `o` = 0b0000000000 | 0b000010 | `0000000000000010` |
 
 ###### Semantics
 
@@ -1742,7 +1813,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b00111 | `0000000000000111` |
+| `o` = 0b0000000000 | 0b000111 | `0000000000000111` |
 
 ###### Semantics
 
@@ -1763,7 +1834,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b000110 | `00000000000000110` |
+| `o` = 0b0000000000 | 0b000110 | `0000000000000110` |
 
 ###### Semantics
 
@@ -1784,7 +1855,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b000111 | `00000000000000111` |
+| `o` = 0b0000000000 | 0b000111 | `0000000000000111` |
 
 ###### Semantics
 
@@ -1805,7 +1876,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b00010 | `0000000000000010` |
+| `o` = 0b0000000000 | 0b000100 | `0000000000000100` |
 
 ###### Semantics
 
@@ -1826,7 +1897,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b01010 | `0000000000001010` |
+| `o` = 0b0000000000 | 0b001010 | `0000000000001010` |
 
 ###### Semantics
 
@@ -1847,7 +1918,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b01011 | `0000000000001011` |
+| `o` = 0b0000000000 | 0b001011 | `0000000000001011` |
 
 ###### Semantics
 
@@ -1868,7 +1939,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b000011 | `00000000000000011` |
+| `o` = 0b0000000000 | 0b000011 | `0000000000000011` |
 
 ###### Semantics
 
@@ -1889,7 +1960,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b000010 | `00000000000000010` |
+| `o` = 0b0000000000 | 0b000010 | `0000000000000010` |
 
 ###### Semantics
 
@@ -1910,7 +1981,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b010011 | `00000000000010011` |
+| `o` = 0b0000000000 | 0b010011 | `0000000000010011` |
 
 ###### Semantics
 
@@ -1931,7 +2002,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b010010 | `00000000000010010` |
+| `o` = 0b0000000000 | 0b010010 | `0000000000010010` |
 
 ###### Semantics
 
@@ -1952,7 +2023,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b01101 | `0000000000001101` |
+| `o` = 0b0000000000 | 0b001101 | `0000000000001101` |
 
 ###### Semantics
 
@@ -1973,7 +2044,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b00111 | `0000000000000111` |
+| `o` = 0b0000000000 | 0b000111 | `0000000000000111` |
 
 ###### Semantics
 
@@ -1994,7 +2065,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b01100 | `0000000000001100` |
+| `o` = 0b0000000000 | 0b001100 | `0000000000001100` |
 
 ###### Semantics
 
@@ -2015,7 +2086,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b01000 | `0000000000001000` |
+| `o` = 0b0000000000 | 0b001000 | `0000000000001000` |
 
 ###### Semantics
 
@@ -2036,7 +2107,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b11001 | `0000000000011001` |
+| `o` = 0b0000000000 | 0b011001 | `0000000000011001` |
 
 ###### Semantics
 
@@ -2057,7 +2128,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b10001 | `0000000000010001` |
+| `o` = 0b0000000000 | 0b010001 | `0000000000010001` |
 
 ###### Semantics
 
@@ -2078,7 +2149,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b110000 | `00000000000110000` |
+| `o` = 0b0000000000 | 0b110000 | `0000000000110000` |
 
 ###### Semantics
 
@@ -2099,7 +2170,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b100000 | `00000000000100000` |
+| `o` = 0b0000000000 | 0b100000 | `0000000000100000` |
 
 ###### Semantics
 
@@ -2120,7 +2191,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b110001 | `00000000000110001` |
+| `o` = 0b0000000000 | 0b110001 | `0000000000110001` |
 
 ###### Semantics
 
@@ -2141,7 +2212,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b100001 | `00000000000100001` |
+| `o` = 0b0000000000 | 0b100001 | `0000000000100001` |
 
 ###### Semantics
 
@@ -2162,7 +2233,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b01101 | `0000000000001101` |
+| `o` = 0b0000000000 | 0b001101 | `0000000000001101` |
 
 ###### Semantics
 
@@ -2183,7 +2254,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b01001 | `0000000000001001` |
+| `o` = 0b0000000000 | 0b001001 | `0000000000001001` |
 
 ###### Semantics
 
@@ -2204,7 +2275,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b00111 | `0000000000000111` |
+| `o` = 0b0000000000 | 0b000111 | `0000000000000111` |
 
 ###### Semantics
 
@@ -2225,7 +2296,53 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b00000000000 | 0b00101 | `0000000000000101` |
+| `o` = 0b0000000000 | 0b000101 | `0000000000000101` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `sleep` Instruction
+
+**Sleep** --- Puts processor into low-power sleep mode.
+
+###### Examples
+
+- `sleep`
+
+###### Layout
+
+
+| Format Prefix | Opcode | Bit Layout |
+|:---:|:---:|:---:|
+| `o` = 0b0000000000 | 0b000001 | `0000000000000001` |
+
+###### Semantics
+
+```
+[]
+----
+todo
+```
+
+--------------
+
+##### The `vijt` Instruction
+
+**Valid Indirect Jump Target** --- When `$CC.jt` is `1`, the `callr` and `jr` instructions must jump to one of these instructions or an exception is raised.
+
+###### Layout
+
+
+| Format Prefix | Opcode | Bit Layout |
+|:---:|:---:|:---:|
+| `o` = 0b0000000000 | 0b000101 | `0000000000000101` |
 
 ###### Semantics
 

@@ -465,6 +465,36 @@ instr_info(asr, info{
     ),
     tags: [sxt, bitwise, shift, right]
 }).
+instr_info(tbitm, info{
+	title: 'Test Bit in Memory',
+	descr: '',
+	ex: ['tbitm [x], 3'],
+	operands: [imm(?imm), reg(?rs)],
+	sem: (
+		  todo
+    ),
+    tags: [ts, bit, bitwise, mem]
+}).
+instr_info(cbitm, info{
+	title: 'Clear Bit in Memory',
+	descr: '',
+	ex: ['tbitm [x], 3'],
+	operands: [imm(?imm), reg(?rs)],
+	sem: (
+		  todo
+    ),
+    tags: [ts, bit, bitwise, clear, mem]
+}).
+instr_info(sbitm, info{
+	title: 'Set Bit in Memory',
+	descr: '',
+	ex: ['tbitm [x], 3'],
+	operands: [imm(?imm), reg(?rs)],
+	sem: (
+		  todo
+    ),
+    tags: [ts, bit, bitwise, set, mem]
+}).
 
 instr_info(add, info{
 	title: 'Add',
@@ -644,7 +674,7 @@ instr_info(callr, info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [pc, ra]
+    tags: [pc, ra, jump, indirect]
 }).
 instr_info(jr, info{
 	title: 'Jump Register',
@@ -652,7 +682,7 @@ instr_info(jr, info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [pc]
+    tags: [pc, jump, indirect]
 }).
 instr_info(neg, info{
 	title: 'Negate',
@@ -918,4 +948,20 @@ instr_info('rstr.cc', info{
 	operands: [],
 	sem: todo,
     tags: [sp, prsv_rstr, rstr, cc]
+}).
+instr_info(sleep, info{
+	title: 'Sleep',
+	descr: 'Puts processor into low-power sleep mode.',
+	ex: ['sleep'],
+	operands: [],
+	sem: todo,
+    tags: [cc, sleep, interrupts]
+}).
+instr_info(vijt, info{
+	title: 'Valid Indirect Jump Target',
+	descr: 'When `$CC.jt` is `1`, the `callr` and `jr` instructions must jump to one of these instructions or an exception is raised.',
+	ex: [],
+	operands: [],
+	sem: todo,
+    tags: [pc, indirect, jump, security]
 }).
