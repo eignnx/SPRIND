@@ -4,7 +4,7 @@
 
 #once
 
-#const ISA_VERSION = "0.2.0"
+#const ISA_VERSION = "0.2.1"
 
 #ruledef Reg {
   sp => 0b000
