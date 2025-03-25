@@ -25,7 +25,7 @@
 
 'incompatible bit sizes'(instruction(Instr), Error) :-
     sem:instr_info(Instr, Info),
-    isa:fmt_instr_title_description(Fmt, Instr, _, _),
+    isa:fmt_instr(Fmt, Instr),
     derive:fmt_opcodebits_immbits(Fmt, _, ImmBits),
     maplist(
         {ImmBits}/[Op, OpName-OpTy]>>operand_immbits_name_type(Op, ImmBits, OpName, OpTy),

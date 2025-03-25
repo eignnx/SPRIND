@@ -5,7 +5,6 @@
     genericfmt/1,
     fmt_prefix/2,
     fmt_operands/2,
-    fmt_instr_title/3,
     fmt_maxopcodes/2,
     total_opcode_count_minmax/2,
     total_opcode_count_minmax/3,
@@ -45,8 +44,6 @@ genericfmt(GFmt) :-
 fmt_operands(Fmt, Operands) :-
     isa:fmt_operands_description(Fmt, Operands, _).
 
-
-fmt_instr_title(Fmt, Instr, Title) :- isa:fmt_instr_title_description(Fmt, Instr, Title, _).
 
 fmt_assignedinstrcount(Fmt, AssignedCount) :-
     fmt_assignedinstrcount(Fmt, AssignedCount, _ReservedCount).
