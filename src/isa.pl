@@ -17,7 +17,8 @@
     gprreg/1,
     sysreg/1,
     fmt_instr/2,
-    fmt_genericfmt/2
+    fmt_genericfmt/2,
+    cpu_exception/1
 ]).
 
 :- set_prolog_flag(double_quotes, chars).
@@ -264,10 +265,16 @@ conditioncode_info(cy, info{
     title: 'Carry',
     descr: 'After an `addcy` or `subcy` instruction, this flag is set if there was an arithmetic carry-out.'
 }).
-conditioncode_info(jt, info{
-    title: 'Jump Target Validation',
+conditioncode_info(jtve, info{
+    title: 'Jump Target Validation Enable',
     descr: 'When enabled, processor raises exception if an indirect jump does not land on a `vijt` instruction.'
 }).
+conditioncode_info(jtvr, info{
+    title: 'Jump Target Validation Request',
+    descr: 'When beginning execution of an instruction while this bit is `1`, the instruction must be `vijt` or an exception will be raised.'
+}).
+
+cpu_exception('ILLINSTR').
 
 %%%%%%%%%%%%%%%%%%%%%%% Instruction Details %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

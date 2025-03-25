@@ -9,6 +9,7 @@
 :- use_module(gen_asm_spec, [report/0 as gen_asm_spec_report]).
 
 generate_spec :-
+    run_validations_wrapper,
     call_time(
         utils:warn_if_nondet(gen_spec:generate_spec_),
         Time
@@ -25,16 +26,20 @@ generate_spec_ :-
 end.
 
 gen_spec_outline(Lvl) :-
+    run_validations_wrapper,
+    markdown:emit_heading(Lvl, 'SPRIND Instruction Set Architecture Specification'),
+    markdown:emit_heading(s(Lvl), 'Outline'),
+    format('- [Machine Overview](machine-overview.md): Describes registers and instruction formats.~n'),
+    format('- [Instruction Listing](instruction-listing.md): Lists and defines all instructions.~n'),
+end.
+
+run_validations_wrapper :-
     catch(validate:run_validations, error(E), (
         format('~n> !!! '),
         numbervars(E),
         write_term(E, [numbervars(true)]),
         format('~n~n')
     )), % validate:run_validations,
-    markdown:emit_heading(Lvl, 'SPRIND Instruction Set Architecture Specification'),
-    markdown:emit_heading(s(Lvl), 'Outline'),
-    format('- [Machine Overview](machine-overview.md): Describes registers and instruction formats.~n'),
-    format('- [Instruction Listing](instruction-listing.md): Lists and defines all instructions.~n'),
 end.
 
 

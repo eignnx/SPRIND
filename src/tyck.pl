@@ -280,6 +280,9 @@ rval_consteval(#Sym, #N) :-
 
 stmt_inference(Tcx, todo, Tcx).
 
+stmt_inference(Tcx, exception(E), Tcx) :-
+    isa:cpu_exception(E) -> true ; throw(error('invalid exception'(E), _)).
+
 stmt_inference(Tcx, b_push(LVal, RVal), Tcx) :-
     inference(Tcx, LVal, LValTy),
     int_ty(LValTy),
@@ -291,11 +294,11 @@ stmt_inference(Tcx, b_push(LVal, RVal), Tcx) :-
     ).
 
 stmt_inference(Tcx, if(Cond, Consq), Tcx) :-
-    (inference(Tcx, Cond, i\1) -> true ; throw(error('if condition must be type `i\\1`'(Cond)))),
+    (inference(Tcx, Cond, i\1) -> true ; throw(error('if condition must be type `i\\1`'(Cond), _))),
     stmt_inference(Tcx, Consq, _).
 
 stmt_inference(Tcx, if(Cond, Consq, Alt), Tcx) :-
-    (inference(Tcx, Cond, i\1) -> true ; throw(error('if condition must be type `i\\1`'(Cond)))),
+    (inference(Tcx, Cond, i\1) -> true ; throw(error('if condition must be type `i\\1`'(Cond), _))),
     stmt_inference(Tcx, Consq, _),
     stmt_inference(Tcx, Alt, _).
 

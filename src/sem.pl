@@ -78,6 +78,7 @@ path(Atom) --> { atom(Atom) }.
 path(Parent/Child) --> { atom(Child) }, path(Parent).
 
 stmt_(todo) --> [].
+stmt_(exception(E)) --> { isa:cpu_exception(E) }.
 stmt_(b_push(LVal, RVal)) --> lval(LVal), rval(RVal).
 stmt_(if(Cond, Consq)) --> rval(Cond), stmt(Consq).
 stmt_(if(Cond, Consq, Alt)) --> rval(Cond), stmt(Consq), stmt(Alt).
@@ -96,6 +97,8 @@ def(attr(cpu/alu/carryout), signal).
 def(attr(cpu/alu/overflow), signal).
 def(#carry_flag_bit, _).
 def(#overflow_flag_bit, _).
+def(#jmp_tgt_validation_req_flag_bit, _).
+def(#jmp_tgt_validation_en_flag_bit, _).
 def(#subr_align, _).
 def(#reg_size_bits, Size) :- isa:register_size(Size).
 
@@ -128,6 +131,17 @@ user:portray(if(Cond, Consq)) :-
     format(codes(ConsqCodes), '~p', [Consq]),
     indent_lines('    ', ConsqCodes, ConsqIndented),
     format('~w~n', [ConsqIndented]),
+    format('}').
+
+user:portray(if(Cond, Consq, Alt)) :-
+    format('if ~p {~n', [Cond]),
+    format(codes(ConsqCodes), '~p', [Consq]),
+    indent_lines('    ', ConsqCodes, ConsqIndented),
+    format('~w~n', [ConsqIndented]),
+    format('} else {~n'),
+    format(codes(AltCodes), '~p', [Alt]),
+    indent_lines('    ', AltCodes, AltIndented),
+    format('~w~n', [AltIndented]),
     format('}').
 
 emit_semantics_codeblock(Info) :-
@@ -470,28 +484,26 @@ instr_info(tbitm, info{
 	descr: '',
 	ex: ['tbitm [x], 3'],
 	operands: [imm(?imm), reg(?rs)],
-	sem: (
-		  todo
-    ),
+	sem: b_push($$ts, bit([?rs], ?imm)),
     tags: [ts, bit, bitwise, mem]
 }).
 instr_info(cbitm, info{
 	title: 'Clear Bit in Memory',
 	descr: '',
-	ex: ['tbitm [x], 3'],
+	ex: ['cbitm [x], 3'],
 	operands: [imm(?imm), reg(?rs)],
 	sem: (
-		  todo
+		[?rs] <- [?rs] and ~(#1 << ?imm)
     ),
     tags: [ts, bit, bitwise, clear, mem]
 }).
 instr_info(sbitm, info{
 	title: 'Set Bit in Memory',
 	descr: '',
-	ex: ['tbitm [x], 3'],
+	ex: ['sbitm [x], 3'],
 	operands: [imm(?imm), reg(?rs)],
 	sem: (
-		  todo
+		[?rs] <- [?rs] or (#1 << ?imm)
     ),
     tags: [ts, bit, bitwise, set, mem]
 }).
@@ -624,10 +636,10 @@ instr_info(mulstep, info{
 	operands: [reg(?multiplicand_hi), reg(?multiplicand_lo), reg(?multiplier)],
 	sem: (
         ?mask = ~((?multiplier and #1) - #1);
-        ?masked_multiplicand_lo = ?multiplicand_lo and ?mask;
-        ?masked_multiplicand_hi = ?multiplicand_hi and ?mask;
-        lo($$mp) <- lo($$mp) + ?masked_multiplicand_lo;
-        hi($$mp) <- hi($$mp) + ?masked_multiplicand_hi + attr(cpu/alu/carryout);
+        ?masked_lo = ?multiplicand_lo and ?mask;
+        ?masked_hi = ?multiplicand_hi and ?mask;
+        lo($$mp) <- lo($$mp) + ?masked_lo;
+        hi($$mp) <- hi($$mp) + ?masked_hi + attr(cpu/alu/carryout);
         ?shift_cout = bit(?multiplicand_lo, (#reg_size_bits - #1));
         ?multiplicand_lo <- ?multiplicand_lo << #1;
         ?multiplicand_hi <- ?multiplicand_hi << #1 + ?shift_cout;
@@ -962,6 +974,13 @@ instr_info(vijt, info{
 	descr: 'When `$CC.jt` is `1`, the `callr` and `jr` instructions must jump to one of these instructions or an exception is raised.',
 	ex: [],
 	operands: [],
-	sem: todo,
+	sem: (
+		if(bit($$cc, #jmp_tgt_validation_en_flag_bit),
+			if(bit($$cc, #jmp_tgt_validation_req_flag_bit),
+				bit($$cc, #jmp_tgt_validation_req_flag_bit) <- #0,
+				exception('ILLINSTR')
+			)
+		)
+	),
     tags: [pc, indirect, jump, security]
 }).

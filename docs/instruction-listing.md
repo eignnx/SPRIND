@@ -994,8 +994,8 @@ rd <- rd>>imm or sign_extension
 
 ```
 [imm(imm), reg(rs)]
--------------------
-todo
+---------------------------
+b_push($TS, bit([rs], imm))
 ```
 
 --------------
@@ -1006,7 +1006,7 @@ todo
 
 ###### Examples
 
-- `tbitm [x], 3`
+- `cbitm [x], 3`
 
 ###### Layout
 
@@ -1019,8 +1019,8 @@ todo
 
 ```
 [imm(imm), reg(rs)]
--------------------
-todo
+-------------------------
+[rs] <- [rs]and~ (1<<imm)
 ```
 
 --------------
@@ -1031,7 +1031,7 @@ todo
 
 ###### Examples
 
-- `tbitm [x], 3`
+- `sbitm [x], 3`
 
 ###### Layout
 
@@ -1044,8 +1044,8 @@ todo
 
 ```
 [imm(imm), reg(rs)]
--------------------
-todo
+----------------------
+[rs] <- [rs]or(1<<imm)
 ```
 
 --------------
@@ -1082,12 +1082,12 @@ todo
 
 ```
 [reg(multiplicand_hi), reg(multiplicand_lo), reg(multiplier)]
------------------------------------------------------------------
+-------------------------------------------------------------
 let mask := ~ ((multiplier and 1)-1);
-let masked_multiplicand_lo := multiplicand_lo and mask;
-let masked_multiplicand_hi := multiplicand_hi and mask;
-lo($MP) <- lo($MP)+masked_multiplicand_lo;
-hi($MP) <- hi($MP)+masked_multiplicand_hi+attr(cpu/alu/carryout);
+let masked_lo := multiplicand_lo and mask;
+let masked_hi := multiplicand_hi and mask;
+lo($MP) <- lo($MP)+masked_lo;
+hi($MP) <- hi($MP)+masked_hi+attr(cpu/alu/carryout);
 let shift_cout := bit(multiplicand_lo, reg_size_bits-1);
 multiplicand_lo <- multiplicand_lo<<1;
 multiplicand_hi <- multiplicand_hi<<1+shift_cout;
@@ -2348,8 +2348,14 @@ todo
 
 ```
 []
-----
-todo
+------------------------------------------------------
+if bit($CC, jmp_tgt_validation_en_flag_bit) {
+    if bit($CC, jmp_tgt_validation_req_flag_bit) {
+        bit($CC, jmp_tgt_validation_req_flag_bit) <- 0
+    } else {
+        exception(ILLINSTR)
+    }
+}
 ```
 
 --------------
