@@ -17,5 +17,9 @@
   b  => 0b111
 }
 
+#ruledef Instruction {
+	lw {dst: Reg}, [{base: Reg} + {disp: s7}] => 0b10 @ 0`2 @ disp @ base @ dst
+}
+
 #const SPRIND_SUBR_ALIGN = 4
 

@@ -2,6 +2,19 @@
 
 :- use_module(isa).
 :- use_module(derive).
+:- use_module(utils).
+:- use_module(library(dcg/basics)).
+:- use_module(library(dcg/high_order)).
+:- op(20, fx, #).
+:- op(20, fx, ?).
+:- op(200, fx, ~).
+:- op(1050, xfx, <-).
+:- op(600, yfx, xor).
+:- op(600, yfx, and).
+:- op(600, yfx, or).
+:- op(600, yfx, <<).
+:- op(600, yfx, >>).
+:- op(150, yfx, \).
 
 report :-
     format(';~n'),
@@ -19,16 +32,65 @@ report :-
     ), Regs),
     format('}~n~n'),
 
+    write_phrase((
+        ruledef('Instruction', [
+            instr(lw, [
+                decl_reg(dst),
+                bracks((decl_reg(base), ` + `, decl(disp, s7)))
+            ])-joined([
+                #'0b10',
+                #0\2,
+                ?disp,
+                ?base,
+                ?dst
+            ])
+        ])
+    )), nl, nl,
+
 
     derive:subr_byte_alignment(SubrAlign),
     format('#const SPRIND_SUBR_ALIGN = ~d~n~n', SubrAlign),
 end.
 
-ruledef(RuleName, Rules) :-
-    format('#ruledef ~w {~n', [RuleName]),
-    maplist([Lhs-Rhs]>>format('  ~w => ~w~n', [Lhs, Rhs]), Rules),
-    format('}~n~n'),
+ruledef(Name, Body) -->
+    `#ruledef `, atom(Name), ` {`, nl,
+        ruledef_body_expansion(Body),
+    `}`,
 end.
+
+ruledef_body_expansion([]) --> ``.
+ruledef_body_expansion([Lhs-Rhs | Rest]) -->
+    `\t`, Lhs, ` => `, Rhs, nl,
+    ruledef_body_expansion(Rest),
+end.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+nl --> `\n`.
+end --> ``.
+braces(Content) --> `{`, Content, `}`.
+bracks(Content) --> `[`, Content, `]`.
+parens(Content) --> `(`, Content, `)`.
+
+decl(Ident, Type) --> braces((atom(Ident), `: `, atom(Type))).
+decl_reg(Ident) --> decl(Ident, 'Reg').
+
+instr(Name, []) --> atom(Name).
+instr(Name, [A | As]) --> atom(Name), ` `, args([A | As]).
+args([]) --> ``.
+args([A]) --> A.
+args([A, B | Rest]) --> A, `, `, args([B | Rest]).
+
+joined([]) --> ``.
+joined([A]) --> A.
+joined([A, B | Rest]) --> A, ` @ `, joined([B | Rest]).
+
+#Literal --> atom(Literal).
+A\B --> A, `\``, integer(B).
+?A --> atom(A).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 /*
 

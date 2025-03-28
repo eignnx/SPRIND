@@ -138,8 +138,8 @@
 ###### Semantics
 
 ```
-[simm(simm), reg(rs), reg(rd)]
-------------------------------
+[simm(simm), reg(r, rs), reg(s, rd)]
+------------------------------------
 let ptr := (rs\s+sxt(simm))\u;
 rd <- zxt([ptr])
 ```
@@ -164,7 +164,7 @@ rd <- zxt([ptr])
 ###### Semantics
 
 ```
-[simm(simm), reg(rs), reg(rd)]
+[simm(simm), reg(r, rs), reg(s, rd)]
 --------------------------------------
 let ptr := (rs\s+sxt(simm)and-2\16)\u;
 rd <- {[ptr+1], [ptr]}
@@ -190,8 +190,8 @@ rd <- {[ptr+1], [ptr]}
 ###### Semantics
 
 ```
-[simm(simm), reg(rd), reg(rs)]
-------------------------------
+[simm(simm), reg(r, rd), reg(s, rs)]
+------------------------------------
 let ptr := rd\s+sxt(simm);
 [ptr\u] <- lo(rs)
 ```
@@ -216,7 +216,7 @@ let ptr := rd\s+sxt(simm);
 ###### Semantics
 
 ```
-[simm(simm), reg(rd), reg(rs)]
+[simm(simm), reg(r, rd), reg(s, rs)]
 --------------------------------------
 let ptr := (rd\s+sxt(simm)and65534)\u;
 [ptr] <- lo(rs);
@@ -372,8 +372,8 @@ if !(b_pop($TS)) {
 ###### Semantics
 
 ```
-[simm(simm), reg(rd)]
----------------------
+[simm(simm), reg(r, rd)]
+------------------------
 rd <- sxt(simm)
 ```
 
@@ -397,7 +397,7 @@ rd <- sxt(simm)
 ###### Semantics
 
 ```
-[imm(imm), reg(rd)]
+[imm(imm), reg(r, rd)]
 -----------------------
 rd <- rd<<8 or zxt(imm)
 ```
@@ -430,7 +430,7 @@ rd <- rd<<8 or zxt(imm)
 ###### Semantics
 
 ```
-[imm(disp), reg(rd)]
+[imm(disp), reg(r, rd)]
 ----------------------------
 rd <- zxt([$GP\u+zxt(disp)])
 ```
@@ -455,7 +455,7 @@ rd <- zxt([$GP\u+zxt(disp)])
 ###### Semantics
 
 ```
-[imm(disp), reg(rd)]
+[imm(disp), reg(r, rd)]
 ---------------------------------------
 let ptr := ($GP\u+zxt(disp)and65534)\u;
 rd <- {[ptr+1], [ptr]}
@@ -481,7 +481,7 @@ rd <- {[ptr+1], [ptr]}
 ###### Semantics
 
 ```
-[imm(disp), reg(rs)]
+[imm(disp), reg(r, rs)]
 ---------------------------
 [$GP\u+zxt(disp)] <- lo(rs)
 ```
@@ -506,7 +506,7 @@ rd <- {[ptr+1], [ptr]}
 ###### Semantics
 
 ```
-[imm(disp), reg(rs)]
+[imm(disp), reg(r, rs)]
 ---------------------------------------
 let ptr := ($GP\u+zxt(disp)and65534)\u;
 {[ptr+1], [ptr]} <- rs
@@ -532,7 +532,7 @@ let ptr := ($GP\u+zxt(disp)and65534)\u;
 ###### Semantics
 
 ```
-[imm(bit_idx), reg(rs)]
+[imm(bit_idx), reg(r, rs)]
 -------------------------------------
 let shamt := bitslice(bit_idx, 3..0);
 let bit := rs>>shamt\u and 1;
@@ -559,7 +559,7 @@ b_push($TS, bit==1)
 ###### Semantics
 
 ```
-[imm(bit_idx), reg(rd)]
+[imm(bit_idx), reg(r, rd)]
 -------------------------------------
 let idx := bitslice(bit_idx, 3..0)\u;
 let mask := ~ (1<<idx);
@@ -586,7 +586,7 @@ rd <- rd and mask
 ###### Semantics
 
 ```
-[imm(bit_idx), reg(rd)]
+[imm(bit_idx), reg(r, rd)]
 -------------------------------------
 let idx := bitslice(bit_idx, 3..0)\u;
 let mask := ~ (1<<idx);
@@ -613,7 +613,7 @@ rd <- rd or mask
 ###### Semantics
 
 ```
-[simm(simm), reg(rs)]
+[simm(simm), reg(r, rs)]
 ----------------------------------------------
 b_push($TS, compare(rs\s, <(s\16), sxt(simm)))
 ```
@@ -638,7 +638,7 @@ b_push($TS, compare(rs\s, <(s\16), sxt(simm)))
 ###### Semantics
 
 ```
-[simm(simm), reg(rs)]
+[simm(simm), reg(r, rs)]
 -----------------------------------------------
 b_push($TS, compare(rs\s, >=(s\16), sxt(simm)))
 ```
@@ -663,7 +663,7 @@ b_push($TS, compare(rs\s, >=(s\16), sxt(simm)))
 ###### Semantics
 
 ```
-[imm(imm), reg(rs)]
+[imm(imm), reg(r, rs)]
 ---------------------------------------------
 b_push($TS, compare(rs\u, <(u\16), zxt(imm)))
 ```
@@ -688,7 +688,7 @@ b_push($TS, compare(rs\u, <(u\16), zxt(imm)))
 ###### Semantics
 
 ```
-[imm(imm), reg(rs)]
+[imm(imm), reg(r, rs)]
 ----------------------------------------------
 b_push($TS, compare(rs\u, >=(u\16), zxt(imm)))
 ```
@@ -713,7 +713,7 @@ b_push($TS, compare(rs\u, >=(u\16), zxt(imm)))
 ###### Semantics
 
 ```
-[simm(simm), reg(rs)]
+[simm(simm), reg(r, rs)]
 ----------------------------
 b_push($TS, rs\s\=sxt(simm))
 ```
@@ -738,7 +738,7 @@ b_push($TS, rs\s\=sxt(simm))
 ###### Semantics
 
 ```
-[simm(simm), reg(rs)]
+[simm(simm), reg(r, rs)]
 ----------------------------
 b_push($TS, rs\s==sxt(simm))
 ```
@@ -763,8 +763,8 @@ b_push($TS, rs\s==sxt(simm))
 ###### Semantics
 
 ```
-[simm(simm), reg(rd)]
----------------------
+[simm(simm), reg(r, rd)]
+------------------------
 rd <- rd\s+sxt(simm)
 ```
 
@@ -788,8 +788,8 @@ rd <- rd\s+sxt(simm)
 ###### Semantics
 
 ```
-[simm(simm), reg(rd)]
-----------------------
+[simm(simm), reg(r, rd)]
+------------------------
 rd <- rd and sxt(simm)
 ```
 
@@ -813,8 +813,8 @@ rd <- rd and sxt(simm)
 ###### Semantics
 
 ```
-[simm(simm), reg(rd)]
----------------------
+[simm(simm), reg(r, rd)]
+------------------------
 rd <- rd or sxt(simm)
 ```
 
@@ -838,8 +838,8 @@ rd <- rd or sxt(simm)
 ###### Semantics
 
 ```
-[simm(simm), reg(rd)]
-----------------------
+[simm(simm), reg(r, rd)]
+------------------------
 rd <- rd xor sxt(simm)
 ```
 
@@ -863,7 +863,7 @@ rd <- rd xor sxt(simm)
 ###### Semantics
 
 ```
-[simm(simm), reg(rd)]
+[simm(simm), reg(r, rd)]
 -----------------------------------------------------
 rd <- rd\s+sxt(simm)+bit($CC, carry_flag_bit)\16\s;
 bit($CC, carry_flag_bit) <- attr(cpu/alu/carryout);
@@ -890,7 +890,7 @@ bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 ###### Semantics
 
 ```
-[simm(simm), reg(rd)]
+[simm(simm), reg(r, rd)]
 -----------------------------------------------------
 rd <- rd\s-sxt(simm)-bit($CC, carry_flag_bit)\16\s;
 bit($CC, carry_flag_bit) <- attr(cpu/alu/carryout);
@@ -917,8 +917,8 @@ bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 ###### Semantics
 
 ```
-[imm(imm), reg(rd)]
--------------------
+[imm(imm), reg(r, rd)]
+----------------------
 rd <- rd>>imm
 ```
 
@@ -942,8 +942,8 @@ rd <- rd>>imm
 ###### Semantics
 
 ```
-[imm(imm), reg(rd)]
--------------------
+[imm(imm), reg(r, rd)]
+----------------------
 rd <- rd<<imm
 ```
 
@@ -967,7 +967,7 @@ rd <- rd<<imm
 ###### Semantics
 
 ```
-[imm(imm), reg(rd)]
+[imm(imm), reg(r, rd)]
 ------------------------------------------------------------
 let sign_extension := sxt(bit(rd, 15)-1)<<reg_size_bits-imm;
 rd <- rd>>imm or sign_extension
@@ -993,7 +993,7 @@ rd <- rd>>imm or sign_extension
 ###### Semantics
 
 ```
-[imm(imm), reg(rs)]
+[imm(imm), reg(r, rs)]
 ---------------------------
 b_push($TS, bit([rs], imm))
 ```
@@ -1018,7 +1018,7 @@ b_push($TS, bit([rs], imm))
 ###### Semantics
 
 ```
-[imm(imm), reg(rs)]
+[imm(imm), reg(r, rs)]
 -------------------------
 [rs] <- [rs]and~ (1<<imm)
 ```
@@ -1043,7 +1043,7 @@ b_push($TS, bit([rs], imm))
 ###### Semantics
 
 ```
-[imm(imm), reg(rs)]
+[imm(imm), reg(r, rs)]
 ----------------------
 [rs] <- [rs]or(1<<imm)
 ```
@@ -1081,8 +1081,8 @@ b_push($TS, bit([rs], imm))
 ###### Semantics
 
 ```
-[reg(multiplicand_hi), reg(multiplicand_lo), reg(multiplier)]
--------------------------------------------------------------
+[reg(r, multiplicand_hi), reg(s, multiplicand_lo), reg(t, multiplier)]
+----------------------------------------------------------------------
 let mask := ~ ((multiplier and 1)-1);
 let masked_lo := multiplicand_lo and mask;
 let masked_hi := multiplicand_hi and mask;
@@ -1122,8 +1122,8 @@ multiplier <- multiplier>>1
 ###### Semantics
 
 ```
-[reg(rs), reg(rd)]
-------------------
+[reg(r, rs), reg(s, rd)]
+------------------------
 rd <- rd+rs
 ```
 
@@ -1147,8 +1147,8 @@ rd <- rd+rs
 ###### Semantics
 
 ```
-[reg(rs), reg(rd)]
-------------------
+[reg(r, rs), reg(s, rd)]
+------------------------
 rd <- rd-rs
 ```
 
@@ -1172,8 +1172,8 @@ rd <- rd-rs
 ###### Semantics
 
 ```
-[reg(rs), reg(rd)]
-------------------
+[reg(r, rs), reg(s, rd)]
+------------------------
 rd <- rd and rs
 ```
 
@@ -1197,8 +1197,8 @@ rd <- rd and rs
 ###### Semantics
 
 ```
-[reg(rs), reg(rd)]
-------------------
+[reg(r, rs), reg(s, rd)]
+------------------------
 rd <- rd or rs
 ```
 
@@ -1222,8 +1222,8 @@ rd <- rd or rs
 ###### Semantics
 
 ```
-[reg(rs), reg(rd)]
-------------------
+[reg(r, rs), reg(s, rd)]
+------------------------
 rd <- rd xor rs
 ```
 
@@ -1247,8 +1247,8 @@ rd <- rd xor rs
 ###### Semantics
 
 ```
-[reg(rs), reg(rd)]
-------------------
+[reg(r, rs), reg(s, rd)]
+------------------------
 rd <- rs
 ```
 
@@ -1272,7 +1272,7 @@ rd <- rs
 ###### Semantics
 
 ```
-[reg(rs), reg(rd)]
+[reg(r, rs), reg(s, rd)]
 -----------------------------------------------------
 rd <- rd+rs+bit($CC, carry_flag_bit)\16;
 bit($CC, carry_flag_bit) <- attr(cpu/alu/carryout);
@@ -1299,7 +1299,7 @@ bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 ###### Semantics
 
 ```
-[reg(rs), reg(rd)]
+[reg(r, rs), reg(s, rd)]
 -----------------------------------------------------
 rd <- rd-rs-bit($CC, carry_flag_bit)\16;
 bit($CC, carry_flag_bit) <- attr(cpu/alu/carryout);
@@ -1331,7 +1331,7 @@ bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 ###### Semantics
 
 ```
-[reg(r1), reg(r2)]
+[reg(r, r1), reg(s, r2)]
 -------------------------------------
 b_push($TS, compare(r1, <(s\16), r2))
 ```
@@ -1356,7 +1356,7 @@ b_push($TS, compare(r1, <(s\16), r2))
 ###### Semantics
 
 ```
-[reg(r1), reg(r2)]
+[reg(r, r1), reg(s, r2)]
 --------------------------------------
 b_push($TS, compare(r1, >=(s\16), r2))
 ```
@@ -1381,7 +1381,7 @@ b_push($TS, compare(r1, >=(s\16), r2))
 ###### Semantics
 
 ```
-[reg(r1), reg(r2)]
+[reg(r, r1), reg(s, r2)]
 -------------------------------------
 b_push($TS, compare(r1, <(u\16), r2))
 ```
@@ -1406,7 +1406,7 @@ b_push($TS, compare(r1, <(u\16), r2))
 ###### Semantics
 
 ```
-[reg(r1), reg(r2)]
+[reg(r, r1), reg(s, r2)]
 --------------------------------------
 b_push($TS, compare(r1, >=(u\16), r2))
 ```
@@ -1436,8 +1436,8 @@ b_push($TS, compare(r1, >=(u\16), r2))
 ###### Semantics
 
 ```
-[reg(r1), reg(r2)]
--------------------
+[reg(r, r1), reg(s, r2)]
+------------------------
 b_push($TS, r1\=r2)
 ```
 
@@ -1461,8 +1461,8 @@ b_push($TS, r1\=r2)
 ###### Semantics
 
 ```
-[reg(r1), reg(r2)]
--------------------
+[reg(r, r1), reg(s, r2)]
+------------------------
 b_push($TS, r1==r2)
 ```
 

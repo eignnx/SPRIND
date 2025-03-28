@@ -6,7 +6,8 @@
     peano_decimal/2,
     output_to_file/2,
     atom_slugified/2,
-    codes_slugified/2
+    codes_slugified/2,
+    write_phrase/1
 ]).
 
 :- use_module(library(clpfd)).
@@ -108,6 +109,14 @@ codes_slugified(Codes, Slug) :-
     atom_codes(Atom, Codes),
     atom_slugified(Atom, SlugAtom),
     atom_codes(SlugAtom, Slug),
+end.
+
+
+:- meta_predicate write_phrase(0).
+
+write_phrase(Nonterminal) :-
+    phrase(Nonterminal, Codes),
+    format('~s', [Codes]),
 end.
 
 
