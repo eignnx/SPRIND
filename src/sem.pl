@@ -178,7 +178,8 @@ instr_info(lb, info{
         ?ptr = (?rs\s + sxt(?simm))\u;
         ?rd <- zxt([?ptr])
     ),
-    tags: [mem, load, byte]
+    tags: [mem, load, byte],
+	module: [base]
 }).
 instr_info(lw, info{
 	title: 'Load Word',
@@ -189,7 +190,8 @@ instr_info(lw, info{
         ?ptr = ((?rs\s + sxt(?simm)) and #(-2)\16)\u;
         ?rd <- {[?ptr + #1], [?ptr]}
     ),
-    tags: [mem, load, word]
+    tags: [mem, load, word],
+	module: [base]
 }).
 instr_info(sb, info{
 	title: 'Store Byte',
@@ -200,7 +202,8 @@ instr_info(sb, info{
         ?ptr = ?rd\s + sxt(?simm);
         [?ptr\u] <- lo(?rs)
     ),
-    tags: [mem, store, byte]
+    tags: [mem, store, byte],
+	module: [base]
 }).
 instr_info(sw, info{
 	title: 'Store Word',
@@ -212,7 +215,8 @@ instr_info(sw, info{
         [?ptr] <- lo(?rs);
         [?ptr + #1] <- hi(?rs)
     ),
-    tags: [mem, store, word]
+    tags: [mem, store, word],
+	module: [base]
 }).
 
 instr_info(call, info{
@@ -224,7 +228,8 @@ instr_info(call, info{
         $$pc <- $$pc\s + (sxt(?simm) << #subr_align);
         $$ra <- $$pc + #2
     ),
-    tags: [pc, ra]
+    tags: [pc, ra],
+	module: [base]
 }).
 
 instr_info(b, info{
@@ -233,7 +238,8 @@ instr_info(b, info{
 	ex: ['b SOME_LABEL'],
 	operands: [simm(?offset)],
 	sem: $$pc <- $$pc\s + sxt(?offset),
-    tags: [pc]
+    tags: [pc],
+	module: [base]
 }).
 instr_info(bt, info{
 	title: 'Branch If True',
@@ -243,7 +249,8 @@ instr_info(bt, info{
 	sem: if(b_pop($$ts),
         $$pc <- $$pc\s + sxt(?offset)
     ),
-    tags: [pc, cond]
+    tags: [pc, cond],
+	module: [base]
 }).
 instr_info(bf, info{
 	title: 'Branch If False',
@@ -253,7 +260,8 @@ instr_info(bf, info{
 	sem: if(!(b_pop($$ts)),
         $$pc <- $$pc\s + sxt(?offset)
     ),
-    tags: [pc, cond]
+    tags: [pc, cond],
+	module: [base]
 }).
 
 instr_info(li, info{
@@ -262,7 +270,8 @@ instr_info(li, info{
 	ex: ['li x, 123'],
 	operands: [simm(?simm), reg(r, ?rd)],
 	sem: ?rd <- sxt(?simm),
-    tags: [sxt, data]
+    tags: [sxt, data],
+	module: [base]
 }).
 instr_info(szi, info{
 	title: 'Shift Zero-extended Immediate',
@@ -270,7 +279,8 @@ instr_info(szi, info{
 	ex: ['szi x, 0xB3'],
 	operands: [imm(?imm), reg(r, ?rd)],
 	sem: ?rd <- (?rd << #8) or zxt(?imm),
-    tags: [zxt, data, shift]
+    tags: [zxt, data, shift],
+	module: [base]
 }).
 
 instr_info(lgb, info{
@@ -279,7 +289,8 @@ instr_info(lgb, info{
 	ex: ['lgb x, [gp+8]'],
 	operands: [imm(?disp), reg(r, ?rd)],
 	sem: ?rd <- zxt([$$gp\u + zxt(?disp)]),
-    tags: [mem, load, global, byte]
+    tags: [mem, load, global, byte],
+	module: [globals]
 }).
 instr_info(lgw, info{
 	title: 'Load Global Word',
@@ -290,7 +301,8 @@ instr_info(lgw, info{
         ?ptr = (($$gp\u + zxt(?disp)) and #0b1111111111111110)\u;
         ?rd <- {[?ptr + #1], [?ptr]}
     ),
-    tags: [mem, load, global, word]
+    tags: [mem, load, global, word],
+	module: [globals]
 }).
 instr_info(sgb, info{
 	title: 'Store Global Byte',
@@ -298,7 +310,8 @@ instr_info(sgb, info{
 	ex: ['sgb [gp+8], x'],
 	operands: [imm(?disp), reg(r, ?rs)],
 	sem: [$$gp\u + zxt(?disp)] <- lo(?rs),
-    tags: [mem, store, global, byte]
+    tags: [mem, store, global, byte],
+	module: [globals]
 }).
 instr_info(sgw, info{
 	title: 'Store Global Word',
@@ -309,7 +322,8 @@ instr_info(sgw, info{
         ?ptr = (($$gp\u + zxt(?disp)) and #0b1111111111111110)\u;
         {[?ptr + #1], [?ptr]} <- ?rs
     ),
-    tags: [mem, store, global, word]
+    tags: [mem, store, global, word],
+	module: [globals]
 }).
 instr_info(tbit, info{
 	title: 'Test Bit',
@@ -321,7 +335,8 @@ instr_info(tbit, info{
         ?bit = (?rs >> ?shamt\u) and #1;
         b_push($$ts, ?bit == #1)
     ),
-    tags: [ts, bit, bitwise]
+    tags: [ts, bit, bitwise],
+	module: [bittests]
 }).
 instr_info(cbit, info{
 	title: 'Clear Bit',
@@ -333,7 +348,8 @@ instr_info(cbit, info{
         ?mask = ~(#1 << ?idx);
         ?rd <- ?rd and ?mask
     ),
-    tags: [bit, bitwise, clear]
+    tags: [bit, bitwise, clear],
+	module: [bittests]
 }).
 instr_info(sbit, info{
 	title: 'Set Bit',
@@ -345,7 +361,8 @@ instr_info(sbit, info{
         ?mask = ~(#1 << ?idx);
         ?rd <- ?rd or ?mask
     ),
-    tags: [bit, bitwise, set]
+    tags: [bit, bitwise, set],
+	module: [bittests]
 }).
 instr_info(tli, info{
 	title: 'Test Less-than Immediate',
@@ -353,7 +370,8 @@ instr_info(tli, info{
 	ex: ['tli x, -5'],
 	operands: [simm(?simm), reg(r, ?rs)],
 	sem: b_push($$ts, compare(?rs\s, <(s\16), sxt(?simm))),
-    tags: [ts, cmp, inequality, signed, '<']
+    tags: [ts, cmp, inequality, signed, '<'],
+	module: [imms]
 }).
 instr_info(tgei, info{
 	title: 'Test Greater-than or Equal Immediate',
@@ -361,7 +379,8 @@ instr_info(tgei, info{
 	ex: ['tgei x, -5'],
 	operands: [simm(?simm), reg(r, ?rs)],
 	sem: b_push($$ts, compare(?rs\s, >=(s\16), sxt(?simm))),
-    tags: [ts, cmp, inequality, signed, '>=']
+    tags: [ts, cmp, inequality, signed, '>='],
+	module: [imms]
 }).
 instr_info(tbi, info{
 	title: 'Test Below Immediate',
@@ -369,7 +388,8 @@ instr_info(tbi, info{
 	ex: ['tbi x, 10'],
 	operands: [imm(?imm), reg(r, ?rs)],
 	sem: b_push($$ts, compare(?rs\u, <(u\16), zxt(?imm))),
-    tags: [ts, cmp, inequality, unsigned, '<']
+    tags: [ts, cmp, inequality, unsigned, '<'],
+	module: [imms]
 }).
 instr_info(taei, info{
 	title: 'Test Above or Equal',
@@ -377,7 +397,8 @@ instr_info(taei, info{
 	ex: ['taei x, 10'],
 	operands: [imm(?imm), reg(r, ?rs)],
 	sem: b_push($$ts, compare(?rs\u, >=(u\16), zxt(?imm))),
-    tags: [ts, cmp, inequality, unsigned, '>=']
+    tags: [ts, cmp, inequality, unsigned, '>='],
+	module: [imms]
 }).
 instr_info(tnei, info{
 	title: 'Test Not Equal Immediate',
@@ -385,7 +406,8 @@ instr_info(tnei, info{
 	ex: ['tnei x, 0'],
 	operands: [simm(?simm), reg(r, ?rs)],
 	sem: b_push($$ts, ?rs\s \= sxt(?simm)),
-    tags: [ts, cmp, equality, not]
+    tags: [ts, cmp, equality, not],
+	module: [imms]
 }).
 instr_info(teqi, info{
 	title: 'Test Equal Immediate',
@@ -393,7 +415,8 @@ instr_info(teqi, info{
 	ex: ['teqi x, -5'],
 	operands: [simm(?simm), reg(r, ?rs)],
 	sem: b_push($$ts, ?rs\s == sxt(?simm)),
-    tags: [ts, cmp, equality]
+    tags: [ts, cmp, equality],
+	module: [imms]
 }).
 instr_info(addi, info{
 	title: 'Add Immediate',
@@ -401,7 +424,8 @@ instr_info(addi, info{
 	ex: ['addi x, -5'],
 	operands: [simm(?simm), reg(r, ?rd)],
 	sem: ?rd <- ?rd\s + sxt(?simm),
-    tags: [arith]
+    tags: [arith],
+	module: [imms]
 }).
 instr_info(andi, info{
 	title: 'AND Immediate',
@@ -409,7 +433,8 @@ instr_info(andi, info{
 	ex: ['andi x, 3'],
 	operands: [simm(?simm), reg(r, ?rd)],
 	sem: ?rd <- ?rd and sxt(?simm),
-    tags: [logical, boolean, bitwise, and]
+    tags: [logical, boolean, bitwise, and],
+	module: [imms]
 }).
 instr_info(ori, info{
 	title: 'OR Immediate',
@@ -417,7 +442,8 @@ instr_info(ori, info{
 	ex: ['ori x, 3'],
 	operands: [simm(?simm), reg(r, ?rd)],
 	sem: ?rd <- ?rd or sxt(?simm),
-    tags: [logical, boolean, bitwise]
+    tags: [logical, boolean, bitwise],
+	module: [imms]
 }).
 
 instr_info(xori, info{
@@ -426,7 +452,8 @@ instr_info(xori, info{
 	ex: ['xori x, 3'],
 	operands: [simm(?simm), reg(r, ?rd)],
 	sem: ?rd <- ?rd xor sxt(?simm),
-    tags: [logical, boolean, bitwise, xor]
+    tags: [logical, boolean, bitwise, xor],
+	module: [imms]
 }).
 instr_info(addicy, info{
 	title: 'Add Immediate with Carry',
@@ -438,7 +465,8 @@ instr_info(addicy, info{
         bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
         bit($$cc, #overflow_flag_bit) <- attr(cpu/alu/overflow)
     ),
-    tags: [arith, carry, add]
+    tags: [arith, carry, add],
+	module: [imms]
 }).
 instr_info(subicy, info{
 	title: 'Subtract Immediate with Carry',
@@ -450,7 +478,8 @@ instr_info(subicy, info{
         bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
         bit($$cc, #overflow_flag_bit) <- attr(cpu/alu/overflow)
     ),
-    tags: [arith, carry]
+    tags: [arith, carry],
+	module: [imms]
 }).
 instr_info(lsr, info{
 	title: 'Logical Shift Right',
@@ -458,7 +487,8 @@ instr_info(lsr, info{
 	ex: ['lsr x, 15'],
 	operands: [imm(?imm), reg(r, ?rd)],
 	sem: ?rd <- ?rd >> ?imm,
-    tags: [bitwise, shift, right]
+    tags: [bitwise, shift, right],
+	module: [base]
 }).
 instr_info(lsl, info{
 	title: 'Logical Shift Left',
@@ -466,7 +496,8 @@ instr_info(lsl, info{
 	ex: ['lsl x, 8'],
 	operands: [imm(?imm), reg(r, ?rd)],
 	sem: ?rd <- ?rd << ?imm,
-    tags: [zxt, bitwise, shift, left]
+    tags: [zxt, bitwise, shift, left],
+	module: [base]
 }).
 instr_info(asr, info{
 	title: 'Arithmetic Shift Right',
@@ -477,7 +508,8 @@ instr_info(asr, info{
         ?sign_extension = (sxt(bit(?rd, #15) - #1)) << (#reg_size_bits - ?imm);
         ?rd <- (?rd >> ?imm) or ?sign_extension 
     ),
-    tags: [sxt, bitwise, shift, right]
+    tags: [sxt, bitwise, shift, right],
+	module: [base]
 }).
 instr_info(tbitm, info{
 	title: 'Test Bit in Memory',
@@ -485,7 +517,8 @@ instr_info(tbitm, info{
 	ex: ['tbitm [x], 3'],
 	operands: [imm(?imm), reg(r, ?rs)],
 	sem: b_push($$ts, bit([?rs], ?imm)),
-    tags: [ts, bit, bitwise, mem]
+    tags: [ts, bit, bitwise, mem],
+	module: [bittests]
 }).
 instr_info(cbitm, info{
 	title: 'Clear Bit in Memory',
@@ -495,7 +528,8 @@ instr_info(cbitm, info{
 	sem: (
 		[?rs] <- [?rs] and ~(#1 << ?imm)
     ),
-    tags: [ts, bit, bitwise, clear, mem]
+    tags: [ts, bit, bitwise, clear, mem],
+	module: [bittests]
 }).
 instr_info(sbitm, info{
 	title: 'Set Bit in Memory',
@@ -505,7 +539,8 @@ instr_info(sbitm, info{
 	sem: (
 		[?rs] <- [?rs] or (#1 << ?imm)
     ),
-    tags: [ts, bit, bitwise, set, mem]
+    tags: [ts, bit, bitwise, set, mem],
+	module: [bittests]
 }).
 
 instr_info(add, info{
@@ -514,7 +549,8 @@ instr_info(add, info{
 	ex: ['add x, y'],
 	operands: [reg(r, ?rs), reg(s, ?rd)],
 	sem: ?rd <- ?rd + ?rs,
-    tags: [arith, add]
+    tags: [arith, add],
+	module: [base]
 }).
 instr_info(sub, info{
 	title: 'Subtract',
@@ -522,7 +558,8 @@ instr_info(sub, info{
 	ex: ['sub x, y'],
 	operands: [reg(r, ?rs), reg(s, ?rd)],
 	sem: ?rd <- ?rd - ?rs,
-    tags: [arith]
+    tags: [arith],
+	module: [base]
 }).
 instr_info(and, info{
 	title: 'AND',
@@ -530,7 +567,8 @@ instr_info(and, info{
 	ex: ['and x, y'],
 	operands: [reg(r, ?rs), reg(s, ?rd)],
 	sem: ?rd <- ?rd and ?rs,
-    tags: [logical, boolean, bitwise, and]
+    tags: [logical, boolean, bitwise, and],
+	module: [base]
 }).
 instr_info(or, info{
 	title: 'OR',
@@ -538,7 +576,8 @@ instr_info(or, info{
 	ex: ['or x, y'],
 	operands: [reg(r, ?rs), reg(s, ?rd)],
 	sem: ?rd <- ?rd or ?rs,
-    tags: [logical, boolean, bitwise]
+    tags: [logical, boolean, bitwise],
+	module: [base]
 }).
 instr_info(xor, info{
 	title: 'XOR',
@@ -546,7 +585,8 @@ instr_info(xor, info{
 	ex: ['xor x, y'],
 	operands: [reg(r, ?rs), reg(s, ?rd)],
 	sem: ?rd <- ?rd xor ?rs,
-    tags: [logical, boolean, bitwise, xor]
+    tags: [logical, boolean, bitwise, xor],
+	module: [base]
 }).
 instr_info(mov, info{
 	title: 'Move',
@@ -554,7 +594,8 @@ instr_info(mov, info{
 	ex: ['mov x, y'],
 	operands: [reg(r, ?rs), reg(s, ?rd)],
 	sem: ?rd <- ?rs,
-    tags: [data]
+    tags: [data],
+	module: [base]
 }).
 instr_info(addcy, info{
 	title: 'Add with Carry',
@@ -566,7 +607,8 @@ instr_info(addcy, info{
         bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
         bit($$cc, #overflow_flag_bit) <- attr(cpu/alu/overflow)
     ),
-    tags: [arith, carry, add]
+    tags: [arith, carry, add],
+	module: [base]
 }).
 instr_info(subcy, info{
 	title: 'Subtract with Carry',
@@ -578,7 +620,8 @@ instr_info(subcy, info{
         bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
         bit($$cc, #overflow_flag_bit) <- attr(cpu/alu/overflow)
     ),
-    tags: [arith, carry]
+    tags: [arith, carry],
+	module: [base]
 }).
 instr_info(tl, info{
 	title: 'Test Less-than',
@@ -586,7 +629,8 @@ instr_info(tl, info{
 	ex: ['tl x, y'],
 	operands: [reg(r, ?r1), reg(s, ?r2)],
 	sem: b_push($$ts, compare(?r1, <(s\16), ?r2)),
-    tags: [ts, cmp, inequality, signed, '<']
+    tags: [ts, cmp, inequality, signed, '<'],
+	module: [base]
 }).
 instr_info(tge, info{
 	title: 'Test Greater-than or Equal',
@@ -594,7 +638,8 @@ instr_info(tge, info{
 	ex: ['tge x, y'],
 	operands: [reg(r, ?r1), reg(s, ?r2)],
 	sem: b_push($$ts, compare(?r1, >=(s\16), ?r2)),
-    tags: [ts, cmp, inequality, signed, '>=']
+    tags: [ts, cmp, inequality, signed, '>='],
+	module: [base]
 }).
 instr_info(tb, info{
 	title: 'Test Below',
@@ -602,7 +647,8 @@ instr_info(tb, info{
 	ex: ['tb x, y'],
 	operands: [reg(r, ?r1), reg(s, ?r2)],
 	sem: b_push($$ts, compare(?r1, <(u\16), ?r2)),
-    tags: [ts, cmp, inequality, unsigned, '<']
+    tags: [ts, cmp, inequality, unsigned, '<'],
+	module: [base]
 }).
 instr_info(tae, info{
 	title: 'Test Above or Equal',
@@ -610,7 +656,8 @@ instr_info(tae, info{
 	ex: ['tae x, y'],
 	operands: [reg(r, ?r1), reg(s, ?r2)],
 	sem: b_push($$ts, compare(?r1, >=(u\16), ?r2)),
-    tags: [ts, cmp, inequality, unsigned, '>=']
+    tags: [ts, cmp, inequality, unsigned, '>='],
+	module: [base]
 }).
 instr_info(tne, info{
 	title: 'Test Not Equal',
@@ -618,7 +665,8 @@ instr_info(tne, info{
 	ex: ['tne x, y'],
 	operands: [reg(r, ?r1), reg(s, ?r2)],
 	sem: b_push($$ts, ?r1 \= ?r2),
-    tags: [ts, cmp, equality, not]
+    tags: [ts, cmp, equality, not],
+	module: [base]
 }).
 instr_info(teq, info{
 	title: 'Test Equal',
@@ -626,7 +674,8 @@ instr_info(teq, info{
 	ex: ['teq x, y'],
 	operands: [reg(r, ?r1), reg(s, ?r2)],
 	sem: b_push($$ts, ?r1 == ?r2),
-    tags: [ts, cmp, equality]
+    tags: [ts, cmp, equality],
+	module: [base]
 }).
 
 instr_info(mulstep, info{
@@ -645,7 +694,8 @@ instr_info(mulstep, info{
         ?multiplicand_hi <- ?multiplicand_hi << #1 + ?shift_cout;
         ?multiplier <- ?multiplier >> #1
     ),
-    tags: [arith, shift]
+    tags: [arith, shift],
+	module: [mul]
 }).
 
 instr_info(pushb, info{
@@ -654,7 +704,8 @@ instr_info(pushb, info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [sp, push, byte]
+    tags: [sp, push, byte],
+	module: [stack]
 }).
 instr_info(pushw, info{
 	title: 'Push Word',
@@ -662,7 +713,8 @@ instr_info(pushw, info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [sp, push, word]
+    tags: [sp, push, word],
+	module: [stack]
 }).
 instr_info(popb, info{
 	title: 'Pop Byte',
@@ -670,7 +722,8 @@ instr_info(popb, info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [sp, pop, byte]
+    tags: [sp, pop, byte],
+	module: [stack]
 }).
 instr_info(popw, info{
 	title: 'Pop Word',
@@ -678,7 +731,8 @@ instr_info(popw, info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [sp, pop, word]
+    tags: [sp, pop, word],
+	module: [stack]
 }).
 instr_info(callr, info{
 	title: 'Call Register',
@@ -686,7 +740,8 @@ instr_info(callr, info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [pc, ra, jump, indirect]
+    tags: [pc, ra, jump, indirect],
+	module: [base]
 }).
 instr_info(jr, info{
 	title: 'Jump Register',
@@ -694,7 +749,8 @@ instr_info(jr, info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [pc, jump, indirect]
+    tags: [pc, jump, indirect],
+	module: [base]
 }).
 instr_info(neg, info{
 	title: 'Negate',
@@ -702,7 +758,8 @@ instr_info(neg, info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [arith]
+    tags: [arith],
+	module: [imms]
 }).
 instr_info(seb, info{
 	title: 'Sign Extend Byte',
@@ -710,7 +767,8 @@ instr_info(seb, info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [arith, sxt]
+    tags: [arith, sxt],
+	module: [base]
 }).
 instr_info('rd.mp.lo', info{
 	title: 'Read $MP.lo',
@@ -718,7 +776,8 @@ instr_info('rd.mp.lo', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [rd, data, mp, lo]
+    tags: [rd, data, mp, lo],
+	module: [mul]
 }).
 instr_info('rd.mp.hi', info{
 	title: 'Read $MP.hi',
@@ -726,7 +785,8 @@ instr_info('rd.mp.hi', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [rd, data, mp, hi]
+    tags: [rd, data, mp, hi],
+	module: [mul]
 }).
 instr_info('rd.gp', info{
 	title: 'Read $GP',
@@ -734,7 +794,8 @@ instr_info('rd.gp', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [rd, data, gp]
+    tags: [rd, data, gp],
+	module: [globals]
 }).
 instr_info('wr.gp', info{
 	title: 'Write $GP',
@@ -742,7 +803,8 @@ instr_info('wr.gp', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [wr, data, gp]
+    tags: [wr, data, gp],
+	module: [globals]
 }).
 
 instr_info('NONEXE0', info{
@@ -751,7 +813,8 @@ instr_info('NONEXE0', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [] % Giving this no tags ensures it gets sorted into the 0-most branch of the optree.
+    tags: [] % Giving this no tags ensures it gets sorted into the 0-most branch of the optree.,
+	module: [base]
 }).
 instr_info('BREAK', info{
 	title: 'Breakpoint',
@@ -759,7 +822,8 @@ instr_info('BREAK', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [exc, dbg]
+    tags: [exc, dbg],
+	module: [dbg]
 }).
 instr_info('HALT', info{
 	title: 'Halt',
@@ -767,7 +831,8 @@ instr_info('HALT', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [exc, cmd]
+    tags: [exc, cmd],
+	module: [base]
 }).
 instr_info('UNIMPL', info{
 	title: 'Unimplemented',
@@ -775,7 +840,8 @@ instr_info('UNIMPL', info{
 	ex: [],
 	operands: [],
 	sem: todo, 
-    tags: [exc, dbg]
+    tags: [exc, dbg],
+	module: [dbg]
 }).
 instr_info(kret, info{
 	title: 'Kernel Return',
@@ -783,7 +849,8 @@ instr_info(kret, info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [kernel, kr, pc, ret]
+    tags: [kernel, kr, pc, ret],
+	module: [interrupts]
 }).
 instr_info(kcall, info{
 	title: 'Kernel Call',
@@ -791,7 +858,8 @@ instr_info(kcall, info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [kernel, kr, pc, call]
+    tags: [kernel, kr, pc, call],
+	module: [interrupts]
 }).
 instr_info(ret, info{
 	title: 'Return',
@@ -799,7 +867,8 @@ instr_info(ret, info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [pc, ra, ret]
+    tags: [pc, ra, ret],
+	module: [base]
 }).
 instr_info(tov, info{
 	title: 'Test Overflow',
@@ -807,7 +876,8 @@ instr_info(tov, info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [ts, cc, ov]
+    tags: [ts, cc, ov],
+	module: [base]
 }).
 instr_info(tcy, info{
 	title: 'Test Carry',
@@ -815,7 +885,8 @@ instr_info(tcy, info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [ts, cc, cy]
+    tags: [ts, cc, cy],
+	module: [base]
 }).
 instr_info('clr.cy', info{
 	title: 'Clear Carry',
@@ -823,7 +894,8 @@ instr_info('clr.cy', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [wr, cy]
+    tags: [wr, cy],
+	module: [base]
 }).
 instr_info('set.cy', info{
 	title: 'Set Carry',
@@ -831,7 +903,8 @@ instr_info('set.cy', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [wr, cy]
+    tags: [wr, cy],
+	module: [base]
 }).
 instr_info(tpush0, info{
 	title: 'Teststack Push 0',
@@ -839,7 +912,8 @@ instr_info(tpush0, info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [ts, push]
+    tags: [ts, push],
+	module: [tsops]
 }).
 instr_info(tpush1, info{
 	title: 'Teststack Push 1',
@@ -847,7 +921,8 @@ instr_info(tpush1, info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [ts, push]
+    tags: [ts, push],
+	module: [tsops]
 }).
 instr_info(tnot, info{
 	title: 'Teststack NOT',
@@ -855,7 +930,8 @@ instr_info(tnot, info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [ts, boolean]
+    tags: [ts, boolean],
+	module: [tsops]
 }).
 instr_info(tand, info{
 	title: 'Teststack AND',
@@ -863,7 +939,8 @@ instr_info(tand, info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [ts, boolean]
+    tags: [ts, boolean],
+	module: [tsops]
 }).
 instr_info(tor, info{
 	title: 'Teststack OR',
@@ -871,7 +948,8 @@ instr_info(tor, info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [ts, boolean]
+    tags: [ts, boolean],
+	module: [tsops]
 }).
 instr_info(tdup, info{
 	title: 'Teststack Duplicate',
@@ -879,7 +957,8 @@ instr_info(tdup, info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [ts, data]
+    tags: [ts, data],
+	module: [tsops]
 }).
 instr_info('prsv.mp', info{
 	title: 'Preserve $MP',
@@ -887,7 +966,8 @@ instr_info('prsv.mp', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [sp, prsv_rstr, prsv, mp]
+    tags: [sp, prsv_rstr, prsv, mp],
+	module: [mul]
 }).
 instr_info('rstr.mp', info{
 	title: 'Restore $MP',
@@ -895,7 +975,8 @@ instr_info('rstr.mp', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [sp, prsv_rstr, rstr, mp]
+    tags: [sp, prsv_rstr, rstr, mp],
+	module: [mul]
 }).
 instr_info('prsv.ts', info{
 	title: 'Preserve $TS',
@@ -903,7 +984,8 @@ instr_info('prsv.ts', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [sp, prsv_rstr, prsv, ts]
+    tags: [sp, prsv_rstr, prsv, ts],
+	module: [interrupts]
 }).
 instr_info('rstr.ts', info{
 	title: 'Restore $TS',
@@ -911,7 +993,8 @@ instr_info('rstr.ts', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [sp, prsv_rstr, rstr, ts]
+    tags: [sp, prsv_rstr, rstr, ts],
+	module: [interrupts]
 }).
 instr_info('prsv.ra', info{
 	title: 'Preserve $RA',
@@ -919,7 +1002,8 @@ instr_info('prsv.ra', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [sp, prsv_rstr, prsv, ra]
+    tags: [sp, prsv_rstr, prsv, ra],
+	module: [interrupts]
 }).
 instr_info('rstr.ra', info{
 	title: 'Restore $RA',
@@ -927,7 +1011,8 @@ instr_info('rstr.ra', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [sp, prsv_rstr, rstr, ra]
+    tags: [sp, prsv_rstr, rstr, ra],
+	module: [interrupts]
 }).
 instr_info('prsv.gp', info{
 	title: 'Preserve $GP',
@@ -935,7 +1020,8 @@ instr_info('prsv.gp', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [sp, prsv_rstr, prsv, gp]
+    tags: [sp, prsv_rstr, prsv, gp],
+	module: [globals]
 }).
 instr_info('rstr.gp', info{
 	title: 'Restore $GP',
@@ -943,7 +1029,8 @@ instr_info('rstr.gp', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [sp, prsv_rstr, rstr, gp]
+    tags: [sp, prsv_rstr, rstr, gp],
+	module: [globals]
 }).
 instr_info('prsv.cc', info{
 	title: 'Preserve $CC',
@@ -951,7 +1038,8 @@ instr_info('prsv.cc', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [sp, prsv_rstr, prsv, cc]
+    tags: [sp, prsv_rstr, prsv, cc],
+	module: [interrupts]
 }).
 instr_info('rstr.cc', info{
 	title: 'Restore $CC',
@@ -959,7 +1047,8 @@ instr_info('rstr.cc', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [sp, prsv_rstr, rstr, cc]
+    tags: [sp, prsv_rstr, rstr, cc],
+	module: [interrupts]
 }).
 instr_info(sleep, info{
 	title: 'Sleep',
@@ -967,7 +1056,8 @@ instr_info(sleep, info{
 	ex: ['sleep'],
 	operands: [],
 	sem: todo,
-    tags: [cc, sleep, interrupts]
+    tags: [cc, sleep, interrupts],
+	module: [interrupts]
 }).
 instr_info(vijt, info{
 	title: 'Valid Indirect Jump Target',
@@ -982,5 +1072,6 @@ instr_info(vijt, info{
 			)
 		)
 	),
-    tags: [pc, indirect, jump, security]
+    tags: [pc, indirect, jump, security],
+	module: [security]
 }).
