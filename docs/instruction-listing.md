@@ -144,6 +144,10 @@ let ptr := (rs\s+sxt(simm))\u;
 rd <- zxt([ptr])
 ```
 
+###### Module
+
+**`base`**
+
 --------------
 
 ##### The `lw` Instruction
@@ -169,6 +173,10 @@ rd <- zxt([ptr])
 let ptr := (rs\s+sxt(simm)and-2\16)\u;
 rd <- {[ptr+1], [ptr]}
 ```
+
+###### Module
+
+**`base`**
 
 --------------
 
@@ -196,6 +204,10 @@ let ptr := rd\s+sxt(simm);
 [ptr\u] <- lo(rs)
 ```
 
+###### Module
+
+**`base`**
+
 --------------
 
 ##### The `sw` Instruction
@@ -222,6 +234,10 @@ let ptr := (rd\s+sxt(simm)and65534)\u;
 [ptr] <- lo(rs);
 [ptr+1] <- hi(rs)
 ```
+
+###### Module
+
+**`base`**
 
 --------------
 
@@ -257,6 +273,10 @@ $PC <- $PC\s+(sxt(simm)<<subr_align);
 $RA <- $PC+2
 ```
 
+###### Module
+
+**`base`**
+
 --------------
 
 ### Instruction Format `b`
@@ -290,6 +310,10 @@ $RA <- $PC+2
 $PC <- $PC\s+sxt(offset)
 ```
 
+###### Module
+
+**`base`**
+
 --------------
 
 ##### The `bt` Instruction
@@ -317,6 +341,10 @@ if b_pop($TS) {
 }
 ```
 
+###### Module
+
+**`base`**
+
 --------------
 
 ##### The `bf` Instruction
@@ -343,6 +371,10 @@ if !(b_pop($TS)) {
     $PC <- $PC\s+sxt(offset)
 }
 ```
+
+###### Module
+
+**`base`**
 
 --------------
 
@@ -377,6 +409,10 @@ if !(b_pop($TS)) {
 rd <- sxt(simm)
 ```
 
+###### Module
+
+**`base`**
+
 --------------
 
 ##### The `szi` Instruction
@@ -401,6 +437,10 @@ rd <- sxt(simm)
 -----------------------
 rd <- rd<<8 or zxt(imm)
 ```
+
+###### Module
+
+**`base`**
 
 --------------
 
@@ -435,6 +475,10 @@ rd <- rd<<8 or zxt(imm)
 rd <- zxt([$GP\u+zxt(disp)])
 ```
 
+###### Module
+
+**`globals`**
+
 --------------
 
 ##### The `lgw` Instruction
@@ -461,6 +505,10 @@ let ptr := ($GP\u+zxt(disp)and65534)\u;
 rd <- {[ptr+1], [ptr]}
 ```
 
+###### Module
+
+**`globals`**
+
 --------------
 
 ##### The `sgb` Instruction
@@ -485,6 +533,10 @@ rd <- {[ptr+1], [ptr]}
 ---------------------------
 [$GP\u+zxt(disp)] <- lo(rs)
 ```
+
+###### Module
+
+**`globals`**
 
 --------------
 
@@ -511,6 +563,10 @@ rd <- {[ptr+1], [ptr]}
 let ptr := ($GP\u+zxt(disp)and65534)\u;
 {[ptr+1], [ptr]} <- rs
 ```
+
+###### Module
+
+**`globals`**
 
 --------------
 
@@ -539,6 +595,10 @@ let bit := rs>>shamt\u and 1;
 b_push($TS, bit==1)
 ```
 
+###### Module
+
+**`bittests`**
+
 --------------
 
 ##### The `cbit` Instruction
@@ -565,6 +625,10 @@ let idx := bitslice(bit_idx, 3..0)\u;
 let mask := ~ (1<<idx);
 rd <- rd and mask
 ```
+
+###### Module
+
+**`bittests`**
 
 --------------
 
@@ -593,6 +657,10 @@ let mask := ~ (1<<idx);
 rd <- rd or mask
 ```
 
+###### Module
+
+**`bittests`**
+
 --------------
 
 ##### The `tli` Instruction
@@ -617,6 +685,10 @@ rd <- rd or mask
 ----------------------------------------------
 b_push($TS, compare(rs\s, <(s\16), sxt(simm)))
 ```
+
+###### Module
+
+**`imms`**
 
 --------------
 
@@ -643,6 +715,10 @@ b_push($TS, compare(rs\s, <(s\16), sxt(simm)))
 b_push($TS, compare(rs\s, >=(s\16), sxt(simm)))
 ```
 
+###### Module
+
+**`imms`**
+
 --------------
 
 ##### The `tbi` Instruction
@@ -667,6 +743,10 @@ b_push($TS, compare(rs\s, >=(s\16), sxt(simm)))
 ---------------------------------------------
 b_push($TS, compare(rs\u, <(u\16), zxt(imm)))
 ```
+
+###### Module
+
+**`imms`**
 
 --------------
 
@@ -693,6 +773,10 @@ b_push($TS, compare(rs\u, <(u\16), zxt(imm)))
 b_push($TS, compare(rs\u, >=(u\16), zxt(imm)))
 ```
 
+###### Module
+
+**`imms`**
+
 --------------
 
 ##### The `tnei` Instruction
@@ -717,6 +801,10 @@ b_push($TS, compare(rs\u, >=(u\16), zxt(imm)))
 ----------------------------
 b_push($TS, rs\s\=sxt(simm))
 ```
+
+###### Module
+
+**`imms`**
 
 --------------
 
@@ -743,6 +831,10 @@ b_push($TS, rs\s\=sxt(simm))
 b_push($TS, rs\s==sxt(simm))
 ```
 
+###### Module
+
+**`imms`**
+
 --------------
 
 ##### The `addi` Instruction
@@ -767,6 +859,10 @@ b_push($TS, rs\s==sxt(simm))
 ------------------------
 rd <- rd\s+sxt(simm)
 ```
+
+###### Module
+
+**`imms`**
 
 --------------
 
@@ -793,6 +889,10 @@ rd <- rd\s+sxt(simm)
 rd <- rd and sxt(simm)
 ```
 
+###### Module
+
+**`imms`**
+
 --------------
 
 ##### The `ori` Instruction
@@ -818,6 +918,10 @@ rd <- rd and sxt(simm)
 rd <- rd or sxt(simm)
 ```
 
+###### Module
+
+**`imms`**
+
 --------------
 
 ##### The `xori` Instruction
@@ -842,6 +946,10 @@ rd <- rd or sxt(simm)
 ------------------------
 rd <- rd xor sxt(simm)
 ```
+
+###### Module
+
+**`imms`**
 
 --------------
 
@@ -870,6 +978,10 @@ bit($CC, carry_flag_bit) <- attr(cpu/alu/carryout);
 bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 ```
 
+###### Module
+
+**`imms`**
+
 --------------
 
 ##### The `subicy` Instruction
@@ -897,6 +1009,10 @@ bit($CC, carry_flag_bit) <- attr(cpu/alu/carryout);
 bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 ```
 
+###### Module
+
+**`imms`**
+
 --------------
 
 ##### The `lsr` Instruction
@@ -922,6 +1038,10 @@ bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 rd <- rd>>imm
 ```
 
+###### Module
+
+**`base`**
+
 --------------
 
 ##### The `lsl` Instruction
@@ -946,6 +1066,10 @@ rd <- rd>>imm
 ----------------------
 rd <- rd<<imm
 ```
+
+###### Module
+
+**`base`**
 
 --------------
 
@@ -973,6 +1097,10 @@ let sign_extension := sxt(bit(rd, 15)-1)<<reg_size_bits-imm;
 rd <- rd>>imm or sign_extension
 ```
 
+###### Module
+
+**`base`**
+
 --------------
 
 ##### The `tbitm` Instruction
@@ -997,6 +1125,10 @@ rd <- rd>>imm or sign_extension
 ---------------------------
 b_push($TS, bit([rs], imm))
 ```
+
+###### Module
+
+**`bittests`**
 
 --------------
 
@@ -1023,6 +1155,10 @@ b_push($TS, bit([rs], imm))
 [rs] <- [rs]and~ (1<<imm)
 ```
 
+###### Module
+
+**`bittests`**
+
 --------------
 
 ##### The `sbitm` Instruction
@@ -1047,6 +1183,10 @@ b_push($TS, bit([rs], imm))
 ----------------------
 [rs] <- [rs]or(1<<imm)
 ```
+
+###### Module
+
+**`bittests`**
 
 --------------
 
@@ -1094,6 +1234,10 @@ multiplicand_hi <- multiplicand_hi<<1+shift_cout;
 multiplier <- multiplier>>1
 ```
 
+###### Module
+
+**`mul`**
+
 --------------
 
 ### Instruction Format `rr(_)`
@@ -1127,6 +1271,10 @@ multiplier <- multiplier>>1
 rd <- rd+rs
 ```
 
+###### Module
+
+**`base`**
+
 --------------
 
 ##### The `sub` Instruction
@@ -1151,6 +1299,10 @@ rd <- rd+rs
 ------------------------
 rd <- rd-rs
 ```
+
+###### Module
+
+**`base`**
 
 --------------
 
@@ -1177,6 +1329,10 @@ rd <- rd-rs
 rd <- rd and rs
 ```
 
+###### Module
+
+**`base`**
+
 --------------
 
 ##### The `or` Instruction
@@ -1201,6 +1357,10 @@ rd <- rd and rs
 ------------------------
 rd <- rd or rs
 ```
+
+###### Module
+
+**`base`**
 
 --------------
 
@@ -1227,6 +1387,10 @@ rd <- rd or rs
 rd <- rd xor rs
 ```
 
+###### Module
+
+**`base`**
+
 --------------
 
 ##### The `mov` Instruction
@@ -1251,6 +1415,10 @@ rd <- rd xor rs
 ------------------------
 rd <- rs
 ```
+
+###### Module
+
+**`base`**
 
 --------------
 
@@ -1279,6 +1447,10 @@ bit($CC, carry_flag_bit) <- attr(cpu/alu/carryout);
 bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 ```
 
+###### Module
+
+**`base`**
+
 --------------
 
 ##### The `subcy` Instruction
@@ -1305,6 +1477,10 @@ rd <- rd-rs-bit($CC, carry_flag_bit)\16;
 bit($CC, carry_flag_bit) <- attr(cpu/alu/carryout);
 bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 ```
+
+###### Module
+
+**`base`**
 
 --------------
 
@@ -1336,6 +1512,10 @@ bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 b_push($TS, compare(r1, <(s\16), r2))
 ```
 
+###### Module
+
+**`base`**
+
 --------------
 
 ##### The `tge` Instruction
@@ -1360,6 +1540,10 @@ b_push($TS, compare(r1, <(s\16), r2))
 --------------------------------------
 b_push($TS, compare(r1, >=(s\16), r2))
 ```
+
+###### Module
+
+**`base`**
 
 --------------
 
@@ -1386,6 +1570,10 @@ b_push($TS, compare(r1, >=(s\16), r2))
 b_push($TS, compare(r1, <(u\16), r2))
 ```
 
+###### Module
+
+**`base`**
+
 --------------
 
 ##### The `tae` Instruction
@@ -1410,6 +1598,10 @@ b_push($TS, compare(r1, <(u\16), r2))
 --------------------------------------
 b_push($TS, compare(r1, >=(u\16), r2))
 ```
+
+###### Module
+
+**`base`**
 
 --------------
 
@@ -1441,6 +1633,10 @@ b_push($TS, compare(r1, >=(u\16), r2))
 b_push($TS, r1\=r2)
 ```
 
+###### Module
+
+**`base`**
+
 --------------
 
 ##### The `teq` Instruction
@@ -1465,6 +1661,10 @@ b_push($TS, r1\=r2)
 ------------------------
 b_push($TS, r1==r2)
 ```
+
+###### Module
+
+**`base`**
 
 --------------
 
@@ -1495,6 +1695,10 @@ b_push($TS, r1==r2)
 todo
 ```
 
+###### Module
+
+**`stack`**
+
 --------------
 
 ##### The `pushw` Instruction
@@ -1515,6 +1719,10 @@ todo
 ----
 todo
 ```
+
+###### Module
+
+**`stack`**
 
 --------------
 
@@ -1537,6 +1745,10 @@ todo
 todo
 ```
 
+###### Module
+
+**`stack`**
+
 --------------
 
 ##### The `popw` Instruction
@@ -1557,6 +1769,10 @@ todo
 ----
 todo
 ```
+
+###### Module
+
+**`stack`**
 
 --------------
 
@@ -1579,6 +1795,10 @@ todo
 todo
 ```
 
+###### Module
+
+**`base`**
+
 --------------
 
 ##### The `jr` Instruction
@@ -1599,6 +1819,10 @@ todo
 ----
 todo
 ```
+
+###### Module
+
+**`base`**
 
 --------------
 
@@ -1621,6 +1845,10 @@ todo
 todo
 ```
 
+###### Module
+
+**`imms`**
+
 --------------
 
 ##### The `seb` Instruction
@@ -1641,6 +1869,10 @@ todo
 ----
 todo
 ```
+
+###### Module
+
+**`base`**
 
 --------------
 
@@ -1668,6 +1900,10 @@ todo
 todo
 ```
 
+###### Module
+
+**`mul`**
+
 --------------
 
 ##### The `rd.mp.hi` Instruction
@@ -1688,6 +1924,10 @@ todo
 ----
 todo
 ```
+
+###### Module
+
+**`mul`**
 
 --------------
 
@@ -1710,6 +1950,10 @@ todo
 todo
 ```
 
+###### Module
+
+**`globals`**
+
 --------------
 
 ##### The `wr.gp` Instruction
@@ -1730,6 +1974,10 @@ todo
 ----
 todo
 ```
+
+###### Module
+
+**`globals`**
 
 --------------
 
@@ -1760,6 +2008,10 @@ todo
 todo
 ```
 
+###### Module
+
+**`base`**
+
 --------------
 
 ##### The `UNIMPL` Instruction
@@ -1780,6 +2032,10 @@ todo
 ----
 todo
 ```
+
+###### Module
+
+**`dbg`**
 
 --------------
 
@@ -1802,6 +2058,10 @@ todo
 todo
 ```
 
+###### Module
+
+**`base`**
+
 --------------
 
 ##### The `BREAK` Instruction
@@ -1822,6 +2082,10 @@ todo
 ----
 todo
 ```
+
+###### Module
+
+**`dbg`**
 
 --------------
 
@@ -1844,6 +2108,10 @@ todo
 todo
 ```
 
+###### Module
+
+**`interrupts`**
+
 --------------
 
 ##### The `kcall` Instruction
@@ -1864,6 +2132,10 @@ todo
 ----
 todo
 ```
+
+###### Module
+
+**`interrupts`**
 
 --------------
 
@@ -1886,6 +2158,10 @@ todo
 todo
 ```
 
+###### Module
+
+**`base`**
+
 --------------
 
 ##### The `tov` Instruction
@@ -1906,6 +2182,10 @@ todo
 ----
 todo
 ```
+
+###### Module
+
+**`base`**
 
 --------------
 
@@ -1928,6 +2208,10 @@ todo
 todo
 ```
 
+###### Module
+
+**`base`**
+
 --------------
 
 ##### The `clr.cy` Instruction
@@ -1948,6 +2232,10 @@ todo
 ----
 todo
 ```
+
+###### Module
+
+**`base`**
 
 --------------
 
@@ -1970,6 +2258,10 @@ todo
 todo
 ```
 
+###### Module
+
+**`base`**
+
 --------------
 
 ##### The `tpush0` Instruction
@@ -1990,6 +2282,10 @@ todo
 ----
 todo
 ```
+
+###### Module
+
+**`tsops`**
 
 --------------
 
@@ -2012,6 +2308,10 @@ todo
 todo
 ```
 
+###### Module
+
+**`tsops`**
+
 --------------
 
 ##### The `tnot` Instruction
@@ -2032,6 +2332,10 @@ todo
 ----
 todo
 ```
+
+###### Module
+
+**`tsops`**
 
 --------------
 
@@ -2054,6 +2358,10 @@ todo
 todo
 ```
 
+###### Module
+
+**`tsops`**
+
 --------------
 
 ##### The `tor` Instruction
@@ -2074,6 +2382,10 @@ todo
 ----
 todo
 ```
+
+###### Module
+
+**`tsops`**
 
 --------------
 
@@ -2096,6 +2408,10 @@ todo
 todo
 ```
 
+###### Module
+
+**`tsops`**
+
 --------------
 
 ##### The `prsv.mp` Instruction
@@ -2116,6 +2432,10 @@ todo
 ----
 todo
 ```
+
+###### Module
+
+**`mul`**
 
 --------------
 
@@ -2138,6 +2458,10 @@ todo
 todo
 ```
 
+###### Module
+
+**`mul`**
+
 --------------
 
 ##### The `prsv.ts` Instruction
@@ -2158,6 +2482,10 @@ todo
 ----
 todo
 ```
+
+###### Module
+
+**`interrupts`**
 
 --------------
 
@@ -2180,6 +2508,10 @@ todo
 todo
 ```
 
+###### Module
+
+**`interrupts`**
+
 --------------
 
 ##### The `prsv.ra` Instruction
@@ -2200,6 +2532,10 @@ todo
 ----
 todo
 ```
+
+###### Module
+
+**`interrupts`**
 
 --------------
 
@@ -2222,6 +2558,10 @@ todo
 todo
 ```
 
+###### Module
+
+**`interrupts`**
+
 --------------
 
 ##### The `prsv.gp` Instruction
@@ -2242,6 +2582,10 @@ todo
 ----
 todo
 ```
+
+###### Module
+
+**`globals`**
 
 --------------
 
@@ -2264,6 +2608,10 @@ todo
 todo
 ```
 
+###### Module
+
+**`globals`**
+
 --------------
 
 ##### The `prsv.cc` Instruction
@@ -2285,6 +2633,10 @@ todo
 todo
 ```
 
+###### Module
+
+**`interrupts`**
+
 --------------
 
 ##### The `rstr.cc` Instruction
@@ -2305,6 +2657,10 @@ todo
 ----
 todo
 ```
+
+###### Module
+
+**`interrupts`**
 
 --------------
 
@@ -2330,6 +2686,10 @@ todo
 ----
 todo
 ```
+
+###### Module
+
+**`interrupts`**
 
 --------------
 
@@ -2357,5 +2717,9 @@ if bit($CC, jmp_tgt_validation_en_flag_bit) {
     }
 }
 ```
+
+###### Module
+
+**`security`**
 
 --------------

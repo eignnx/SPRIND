@@ -29,7 +29,8 @@ run_validations :-
     disprove('ill-formed instruction semantics'(_, _)),
     disprove('undefined constant in semantic definition'(_, _)),
     disprove(tyck:'incompatible bit sizes'(_, _)),
-    true.
+    disprove('use of undefined module'(_)),
+end.
 
 disprove(NegativeCheck) :-
     NegativeCheck ->
@@ -57,3 +58,11 @@ disprove(NegativeCheck) :-
     phrase(sem:valid_semantics(Info.sem), Emissions),
     member(constant(Constant), Emissions),
     \+ sem:def(Constant, _).
+
+'use of undefined module'(Module) :-
+    sem:instr_info(_Instr, Info),
+    [Module] = Info.module,
+    \+ sem:module_info(Module, _).
+
+
+end.

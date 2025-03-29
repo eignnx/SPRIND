@@ -244,7 +244,6 @@ display_instr_specification(Lvl, Fmt, Instr, OpTree) :-
     ),
 
     markdown:emit_table_header(['Format Prefix', 'Opcode', 'Bit Layout' | MaybeImmRange]),
-
     foreach(
         derive:fmt_layout(Fmt, Layout),
         display_detailed_instr_layout(Fmt, Instr, Prefix, Opcode, Layout)
@@ -252,6 +251,10 @@ display_instr_specification(Lvl, Fmt, Instr, OpTree) :-
 
     markdown:emit_heading(s(Lvl), 'Semantics'),
     sem:emit_semantics_codeblock(Info),
+
+    markdown:emit_heading(s(Lvl), 'Module'),
+    [Module | _] = Info.module,
+    format('**`~p`**~n', [Module]),
 
     format('~n--------------~n').
 

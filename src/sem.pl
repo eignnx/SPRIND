@@ -2,7 +2,10 @@
     instr_info/2,
     valid_semantics//1,
     def/2,
-	emit_semantics_codeblock/1
+	emit_semantics_codeblock/1,
+	all_modules/1,
+	module_instrs/2,
+	module_info/2
 ]).
 
 :- set_prolog_flag(double_quotes, chars).
@@ -10,6 +13,8 @@
 
 :- use_module(isa).
 :- use_module(library(clpfd)).
+:- use_module(library(aggregate)).
+
 :- op(20, fx, #).
 :- op(20, fx, $$).
 :- op(20, fx, ?).
@@ -1074,4 +1079,80 @@ instr_info(vijt, info{
 	),
     tags: [pc, indirect, jump, security],
 	module: [security]
+}).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+all_modules(Modules) :-
+	aggregate_all(set(M), (
+		instr_info(_, Info),
+		[M] = Info.module
+	), Modules).
+
+module_instrs(Module, Instrs) :-
+	bagof(I, instr_module(I, Module), Instrs).
+
+instr_module(Instr, Module) :-
+	instr_info(Instr, Info),
+	[Module] = Info.module.
+
+
+module_info(base, info{
+	title: 'Base',
+	descr: 'The minimal set of features needed for general computation.',
+	deps: []
+}).
+
+module_info(globals, info{
+	title: 'Globals',
+	descr: 'Instructions related to the `$GP` global variable pointer register and gloal variables.',
+	deps: [base]
+}).
+
+module_info(bittests, info{
+	title: 'Bit Tests',
+	descr: 'Instructions related to testing specific bits of a register or memory.',
+	deps: [base]
+}).
+
+module_info(dbg, info{
+	title: 'Debugging',
+	descr: 'Instructions which communicate with a debugger.',
+	deps: [base]
+}).
+
+module_info(imms, info{
+	title: 'Immediates',
+	descr: 'Instructions contain embedded (immediate) values. Generally duplicates of instructions which operate on registers.',
+	deps: [base]
+}).
+
+module_info(interrupts, info{
+	title: 'Interrupts',
+	descr: 'Instructions for handling and operating during hardware/software interrupts.',
+	deps: [base, stack]
+}).
+
+module_info(mul, info{
+	title: 'Multiply',
+	descr: 'Instructions related to integer multiplication.',
+	deps: [base, stack]
+}).
+
+module_info(security, info{
+	title: 'Security',
+	descr: 'Instructions related to computer security.',
+	deps: [base]
+}).
+
+module_info(stack, info{
+	title: 'Stack',
+	descr: 'Instructions for manipulating the subroutine stack.',
+	deps: [base]
+}).
+
+module_info(tsops, info{
+	title: 'Test-stack Operations',
+	descr: 'Instructions for manipulating the test-stack (`$TS`).',
+	deps: [base]
 }).
