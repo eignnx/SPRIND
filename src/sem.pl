@@ -813,7 +813,7 @@ instr_info('NONEXE0', info{
 	ex: [],
 	operands: [],
 	sem: todo,
-    tags: [] % Giving this no tags ensures it gets sorted into the 0-most branch of the optree.,
+    tags: [], % Giving this no tags ensures it gets sorted into the 0-most branch of the optree.
 	module: [base]
 }).
 instr_info('BREAK', info{

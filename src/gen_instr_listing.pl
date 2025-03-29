@@ -247,7 +247,7 @@ display_instr_specification(Lvl, Fmt, Instr, OpTree) :-
 
     foreach(
         derive:fmt_layout(Fmt, Layout),
-        display_detailed_instr_layout(Fmt, Prefix, Opcode, Layout)
+        display_detailed_instr_layout(Fmt, Instr, Prefix, Opcode, Layout)
     ),
 
     markdown:emit_heading(s(Lvl), 'Semantics'),
@@ -255,7 +255,7 @@ display_instr_specification(Lvl, Fmt, Instr, OpTree) :-
 
     format('~n--------------~n').
 
-display_detailed_instr_layout(Fmt, Prefix, Opcode, Layout) :-
+display_detailed_instr_layout(Fmt, Instr, Prefix, Opcode, Layout) :-
     bitlayout_opcodebits(Layout, OBits),
     bitlayout_immbits(Layout, IBits),
     bitlayout_operands(Layout, OperandsBits),
@@ -274,8 +274,13 @@ display_detailed_instr_layout(Fmt, Prefix, Opcode, Layout) :-
     ),
 
     ( fmt_operands(Fmt, Operands), member(i, Operands) ->
-        immbits_immdescription(IBits, ImmRange),
-        MaybeImmRange = [d(IBits), a(ImmRange)]
+        ( sem:instr_info(Instr, Info), member(simm(_), Info.operands) ->
+            immbits_simmrange(IBits, ImmRange)
+        ;
+            immbits_immrange(IBits, ImmRange)
+        ),
+        format(atom(Range), '`~p`', [ImmRange]),
+        MaybeImmRange = [d(IBits), a(Range)]
     ;
         MaybeImmRange = []
     ),
