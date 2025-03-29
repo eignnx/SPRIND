@@ -72,7 +72,7 @@ display_module(Lvl, Module, Info) :-
         [Instr]>>(
             format(codes(SectionNameRendered), 'The `~w` Instruction', [Instr]),
             utils:codes_slugified(SectionNameRendered, Slug),
-            format('[`~p`](instruction-listing#~s), ', [Instr, Slug])
+            format('[`~p`](instruction-listing.md#~s), ', [Instr, Slug])
         ),
         Instrs
     ),
