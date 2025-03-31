@@ -179,6 +179,7 @@ instr_info(lb, info{
 	descr: 'Load a byte from memory into a register.',
     ex: ['lb w, [sp+12]'],
     operands: [simm(?simm), reg(r, ?rs), reg(s, ?rd)],
+	syntax: { reg(r, ?rs), [reg(s, ?rd) + simm(?simm)] },
 	sem: (
         ?ptr = (?rs\s + sxt(?simm))\u;
         ?rd <- zxt([?ptr])
@@ -191,6 +192,7 @@ instr_info(lw, info{
 	descr: 'Load a word from memory into a register.',
 	ex: ['lw w, [sp+12]'],
     operands: [simm(?simm), reg(r, ?rs), reg(s, ?rd)],
+	syntax: { reg(r, ?rs), [reg(s, ?rd) + simm(?simm)] },
 	sem: (
         ?ptr = ((?rs\s + sxt(?simm)) and #(-2)\16)\u;
         ?rd <- {[?ptr + #1], [?ptr]}
@@ -203,6 +205,7 @@ instr_info(sb, info{
 	descr: 'Store a byte from a register into memory.',
 	ex: ['sb [sp-20], x'],
     operands: [simm(?simm), reg(r, ?rd), reg(s, ?rs)],
+	syntax: { [reg(r, ?rd) + simm(?simm)], reg(s, ?rs) },
 	sem: (
         ?ptr = ?rd\s + sxt(?simm);
         [?ptr\u] <- lo(?rs)
@@ -215,6 +218,7 @@ instr_info(sw, info{
 	descr: 'Store a word from a register into memory.',
 	ex: ['sw [sp-20], x'],
     operands: [simm(?simm), reg(r, ?rd), reg(s, ?rs)],
+	syntax: { [reg(r, ?rd) + simm(?simm)], reg(s, ?rs) },
 	sem: (
         ?ptr = ((?rd\s + sxt(?simm)) and #0b1111111111111110)\u;
         [?ptr] <- lo(?rs);
@@ -229,6 +233,10 @@ instr_info(call, info{
 	descr: 'Call a subroutine at the specified address.',
 	ex: ['call SOME_LABEL'],
 	operands: [simm(?simm)],
+	syntax: { simm(?abs_lbl) } -> (
+		?rel_lbl = #asm_pc - ?abs_lbl;
+		{ ?rel_lbl }
+	),
 	sem: (
         $$pc <- $$pc\s + (sxt(?simm) << #subr_align);
         $$ra <- $$pc + #2
@@ -242,6 +250,10 @@ instr_info(b, info{
 	descr: 'Branch to the specified address by adding the immediate offset to `$PC`.',
 	ex: ['b SOME_LABEL'],
 	operands: [simm(?offset)],
+	syntax: { simm(?abs_lbl) } -> (
+		?rel_lbl = #asm_pc - ?abs_lbl;
+		{ ?rel_lbl }
+	),
 	sem: $$pc <- $$pc\s + sxt(?offset),
     tags: [pc],
 	module: [base]
@@ -251,6 +263,10 @@ instr_info(bt, info{
 	descr: 'Branch to the specified address if the condition is true by adding the immediate offset to `$PC`.',
 	ex: ['bt SOME_LABEL'],
 	operands: [simm(?offset)],
+	syntax: { simm(?abs_lbl) } -> (
+		?rel_lbl = #asm_pc - ?abs_lbl;
+		{ ?rel_lbl }
+	),
 	sem: if(b_pop($$ts),
         $$pc <- $$pc\s + sxt(?offset)
     ),
@@ -262,6 +278,10 @@ instr_info(bf, info{
 	descr: 'Branch to the specified address if the condition is false by adding the immediate offset to `$PC`.',
 	ex: ['bf SOME_LABEL'],
 	operands: [simm(?offset)],
+	syntax: { simm(?abs_lbl) } -> (
+		?rel_lbl = #asm_pc - ?abs_lbl;
+		{ ?rel_lbl }
+	),
 	sem: if(!(b_pop($$ts)),
         $$pc <- $$pc\s + sxt(?offset)
     ),
@@ -274,6 +294,7 @@ instr_info(li, info{
 	descr: 'Load an immediate value into a register.',
 	ex: ['li x, 123'],
 	operands: [simm(?simm), reg(r, ?rd)],
+	syntax: { reg(r, ?rd), simm(?simm) },
 	sem: ?rd <- sxt(?simm),
     tags: [sxt, data],
 	module: [base]
@@ -283,6 +304,7 @@ instr_info(szi, info{
 	descr: 'Left-shift a zero-extended immediate value into a register.',
 	ex: ['szi x, 0xB3'],
 	operands: [imm(?imm), reg(r, ?rd)],
+	syntax: { reg(r, ?rd), imm(?imm) },
 	sem: ?rd <- (?rd << #8) or zxt(?imm),
     tags: [zxt, data, shift],
 	module: [base]
@@ -293,6 +315,7 @@ instr_info(lgb, info{
 	descr: 'Load a byte from a memory address offset from `$GP`.',
 	ex: ['lgb x, [gp+8]'],
 	operands: [imm(?disp), reg(r, ?rd)],
+	syntax: { reg(r, ?rd), [reg(s, ?rs) + imm(?disp)] },
 	sem: ?rd <- zxt([$$gp\u + zxt(?disp)]),
     tags: [mem, load, global, byte],
 	module: [globals]
@@ -302,6 +325,7 @@ instr_info(lgw, info{
 	descr: 'Load a word from a memory address offset from `$GP`.',
 	ex: ['lgw x, [gp+8]'],
 	operands: [imm(?disp), reg(r, ?rd)],
+	syntax: { reg(r, ?rd), [reg(s, ?rs) + imm(?disp)] },
 	sem: (
         ?ptr = (($$gp\u + zxt(?disp)) and #0b1111111111111110)\u;
         ?rd <- {[?ptr + #1], [?ptr]}
@@ -314,6 +338,7 @@ instr_info(sgb, info{
 	descr: 'Store a byte into memory address offset from `$GP`.',
 	ex: ['sgb [gp+8], x'],
 	operands: [imm(?disp), reg(r, ?rs)],
+	syntax: { [reg(r, ?rd) + imm(?disp)], reg(s, ?rs) },
 	sem: [$$gp\u + zxt(?disp)] <- lo(?rs),
     tags: [mem, store, global, byte],
 	module: [globals]
@@ -323,6 +348,7 @@ instr_info(sgw, info{
 	descr: 'Store a word into memory address offset from `$GP`.',
 	ex: ['sgw [gp+8], x'],
 	operands: [imm(?disp), reg(r, ?rs)],
+	syntax: { [reg(r, ?rd) + imm(?disp)], reg(s, ?rs) },
 	sem: (
         ?ptr = (($$gp\u + zxt(?disp)) and #0b1111111111111110)\u;
         {[?ptr + #1], [?ptr]} <- ?rs
@@ -335,6 +361,7 @@ instr_info(tbit, info{
 	descr: 'Test a specific bit in a register, modifying `$TS`.',
 	ex: ['tbit 12, w'],
 	operands: [imm(?bit_idx), reg(r, ?rs)],
+	syntax: { imm(?bit_idx), reg(r, ?rs) },
 	sem: (
         ?shamt = bitslice(?bit_idx, #3 .. #0);
         ?bit = (?rs >> ?shamt\u) and #1;
@@ -348,6 +375,7 @@ instr_info(cbit, info{
 	descr: 'Clear a specific bit in a register.',
 	ex: ['cbit 9, v'],
 	operands: [imm(?bit_idx), reg(r, ?rd)],
+	syntax: { imm(?bit_idx), reg(r, ?rd) },
 	sem: (
         ?idx = bitslice(?bit_idx, #3 .. #0)\u;
         ?mask = ~(#1 << ?idx);
@@ -361,6 +389,7 @@ instr_info(sbit, info{
 	descr: 'Set a specific bit in a register.',
 	ex: ['sbit 15, a'],
 	operands: [imm(?bit_idx), reg(r, ?rd)],
+	syntax: { imm(?bit_idx), reg(r, ?rd) },
 	sem: (
         ?idx = bitslice(?bit_idx, #3 .. #0)\u;
         ?mask = ~(#1 << ?idx);
@@ -374,6 +403,7 @@ instr_info(tli, info{
 	descr: 'Test if a register value is less than an immediate value.',
 	ex: ['tli x, -5'],
 	operands: [simm(?simm), reg(r, ?rs)],
+	syntax: { reg(r, ?rs), simm(?simm) },
 	sem: b_push($$ts, compare(?rs\s, <(s\16), sxt(?simm))),
     tags: [ts, cmp, inequality, signed, '<'],
 	module: [imms]
@@ -383,6 +413,7 @@ instr_info(tgei, info{
 	descr: 'Test if a register value is greater than or equal to an immediate value.',
 	ex: ['tgei x, -5'],
 	operands: [simm(?simm), reg(r, ?rs)],
+	syntax: { reg(r, ?rs), simm(?simm) },
 	sem: b_push($$ts, compare(?rs\s, >=(s\16), sxt(?simm))),
     tags: [ts, cmp, inequality, signed, '>='],
 	module: [imms]
@@ -392,6 +423,7 @@ instr_info(tbi, info{
 	descr: 'Test if a register value is below an immediate value.',
 	ex: ['tbi x, 10'],
 	operands: [imm(?imm), reg(r, ?rs)],
+	syntax: { reg(r, ?rs), imm(?imm) },
 	sem: b_push($$ts, compare(?rs\u, <(u\16), zxt(?imm))),
     tags: [ts, cmp, inequality, unsigned, '<'],
 	module: [imms]
@@ -401,6 +433,7 @@ instr_info(taei, info{
 	descr: 'Test if a register value is above or equal to an immediate value.',
 	ex: ['taei x, 10'],
 	operands: [imm(?imm), reg(r, ?rs)],
+	syntax: { reg(r, ?rs), imm(?imm) },
 	sem: b_push($$ts, compare(?rs\u, >=(u\16), zxt(?imm))),
     tags: [ts, cmp, inequality, unsigned, '>='],
 	module: [imms]
@@ -410,6 +443,7 @@ instr_info(tnei, info{
 	descr: 'Test if a register value is not equal to an immediate value.',
 	ex: ['tnei x, 0'],
 	operands: [simm(?simm), reg(r, ?rs)],
+	syntax: { reg(r, ?rs), simm(?simm) },
 	sem: b_push($$ts, ?rs\s \= sxt(?simm)),
     tags: [ts, cmp, equality, not],
 	module: [imms]
@@ -419,6 +453,7 @@ instr_info(teqi, info{
 	descr: 'Test if a register value is equal to an immediate value.',
 	ex: ['teqi x, -5'],
 	operands: [simm(?simm), reg(r, ?rs)],
+	syntax: { reg(r, ?rs), simm(?simm) },
 	sem: b_push($$ts, ?rs\s == sxt(?simm)),
     tags: [ts, cmp, equality],
 	module: [imms]
@@ -428,6 +463,7 @@ instr_info(addi, info{
 	descr: 'Add an immediate value to a register.',
 	ex: ['addi x, -5'],
 	operands: [simm(?simm), reg(r, ?rd)],
+	syntax: { reg(r, ?rd), simm(?simm) },
 	sem: ?rd <- ?rd\s + sxt(?simm),
     tags: [arith],
 	module: [imms]
@@ -437,6 +473,7 @@ instr_info(andi, info{
 	descr: 'Perform a bitwise AND between a register and an immediate value.',
 	ex: ['andi x, 3'],
 	operands: [simm(?simm), reg(r, ?rd)],
+	syntax: { reg(r, ?rd), simm(?simm) },
 	sem: ?rd <- ?rd and sxt(?simm),
     tags: [logical, boolean, bitwise, and],
 	module: [imms]
@@ -446,6 +483,7 @@ instr_info(ori, info{
 	descr: 'Perform a bitwise OR between a register and an immediate value.',
 	ex: ['ori x, 3'],
 	operands: [simm(?simm), reg(r, ?rd)],
+	syntax: { reg(r, ?rd), simm(?simm) },
 	sem: ?rd <- ?rd or sxt(?simm),
     tags: [logical, boolean, bitwise],
 	module: [imms]
@@ -456,6 +494,7 @@ instr_info(xori, info{
 	descr: 'Perform a bitwise XOR between a register and an immediate value.',
 	ex: ['xori x, 3'],
 	operands: [simm(?simm), reg(r, ?rd)],
+	syntax: { reg(r, ?rd), simm(?simm) },
 	sem: ?rd <- ?rd xor sxt(?simm),
     tags: [logical, boolean, bitwise, xor],
 	module: [imms]
@@ -465,6 +504,7 @@ instr_info(addicy, info{
 	descr: 'Add an immediate value and the carry bit to a register.',
 	ex: ['addicy x, 3'],
 	operands: [simm(?simm), reg(r, ?rd)],
+	syntax: { reg(r, ?rd), simm(?simm) },
 	sem: (
         ?rd <- ?rd\s + sxt(?simm) + bit($$cc, #carry_flag_bit)\16\s;
         bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
@@ -478,6 +518,7 @@ instr_info(subicy, info{
 	descr: 'Sutract an immediate value and the carry bit from a register.',
 	ex: ['subicy x, 3'],
 	operands: [simm(?simm), reg(r, ?rd)],
+	syntax: { reg(r, ?rd), simm(?simm) },
 	sem: (
         ?rd <- ?rd\s - sxt(?simm) - bit($$cc, #carry_flag_bit)\16\s;
         bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
@@ -491,6 +532,7 @@ instr_info(lsr, info{
 	descr: 'Perform a logical shift right on a register by an immediate value.',
 	ex: ['lsr x, 15'],
 	operands: [imm(?imm), reg(r, ?rd)],
+	syntax: { reg(r, ?rd), imm(?imm) },
 	sem: ?rd <- ?rd >> ?imm,
     tags: [bitwise, shift, right],
 	module: [base]
@@ -500,6 +542,7 @@ instr_info(lsl, info{
 	descr: 'Perform a logical shift left on a register by an immediate value.',
 	ex: ['lsl x, 8'],
 	operands: [imm(?imm), reg(r, ?rd)],
+	syntax: { reg(r, ?rd), imm(?imm) },
 	sem: ?rd <- ?rd << ?imm,
     tags: [zxt, bitwise, shift, left],
 	module: [base]
@@ -509,6 +552,7 @@ instr_info(asr, info{
 	descr: 'Perform an arithmetic shift right on a register by an immediate value.',
 	ex: ['asr x, 3'],
 	operands: [imm(?imm), reg(r, ?rd)],
+	syntax: { reg(r, ?rd), imm(?imm) },
 	sem: (
         ?sign_extension = (sxt(bit(?rd, #15) - #1)) << (#reg_size_bits - ?imm);
         ?rd <- (?rd >> ?imm) or ?sign_extension 
@@ -521,6 +565,7 @@ instr_info(tbitm, info{
 	descr: '',
 	ex: ['tbitm [x], 3'],
 	operands: [imm(?imm), reg(r, ?rs)],
+	syntax: { [reg(r, ?rs)], imm(?imm) },
 	sem: b_push($$ts, bit([?rs], ?imm)),
     tags: [ts, bit, bitwise, mem],
 	module: [bittests]
@@ -530,6 +575,7 @@ instr_info(cbitm, info{
 	descr: '',
 	ex: ['cbitm [x], 3'],
 	operands: [imm(?imm), reg(r, ?rs)],
+	syntax: { [reg(r, ?rs)], imm(?imm) },
 	sem: (
 		[?rs] <- [?rs] and ~(#1 << ?imm)
     ),
@@ -541,6 +587,7 @@ instr_info(sbitm, info{
 	descr: '',
 	ex: ['sbitm [x], 3'],
 	operands: [imm(?imm), reg(r, ?rs)],
+	syntax: { [reg(r, ?rs)], imm(?imm) },
 	sem: (
 		[?rs] <- [?rs] or (#1 << ?imm)
     ),
@@ -553,6 +600,7 @@ instr_info(add, info{
 	descr: 'Add the values of two registers.',
 	ex: ['add x, y'],
 	operands: [reg(r, ?rs), reg(s, ?rd)],
+	syntax: { reg(r, ?rd), reg(s, ?rs) },
 	sem: ?rd <- ?rd + ?rs,
     tags: [arith, add],
 	module: [base]
@@ -562,6 +610,7 @@ instr_info(sub, info{
 	descr: 'Subtract the value of one register from another.',
 	ex: ['sub x, y'],
 	operands: [reg(r, ?rs), reg(s, ?rd)],
+	syntax: { reg(r, ?rd), reg(s, ?rs) },
 	sem: ?rd <- ?rd - ?rs,
     tags: [arith],
 	module: [base]
@@ -571,6 +620,7 @@ instr_info(and, info{
 	descr: 'Perform a bitwise AND between two registers.',
 	ex: ['and x, y'],
 	operands: [reg(r, ?rs), reg(s, ?rd)],
+	syntax: { reg(r, ?rd), reg(s, ?rs) },
 	sem: ?rd <- ?rd and ?rs,
     tags: [logical, boolean, bitwise, and],
 	module: [base]
@@ -580,6 +630,7 @@ instr_info(or, info{
 	descr: 'Perform a bitwise OR between two registers.',
 	ex: ['or x, y'],
 	operands: [reg(r, ?rs), reg(s, ?rd)],
+	syntax: { reg(r, ?rd), reg(s, ?rs) },
 	sem: ?rd <- ?rd or ?rs,
     tags: [logical, boolean, bitwise],
 	module: [base]
@@ -589,6 +640,7 @@ instr_info(xor, info{
 	descr: 'Perform a bitwise XOR between two registers.',
 	ex: ['xor x, y'],
 	operands: [reg(r, ?rs), reg(s, ?rd)],
+	syntax: { reg(r, ?rd), reg(s, ?rs) },
 	sem: ?rd <- ?rd xor ?rs,
     tags: [logical, boolean, bitwise, xor],
 	module: [base]
@@ -598,6 +650,7 @@ instr_info(mov, info{
 	descr: 'Move the value from one register to another.',
 	ex: ['mov x, y'],
 	operands: [reg(r, ?rs), reg(s, ?rd)],
+	syntax: { reg(r, ?rd), reg(s, ?rs) },
 	sem: ?rd <- ?rs,
     tags: [data],
 	module: [base]
@@ -607,6 +660,7 @@ instr_info(addcy, info{
 	descr: 'Add the values of two registers with carry.',
 	ex: ['addcy x, y'],
 	operands: [reg(r, ?rs), reg(s, ?rd)],
+	syntax: { reg(r, ?rd), reg(s, ?rs) },
 	sem: (
         ?rd <- ?rd + ?rs + bit($$cc, #carry_flag_bit)\16;
         bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
@@ -620,6 +674,7 @@ instr_info(subcy, info{
 	descr: 'Subtract the value of one register from another with carry.',
 	ex: ['subcy x, y'],
 	operands: [reg(r, ?rs), reg(s, ?rd)],
+	syntax: { reg(r, ?rd), reg(s, ?rs) },
 	sem: (
         ?rd <- ?rd - ?rs - bit($$cc, #carry_flag_bit)\16;
         bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
@@ -633,6 +688,7 @@ instr_info(tl, info{
 	descr: 'Test if the value of one register is less than another.',
 	ex: ['tl x, y'],
 	operands: [reg(r, ?r1), reg(s, ?r2)],
+	syntax: { reg(r, ?r1), reg(s, ?r2) },
 	sem: b_push($$ts, compare(?r1, <(s\16), ?r2)),
     tags: [ts, cmp, inequality, signed, '<'],
 	module: [base]
@@ -642,6 +698,7 @@ instr_info(tge, info{
 	descr: 'Test if the value of one register is greater than or equal to another.',
 	ex: ['tge x, y'],
 	operands: [reg(r, ?r1), reg(s, ?r2)],
+	syntax: { reg(r, ?r1), reg(s, ?r2) },
 	sem: b_push($$ts, compare(?r1, >=(s\16), ?r2)),
     tags: [ts, cmp, inequality, signed, '>='],
 	module: [base]
@@ -651,6 +708,7 @@ instr_info(tb, info{
 	descr: 'Test if the value of one register is below another.',
 	ex: ['tb x, y'],
 	operands: [reg(r, ?r1), reg(s, ?r2)],
+	syntax: { reg(r, ?r1), reg(s, ?r2) },
 	sem: b_push($$ts, compare(?r1, <(u\16), ?r2)),
     tags: [ts, cmp, inequality, unsigned, '<'],
 	module: [base]
@@ -660,6 +718,7 @@ instr_info(tae, info{
 	descr: 'Test if the value of one register is above or equal to another.',
 	ex: ['tae x, y'],
 	operands: [reg(r, ?r1), reg(s, ?r2)],
+	syntax: { reg(r, ?r1), reg(s, ?r2) },
 	sem: b_push($$ts, compare(?r1, >=(u\16), ?r2)),
     tags: [ts, cmp, inequality, unsigned, '>='],
 	module: [base]
@@ -669,6 +728,7 @@ instr_info(tne, info{
 	descr: 'Test if the value of one register is not equal to another.',
 	ex: ['tne x, y'],
 	operands: [reg(r, ?r1), reg(s, ?r2)],
+	syntax: { reg(r, ?r1), reg(s, ?r2) },
 	sem: b_push($$ts, ?r1 \= ?r2),
     tags: [ts, cmp, equality, not],
 	module: [base]
@@ -678,6 +738,7 @@ instr_info(teq, info{
 	descr: 'Test if the value of one register is equal to another.',
 	ex: ['teq x, y'],
 	operands: [reg(r, ?r1), reg(s, ?r2)],
+	syntax: { reg(r, ?r1), reg(s, ?r2) },
 	sem: b_push($$ts, ?r1 == ?r2),
     tags: [ts, cmp, equality],
 	module: [base]
@@ -688,6 +749,7 @@ instr_info(mulstep, info{
 	descr: 'Computes one step in a full 16-bit by 16-bit unsigned multiplication.',
 	ex: ['mulstep x:y, z'],
 	operands: [reg(r, ?multiplicand_hi), reg(s, ?multiplicand_lo), reg(t, ?multiplier)],
+	syntax: { reg(t, ?multiplicand_hi):reg(s, ?multiplicand_lo), reg(r, ?multiplier) },
 	sem: (
         ?mask = ~((?multiplier and #1) - #1);
         ?masked_lo = ?multiplicand_lo and ?mask;
@@ -706,8 +768,9 @@ instr_info(mulstep, info{
 instr_info(pushb, info{
 	title: 'Push Byte',
 	descr: 'Push a byte from a register onto the stack.',
-	ex: [],
-	operands: [],
+	ex: ['pushb x'],
+	operands: [reg(r, ?rs)],
+	syntax: { reg(r, ?rs) },
 	sem: todo,
     tags: [sp, push, byte],
 	module: [stack]
@@ -715,8 +778,9 @@ instr_info(pushb, info{
 instr_info(pushw, info{
 	title: 'Push Word',
 	descr: 'Push a word from a register onto the stack.',
-	ex: [],
-	operands: [],
+	ex: ['pushw x'],
+	operands: [reg(r, ?rs)],
+	syntax: { reg(r, ?rs) },
 	sem: todo,
     tags: [sp, push, word],
 	module: [stack]
@@ -724,8 +788,9 @@ instr_info(pushw, info{
 instr_info(popb, info{
 	title: 'Pop Byte',
 	descr: 'Pop a byte from the stack into a register.',
-	ex: [],
-	operands: [],
+	ex: ['popb x'],
+	operands: [reg(r, ?rd)],
+	syntax: { reg(r, ?rd) },
 	sem: todo,
     tags: [sp, pop, byte],
 	module: [stack]
@@ -733,8 +798,9 @@ instr_info(popb, info{
 instr_info(popw, info{
 	title: 'Pop Word',
 	descr: 'Pop a word from the stack into a register.',
-	ex: [],
-	operands: [],
+	ex: ['popw x'],
+	operands: [reg(r, ?rd)],
+	syntax: { reg(r, ?rd) },
 	sem: todo,
     tags: [sp, pop, word],
 	module: [stack]
@@ -742,27 +808,33 @@ instr_info(popw, info{
 instr_info(callr, info{
 	title: 'Call Register',
 	descr: 'Call a subroutine at the address in a register.',
-	ex: [],
-	operands: [],
-	sem: todo,
+	ex: ['callr x'],
+	operands: [reg(r, ?abs_lbl)],
+	syntax: { reg(r, ?abs_lbl) },
+	sem: (
+		$$pc <- ?abs_lbl;
+		$$ra <- $$pc + #2
+	),
     tags: [pc, ra, jump, indirect],
 	module: [base]
 }).
 instr_info(jr, info{
 	title: 'Jump Register',
 	descr: 'Jump to the address in a register.',
-	ex: [],
-	operands: [],
-	sem: todo,
+	ex: ['jr x'],
+	operands: [reg(r, ?abs_lbl)],
+	syntax: { reg(r, ?abs_lbl) },
+	sem: $$pc <- ?abs_lbl,
     tags: [pc, jump, indirect],
 	module: [base]
 }).
 instr_info(neg, info{
 	title: 'Negate',
 	descr: 'Negate the value in a register.',
-	ex: [],
-	operands: [],
-	sem: todo,
+	ex: ['neg x'],
+	operands: [reg(r, ?rd)],
+	syntax: { reg(r, ?rd) },
+	sem: ?rd <- -(?rd),
     tags: [arith],
 	module: [imms]
 }).
@@ -770,44 +842,50 @@ instr_info(seb, info{
 	title: 'Sign Extend Byte',
 	descr: 'Sign extend a byte in a register.',
 	ex: [],
-	operands: [],
-	sem: todo,
+	ex: ['seb x'],
+	operands: [reg(r, ?rd)],
+	syntax: { reg(r, ?rd) },
+	sem: ?rd <- sxt(?rd\8),
     tags: [arith, sxt],
 	module: [base]
 }).
 instr_info('rd.mp.lo', info{
 	title: 'Read $MP.lo',
 	descr: 'Read the low word in the system `$MP` register into a general purpose register.',
-	ex: [],
-	operands: [],
-	sem: todo,
+	ex: ['rd.mp.lo x'],
+	operands: [reg(r, ?rd)],
+	syntax: { reg(r, ?rd) },
+	sem: ?rd <- lo($$mp),
     tags: [rd, data, mp, lo],
 	module: [mul]
 }).
 instr_info('rd.mp.hi', info{
 	title: 'Read $MP.hi',
 	descr: 'Read the high word in the system `$MP` register into a general purpose register.',
-	ex: [],
-	operands: [],
-	sem: todo,
+	ex: ['rd.mp.hi x'],
+	operands: [reg(r, ?rd)],
+	syntax: { reg(r, ?rd) },
+	sem: ?rd <- hi($$mp),
     tags: [rd, data, mp, hi],
 	module: [mul]
 }).
 instr_info('rd.gp', info{
 	title: 'Read $GP',
 	descr: 'Read the value of the system `$GP` register into a general purpose register.',
-	ex: [],
-	operands: [],
-	sem: todo,
+	ex: ['rd.gp x'],
+	operands: [reg(r, ?rd)],
+	syntax: { reg(r, ?rd) },
+	sem: ?rd <- $$gp,
     tags: [rd, data, gp],
 	module: [globals]
 }).
 instr_info('wr.gp', info{
 	title: 'Write $GP',
 	descr: 'Write a value to the system `$GP` register from a general purpose register.',
-	ex: [],
-	operands: [],
-	sem: todo,
+	ex: ['wr.gp x'],
+	operands: [reg(r, ?rs)],
+	syntax: { reg(r, ?rs) },
+	sem: $$gp <- ?rs,
     tags: [wr, data, gp],
 	module: [globals]
 }).
@@ -815,26 +893,29 @@ instr_info('wr.gp', info{
 instr_info('NONEXE0', info{
 	title: 'Non-executable (0s Version)',
 	descr: 'Triggers a "non-executable instruction" exception. The entire instruction is 16 `0`s.',
-	ex: [],
+	ex: ['NONEXE0'],
 	operands: [],
-	sem: todo,
+	syntax: {},
+	sem: $$pc <- #nonexe0_isr,
     tags: [], % Giving this no tags ensures it gets sorted into the 0-most branch of the optree.
 	module: [base]
 }).
 instr_info('BREAK', info{
 	title: 'Breakpoint',
 	descr: 'Trigger a breakpoint.',
-	ex: [],
+	ex: ['BREAK'],
 	operands: [],
-	sem: todo,
+	syntax: {},
+	sem: $$pc <- #break_isr,
     tags: [exc, dbg],
 	module: [dbg]
 }).
 instr_info('HALT', info{
 	title: 'Halt',
 	descr: 'Halt the processor.',
-	ex: [],
+	ex: ['HALT'],
 	operands: [],
+	syntax: {},
 	sem: todo,
     tags: [exc, cmd],
 	module: [base]
@@ -842,107 +923,123 @@ instr_info('HALT', info{
 instr_info('UNIMPL', info{
 	title: 'Unimplemented',
 	descr: 'Unimplemented instruction.',
-	ex: [],
+	ex: ['UNIMPL'],
 	operands: [],
-	sem: todo, 
+	syntax: {},
+	sem: $$pc <- #unimpl_isr, 
     tags: [exc, dbg],
 	module: [dbg]
 }).
 instr_info(kret, info{
 	title: 'Kernel Return',
 	descr: 'Return from kernel mode.',
-	ex: [],
+	ex: ['kret'],
 	operands: [],
-	sem: todo,
+	syntax: {},
+	sem: $$pc <- $$kr,
     tags: [kernel, kr, pc, ret],
 	module: [interrupts]
 }).
 instr_info(kcall, info{
 	title: 'Kernel Call',
-	descr: 'Call a kernel function.',
-	ex: [],
+	descr: 'Call a kernel function. The function index must be stored in `v`.',
+	ex: ['kcall'],
 	operands: [],
-	sem: todo,
+	syntax: {},
+	sem: (
+		$$kr <- $$pc + #2;
+		$$pc <- $v;
+		todo
+	),
     tags: [kernel, kr, pc, call],
 	module: [interrupts]
 }).
 instr_info(ret, info{
 	title: 'Return',
 	descr: 'Return from a subroutine.',
-	ex: [],
+	ex: ['ret'],
 	operands: [],
-	sem: todo,
+	syntax: {},
+	sem: $$pc <- $$ra,
     tags: [pc, ra, ret],
 	module: [base]
 }).
 instr_info(tov, info{
 	title: 'Test Overflow',
 	descr: 'Test for overflow.',
-	ex: [],
+	ex: ['tov'],
 	operands: [],
-	sem: todo,
+	syntax: {},
+	sem: b_push($$ts, bit($$cc, #overflow_flag_idx)),
     tags: [ts, cc, ov],
 	module: [base]
 }).
 instr_info(tcy, info{
 	title: 'Test Carry',
 	descr: 'Test for carry.',
-	ex: [],
+	ex: ['tcy'],
 	operands: [],
-	sem: todo,
+	syntax: {},
+	sem: b_push($$ts, bit($$cc, #carry_flag_idx)),
     tags: [ts, cc, cy],
 	module: [base]
 }).
 instr_info('clr.cy', info{
 	title: 'Clear Carry',
 	descr: 'Clear the carry flag.',
-	ex: [],
+	ex: ['clr.cy'],
 	operands: [],
-	sem: todo,
+	syntax: {},
+	sem: bit($$cc, #carry_flag_idx) <- #0,
     tags: [wr, cy],
 	module: [base]
 }).
 instr_info('set.cy', info{
 	title: 'Set Carry',
 	descr: 'Set the carry flag.',
-	ex: [],
+	ex: ['set.cy'],
 	operands: [],
-	sem: todo,
+	syntax: {},
+	sem: bit($$cc, #carry_flag_idx) <- #1,
     tags: [wr, cy],
 	module: [base]
 }).
 instr_info(tpush0, info{
 	title: 'Teststack Push 0',
 	descr: 'Push 0 onto the test stack.',
-	ex: [],
+	ex: ['tpush0'],
 	operands: [],
-	sem: todo,
+	syntax: {},
+	sem: b_push($$ts, #0),
     tags: [ts, push],
 	module: [tsops]
 }).
 instr_info(tpush1, info{
 	title: 'Teststack Push 1',
 	descr: 'Push 1 onto the test stack.',
-	ex: [],
+	ex: ['tpush1'],
 	operands: [],
-	sem: todo,
+	syntax: {},
+	sem: b_push($$ts, #1),
     tags: [ts, push],
 	module: [tsops]
 }).
 instr_info(tnot, info{
 	title: 'Teststack NOT',
 	descr: 'Perform a NOT operation on the test stack.',
-	ex: [],
+	ex: ['tnot'],
 	operands: [],
-	sem: todo,
+	syntax: {},
+	sem: b_push($$ts, ~(b_pop($$ts))),
     tags: [ts, boolean],
 	module: [tsops]
 }).
 instr_info(tand, info{
 	title: 'Teststack AND',
 	descr: 'Perform an AND operation on the test stack.',
-	ex: [],
+	ex: ['tand'],
 	operands: [],
+	syntax: {},
 	sem: todo,
     tags: [ts, boolean],
 	module: [tsops]
@@ -950,8 +1047,9 @@ instr_info(tand, info{
 instr_info(tor, info{
 	title: 'Teststack OR',
 	descr: 'Perform an OR operation on the test stack.',
-	ex: [],
+	ex: ['tor'],
 	operands: [],
+	syntax: {},
 	sem: todo,
     tags: [ts, boolean],
 	module: [tsops]
@@ -959,8 +1057,9 @@ instr_info(tor, info{
 instr_info(tdup, info{
 	title: 'Teststack Duplicate',
 	descr: 'Duplicate the top value on the test stack.',
-	ex: [],
+	ex: ['tdup'],
 	operands: [],
+	syntax: {},
 	sem: todo,
     tags: [ts, data],
 	module: [tsops]
@@ -970,6 +1069,7 @@ instr_info('prsv.mp', info{
 	descr: 'Preserve the value of the `$MP` register onto the stack.',
 	ex: [],
 	operands: [],
+	syntax: {},
 	sem: todo,
     tags: [sp, prsv_rstr, prsv, mp],
 	module: [mul]
@@ -979,6 +1079,7 @@ instr_info('rstr.mp', info{
 	descr: 'Restore the value of the `$MP` register from the stack.',
 	ex: [],
 	operands: [],
+	syntax: {},
 	sem: todo,
     tags: [sp, prsv_rstr, rstr, mp],
 	module: [mul]
@@ -988,6 +1089,7 @@ instr_info('prsv.ts', info{
 	descr: 'Preserve the value of the `$TS` register onto the stack.',
 	ex: [],
 	operands: [],
+	syntax: {},
 	sem: todo,
     tags: [sp, prsv_rstr, prsv, ts],
 	module: [interrupts]
@@ -997,6 +1099,7 @@ instr_info('rstr.ts', info{
 	descr: 'Restore the value of the `$TS` register from the stack.',
 	ex: [],
 	operands: [],
+	syntax: {},
 	sem: todo,
     tags: [sp, prsv_rstr, rstr, ts],
 	module: [interrupts]
@@ -1006,6 +1109,7 @@ instr_info('prsv.ra', info{
 	descr: 'Preserve the value of the `$RA` register onto the stack.',
 	ex: [],
 	operands: [],
+	syntax: {},
 	sem: todo,
     tags: [sp, prsv_rstr, prsv, ra],
 	module: [interrupts]
@@ -1015,6 +1119,7 @@ instr_info('rstr.ra', info{
 	descr: 'Restore the value of the `$RA` register from the stack.',
 	ex: [],
 	operands: [],
+	syntax: {},
 	sem: todo,
     tags: [sp, prsv_rstr, rstr, ra],
 	module: [interrupts]
@@ -1024,6 +1129,7 @@ instr_info('prsv.gp', info{
 	descr: 'Preserve the value of the `$GP` register onto the stack.',
 	ex: [],
 	operands: [],
+	syntax: {},
 	sem: todo,
     tags: [sp, prsv_rstr, prsv, gp],
 	module: [globals]
@@ -1033,6 +1139,7 @@ instr_info('rstr.gp', info{
 	descr: 'Restore the value of the `$GP` register from the stack.',
 	ex: [],
 	operands: [],
+	syntax: {},
 	sem: todo,
     tags: [sp, prsv_rstr, rstr, gp],
 	module: [globals]
@@ -1042,6 +1149,7 @@ instr_info('prsv.cc', info{
 	descr: 'Preserve the value of the `$CC` register onto the stack.',
 	ex: [],
 	operands: [],
+	syntax: {},
 	sem: todo,
     tags: [sp, prsv_rstr, prsv, cc],
 	module: [interrupts]
@@ -1051,6 +1159,7 @@ instr_info('rstr.cc', info{
 	descr: 'Restore the value of the `$CC` register from the stack.',
 	ex: [],
 	operands: [],
+	syntax: {},
 	sem: todo,
     tags: [sp, prsv_rstr, rstr, cc],
 	module: [interrupts]
@@ -1060,6 +1169,7 @@ instr_info(sleep, info{
 	descr: 'Puts processor into low-power sleep mode.',
 	ex: ['sleep'],
 	operands: [],
+	syntax: {},
 	sem: todo,
     tags: [cc, sleep, interrupts],
 	module: [interrupts]
@@ -1069,6 +1179,7 @@ instr_info(vijt, info{
 	descr: 'When `$CC.jt` is `1`, the `callr` and `jr` instructions must jump to one of these instructions or an exception is raised.',
 	ex: [],
 	operands: [],
+	syntax: {},
 	sem: (
 		if(bit($$cc, #jmp_tgt_validation_en_flag_bit),
 			if(bit($$cc, #jmp_tgt_validation_req_flag_bit),
