@@ -112,7 +112,7 @@ codes_slugified(Codes, Slug) :-
 end.
 
 
-:- meta_predicate write_phrase(0).
+:- meta_predicate write_phrase(//).
 
 write_phrase(Nonterminal) :-
     phrase(Nonterminal, Codes),

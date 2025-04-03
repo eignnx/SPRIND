@@ -234,7 +234,7 @@ instr_info(call, info{
 	ex: ['call SOME_LABEL'],
 	operands: [simm(?simm)],
 	syntax: { simm(?abs_lbl) } -> (
-		?rel_lbl = #asm_pc - ?abs_lbl;
+		?rel_lbl = ?abs_lbl - #asm_pc;
 		{ ?rel_lbl }
 	),
 	sem: (
@@ -251,7 +251,7 @@ instr_info(b, info{
 	ex: ['b SOME_LABEL'],
 	operands: [simm(?offset)],
 	syntax: { simm(?abs_lbl) } -> (
-		?rel_lbl = #asm_pc - ?abs_lbl;
+		?rel_lbl = ?abs_lbl - #asm_pc;
 		{ ?rel_lbl }
 	),
 	sem: $$pc <- $$pc\s + sxt(?offset),
@@ -264,7 +264,7 @@ instr_info(bt, info{
 	ex: ['bt SOME_LABEL'],
 	operands: [simm(?offset)],
 	syntax: { simm(?abs_lbl) } -> (
-		?rel_lbl = #asm_pc - ?abs_lbl;
+		?rel_lbl = ?abs_lbl - #asm_pc;
 		{ ?rel_lbl }
 	),
 	sem: if(b_pop($$ts),
@@ -279,7 +279,7 @@ instr_info(bf, info{
 	ex: ['bf SOME_LABEL'],
 	operands: [simm(?offset)],
 	syntax: { simm(?abs_lbl) } -> (
-		?rel_lbl = #asm_pc - ?abs_lbl;
+		?rel_lbl = ?abs_lbl - #asm_pc;
 		{ ?rel_lbl }
 	),
 	sem: if(!(b_pop($$ts)),
@@ -841,7 +841,6 @@ instr_info(neg, info{
 instr_info(seb, info{
 	title: 'Sign Extend Byte',
 	descr: 'Sign extend a byte in a register.',
-	ex: [],
 	ex: ['seb x'],
 	operands: [reg(r, ?rd)],
 	syntax: { reg(r, ?rd) },

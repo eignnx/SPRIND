@@ -4,9 +4,11 @@
 
 #once
 
-#const ISA_VERSION = "0.2.1"
+#const ISA_VERSION_MAJOR = 0
+#const ISA_VERSION_MINOR = 2
+#const ISA_VERSION_PATCH = 1
 
-#ruledef Reg {
+#subruledef Reg {
   sp => 0b000
   x  => 0b001
   y  => 0b010
@@ -18,7 +20,109 @@
 }
 
 #ruledef Instruction {
-	lw {dst: Reg}, [{base: Reg} + {disp: s7}] => 0b10 @ 0`2 @ disp @ base @ dst
+	lb {rs: Reg}, [{rd: Reg} + {simm: s6}] => 0b11 @ 0b11`2 @ simm @ rd @ rs
+	lw {rs: Reg}, [{rd: Reg} + {simm: s6}] => 0b11 @ 0b01`2 @ simm @ rd @ rs
+	sb [{rd: Reg} + {simm: s6}], {rs: Reg} => 0b11 @ 0b10`2 @ simm @ rs @ rd
+	sw [{rd: Reg} + {simm: s6}], {rs: Reg} => 0b11 @ 0b00`2 @ simm @ rs @ rd
+	call {abs_lbl: s13} => {
+		rel_lbl = abs_lbl - $
+		0b101 @ rel_lbl
+	}
+	b {abs_lbl: s10} => {
+		rel_lbl = abs_lbl - $
+		0b1001 @ 0b0`2 @ rel_lbl
+	}
+	bt {abs_lbl: s10} => {
+		rel_lbl = abs_lbl - $
+		0b1001 @ 0b10`2 @ rel_lbl
+	}
+	bf {abs_lbl: s10} => {
+		rel_lbl = abs_lbl - $
+		0b1001 @ 0b11`2 @ rel_lbl
+	}
+	li {rd: Reg}, {simm: s8} => 0b1000 @ 0b0`1 @ simm @ rd
+	szi {rd: Reg}, {imm: u8} => 0b1000 @ 0b1`1 @ imm @ rd
+	lgb {rd: Reg}, [{rs: Reg} + {disp: u6}] => 0b01 @ 0b00111`5 @ disp @ rs @ rd
+	lgw {rd: Reg}, [{rs: Reg} + {disp: u6}] => 0b01 @ 0b00101`5 @ disp @ rs @ rd
+	sgb [{rd: Reg} + {disp: u6}], {rs: Reg} => 0b01 @ 0b00110`5 @ disp @ rs @ rd
+	sgw [{rd: Reg} + {disp: u6}], {rs: Reg} => 0b01 @ 0b00100`5 @ disp @ rs @ rd
+	tbit {bit_idx: u6}, {rs: Reg} => 0b01 @ 0b11000`5 @ bit_idx @ rs
+	cbit {bit_idx: u6}, {rd: Reg} => 0b01 @ 0b01101`5 @ bit_idx @ rd
+	sbit {bit_idx: u6}, {rd: Reg} => 0b01 @ 0b11001`5 @ bit_idx @ rd
+	tli {rs: Reg}, {simm: s6} => 0b01 @ 0b01111`5 @ simm @ rs
+	tgei {rs: Reg}, {simm: s6} => 0b01 @ 0b01101`5 @ simm @ rs
+	tbi {rs: Reg}, {imm: u6} => 0b01 @ 0b01110`5 @ imm @ rs
+	taei {rs: Reg}, {imm: u6} => 0b01 @ 0b01100`5 @ imm @ rs
+	tnei {rs: Reg}, {simm: s6} => 0b01 @ 0b00101`5 @ simm @ rs
+	teqi {rs: Reg}, {simm: s6} => 0b01 @ 0b00100`5 @ simm @ rs
+	addi {rd: Reg}, {simm: s6} => 0b01 @ 0b00000`5 @ simm @ rd
+	andi {rd: Reg}, {simm: s6} => 0b01 @ 0b01011`5 @ simm @ rd
+	ori {rd: Reg}, {simm: s6} => 0b01 @ 0b10100`5 @ simm @ rd
+	xori {rd: Reg}, {simm: s6} => 0b01 @ 0b10101`5 @ simm @ rd
+	addicy {rd: Reg}, {simm: s6} => 0b01 @ 0b00011`5 @ simm @ rd
+	subicy {rd: Reg}, {simm: s6} => 0b01 @ 0b00010`5 @ simm @ rd
+	lsr {rd: Reg}, {imm: u6} => 0b01 @ 0b10010`5 @ imm @ rd
+	lsl {rd: Reg}, {imm: u6} => 0b01 @ 0b01000`5 @ imm @ rd
+	asr {rd: Reg}, {imm: u6} => 0b01 @ 0b10011`5 @ imm @ rd
+	tbitm [{rs: Reg}], {imm: u6} => 0b01 @ 0b11100`5 @ imm @ rs
+	cbitm [{rs: Reg}], {imm: u6} => 0b01 @ 0b01111`5 @ imm @ rs
+	sbitm [{rs: Reg}], {imm: u6} => 0b01 @ 0b11101`5 @ imm @ rs
+	add {rd: Reg}, {rs: Reg} => 0b000001 @ 0b0110`4 @ rs @ rd
+	sub {rd: Reg}, {rs: Reg} => 0b000001 @ 0b0100`4 @ rs @ rd
+	and {rd: Reg}, {rs: Reg} => 0b000001 @ 0b0001`4 @ rs @ rd
+	or {rd: Reg}, {rs: Reg} => 0b000001 @ 0b0010`4 @ rs @ rd
+	xor {rd: Reg}, {rs: Reg} => 0b000001 @ 0b0011`4 @ rs @ rd
+	mov {rd: Reg}, {rs: Reg} => 0b000001 @ 0b0000`4 @ rs @ rd
+	addcy {rd: Reg}, {rs: Reg} => 0b000001 @ 0b0111`4 @ rs @ rd
+	subcy {rd: Reg}, {rs: Reg} => 0b000001 @ 0b0101`4 @ rs @ rd
+	tl {r1: Reg}, {r2: Reg} => 0b0000001 @ 0b011`3 @ r2 @ r1
+	tge {r1: Reg}, {r2: Reg} => 0b0000001 @ 0b001`3 @ r2 @ r1
+	tb {r1: Reg}, {r2: Reg} => 0b0000001 @ 0b010`3 @ r2 @ r1
+	tae {r1: Reg}, {r2: Reg} => 0b0000001 @ 0b000`3 @ r2 @ r1
+	tne {r1: Reg}, {r2: Reg} => 0b00000001 @ 0b01`2 @ r2 @ r1
+	teq {r1: Reg}, {r2: Reg} => 0b00000001 @ 0b00`2 @ r2 @ r1
+	mulstep ({multiplicand_hi: Reg},{multiplicand_lo: Reg}), {multiplier: Reg} => 0b00001 @ 0b00`2 @ multiplicand_hi @ multiplicand_lo @ multiplier
+	pushb {rs: Reg} => 0b000000001 @ 0b0110`4 @ rs
+	pushw {rs: Reg} => 0b000000001 @ 0b0100`4 @ rs
+	popb {rd: Reg} => 0b000000001 @ 0b0111`4 @ rd
+	popw {rd: Reg} => 0b000000001 @ 0b0101`4 @ rd
+	callr {abs_lbl: Reg} => 0b000000001 @ 0b0001`4 @ abs_lbl
+	jr {abs_lbl: Reg} => 0b000000001 @ 0b0000`4 @ abs_lbl
+	neg {rd: Reg} => 0b000000001 @ 0b0010`4 @ rd
+	seb {rd: Reg} => 0b000000001 @ 0b0011`4 @ rd
+	rd.mp.lo {rd: Reg} => 0b0000000001 @ 0b000`3 @ rd
+	rd.mp.hi {rd: Reg} => 0b0000000001 @ 0b001`3 @ rd
+	rd.gp {rd: Reg} => 0b0000000001 @ 0b011`3 @ rd
+	wr.gp {rs: Reg} => 0b0000000001 @ 0b010`3 @ rs
+	NONEXE0 => 0b0000000000 @ 0b000000`6
+	BREAK => 0b0000000000 @ 0b000111`6
+	HALT => 0b0000000000 @ 0b000010`6
+	UNIMPL => 0b0000000000 @ 0b000110`6
+	kret => 0b0000000000 @ 0b000110`6
+	kcall => 0b0000000000 @ 0b000111`6
+	ret => 0b0000000000 @ 0b000100`6
+	tov => 0b0000000000 @ 0b001010`6
+	tcy => 0b0000000000 @ 0b001011`6
+	clr.cy => 0b0000000000 @ 0b000011`6
+	set.cy => 0b0000000000 @ 0b000010`6
+	tpush0 => 0b0000000000 @ 0b010011`6
+	tpush1 => 0b0000000000 @ 0b010010`6
+	tnot => 0b0000000000 @ 0b001101`6
+	tand => 0b0000000000 @ 0b000111`6
+	tor => 0b0000000000 @ 0b001100`6
+	tdup => 0b0000000000 @ 0b001000`6
+	prsv.mp => 0b0000000000 @ 0b011001`6
+	rstr.mp => 0b0000000000 @ 0b010001`6
+	prsv.ts => 0b0000000000 @ 0b110000`6
+	rstr.ts => 0b0000000000 @ 0b100000`6
+	prsv.ra => 0b0000000000 @ 0b110001`6
+	rstr.ra => 0b0000000000 @ 0b100001`6
+	prsv.gp => 0b0000000000 @ 0b001101`6
+	rstr.gp => 0b0000000000 @ 0b001001`6
+	prsv.cc => 0b0000000000 @ 0b000111`6
+	rstr.cc => 0b0000000000 @ 0b000101`6
+	sleep => 0b0000000000 @ 0b000001`6
+	vijt => 0b0000000000 @ 0b000101`6
 }
 
 #const SPRIND_SUBR_ALIGN = 4

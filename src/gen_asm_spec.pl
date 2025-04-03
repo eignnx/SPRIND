@@ -2,9 +2,12 @@
 
 :- use_module(isa).
 :- use_module(derive).
-:- use_module(utils).
+:- use_module(optree).
+:- use_module(sem, [instr_info/2]).
+:- use_module(utils, [write_phrase/1]).
 :- use_module(library(dcg/basics)).
 :- use_module(library(dcg/high_order)).
+
 :- op(20, fx, #).
 :- op(20, fx, ?).
 :- op(200, fx, ~).
@@ -22,49 +25,203 @@ report :-
     format(';~n~n'),
     format('#once~n~n'),
     isa:version(VMajor, VMinor, VPatch),
-    format('#const ISA_VERSION = "~d.~d.~d"~n~n', [VMajor, VMinor, VPatch]),
+    format('#const ISA_VERSION_MAJOR = ~d~n', [VMajor]),
+    format('#const ISA_VERSION_MINOR = ~d~n', [VMinor]),
+    format('#const ISA_VERSION_PATCH = ~d~n~n', [VPatch]),
 
     findall(Reg, isa:regname_uses(Reg, _), Regs),
-    format('#ruledef Reg {~n'),
+    format('#subruledef Reg {~n'),
     maplist({Regs}/[Reg]>>(
-      nth0(Idx, Regs, Reg),
-      format('  ~|~w~t~3+=> 0b~|~`0t~2r~3+~n', [Reg, Idx])
+        nth0(Idx, Regs, Reg),
+        format('  ~|~w~t~3+=> 0b~|~`0t~2r~3+~n', [Reg, Idx])
     ), Regs),
     format('}~n~n'),
 
-    write_phrase((
-        ruledef('Instruction', [
-            instr(lw, [
-                decl_reg(dst),
-                bracks((decl_reg(base), ` + `, decl(disp, s7)))
-            ])-joined([
-                #'0b10',
-                #0\2,
-                ?disp,
-                ?base,
-                ?dst
-            ])
-        ])
-    )), nl, nl,
-
+    write_phrase(instruction_ruledef), nl, nl,
 
     derive:subr_byte_alignment(SubrAlign),
     format('#const SPRIND_SUBR_ALIGN = ~d~n~n', SubrAlign),
 end.
 
-ruledef(Name, Body) -->
-    `#ruledef `, atom(Name), ` {`, nl,
-        ruledef_body_expansion(Body),
+instruction_ruledef -->
+    `#ruledef Instruction {`, nl,
+	{ bagof(Instr-Info, instr_info(Instr, Info), InstrsInfos) },
+	instr_ruledef_arms(InstrsInfos),
     `}`,
 end.
 
-ruledef_body_expansion([]) --> ``.
-ruledef_body_expansion([Lhs-Rhs | Rest]) -->
-    `\t`, Lhs, ` => `, Rhs, nl,
-    ruledef_body_expansion(Rest),
+instr_ruledef_arms([]) --> ``.
+instr_ruledef_arms([Instr-Info | Rest]) -->
+	instr_arm(Instr, Info.syntax),
+    instr_ruledef_arms(Rest),
+end.
+
+instr_arm(Instr, Syntax) -->
+	{ instr_ctx(Instr, Ctx) },
+	`\t`, expand_syntax(Syntax, Ctx), nl,
 end.
 
 
+% :- det(instr_ctx/2).
+
+instr_ctx(Instr, Ctx) :-
+	isa:fmt_instr(Fmt, Instr),
+	derive:fmt_prefix(Fmt, PrefixChars),
+	atom_chars(Prefix, PrefixChars),
+	once(optree:fmt_tree(Fmt, OpTree)),
+	optree:optree_instr_prefix(OpTree, Instr, OpcodeChars),
+	atom_chars(Opcode, OpcodeChars),
+	derive:fmt_opcodebits_immbits(Fmt, OBits, IBits),
+	once(clpfd:label([OBits, IBits])),
+	Ctx = ctx{
+		fmt: Fmt,
+		instr: Instr,
+		prefix: Prefix,
+		opcode: Opcode,
+		obits: OBits,
+		ibits: IBits
+	},
+end.
+
+
+expand_syntax({}, Ctx) -->
+	atom(Ctx.instr),
+	` => `,
+	autoexpand_rhs_args([], Ctx),
+end.
+
+expand_syntax({ LhsCommas }, Ctx) -->
+	{ comma_list(LhsCommas, Lhs) },
+	atom(Ctx.instr), ` `, expand_lhs_args(Lhs, Ctx),
+	` => `,
+	autoexpand_rhs_args(Lhs, Ctx),
+end.
+
+expand_syntax({LhsCommas} -> RhsSemis, Ctx) -->
+	{ comma_list(LhsCommas, Lhs) },
+	{ semicolon_list(RhsSemis, Rhs) },
+	atom(Ctx.instr), ` `,
+	expand_lhs_args(Lhs, Ctx), ` => `, `{`, nl,
+		expand_rhs_stmts(Rhs, Ctx, Lhs),
+	`\t}`,
+end.
+
+
+expand_lhs_args([], _Ctx) --> ``.
+expand_lhs_args([Item], Ctx) --> expand_lhs(Item, Ctx).
+expand_lhs_args([Item, ItemNext | Items], Ctx) -->
+	expand_lhs(Item, Ctx),
+	`, `,
+	expand_lhs_args([ItemNext | Items], Ctx).
+
+expand_lhs([Syntax], Ctx) --> `[`, expand_lhs(Syntax, Ctx), `]`.
+expand_lhs(A:B, Ctx) --> `(`, expand_lhs(A, Ctx), `,`, expand_lhs(B, Ctx), `)`.
+expand_lhs(Syn1 + Syn2, Ctx) --> expand_lhs(Syn1, Ctx), ` + `, expand_lhs(Syn2, Ctx).
+expand_lhs(reg(_RegField, ?Ident), _Ctx) --> decl_reg(Ident).
+expand_lhs(imm(?Ident), Ctx) -->
+	decl(Ident, u\Ctx.ibits).
+expand_lhs(simm(?Ident), Ctx) -->
+	decl(Ident, s\Ctx.ibits).
+
+autoexpand_rhs_args(Items, Ctx) -->
+	{ phrase(flatten_args(Items), ArgsFlat) },
+	{ predsort(order_args, ArgsFlat, Args) },
+	sequence(
+		{Ctx}/[Arg]>>expand_rhs_from_lhs(Arg, Ctx),
+		` @ `,
+		[prefix(Ctx.prefix), opcode(Ctx.opcode) | Args]
+	),
+end.
+
+flatten_args([]) --> [].
+flatten_args([Term | Rest]) --> flatten_arg(Term), flatten_args(Rest).
+
+flatten_arg(reg(R, Ident)) --> [reg(R, Ident)].
+flatten_arg(imm(Ident)) --> [imm(Ident)].
+flatten_arg(simm(Ident)) --> [simm(Ident)].
+flatten_arg([Inner]) --> flatten_arg(Inner).
+flatten_arg(A + B) --> flatten_arg(A), flatten_arg(B).
+flatten_arg(A - B) --> flatten_arg(A), flatten_arg(B).
+flatten_arg(A:B) --> flatten_arg(A), flatten_arg(B).
+
+order_args(Delta, A, B) :-
+	List = [
+		imm(_),
+		simm(_),
+		reg(t, _),
+		reg(s, _),
+		reg(r, _)
+	],
+	nth0(IdxA, List, A),
+	nth0(IdxB, List, B),
+	compare(Delta, IdxA, IdxB),
+end.
+
+
+:- det(expand_rhs_from_lhs//2).
+
+expand_rhs_from_lhs(reg(_R, ?Ident), _Ctx) --> atom(Ident).
+expand_rhs_from_lhs(imm(?Ident), _Ctx) --> atom(Ident).
+expand_rhs_from_lhs(simm(?Ident), _Ctx) --> atom(Ident).
+expand_rhs_from_lhs(prefix(Bits), _Ctx) --> `0b`, atom(Bits).
+expand_rhs_from_lhs(opcode(Bits), Ctx) -->
+	{ atom_codes(Bits, BitsCodes) },
+	{ length(BitsCodes, NBits) },
+	{ NZeros is Ctx.obits - NBits },
+	{ length(Zeros, NZeros) },
+	{ maplist(=(0'0), Zeros) },
+	{ append(Zeros, BitsCodes, PaddedCodes) },
+	{ atom_codes(Padded, PaddedCodes) },
+	`0b`, atom(Padded), `\``, integer(Ctx.obits).
+
+expand_rhs_stmt(Ctx, (?Ident = Rhs), _Lhs) -->
+	atom(Ident), ` = `, expand_rhs(Ctx, Rhs),
+end.
+expand_rhs_stmt(Ctx, {CommaList}, Lhs) -->
+	{ comma_list(CommaList, List) },
+	expand_rhs_concat_expr(List, Ctx, Lhs),
+end.
+
+expand_rhs(Ctx, A - B) -->
+	expand_rhs(Ctx, A), ` - `, expand_rhs(Ctx, B),
+end.
+expand_rhs(Ctx, A + B) -->
+	expand_rhs(Ctx, A), ` + `, expand_rhs(Ctx, B),
+end.
+expand_rhs(_Ctx, ?Ident) --> atom(Ident).
+expand_rhs(_Ctx, #Value) -->
+	( { integer(Value) } ->
+		integer(Value)
+	; { Value = asm_pc } ->
+		`$`
+	),
+end.
+expand_rhs(Ctx, {CommaList}) -->
+	{ comma_list(CommaList, Items) },
+	sequence(expand_rhs(Ctx), ` @ `, Items),
+end.
+
+expand_rhs_stmts([], _, _) --> ``.
+expand_rhs_stmts([Line | Lines], Ctx, Lhs) -->
+	`\t\t`, expand_rhs_stmt(Ctx, Line, Lhs), nl,
+	expand_rhs_stmts(Lines, Ctx, Lhs),
+end.
+
+expand_rhs_concat_expr(Items0, Ctx, _Lhs) -->
+	{ dif(Ctx.obits, 0) ->
+		Items1 = [opcode(Ctx.opcode) | Items0]
+	;
+		Items1 = Items0
+	},
+	sequence(
+		{Ctx}/[Item]>>expand_concat_item(Item, Ctx),
+		` @ `,
+		[prefix(Ctx.prefix) | Items1]
+	),
+end.
+expand_concat_item(?Ident, _Ctx) --> atom(Ident).
+expand_concat_item(prefix(Bits), _Ctx) --> `0b`, atom(Bits).
+expand_concat_item(opcode(Bits), Ctx) --> `0b`, atom(Bits), `\``, integer(Ctx.obits).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 nl --> `\n`.
@@ -73,7 +230,11 @@ braces(Content) --> `{`, Content, `}`.
 bracks(Content) --> `[`, Content, `]`.
 parens(Content) --> `(`, Content, `)`.
 
-decl(Ident, Type) --> braces((atom(Ident), `: `, atom(Type))).
+decl(Ident, Type) --> braces((atom(Ident), `: `, type(Type))).
+type('Reg') --> `Reg`.
+type(s\N) --> `s`, number(N).
+type(u\N) --> `u`, number(N).
+type(i\N) --> `i`, number(N).
 decl_reg(Ident) --> decl(Ident, 'Reg').
 
 instr(Name, []) --> atom(Name).

@@ -1680,6 +1680,10 @@ b_push($TS, r1==r2)
 
 **Push Byte** --- Push a byte from a register onto the stack.
 
+###### Examples
+
+- `pushb x`
+
 ###### Layout
 
 
@@ -1690,8 +1694,8 @@ b_push($TS, r1==r2)
 ###### Semantics
 
 ```
-[]
-----
+[reg(r, rs)]
+------------
 todo
 ```
 
@@ -1705,6 +1709,10 @@ todo
 
 **Push Word** --- Push a word from a register onto the stack.
 
+###### Examples
+
+- `pushw x`
+
 ###### Layout
 
 
@@ -1715,8 +1723,8 @@ todo
 ###### Semantics
 
 ```
-[]
-----
+[reg(r, rs)]
+------------
 todo
 ```
 
@@ -1730,6 +1738,10 @@ todo
 
 **Pop Byte** --- Pop a byte from the stack into a register.
 
+###### Examples
+
+- `popb x`
+
 ###### Layout
 
 
@@ -1740,8 +1752,8 @@ todo
 ###### Semantics
 
 ```
-[]
-----
+[reg(r, rd)]
+------------
 todo
 ```
 
@@ -1755,6 +1767,10 @@ todo
 
 **Pop Word** --- Pop a word from the stack into a register.
 
+###### Examples
+
+- `popw x`
+
 ###### Layout
 
 
@@ -1765,8 +1781,8 @@ todo
 ###### Semantics
 
 ```
-[]
-----
+[reg(r, rd)]
+------------
 todo
 ```
 
@@ -1780,6 +1796,10 @@ todo
 
 **Call Register** --- Call a subroutine at the address in a register.
 
+###### Examples
+
+- `callr x`
+
 ###### Layout
 
 
@@ -1790,9 +1810,10 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[reg(r, abs_lbl)]
+-----------------
+$PC <- abs_lbl;
+$RA <- $PC+2
 ```
 
 ###### Module
@@ -1805,6 +1826,10 @@ todo
 
 **Jump Register** --- Jump to the address in a register.
 
+###### Examples
+
+- `jr x`
+
 ###### Layout
 
 
@@ -1815,9 +1840,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[reg(r, abs_lbl)]
+-----------------
+$PC <- abs_lbl
 ```
 
 ###### Module
@@ -1830,6 +1855,10 @@ todo
 
 **Negate** --- Negate the value in a register.
 
+###### Examples
+
+- `neg x`
+
 ###### Layout
 
 
@@ -1840,9 +1869,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[reg(r, rd)]
+------------
+rd <- -rd
 ```
 
 ###### Module
@@ -1855,6 +1884,10 @@ todo
 
 **Sign Extend Byte** --- Sign extend a byte in a register.
 
+###### Examples
+
+- `seb x`
+
 ###### Layout
 
 
@@ -1865,9 +1898,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[reg(r, rd)]
+---------------
+rd <- sxt(rd\8)
 ```
 
 ###### Module
@@ -1885,6 +1918,10 @@ todo
 
 **Read $MP.lo** --- Read the low word in the system `$MP` register into a general purpose register.
 
+###### Examples
+
+- `rd.mp.lo x`
+
 ###### Layout
 
 
@@ -1895,9 +1932,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[reg(r, rd)]
+-------------
+rd <- lo($MP)
 ```
 
 ###### Module
@@ -1910,6 +1947,10 @@ todo
 
 **Read $MP.hi** --- Read the high word in the system `$MP` register into a general purpose register.
 
+###### Examples
+
+- `rd.mp.hi x`
+
 ###### Layout
 
 
@@ -1920,9 +1961,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[reg(r, rd)]
+-------------
+rd <- hi($MP)
 ```
 
 ###### Module
@@ -1935,6 +1976,10 @@ todo
 
 **Read $GP** --- Read the value of the system `$GP` register into a general purpose register.
 
+###### Examples
+
+- `rd.gp x`
+
 ###### Layout
 
 
@@ -1945,9 +1990,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[reg(r, rd)]
+------------
+rd <- $GP
 ```
 
 ###### Module
@@ -1960,6 +2005,10 @@ todo
 
 **Write $GP** --- Write a value to the system `$GP` register from a general purpose register.
 
+###### Examples
+
+- `wr.gp x`
+
 ###### Layout
 
 
@@ -1970,9 +2019,9 @@ todo
 ###### Semantics
 
 ```
-[]
-----
-todo
+[reg(r, rs)]
+------------
+$GP <- rs
 ```
 
 ###### Module
@@ -1993,6 +2042,10 @@ todo
 
 **Non-executable (0s Version)** --- Triggers a "non-executable instruction" exception. The entire instruction is 16 `0`s.
 
+###### Examples
+
+- `NONEXE0`
+
 ###### Layout
 
 
@@ -2004,8 +2057,8 @@ todo
 
 ```
 []
-----
-todo
+------------------
+$PC <- nonexe0_isr
 ```
 
 ###### Module
@@ -2018,6 +2071,10 @@ todo
 
 **Unimplemented** --- Unimplemented instruction.
 
+###### Examples
+
+- `UNIMPL`
+
 ###### Layout
 
 
@@ -2029,8 +2086,8 @@ todo
 
 ```
 []
-----
-todo
+-----------------
+$PC <- unimpl_isr
 ```
 
 ###### Module
@@ -2042,6 +2099,10 @@ todo
 ##### The `HALT` Instruction
 
 **Halt** --- Halt the processor.
+
+###### Examples
+
+- `HALT`
 
 ###### Layout
 
@@ -2068,6 +2129,10 @@ todo
 
 **Breakpoint** --- Trigger a breakpoint.
 
+###### Examples
+
+- `BREAK`
+
 ###### Layout
 
 
@@ -2079,8 +2144,8 @@ todo
 
 ```
 []
-----
-todo
+----------------
+$PC <- break_isr
 ```
 
 ###### Module
@@ -2093,6 +2158,10 @@ todo
 
 **Kernel Return** --- Return from kernel mode.
 
+###### Examples
+
+- `kret`
+
 ###### Layout
 
 
@@ -2104,8 +2173,8 @@ todo
 
 ```
 []
-----
-todo
+----------
+$PC <- $KR
 ```
 
 ###### Module
@@ -2116,7 +2185,11 @@ todo
 
 ##### The `kcall` Instruction
 
-**Kernel Call** --- Call a kernel function.
+**Kernel Call** --- Call a kernel function. The function index must be stored in `v`.
+
+###### Examples
+
+- `kcall`
 
 ###### Layout
 
@@ -2129,7 +2202,9 @@ todo
 
 ```
 []
-----
+-------------
+$KR <- $PC+2;
+$PC <- $v;
 todo
 ```
 
@@ -2143,6 +2218,10 @@ todo
 
 **Return** --- Return from a subroutine.
 
+###### Examples
+
+- `ret`
+
 ###### Layout
 
 
@@ -2154,8 +2233,8 @@ todo
 
 ```
 []
-----
-todo
+----------
+$PC <- $RA
 ```
 
 ###### Module
@@ -2168,6 +2247,10 @@ todo
 
 **Test Overflow** --- Test for overflow.
 
+###### Examples
+
+- `tov`
+
 ###### Layout
 
 
@@ -2179,8 +2262,8 @@ todo
 
 ```
 []
-----
-todo
+----------------------------------------
+b_push($TS, bit($CC, overflow_flag_idx))
 ```
 
 ###### Module
@@ -2193,6 +2276,10 @@ todo
 
 **Test Carry** --- Test for carry.
 
+###### Examples
+
+- `tcy`
+
 ###### Layout
 
 
@@ -2204,8 +2291,8 @@ todo
 
 ```
 []
-----
-todo
+-------------------------------------
+b_push($TS, bit($CC, carry_flag_idx))
 ```
 
 ###### Module
@@ -2218,6 +2305,10 @@ todo
 
 **Clear Carry** --- Clear the carry flag.
 
+###### Examples
+
+- `clr.cy`
+
 ###### Layout
 
 
@@ -2229,8 +2320,8 @@ todo
 
 ```
 []
-----
-todo
+-----------------------------
+bit($CC, carry_flag_idx) <- 0
 ```
 
 ###### Module
@@ -2243,6 +2334,10 @@ todo
 
 **Set Carry** --- Set the carry flag.
 
+###### Examples
+
+- `set.cy`
+
 ###### Layout
 
 
@@ -2254,8 +2349,8 @@ todo
 
 ```
 []
-----
-todo
+-----------------------------
+bit($CC, carry_flag_idx) <- 1
 ```
 
 ###### Module
@@ -2268,6 +2363,10 @@ todo
 
 **Teststack Push 0** --- Push 0 onto the test stack.
 
+###### Examples
+
+- `tpush0`
+
 ###### Layout
 
 
@@ -2279,8 +2378,8 @@ todo
 
 ```
 []
-----
-todo
+--------------
+b_push($TS, 0)
 ```
 
 ###### Module
@@ -2293,6 +2392,10 @@ todo
 
 **Teststack Push 1** --- Push 1 onto the test stack.
 
+###### Examples
+
+- `tpush1`
+
 ###### Layout
 
 
@@ -2304,8 +2407,8 @@ todo
 
 ```
 []
-----
-todo
+--------------
+b_push($TS, 1)
 ```
 
 ###### Module
@@ -2318,6 +2421,10 @@ todo
 
 **Teststack NOT** --- Perform a NOT operation on the test stack.
 
+###### Examples
+
+- `tnot`
+
 ###### Layout
 
 
@@ -2329,8 +2436,8 @@ todo
 
 ```
 []
-----
-todo
+------------------------
+b_push($TS, ~b_pop($TS))
 ```
 
 ###### Module
@@ -2342,6 +2449,10 @@ todo
 ##### The `tand` Instruction
 
 **Teststack AND** --- Perform an AND operation on the test stack.
+
+###### Examples
+
+- `tand`
 
 ###### Layout
 
@@ -2368,6 +2479,10 @@ todo
 
 **Teststack OR** --- Perform an OR operation on the test stack.
 
+###### Examples
+
+- `tor`
+
 ###### Layout
 
 
@@ -2392,6 +2507,10 @@ todo
 ##### The `tdup` Instruction
 
 **Teststack Duplicate** --- Duplicate the top value on the test stack.
+
+###### Examples
+
+- `tdup`
 
 ###### Layout
 
