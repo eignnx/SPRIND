@@ -19,7 +19,19 @@
 :- op(600, yfx, >>).
 :- op(150, yfx, \).
 
+% Five things I hate about this code:
+% - disorganization of predicate definitions (largely unordered)
+% - dcg rules aren't structured like a grammar, they're kinda spaghetti
+% - `{}` vs `{} -> ()` syntax is not discriminated upon very explicitly
+
 report :-
+	heading,
+	register_definitions,
+	instruction_definitions,
+	constant_definitions,
+end.
+
+heading :-
     format(';~n'),
     format('; SPRIND ISA Assembly Language Specification~n'),
     format(';~n~n'),
@@ -28,7 +40,9 @@ report :-
     format('#const ISA_VERSION_MAJOR = ~d~n', [VMajor]),
     format('#const ISA_VERSION_MINOR = ~d~n', [VMinor]),
     format('#const ISA_VERSION_PATCH = ~d~n~n', [VPatch]),
+end.
 
+register_definitions :-
     findall(Reg, isa:regname_uses(Reg, _), Regs),
     format('#subruledef Reg {~n'),
     maplist({Regs}/[Reg]>>(
@@ -36,9 +50,13 @@ report :-
         format('  ~|~w~t~3+=> 0b~|~`0t~2r~3+~n', [Reg, Idx])
     ), Regs),
     format('}~n~n'),
+end.
 
+instruction_definitions :-
     write_phrase(instruction_ruledef), nl, nl,
+end.
 
+constant_definitions :-
     derive:subr_byte_alignment(SubrAlign),
     format('#const SPRIND_SUBR_ALIGN = ~d~n~n', SubrAlign),
 end.
