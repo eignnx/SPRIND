@@ -35,6 +35,7 @@ rval_(#Term) --> % Constant or Immediate
     ( { atom(Term) } -> [constant(#Term)] % Specification-time named constant
     ; { integer(Term) } -> [] % Numeric Literal
     ).
+rval_(-(A)) --> rval(A).
 rval_(~(A)) --> rval(A).
 rval_(A + B) --> rval(A), rval(B).
 rval_(A - B) --> rval(A), rval(B).
@@ -106,6 +107,11 @@ def(#jmp_tgt_validation_req_flag_bit, _).
 def(#jmp_tgt_validation_en_flag_bit, _).
 def(#subr_align, _).
 def(#reg_size_bits, Size) :- isa:register_size(Size).
+def(#nonexe0_isr, _).
+def(#break_isr, _).
+def(#unimpl_isr, _).
+def(#overflow_flag_idx, _).
+def(#carry_flag_idx, _).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- set_prolog_flag(print_write_options, [
@@ -235,7 +241,7 @@ instr_info(call, info{
 	operands: [simm(?simm)],
 	syntax: { simm(?abs_lbl) } -> (
 		?rel_lbl = ?abs_lbl - #asm_pc;
-		{ ?rel_lbl }
+		{ ?rel_lbl\size(imm) }
 	),
 	sem: (
         $$pc <- $$pc\s + (sxt(?simm) << #subr_align);
@@ -252,7 +258,7 @@ instr_info(b, info{
 	operands: [simm(?offset)],
 	syntax: { simm(?abs_lbl) } -> (
 		?rel_lbl = ?abs_lbl - #asm_pc;
-		{ ?rel_lbl }
+		{ ?rel_lbl\size(imm) }
 	),
 	sem: $$pc <- $$pc\s + sxt(?offset),
     tags: [pc],
@@ -265,7 +271,7 @@ instr_info(bt, info{
 	operands: [simm(?offset)],
 	syntax: { simm(?abs_lbl) } -> (
 		?rel_lbl = ?abs_lbl - #asm_pc;
-		{ ?rel_lbl }
+		{ ?rel_lbl\size(imm) }
 	),
 	sem: if(b_pop($$ts),
         $$pc <- $$pc\s + sxt(?offset)
@@ -280,7 +286,7 @@ instr_info(bf, info{
 	operands: [simm(?offset)],
 	syntax: { simm(?abs_lbl) } -> (
 		?rel_lbl = ?abs_lbl - #asm_pc;
-		{ ?rel_lbl }
+		{ ?rel_lbl\size(imm) }
 	),
 	sem: if(!(b_pop($$ts)),
         $$pc <- $$pc\s + sxt(?offset)

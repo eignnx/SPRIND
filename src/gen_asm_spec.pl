@@ -129,8 +129,6 @@ expand_syntax_ast(Lhs -> Rhs, Ctx) -->
 	`\t}`,
 end.
 
-%%%%%%%%%%%%
-
 expand_lhs([Syntax], Ctx) --> `[`, expand_lhs(Syntax, Ctx), `]`.
 expand_lhs(A:B, Ctx) --> `(`, expand_lhs(A, Ctx), `,`, expand_lhs(B, Ctx), `)`.
 expand_lhs(Syn1 + Syn2, Ctx) --> expand_lhs(Syn1, Ctx), ` + `, expand_lhs(Syn2, Ctx).
@@ -183,6 +181,12 @@ expand_rhs_from_lhs(opcode(Bits), Ctx) -->
 	`0b`, Padded, `\``, integer(Ctx.obits),
 end.
 
+expand_rhs_stmts([], _) --> ``.
+expand_rhs_stmts([Line | Lines], Ctx) -->
+	`\t\t`, expand_rhs_stmt(Ctx, Line), nl,
+	expand_rhs_stmts(Lines, Ctx),
+end.
+
 expand_rhs_stmt(Ctx, (?Ident = Rhs)) -->
 	atom(Ident), ` = `, expand_rhs(Ctx, Rhs),
 end.
@@ -213,11 +217,6 @@ expand_rhs(Ctx, {CommaList}) -->
 	sequence(expand_rhs(Ctx), ` @ `, Items),
 end.
 
-expand_rhs_stmts([], _) --> ``.
-expand_rhs_stmts([Line | Lines], Ctx) -->
-	`\t\t`, expand_rhs_stmt(Ctx, Line), nl,
-	expand_rhs_stmts(Lines, Ctx),
-end.
 
 expand_rhs_concat_expr(Items0, Ctx) -->
 	{ dif(Ctx.obits, 0) ->
@@ -225,15 +224,14 @@ expand_rhs_concat_expr(Items0, Ctx) -->
 	;
 		Items1 = Items0
 	},
-	sequence(
-		flip(expand_concat_item(Ctx)),
-		` @ `,
-		[prefix(Ctx.prefix) | Items1]
-	),
+	{ Items = [prefix(Ctx.prefix) | Items1] },
+	sequence(flip(expand_concat_item(Ctx)), ` @ `, Items),
 end.
+
 expand_concat_item(?Ident, _Ctx) --> atom(Ident).
 expand_concat_item(prefix(Bits), _Ctx) --> `0b`, atom(Bits).
 expand_concat_item(opcode(Bits), Ctx) --> `0b`, atom(Bits), `\``, integer(Ctx.obits).
+expand_concat_item(?Ident\size(imm), Ctx) --> atom(Ident), `\``, integer(Ctx.ibits).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 nl --> `\n`.
@@ -263,6 +261,9 @@ joined([A, B | Rest]) --> A, ` @ `, joined([B | Rest]).
 A\B --> A, `\``, integer(B).
 ?A --> atom(A).
 
+
+:- meta_predicate(flip(1, ?)).
+:- meta_predicate(flip(3, ?)).
 
 flip(Expr0, Arg1) :-
 	Expr0 =.. [Functor, Arg2],

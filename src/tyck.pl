@@ -289,7 +289,7 @@ stmt_inference(Tcx, b_push(LVal, RVal), Tcx) :-
     ( inference(Tcx, RVal, RValTy) -> true
     ; throw(error('`b_push` could not infer 2nd arg'(RVal)))
     ),
-    ( RValTy = i\1 -> true
+    ( RValTy = _\1 -> true
     ; throw(error('`b_push` accepts a boolean as 2nd arg'(RVal\RValTy)))
     ).
 

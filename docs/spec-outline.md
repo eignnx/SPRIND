@@ -1,7 +1,4 @@
 
-> !!! validation_failed(ill-formed instruction semantics(instruction(neg),[invalid_rval(- ?(rd))]))
-
-
 # SPRIND Instruction Set Architecture Specification
 
 
