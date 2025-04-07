@@ -25,19 +25,19 @@
 	sb [{rd: Reg} + {simm: s6}], {rs: Reg} => 0b11 @ 0b10`2 @ simm @ rs @ rd
 	sw [{rd: Reg} + {simm: s6}], {rs: Reg} => 0b11 @ 0b00`2 @ simm @ rs @ rd
 	call {abs_lbl: s13} => {
-		rel_lbl = abs_lbl - $
+		rel_lbl = abs_lbl`13 - $
 		0b101 @ rel_lbl
 	}
 	b {abs_lbl: s10} => {
-		rel_lbl = abs_lbl - $
+		rel_lbl = abs_lbl`10 - $
 		0b1001 @ 0b0`2 @ rel_lbl
 	}
 	bt {abs_lbl: s10} => {
-		rel_lbl = abs_lbl - $
+		rel_lbl = abs_lbl`10 - $
 		0b1001 @ 0b10`2 @ rel_lbl
 	}
 	bf {abs_lbl: s10} => {
-		rel_lbl = abs_lbl - $
+		rel_lbl = abs_lbl`10 - $
 		0b1001 @ 0b11`2 @ rel_lbl
 	}
 	li {rd: Reg}, {simm: s8} => 0b1000 @ 0b0`1 @ simm @ rd

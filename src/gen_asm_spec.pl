@@ -19,11 +19,6 @@
 :- op(600, yfx, >>).
 :- op(150, yfx, \).
 
-% Five things I hate about this code:
-% - disorganization of predicate definitions (largely unordered)
-% 	- dcg rules aren't structured like a grammar, they're kinda spaghetti
-% 		- `{}` vs `{} -> ()` syntax is not discriminated upon very explicitly
-
 report :-
 	heading,
 	register_definitions,
@@ -69,42 +64,57 @@ instruction_ruledef -->
 end.
 
 instr_arm(Instr, Info) -->
-	{ instr_ctx(Instr, Ctx) },
+	{ instr_syntax_ctx(Instr, Info.syntax, Ctx) },
 	`\t`, expand_syntax(Info.syntax, Ctx), nl,
 end.
 
 
-instr_ctx(Instr, Ctx) :-
+instr_syntax_ctx(Instr, Syntax, Ctx) :-
 	isa:fmt_instr(Fmt, Instr),
+
+	% Get prefix
 	derive:fmt_prefix(Fmt, PrefixChars),
 	atom_chars(Prefix, PrefixChars),
+
+	% Get opcode
 	once(optree:fmt_tree(Fmt, OpTree)),
 	optree:optree_instr_prefix(OpTree, Instr, OpcodeChars),
 	atom_chars(Opcode, OpcodeChars),
+
+	% Get imm and opcode bit counts
 	derive:fmt_opcodebits_immbits(Fmt, OBits, IBits),
 	once(clpfd:label([OBits, IBits])),
+
+	% Get name of immediate variable (if any)
+	syntax_components(Syntax, Lhs, _),
+	(
+		member(imm(?ImmVar), Lhs), ! ;
+		member(simm(?ImmVar), Lhs), ! ;
+		ImmVar = '<none>'
+	),
+
+
 	Ctx = ctx{
 		fmt: Fmt,
 		instr: Instr,
 		prefix: Prefix,
 		opcode: Opcode,
 		obits: OBits,
-		ibits: IBits
+		ibits: IBits,
+		immvar: ImmVar
 	},
 end.
 
-
-expand_syntax({}, Ctx) -->
-	expand_syntax_ast([] -> auto, Ctx),
-end.
-expand_syntax({LhsCommas}, Ctx) -->
-	{ comma_list(LhsCommas, Lhs) },
-	expand_syntax_ast(Lhs -> auto, Ctx),
-end.
-expand_syntax({LhsCommas} -> RhsSemis, Ctx) -->
-	{ comma_list(LhsCommas, Lhs) },
-	{ semicolon_list(RhsSemis, Rhs) },
+expand_syntax(Syntax, Ctx) -->
+	{ syntax_components(Syntax, Lhs, Rhs) },
 	expand_syntax_ast(Lhs -> Rhs, Ctx),
+end.
+
+syntax_components({}, [], auto).
+syntax_components({LhsCommas}, Lhs, auto) :- comma_list(LhsCommas, Lhs).
+syntax_components({LhsCommas} -> RhsSemis, Lhs, Rhs) :-
+	comma_list(LhsCommas, Lhs),
+	semicolon_list(RhsSemis, Rhs),
 end.
 
 expand_syntax_ast(Lhs -> auto, Ctx) --> !,
@@ -170,7 +180,8 @@ expand_rhs_from_lhs(simm(?Ident), _Ctx) --> atom(Ident).
 expand_rhs_from_lhs(prefix(Bits), _Ctx) --> `0b`, atom(Bits).
 expand_rhs_from_lhs(opcode(Bits), Ctx) -->
 	{ format(codes(Padded), '~`0t~w~*|', [Bits, Ctx.obits]) },
-	`0b`, Padded, `\``, integer(Ctx.obits).
+	`0b`, Padded, `\``, integer(Ctx.obits),
+end.
 
 expand_rhs_stmt(Ctx, (?Ident = Rhs)) -->
 	atom(Ident), ` = `, expand_rhs(Ctx, Rhs),
@@ -186,7 +197,10 @@ end.
 expand_rhs(Ctx, A + B) -->
 	expand_rhs(Ctx, A), ` + `, expand_rhs(Ctx, B),
 end.
-expand_rhs(_Ctx, ?Ident) --> atom(Ident).
+expand_rhs(Ctx, ?Ident) -->
+	atom(Ident),
+	( { Ctx.immvar = Ident } -> `\``, integer(Ctx.ibits) ; [] ),
+end.
 expand_rhs(_Ctx, #Value) -->
 	( { integer(Value) } ->
 		integer(Value)
