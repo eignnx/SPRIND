@@ -21,8 +21,8 @@
 
 % Five things I hate about this code:
 % - disorganization of predicate definitions (largely unordered)
-% - dcg rules aren't structured like a grammar, they're kinda spaghetti
-% - `{}` vs `{} -> ()` syntax is not discriminated upon very explicitly
+% 	- dcg rules aren't structured like a grammar, they're kinda spaghetti
+% 		- `{}` vs `{} -> ()` syntax is not discriminated upon very explicitly
 
 report :-
 	heading,
@@ -61,26 +61,18 @@ constant_definitions :-
     format('#const SPRIND_SUBR_ALIGN = ~d~n~n', SubrAlign),
 end.
 
+
 instruction_ruledef -->
     `#ruledef Instruction {`, nl,
-	{ bagof(Instr-Info, instr_info(Instr, Info), InstrsInfos) },
-	instr_ruledef_arms(InstrsInfos),
+	foreach(instr_info(Instr, Info), instr_arm(Instr, Info)),
     `}`,
 end.
 
-instr_ruledef_arms([]) --> ``.
-instr_ruledef_arms([Instr-Info | Rest]) -->
-	instr_arm(Instr, Info.syntax),
-    instr_ruledef_arms(Rest),
-end.
-
-instr_arm(Instr, Syntax) -->
+instr_arm(Instr, Info) -->
 	{ instr_ctx(Instr, Ctx) },
-	`\t`, expand_syntax(Syntax, Ctx), nl,
+	`\t`, expand_syntax(Info.syntax, Ctx), nl,
 end.
 
-
-% :- det(instr_ctx/2).
 
 instr_ctx(Instr, Ctx) :-
 	isa:fmt_instr(Fmt, Instr),
@@ -103,34 +95,31 @@ end.
 
 
 expand_syntax({}, Ctx) -->
-	atom(Ctx.instr),
-	` => `,
-	autoexpand_rhs_args([], Ctx),
+	expand_syntax_ast([] -> auto, Ctx),
 end.
-
-expand_syntax({ LhsCommas }, Ctx) -->
+expand_syntax({LhsCommas}, Ctx) -->
 	{ comma_list(LhsCommas, Lhs) },
-	atom(Ctx.instr), ` `, expand_lhs_args(Lhs, Ctx),
-	` => `,
-	autoexpand_rhs_args(Lhs, Ctx),
+	expand_syntax_ast(Lhs -> auto, Ctx),
 end.
-
 expand_syntax({LhsCommas} -> RhsSemis, Ctx) -->
 	{ comma_list(LhsCommas, Lhs) },
 	{ semicolon_list(RhsSemis, Rhs) },
-	atom(Ctx.instr), ` `,
-	expand_lhs_args(Lhs, Ctx), ` => `, `{`, nl,
-		expand_rhs_stmts(Rhs, Ctx, Lhs),
+	expand_syntax_ast(Lhs -> Rhs, Ctx),
+end.
+
+expand_syntax_ast(Lhs -> auto, Ctx) --> !,
+	atom(Ctx.instr), ` `, sequence(flip(expand_lhs(Ctx)), `, `, Lhs),
+	` => `,
+	autoexpand_rhs_args(Lhs, Ctx),
+end.
+expand_syntax_ast(Lhs -> Rhs, Ctx) -->
+	atom(Ctx.instr), ` `, sequence(flip(expand_lhs(Ctx)), `, `, Lhs),
+	` => `, `{`, nl,
+		expand_rhs_stmts(Rhs, Ctx),
 	`\t}`,
 end.
 
-
-expand_lhs_args([], _Ctx) --> ``.
-expand_lhs_args([Item], Ctx) --> expand_lhs(Item, Ctx).
-expand_lhs_args([Item, ItemNext | Items], Ctx) -->
-	expand_lhs(Item, Ctx),
-	`, `,
-	expand_lhs_args([ItemNext | Items], Ctx).
+%%%%%%%%%%%%
 
 expand_lhs([Syntax], Ctx) --> `[`, expand_lhs(Syntax, Ctx), `]`.
 expand_lhs(A:B, Ctx) --> `(`, expand_lhs(A, Ctx), `,`, expand_lhs(B, Ctx), `)`.
@@ -141,14 +130,11 @@ expand_lhs(imm(?Ident), Ctx) -->
 expand_lhs(simm(?Ident), Ctx) -->
 	decl(Ident, s\Ctx.ibits).
 
-autoexpand_rhs_args(Items, Ctx) -->
-	{ phrase(flatten_args(Items), ArgsFlat) },
-	{ predsort(order_args, ArgsFlat, Args) },
-	sequence(
-		{Ctx}/[Arg]>>expand_rhs_from_lhs(Arg, Ctx),
-		` @ `,
-		[prefix(Ctx.prefix), opcode(Ctx.opcode) | Args]
-	),
+autoexpand_rhs_args(Args, Ctx) -->
+	{ phrase(flatten_args(Args), ArgsFlat) },
+	{ predsort(order_args, ArgsFlat, ArgsSorted) },
+	{ Items = [prefix(Ctx.prefix), opcode(Ctx.opcode) | ArgsSorted] },
+	sequence(flip(expand_rhs_from_lhs(Ctx)), ` @ `, Items),
 end.
 
 flatten_args([]) --> [].
@@ -183,21 +169,15 @@ expand_rhs_from_lhs(imm(?Ident), _Ctx) --> atom(Ident).
 expand_rhs_from_lhs(simm(?Ident), _Ctx) --> atom(Ident).
 expand_rhs_from_lhs(prefix(Bits), _Ctx) --> `0b`, atom(Bits).
 expand_rhs_from_lhs(opcode(Bits), Ctx) -->
-	{ atom_codes(Bits, BitsCodes) },
-	{ length(BitsCodes, NBits) },
-	{ NZeros is Ctx.obits - NBits },
-	{ length(Zeros, NZeros) },
-	{ maplist(=(0'0), Zeros) },
-	{ append(Zeros, BitsCodes, PaddedCodes) },
-	{ atom_codes(Padded, PaddedCodes) },
-	`0b`, atom(Padded), `\``, integer(Ctx.obits).
+	{ format(codes(Padded), '~`0t~w~*|', [Bits, Ctx.obits]) },
+	`0b`, Padded, `\``, integer(Ctx.obits).
 
-expand_rhs_stmt(Ctx, (?Ident = Rhs), _Lhs) -->
+expand_rhs_stmt(Ctx, (?Ident = Rhs)) -->
 	atom(Ident), ` = `, expand_rhs(Ctx, Rhs),
 end.
-expand_rhs_stmt(Ctx, {CommaList}, Lhs) -->
+expand_rhs_stmt(Ctx, {CommaList}) -->
 	{ comma_list(CommaList, List) },
-	expand_rhs_concat_expr(List, Ctx, Lhs),
+	expand_rhs_concat_expr(List, Ctx),
 end.
 
 expand_rhs(Ctx, A - B) -->
@@ -219,20 +199,20 @@ expand_rhs(Ctx, {CommaList}) -->
 	sequence(expand_rhs(Ctx), ` @ `, Items),
 end.
 
-expand_rhs_stmts([], _, _) --> ``.
-expand_rhs_stmts([Line | Lines], Ctx, Lhs) -->
-	`\t\t`, expand_rhs_stmt(Ctx, Line, Lhs), nl,
-	expand_rhs_stmts(Lines, Ctx, Lhs),
+expand_rhs_stmts([], _) --> ``.
+expand_rhs_stmts([Line | Lines], Ctx) -->
+	`\t\t`, expand_rhs_stmt(Ctx, Line), nl,
+	expand_rhs_stmts(Lines, Ctx),
 end.
 
-expand_rhs_concat_expr(Items0, Ctx, _Lhs) -->
+expand_rhs_concat_expr(Items0, Ctx) -->
 	{ dif(Ctx.obits, 0) ->
 		Items1 = [opcode(Ctx.opcode) | Items0]
 	;
 		Items1 = Items0
 	},
 	sequence(
-		{Ctx}/[Item]>>expand_concat_item(Item, Ctx),
+		flip(expand_concat_item(Ctx)),
 		` @ `,
 		[prefix(Ctx.prefix) | Items1]
 	),
@@ -268,6 +248,17 @@ joined([A, B | Rest]) --> A, ` @ `, joined([B | Rest]).
 #Literal --> atom(Literal).
 A\B --> A, `\``, integer(B).
 ?A --> atom(A).
+
+
+flip(Expr0, Arg1) :-
+	Expr0 =.. [Functor, Arg2],
+	Expr =.. [Functor, Arg1, Arg2],
+	call(Expr).
+
+flip(Dcg0, Arg1) -->
+	{ Dcg0 =.. [Functor, Arg2] },
+	{ Dcg =.. [Functor, Arg1, Arg2] },
+	Dcg.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
