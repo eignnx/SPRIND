@@ -74,14 +74,14 @@ display_synthetic_instrutruction_listing(Lvl) :-
     markdown:emit_heading(Lvl, 'Synthetic Instructions'),
     markdown:emit_table_header(['Synth. Instr.', 'Description', 'Expansion', 'Reversability']),
     foreach(
-        isa:synthinstr_descr_expansion_reversability(Instr, Descr, Expansion, Rev),
-        synth_instr_row(Instr, Descr, Expansion, Rev)
+        isa:synthinstr_info(Instr, Info),
+        synth_instr_row(Instr, Info)
     ),
 end.
 
-synth_instr_row(Instr, Descr, Expansion, Rev) :-
+synth_instr_row(Instr, Info) :-
     Instr =.. [InstrName | InstrArgs],
-    Expansion =.. [ExpName | ExpArgs],
+    Info.expansion =.. [ExpName | ExpArgs],
     markdown:emit_table_row([
         code(fmt('~w', InstrName)++sequence{
             element: fmt('~w'),
@@ -89,7 +89,7 @@ synth_instr_row(Instr, Descr, Expansion, Rev) :-
             list: InstrArgs
         }),
 
-        a(Descr),
+        a(Info.descr),
 
         code(fmt('~w', ExpName)++sequence{
             element: fmt('~w'),
@@ -97,7 +97,7 @@ synth_instr_row(Instr, Descr, Expansion, Rev) :-
             list: ExpArgs
         }),
 
-        snakecase_to_titlecase(a(Rev))
+        snakecase_to_titlecase(a(Info.reversability))
     ]),
 end.
 

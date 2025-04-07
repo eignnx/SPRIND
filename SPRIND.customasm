@@ -123,6 +123,17 @@
 	rstr.cc  => 0b0000000000 @ 0b000101`6
 	sleep  => 0b0000000000 @ 0b000001`6
 	vijt  => 0b0000000000 @ 0b000101`6
+
+	clr {r: Reg} => asm { xor {r}, {r} }
+	nop  => asm { ori sp, 0 }
+	incr {r: Reg} => asm { addi {r}, 1 }
+	decr {r: Reg} => asm { addi {r}, -1 }
+	inv {r: Reg} => asm { xori {r}, -1 }
+	not {r: Reg} => asm { xori {r}, 1 }
+	tg {r1: Reg}, {r2: Reg} => asm { tl {r2}, {r1} }
+	tle {r1: Reg}, {r2: Reg} => asm { tge {r2}, {r1} }
+	ta {r1: Reg}, {r2: Reg} => asm { ta {r2}, {r1} }
+	tbe {r1: Reg}, {r2: Reg} => asm { tae {r2}, {r1} }
 }
 
 #const SPRIND_SUBR_ALIGN = 4

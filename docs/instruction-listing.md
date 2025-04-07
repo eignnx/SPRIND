@@ -61,12 +61,12 @@
 
 | Synth. Instr. | Description | Expansion | Reversability |
 |:---:|:---:|:---:|:---:|
-| `clr r` | Clear a register | `xor r, r` | Reversible |
-| `nop` | The no-op instruction | `ori $sp, 0` | Reversible |
-| `incr r` | Increment a register | `addi r, 1` | Reversible |
-| `decr r` | Increment a register | `subi r, 1` | Reversible |
-| `inv r` | Bitwise inversion (complement) | `xori r, -1` | Reversible |
-| `not r` | Invert a boolean (0 or 1) | `xori r, 1` | Reversible |
+| `clr r` | Clear a register | `xor r, r` | Reversable |
+| `nop` | The no-op instruction | `ori $sp, 0` | Reversable |
+| `incr r` | Increment a register | `addi r, 1` | Reversable |
+| `decr r` | Increment a register | `addi r, -1` | Reversable |
+| `inv r` | Bitwise inversion (complement) | `xori r, -1` | Reversable |
+| `not r` | Invert a boolean (0 or 1) | `xori r, 1` | Reversable |
 | `tg r1, r2` | Test greater-than | `tl r2, r1` | One Way |
 | `tle r1, r2` | Test Less-than or Equal | `tge r2, r1` | One Way |
 | `ta r1, r2` | Test Above | `ta r2, r1` | One Way |

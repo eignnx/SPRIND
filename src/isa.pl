@@ -11,6 +11,7 @@
     regname_uses/2,
     reguse_description/2,
     sysregname_name_size_description/4,
+	synthinstr_info/2,
     instr/1,
     gfmt/1,
     fmt/1,
@@ -217,16 +218,16 @@ fmt_instr_title(o, vijt, 'Valid Indirect Jump Target').
 
 %%%%%%%%%%%%%%%%%%%%%%%%% Synthetic Instructions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-synthinstr_descr_expansion_reversability(clr(r),      'Clear a register',               xor(r, r),   reversible).
-synthinstr_descr_expansion_reversability(nop,         'The no-op instruction',          ori('$sp', 0),  reversible).
-synthinstr_descr_expansion_reversability(incr(r),     'Increment a register',           addi(r, 1),  reversible).
-synthinstr_descr_expansion_reversability(decr(r),     'Increment a register',           subi(r, 1),  reversible).
-synthinstr_descr_expansion_reversability(inv(r),      'Bitwise inversion (complement)', xori(r, -1), reversible).
-synthinstr_descr_expansion_reversability(not(r),      'Invert a boolean (0 or 1)',      xori(r, 1),  reversible).
-synthinstr_descr_expansion_reversability(tg(r1, r2),  'Test greater-than',              tl(r2, r1),  one_way).
-synthinstr_descr_expansion_reversability(tle(r1, r2), 'Test Less-than or Equal',        tge(r2, r1), one_way).
-synthinstr_descr_expansion_reversability(ta(r1, r2),  'Test Above',                     ta(r2, r1),  one_way).
-synthinstr_descr_expansion_reversability(tbe(r1, r2), 'Test Below or Equal',            tae(r2, r1), one_way).
+synthinstr_info(clr(r),      info{descr: 'Clear a register',               expansion: xor(r, r),     reversability: reversable}).
+synthinstr_info(nop,         info{descr: 'The no-op instruction',          expansion: ori($(sp), 0), reversability: reversable}).
+synthinstr_info(incr(r),     info{descr: 'Increment a register',           expansion: addi(r, 1),    reversability: reversable}).
+synthinstr_info(decr(r),     info{descr: 'Increment a register',           expansion: addi(r, -1),   reversability: reversable}).
+synthinstr_info(inv(r),      info{descr: 'Bitwise inversion (complement)', expansion: xori(r, -1),   reversability: reversable}).
+synthinstr_info(not(r),      info{descr: 'Invert a boolean (0 or 1)',      expansion: xori(r, 1),    reversability: reversable}).
+synthinstr_info(tg(r1, r2),  info{descr: 'Test greater-than',              expansion: tl(r2, r1),    reversability: one_way}).
+synthinstr_info(tle(r1, r2), info{descr: 'Test Less-than or Equal',        expansion: tge(r2, r1),   reversability: one_way}).
+synthinstr_info(ta(r1, r2),  info{descr: 'Test Above',                     expansion: ta(r2, r1),    reversability: one_way}).
+synthinstr_info(tbe(r1, r2), info{descr: 'Test Below or Equal',            expansion: tae(r2, r1),   reversability: one_way}).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Registers %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

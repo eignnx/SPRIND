@@ -1,15 +1,11 @@
 #include "../SPRIND.customasm"
 
-#ruledef {
-	decr {rd: Reg} => asm { addi {rd}, -1 }
-}
-
 #align SPRIND_SUBR_ALIGN
 arr_sum: ; subr(arr_addr: *i16 => x, len: u16 => y) -> (sum: i16 => v)
 	b .loop.cond
 
 	.loop:
-		addi y, -1
+		decr y
 		mov z, x
 		add z, y
 		lw w, [z + 0]
