@@ -11,10 +11,16 @@ A silly little instruction set architechture.
 - [Machine Overview](docs/machine-overview.md)
 - [Instruction Listing](docs/instruction-listing.md)
 
-## Motivation
-I've automated the ISA design process as much as possible because:
+## Goals
+- Powerful enough to implement an operating system (this basically rules out a Harvard architecture afaik)
+- Run programs on an FPGA. I'd like to generate HDL code and get the machine actually instantiated on real hardware.
+- Have some support for microcontoller use cases
+- Prioritize an easy-to-use design for the assembly language (from the perspective of an assembly programmer or, secondarily, a compiler)
 
-1. Code is hopefully consistent. Changes should automatically propagate throughout the design.
+## Process
+I've tried to automate the ISA design process as much as possible by defining the spec in Prolog because:
+
+1. Code is (hopefully) more consistent. Changes should automatically propagate throughout the design.
 2. Design decisions are less arbitrary. You can see where I'm using an algorithm to make a decision, and hopefullly where decisions are made arbitrarily.
 3. Prolog is fun to write, and is well suited to data modelling. I had been using spreadsheets, but I ran into enough issues and limitations that I decided to switch technologies.
 
