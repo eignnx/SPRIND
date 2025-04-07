@@ -16,8 +16,8 @@
 | [`rrr`](#instruction-format-rrr) | Register-register-register | 4 | 1 | 25% |
 | [`rr(_)`](#instruction-format-rr_) | Register-register | 28 | 14 | 50% |
 | [`r(_)`](#instruction-format-r_) | Register | 24 | 12 | 50% |
-| [`o`](#instruction-format-o) | Opcode | 64 | 29 | 45% |
-|  | **Totals (excluding `ext`)** | **179** | **91** | **51%** |
+| [`o`](#instruction-format-o) | Opcode | 64 | 28 | 44% |
+|  | **Totals (excluding `ext`)** | **179** | **90** | **50%** |
 
 
 
@@ -28,30 +28,29 @@
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | [`lb`](#the-lb-instruction) | [`call`](#the-call-instruction) | [`b`](#the-b-instruction) | [`li`](#the-li-instruction) | [`lgb`](#the-lgb-instruction) | [`mulstep`](#the-mulstep-instruction) | [`add`](#the-add-instruction) | [`pushb`](#the-pushb-instruction) | [`NONEXE0`](#the-nonexe0-instruction) |
 | [`lw`](#the-lw-instruction) |  | [`bt`](#the-bt-instruction) | [`szi`](#the-szi-instruction) | [`lgw`](#the-lgw-instruction) |  | [`sub`](#the-sub-instruction) | [`pushw`](#the-pushw-instruction) | [`UNIMPL`](#the-unimpl-instruction) |
-| [`sb`](#the-sb-instruction) |  | [`bf`](#the-bf-instruction) |  | [`sgb`](#the-sgb-instruction) |  | [`and`](#the-and-instruction) | [`popb`](#the-popb-instruction) | [`HALT`](#the-halt-instruction) |
-| [`sw`](#the-sw-instruction) |  |  |  | [`sgw`](#the-sgw-instruction) |  | [`or`](#the-or-instruction) | [`popw`](#the-popw-instruction) | [`BREAK`](#the-break-instruction) |
-|  |  |  |  | [`tbit`](#the-tbit-instruction) |  | [`xor`](#the-xor-instruction) | [`callr`](#the-callr-instruction) | [`kret`](#the-kret-instruction) |
-|  |  |  |  | [`cbit`](#the-cbit-instruction) |  | [`mov`](#the-mov-instruction) | [`jr`](#the-jr-instruction) | [`kcall`](#the-kcall-instruction) |
-|  |  |  |  | [`sbit`](#the-sbit-instruction) |  | [`addcy`](#the-addcy-instruction) | [`neg`](#the-neg-instruction) | [`ret`](#the-ret-instruction) |
-|  |  |  |  | [`tli`](#the-tli-instruction) |  | [`subcy`](#the-subcy-instruction) | [`seb`](#the-seb-instruction) | [`tov`](#the-tov-instruction) |
-|  |  |  |  | [`tgei`](#the-tgei-instruction) |  | [`tl`](#the-tl-instruction) | [`rd.mp.lo`](#the-rdmplo-instruction) | [`tcy`](#the-tcy-instruction) |
-|  |  |  |  | [`tbi`](#the-tbi-instruction) |  | [`tge`](#the-tge-instruction) | [`rd.mp.hi`](#the-rdmphi-instruction) | [`clr.cy`](#the-clrcy-instruction) |
-|  |  |  |  | [`taei`](#the-taei-instruction) |  | [`tb`](#the-tb-instruction) | [`rd.gp`](#the-rdgp-instruction) | [`set.cy`](#the-setcy-instruction) |
-|  |  |  |  | [`tnei`](#the-tnei-instruction) |  | [`tae`](#the-tae-instruction) | [`wr.gp`](#the-wrgp-instruction) | [`tpush0`](#the-tpush0-instruction) |
-|  |  |  |  | [`teqi`](#the-teqi-instruction) |  | [`tne`](#the-tne-instruction) |  | [`tpush1`](#the-tpush1-instruction) |
-|  |  |  |  | [`addi`](#the-addi-instruction) |  | [`teq`](#the-teq-instruction) |  | [`tnot`](#the-tnot-instruction) |
-|  |  |  |  | [`andi`](#the-andi-instruction) |  |  |  | [`tand`](#the-tand-instruction) |
-|  |  |  |  | [`ori`](#the-ori-instruction) |  |  |  | [`tor`](#the-tor-instruction) |
-|  |  |  |  | [`xori`](#the-xori-instruction) |  |  |  | [`tdup`](#the-tdup-instruction) |
-|  |  |  |  | [`addicy`](#the-addicy-instruction) |  |  |  | [`prsv.mp`](#the-prsvmp-instruction) |
-|  |  |  |  | [`subicy`](#the-subicy-instruction) |  |  |  | [`rstr.mp`](#the-rstrmp-instruction) |
-|  |  |  |  | [`lsr`](#the-lsr-instruction) |  |  |  | [`prsv.ts`](#the-prsvts-instruction) |
-|  |  |  |  | [`lsl`](#the-lsl-instruction) |  |  |  | [`rstr.ts`](#the-rstrts-instruction) |
-|  |  |  |  | [`asr`](#the-asr-instruction) |  |  |  | [`prsv.ra`](#the-prsvra-instruction) |
-|  |  |  |  | [`tbitm`](#the-tbitm-instruction) |  |  |  | [`rstr.ra`](#the-rstrra-instruction) |
-|  |  |  |  | [`cbitm`](#the-cbitm-instruction) |  |  |  | [`prsv.gp`](#the-prsvgp-instruction) |
-|  |  |  |  | [`sbitm`](#the-sbitm-instruction) |  |  |  | [`rstr.gp`](#the-rstrgp-instruction) |
-|  |  |  |  |  |  |  |  | [`prsv.cc`](#the-prsvcc-instruction) |
+| [`sb`](#the-sb-instruction) |  | [`bf`](#the-bf-instruction) |  | [`sgb`](#the-sgb-instruction) |  | [`and`](#the-and-instruction) | [`popb`](#the-popb-instruction) | [`BREAK`](#the-break-instruction) |
+| [`sw`](#the-sw-instruction) |  |  |  | [`sgw`](#the-sgw-instruction) |  | [`or`](#the-or-instruction) | [`popw`](#the-popw-instruction) | [`kret`](#the-kret-instruction) |
+|  |  |  |  | [`tbit`](#the-tbit-instruction) |  | [`xor`](#the-xor-instruction) | [`callr`](#the-callr-instruction) | [`kcall`](#the-kcall-instruction) |
+|  |  |  |  | [`cbit`](#the-cbit-instruction) |  | [`mov`](#the-mov-instruction) | [`jr`](#the-jr-instruction) | [`ret`](#the-ret-instruction) |
+|  |  |  |  | [`sbit`](#the-sbit-instruction) |  | [`addcy`](#the-addcy-instruction) | [`neg`](#the-neg-instruction) | [`tov`](#the-tov-instruction) |
+|  |  |  |  | [`tli`](#the-tli-instruction) |  | [`subcy`](#the-subcy-instruction) | [`seb`](#the-seb-instruction) | [`tcy`](#the-tcy-instruction) |
+|  |  |  |  | [`tgei`](#the-tgei-instruction) |  | [`tl`](#the-tl-instruction) | [`rd.mp.lo`](#the-rdmplo-instruction) | [`clr.cy`](#the-clrcy-instruction) |
+|  |  |  |  | [`tbi`](#the-tbi-instruction) |  | [`tge`](#the-tge-instruction) | [`rd.mp.hi`](#the-rdmphi-instruction) | [`set.cy`](#the-setcy-instruction) |
+|  |  |  |  | [`taei`](#the-taei-instruction) |  | [`tb`](#the-tb-instruction) | [`rd.gp`](#the-rdgp-instruction) | [`tpush0`](#the-tpush0-instruction) |
+|  |  |  |  | [`tnei`](#the-tnei-instruction) |  | [`tae`](#the-tae-instruction) | [`wr.gp`](#the-wrgp-instruction) | [`tpush1`](#the-tpush1-instruction) |
+|  |  |  |  | [`teqi`](#the-teqi-instruction) |  | [`tne`](#the-tne-instruction) |  | [`tnot`](#the-tnot-instruction) |
+|  |  |  |  | [`addi`](#the-addi-instruction) |  | [`teq`](#the-teq-instruction) |  | [`tand`](#the-tand-instruction) |
+|  |  |  |  | [`andi`](#the-andi-instruction) |  |  |  | [`tor`](#the-tor-instruction) |
+|  |  |  |  | [`ori`](#the-ori-instruction) |  |  |  | [`tdup`](#the-tdup-instruction) |
+|  |  |  |  | [`xori`](#the-xori-instruction) |  |  |  | [`prsv.mp`](#the-prsvmp-instruction) |
+|  |  |  |  | [`addicy`](#the-addicy-instruction) |  |  |  | [`rstr.mp`](#the-rstrmp-instruction) |
+|  |  |  |  | [`subicy`](#the-subicy-instruction) |  |  |  | [`prsv.ts`](#the-prsvts-instruction) |
+|  |  |  |  | [`lsr`](#the-lsr-instruction) |  |  |  | [`rstr.ts`](#the-rstrts-instruction) |
+|  |  |  |  | [`lsl`](#the-lsl-instruction) |  |  |  | [`prsv.ra`](#the-prsvra-instruction) |
+|  |  |  |  | [`asr`](#the-asr-instruction) |  |  |  | [`rstr.ra`](#the-rstrra-instruction) |
+|  |  |  |  | [`tbitm`](#the-tbitm-instruction) |  |  |  | [`prsv.gp`](#the-prsvgp-instruction) |
+|  |  |  |  | [`cbitm`](#the-cbitm-instruction) |  |  |  | [`rstr.gp`](#the-rstrgp-instruction) |
+|  |  |  |  | [`sbitm`](#the-sbitm-instruction) |  |  |  | [`prsv.cc`](#the-prsvcc-instruction) |
 |  |  |  |  |  |  |  |  | [`rstr.cc`](#the-rstrcc-instruction) |
 |  |  |  |  |  |  |  |  | [`sleep`](#the-sleep-instruction) |
 |  |  |  |  |  |  |  |  | [`vijt`](#the-vijt-instruction) |
@@ -71,6 +70,7 @@
 | `tle r1, r2` | Test Less-than or Equal | `tge r2, r1` | One Way |
 | `ta r1, r2` | Test Above | `ta r2, r1` | One Way |
 | `tbe r1, r2` | Test Below or Equal | `tae r2, r1` | One Way |
+| `HALT` | Halt the processor (infinite loop) | `b 0` | Reversable |
 
 ## Instruction Format Breakdown
 
@@ -93,7 +93,7 @@
 | [`rr(3)`](#format-rr3) | `00000001oosssrrr` | 4 | 2 | 50% |  |
 | [`r(1)`](#format-r1) | `000000001oooorrr` | 16 | 8 | 50% |  |
 | [`r(2)`](#format-r2) | `0000000001ooorrr` | 8 | 4 | 50% |  |
-| [`o`](#format-o) | `0000000000oooooo` | 64 | 29 | 45% |  |
+| [`o`](#format-o) | `0000000000oooooo` | 64 | 28 | 44% |  |
 
 ### Legend
 
@@ -2080,7 +2080,7 @@ $PC <- nonexe0_isr
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b0000000000 | 0b000110 | `0000000000000110` |
+| `o` = 0b0000000000 | 0b000010 | `0000000000000010` |
 
 ###### Semantics
 
@@ -2093,35 +2093,6 @@ $PC <- unimpl_isr
 ###### Module
 
 **`dbg`**
-
---------------
-
-##### The `HALT` Instruction
-
-**Halt** --- Halt the processor.
-
-###### Examples
-
-- `HALT`
-
-###### Layout
-
-
-| Format Prefix | Opcode | Bit Layout |
-|:---:|:---:|:---:|
-| `o` = 0b0000000000 | 0b000010 | `0000000000000010` |
-
-###### Semantics
-
-```
-[]
-----
-todo
-```
-
-###### Module
-
-**`base`**
 
 --------------
 
@@ -2138,7 +2109,7 @@ todo
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `o` = 0b0000000000 | 0b000111 | `0000000000000111` |
+| `o` = 0b0000000000 | 0b000011 | `0000000000000011` |
 
 ###### Semantics
 

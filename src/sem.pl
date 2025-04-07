@@ -915,16 +915,6 @@ instr_info('BREAK', info{
     tags: [exc, dbg],
 	module: [dbg]
 }).
-instr_info('HALT', info{
-	title: 'Halt',
-	descr: 'Halt the processor.',
-	ex: ['HALT'],
-	operands: [],
-	syntax: {},
-	sem: todo,
-    tags: [exc, cmd],
-	module: [base]
-}).
 instr_info('UNIMPL', info{
 	title: 'Unimplemented',
 	descr: 'Unimplemented instruction.',

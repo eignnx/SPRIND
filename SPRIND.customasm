@@ -95,9 +95,8 @@
 	rd.gp {rd: Reg} => 0b0000000001 @ 0b011`3 @ rd
 	wr.gp {rs: Reg} => 0b0000000001 @ 0b010`3 @ rs
 	NONEXE0  => 0b0000000000 @ 0b000000`6
-	BREAK  => 0b0000000000 @ 0b000111`6
-	HALT  => 0b0000000000 @ 0b000010`6
-	UNIMPL  => 0b0000000000 @ 0b000110`6
+	BREAK  => 0b0000000000 @ 0b000011`6
+	UNIMPL  => 0b0000000000 @ 0b000010`6
 	kret  => 0b0000000000 @ 0b000110`6
 	kcall  => 0b0000000000 @ 0b000111`6
 	ret  => 0b0000000000 @ 0b000100`6
@@ -134,6 +133,7 @@
 	tle {r1: Reg}, {r2: Reg} => asm { tge {r2}, {r1} }
 	ta {r1: Reg}, {r2: Reg} => asm { ta {r2}, {r1} }
 	tbe {r1: Reg}, {r2: Reg} => asm { tae {r2}, {r1} }
+	HALT  => asm { b 0 }
 }
 
 #const SPRIND_SUBR_ALIGN = 4
