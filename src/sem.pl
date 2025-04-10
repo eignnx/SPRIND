@@ -114,6 +114,14 @@ def(#overflow_flag_idx, _).
 def(#carry_flag_idx, _).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+tag_instrs(Tag, Instrs) :-
+	bagof(Instr, Info^(
+		instr_info(Instr, Info),
+		member(Tag, Info.tags)
+	), Instrs).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- set_prolog_flag(print_write_options, [
     portrayed(true),
     spacing(next_argument)
@@ -471,7 +479,17 @@ instr_info(addi, info{
 	operands: [simm(?simm), reg(r, ?rd)],
 	syntax: { reg(r, ?rd), simm(?simm) },
 	sem: ?rd <- ?rd\s + sxt(?simm),
-    tags: [arith],
+    tags: [aligned_subcat(alu), arith, add],
+	module: [imms]
+}).
+instr_info(subi, info{
+	title: 'Subtract Immediate',
+	descr: 'Subtract an immediate value from a register.',
+	ex: ['subi x, -5'],
+	operands: [simm(?simm), reg(r, ?rd)],
+	syntax: { reg(r, ?rd), simm(?simm) },
+	sem: ?rd <- ?rd\s - sxt(?simm),
+    tags: [aligned_subcat(alu), arith, sub],
 	module: [imms]
 }).
 instr_info(andi, info{
@@ -481,7 +499,7 @@ instr_info(andi, info{
 	operands: [simm(?simm), reg(r, ?rd)],
 	syntax: { reg(r, ?rd), simm(?simm) },
 	sem: ?rd <- ?rd and sxt(?simm),
-    tags: [logical, boolean, bitwise, and],
+    tags: [aligned_subcat(alu), logical, boolean, bitwise, and],
 	module: [imms]
 }).
 instr_info(ori, info{
@@ -491,7 +509,7 @@ instr_info(ori, info{
 	operands: [simm(?simm), reg(r, ?rd)],
 	syntax: { reg(r, ?rd), simm(?simm) },
 	sem: ?rd <- ?rd or sxt(?simm),
-    tags: [logical, boolean, bitwise],
+    tags: [aligned_subcat(alu), logical, boolean, bitwise, or],
 	module: [imms]
 }).
 
@@ -502,7 +520,7 @@ instr_info(xori, info{
 	operands: [simm(?simm), reg(r, ?rd)],
 	syntax: { reg(r, ?rd), simm(?simm) },
 	sem: ?rd <- ?rd xor sxt(?simm),
-    tags: [logical, boolean, bitwise, xor],
+    tags: [aligned_subcat(alu), logical, boolean, bitwise, xor],
 	module: [imms]
 }).
 instr_info(addicy, info{
@@ -516,7 +534,7 @@ instr_info(addicy, info{
         bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
         bit($$cc, #overflow_flag_bit) <- attr(cpu/alu/overflow)
     ),
-    tags: [arith, carry, add],
+    tags: [aligned_subcat(alu), arith, carry, add],
 	module: [imms]
 }).
 instr_info(subicy, info{
@@ -530,7 +548,7 @@ instr_info(subicy, info{
         bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
         bit($$cc, #overflow_flag_bit) <- attr(cpu/alu/overflow)
     ),
-    tags: [arith, carry],
+    tags: [aligned_subcat(alu), arith, carry, sub],
 	module: [imms]
 }).
 instr_info(lsr, info{
@@ -608,7 +626,7 @@ instr_info(add, info{
 	operands: [reg(r, ?rs), reg(s, ?rd)],
 	syntax: { reg(r, ?rd), reg(s, ?rs) },
 	sem: ?rd <- ?rd + ?rs,
-    tags: [arith, add],
+    tags: [aligned_subcat(alu), arith, add],
 	module: [base]
 }).
 instr_info(sub, info{
@@ -618,7 +636,7 @@ instr_info(sub, info{
 	operands: [reg(r, ?rs), reg(s, ?rd)],
 	syntax: { reg(r, ?rd), reg(s, ?rs) },
 	sem: ?rd <- ?rd - ?rs,
-    tags: [arith],
+    tags: [aligned_subcat(alu), arith, sub],
 	module: [base]
 }).
 instr_info(and, info{
@@ -628,7 +646,7 @@ instr_info(and, info{
 	operands: [reg(r, ?rs), reg(s, ?rd)],
 	syntax: { reg(r, ?rd), reg(s, ?rs) },
 	sem: ?rd <- ?rd and ?rs,
-    tags: [logical, boolean, bitwise, and],
+    tags: [aligned_subcat(alu), logical, boolean, bitwise, and],
 	module: [base]
 }).
 instr_info(or, info{
@@ -638,7 +656,7 @@ instr_info(or, info{
 	operands: [reg(r, ?rs), reg(s, ?rd)],
 	syntax: { reg(r, ?rd), reg(s, ?rs) },
 	sem: ?rd <- ?rd or ?rs,
-    tags: [logical, boolean, bitwise],
+    tags: [aligned_subcat(alu), logical, boolean, bitwise, or],
 	module: [base]
 }).
 instr_info(xor, info{
@@ -648,7 +666,7 @@ instr_info(xor, info{
 	operands: [reg(r, ?rs), reg(s, ?rd)],
 	syntax: { reg(r, ?rd), reg(s, ?rs) },
 	sem: ?rd <- ?rd xor ?rs,
-    tags: [logical, boolean, bitwise, xor],
+    tags: [aligned_subcat(alu), logical, boolean, bitwise, xor],
 	module: [base]
 }).
 instr_info(mov, info{
@@ -686,7 +704,7 @@ instr_info(subcy, info{
         bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
         bit($$cc, #overflow_flag_bit) <- attr(cpu/alu/overflow)
     ),
-    tags: [arith, carry],
+    tags: [arith, carry, sub],
 	module: [base]
 }).
 instr_info(tl, info{

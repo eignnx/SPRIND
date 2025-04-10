@@ -132,15 +132,15 @@ instrpool_tree([I0, I1 | Is], node(LeftTree, SplitTag, RightTree)) :-
         pool_tag_score(Pool, Tag, Score)
     ), Tags, ScoresTags),
     predsort(cmp_score_ascending, ScoresTags, SortedScoresTags),
-    member(_SplitScore-SplitTag, SortedScoresTags), % Generate many solns here...
+	member(_SplitScore-SplitTag, SortedScoresTags), % Generate many solns here... <1> 
     partition(tag_instr(SplitTag), Pool, RightPool, LeftPool),
-    LeftPool \= Pool, RightPool \= Pool, % ...because some split tags may need to be skipped.
+	LeftPool \= Pool, RightPool \= Pool, % <1> ...because some split tags may need to be skipped.
     instrpool_tree(LeftPool, LeftTree),
     instrpool_tree(RightPool, RightTree).
 
 
 cmp_score_ascending(Ord, Score1-Tag1, Score2-Tag2) :-
-    ( Score1 > Score2 ->
+	( Score1 > Score2 ->
         Ord = '<'
     ; Score1 < Score2 ->
         Ord = '>'

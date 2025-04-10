@@ -11,13 +11,13 @@
 | [`subr`](#instruction-format-subr) | Subroutine Call | 1 | 1 | 100% |
 | [`b`](#instruction-format-b) | Branch | 4 | 3 | 75% |
 | [`li`](#instruction-format-li) | Load Immediate | 2 | 2 | 100% |
-| [`ri(_)`](#instruction-format-ri_) | Register-immediate | 48 | 25 | 52% |
+| [`ri(_)`](#instruction-format-ri_) | Register-immediate | 48 | 26 | 54% |
 | [`ext`](#instruction-format-ext) | Reserved for Extension | 4096 | 0 | 0% |
 | [`rrr`](#instruction-format-rrr) | Register-register-register | 4 | 1 | 25% |
 | [`rr(_)`](#instruction-format-rr_) | Register-register | 28 | 14 | 50% |
 | [`r(_)`](#instruction-format-r_) | Register | 24 | 12 | 50% |
 | [`o`](#instruction-format-o) | Opcode | 64 | 28 | 44% |
-|  | **Totals (excluding `ext`)** | **179** | **90** | **50%** |
+|  | **Totals (excluding `ext`)** | **179** | **91** | **51%** |
 
 
 
@@ -40,18 +40,18 @@
 |  |  |  |  | [`tnei`](#the-tnei-instruction) |  | [`tae`](#the-tae-instruction) | [`wr.gp`](#the-wrgp-instruction) | [`tpush1`](#the-tpush1-instruction) |
 |  |  |  |  | [`teqi`](#the-teqi-instruction) |  | [`tne`](#the-tne-instruction) |  | [`tnot`](#the-tnot-instruction) |
 |  |  |  |  | [`addi`](#the-addi-instruction) |  | [`teq`](#the-teq-instruction) |  | [`tand`](#the-tand-instruction) |
-|  |  |  |  | [`andi`](#the-andi-instruction) |  |  |  | [`tor`](#the-tor-instruction) |
-|  |  |  |  | [`ori`](#the-ori-instruction) |  |  |  | [`tdup`](#the-tdup-instruction) |
-|  |  |  |  | [`xori`](#the-xori-instruction) |  |  |  | [`prsv.mp`](#the-prsvmp-instruction) |
-|  |  |  |  | [`addicy`](#the-addicy-instruction) |  |  |  | [`rstr.mp`](#the-rstrmp-instruction) |
-|  |  |  |  | [`subicy`](#the-subicy-instruction) |  |  |  | [`prsv.ts`](#the-prsvts-instruction) |
-|  |  |  |  | [`lsr`](#the-lsr-instruction) |  |  |  | [`rstr.ts`](#the-rstrts-instruction) |
-|  |  |  |  | [`lsl`](#the-lsl-instruction) |  |  |  | [`prsv.ra`](#the-prsvra-instruction) |
-|  |  |  |  | [`asr`](#the-asr-instruction) |  |  |  | [`rstr.ra`](#the-rstrra-instruction) |
-|  |  |  |  | [`tbitm`](#the-tbitm-instruction) |  |  |  | [`prsv.gp`](#the-prsvgp-instruction) |
-|  |  |  |  | [`cbitm`](#the-cbitm-instruction) |  |  |  | [`rstr.gp`](#the-rstrgp-instruction) |
-|  |  |  |  | [`sbitm`](#the-sbitm-instruction) |  |  |  | [`prsv.cc`](#the-prsvcc-instruction) |
-|  |  |  |  |  |  |  |  | [`rstr.cc`](#the-rstrcc-instruction) |
+|  |  |  |  | [`subi`](#the-subi-instruction) |  |  |  | [`tor`](#the-tor-instruction) |
+|  |  |  |  | [`andi`](#the-andi-instruction) |  |  |  | [`tdup`](#the-tdup-instruction) |
+|  |  |  |  | [`ori`](#the-ori-instruction) |  |  |  | [`prsv.mp`](#the-prsvmp-instruction) |
+|  |  |  |  | [`xori`](#the-xori-instruction) |  |  |  | [`rstr.mp`](#the-rstrmp-instruction) |
+|  |  |  |  | [`addicy`](#the-addicy-instruction) |  |  |  | [`prsv.ts`](#the-prsvts-instruction) |
+|  |  |  |  | [`subicy`](#the-subicy-instruction) |  |  |  | [`rstr.ts`](#the-rstrts-instruction) |
+|  |  |  |  | [`lsr`](#the-lsr-instruction) |  |  |  | [`prsv.ra`](#the-prsvra-instruction) |
+|  |  |  |  | [`lsl`](#the-lsl-instruction) |  |  |  | [`rstr.ra`](#the-rstrra-instruction) |
+|  |  |  |  | [`asr`](#the-asr-instruction) |  |  |  | [`prsv.gp`](#the-prsvgp-instruction) |
+|  |  |  |  | [`tbitm`](#the-tbitm-instruction) |  |  |  | [`rstr.gp`](#the-rstrgp-instruction) |
+|  |  |  |  | [`cbitm`](#the-cbitm-instruction) |  |  |  | [`prsv.cc`](#the-prsvcc-instruction) |
+|  |  |  |  | [`sbitm`](#the-sbitm-instruction) |  |  |  | [`rstr.cc`](#the-rstrcc-instruction) |
 |  |  |  |  |  |  |  |  | [`sleep`](#the-sleep-instruction) |
 |  |  |  |  |  |  |  |  | [`vijt`](#the-vijt-instruction) |
 
@@ -84,7 +84,7 @@
 | [`subr`](#format-subr) | `101iiiiiiiiiiiii` | 1 | 1 | 100% | `imm13` in `[-4096, 4095]` or `[0, 8191]` |
 | [`b`](#format-b) | `1001ooiiiiiiiiii` | 4 | 3 | 75% | `imm10` in `[-512, 511]` or `[0, 1023]` |
 | [`li`](#format-li) | `1000oiiiiiiiirrr` | 2 | 2 | 100% | `imm8` in `[-128, 127]` or `[0, 255]` |
-| [`ri(1)`](#format-ri1) | `01oooooiiiiiirrr` | 32 | 25 | 78% | `imm6` in `[-32, 31]` or `[0, 63]` |
+| [`ri(1)`](#format-ri1) | `01oooooiiiiiirrr` | 32 | 26 | 81% | `imm6` in `[-32, 31]` or `[0, 63]` |
 | [`ri(2)`](#format-ri2) | `001ooooiiiiiirrr` | 16 | 0 | 0% | `imm6` in `[-32, 31]` or `[0, 63]` |
 | [`ext`](#format-ext) | `0001oooooooooooo` | 4096 | 0 | 0% |  |
 | [`rrr`](#format-rrr) | `00001ootttsssrrr` | 4 | 1 | 25% |  |
@@ -465,7 +465,7 @@ rd <- rd<<8 or zxt(imm)
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b00111 | `0100111iiiiiirrr` | 6 | `[0, 63]` |
+| `ri(1)` = 0b01 | 0b00011 | `0100011iiiiiirrr` | 6 | `[0, 63]` |
 
 ###### Semantics
 
@@ -494,7 +494,7 @@ rd <- zxt([$GP\u+zxt(disp)])
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b00101 | `0100101iiiiiirrr` | 6 | `[0, 63]` |
+| `ri(1)` = 0b01 | 0b00001 | `0100001iiiiiirrr` | 6 | `[0, 63]` |
 
 ###### Semantics
 
@@ -524,7 +524,7 @@ rd <- {[ptr+1], [ptr]}
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b00110 | `0100110iiiiiirrr` | 6 | `[0, 63]` |
+| `ri(1)` = 0b01 | 0b00010 | `0100010iiiiiirrr` | 6 | `[0, 63]` |
 
 ###### Semantics
 
@@ -553,7 +553,7 @@ rd <- {[ptr+1], [ptr]}
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b00100 | `0100100iiiiiirrr` | 6 | `[0, 63]` |
+| `ri(1)` = 0b01 | 0b00000 | `0100000iiiiiirrr` | 6 | `[0, 63]` |
 
 ###### Semantics
 
@@ -850,7 +850,7 @@ b_push($TS, rs\s==sxt(simm))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b00000 | `0100000iiiiiirrr` | 6 | `[-32, 31]` |
+| `ri(1)` = 0b01 | 0b00110 | `0100110iiiiiirrr` | 6 | `[-32, 31]` |
 
 ###### Semantics
 
@@ -858,6 +858,35 @@ b_push($TS, rs\s==sxt(simm))
 [simm(simm), reg(r, rd)]
 ------------------------
 rd <- rd\s+sxt(simm)
+```
+
+###### Module
+
+**`imms`**
+
+--------------
+
+##### The `subi` Instruction
+
+**Subtract Immediate** --- Subtract an immediate value from a register.
+
+###### Examples
+
+- `subi x, -5`
+
+###### Layout
+
+
+| Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
+|:---:|:---:|:---:|:---:|:---:|
+| `ri(1)` = 0b01 | 0b00100 | `0100100iiiiiirrr` | 6 | `[-32, 31]` |
+
+###### Semantics
+
+```
+[simm(simm), reg(r, rd)]
+------------------------
+rd <- rd\s-sxt(simm)
 ```
 
 ###### Module
@@ -908,7 +937,7 @@ rd <- rd and sxt(simm)
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b10100 | `0110100iiiiiirrr` | 6 | `[-32, 31]` |
+| `ri(1)` = 0b01 | 0b10101 | `0110101iiiiiirrr` | 6 | `[-32, 31]` |
 
 ###### Semantics
 
@@ -937,7 +966,7 @@ rd <- rd or sxt(simm)
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b10101 | `0110101iiiiiirrr` | 6 | `[-32, 31]` |
+| `ri(1)` = 0b01 | 0b10100 | `0110100iiiiiirrr` | 6 | `[-32, 31]` |
 
 ###### Semantics
 
@@ -966,7 +995,7 @@ rd <- rd xor sxt(simm)
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b00011 | `0100011iiiiiirrr` | 6 | `[-32, 31]` |
+| `ri(1)` = 0b01 | 0b00111 | `0100111iiiiiirrr` | 6 | `[-32, 31]` |
 
 ###### Semantics
 
@@ -997,7 +1026,7 @@ bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b00010 | `0100010iiiiiirrr` | 6 | `[-32, 31]` |
+| `ri(1)` = 0b01 | 0b00101 | `0100101iiiiiirrr` | 6 | `[-32, 31]` |
 
 ###### Semantics
 
@@ -1348,7 +1377,7 @@ rd <- rd and rs
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `rr(1)` = 0b000001 | 0b00010 | `00000100010sssrrr` |
+| `rr(1)` = 0b000001 | 0b00011 | `00000100011sssrrr` |
 
 ###### Semantics
 
@@ -1377,7 +1406,7 @@ rd <- rd or rs
 
 | Format Prefix | Opcode | Bit Layout |
 |:---:|:---:|:---:|
-| `rr(1)` = 0b000001 | 0b00011 | `00000100011sssrrr` |
+| `rr(1)` = 0b000001 | 0b00010 | `00000100010sssrrr` |
 
 ###### Semantics
 

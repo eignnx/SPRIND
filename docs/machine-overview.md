@@ -114,7 +114,7 @@ Instructions contain embedded (immediate) values. Generally duplicates of instru
 
 #### Instructions
 
-[`tli`](instruction-listing.md#the-tli-instruction), [`tgei`](instruction-listing.md#the-tgei-instruction), [`tbi`](instruction-listing.md#the-tbi-instruction), [`taei`](instruction-listing.md#the-taei-instruction), [`tnei`](instruction-listing.md#the-tnei-instruction), [`teqi`](instruction-listing.md#the-teqi-instruction), [`addi`](instruction-listing.md#the-addi-instruction), [`andi`](instruction-listing.md#the-andi-instruction), [`ori`](instruction-listing.md#the-ori-instruction), [`xori`](instruction-listing.md#the-xori-instruction), [`addicy`](instruction-listing.md#the-addicy-instruction), [`subicy`](instruction-listing.md#the-subicy-instruction), [`neg`](instruction-listing.md#the-neg-instruction), 
+[`tli`](instruction-listing.md#the-tli-instruction), [`tgei`](instruction-listing.md#the-tgei-instruction), [`tbi`](instruction-listing.md#the-tbi-instruction), [`taei`](instruction-listing.md#the-taei-instruction), [`tnei`](instruction-listing.md#the-tnei-instruction), [`teqi`](instruction-listing.md#the-teqi-instruction), [`addi`](instruction-listing.md#the-addi-instruction), [`subi`](instruction-listing.md#the-subi-instruction), [`andi`](instruction-listing.md#the-andi-instruction), [`ori`](instruction-listing.md#the-ori-instruction), [`xori`](instruction-listing.md#the-xori-instruction), [`addicy`](instruction-listing.md#the-addicy-instruction), [`subicy`](instruction-listing.md#the-subicy-instruction), [`neg`](instruction-listing.md#the-neg-instruction), 
 ### `interrupts`
 
 **Interrupts**

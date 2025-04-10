@@ -144,6 +144,7 @@ fmt_instr_title(ri(1), taei, 'Test Above or Equal').
 fmt_instr_title(ri(1), tnei, 'Test Not Equal Immediate').
 fmt_instr_title(ri(1), teqi, 'Test Equal Immediate').
 fmt_instr_title(ri(1), addi, 'Add Immediate').
+fmt_instr_title(ri(1), subi, 'Sub Immediate').
 fmt_instr_title(ri(1), andi, 'AND Immediate').
 fmt_instr_title(ri(1), ori, 'OR Immediate').
 fmt_instr_title(ri(1), xori, 'XOR Immediate').
