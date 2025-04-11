@@ -17,6 +17,7 @@
 :- use_module(library(clpfd)).
 :- op(20, fx, #).
 
+
 fmt_tree_maxbits(Fmt, Tree, MaxBits) :-
 	fmt_all_instrs(Fmt, Pool),
 	catch(
@@ -29,29 +30,45 @@ fmt_tree_maxbits(Fmt, Tree, MaxBits) :-
 	),
 end.
 
+
 instrpool_tree([], _, _) :- throw(error(empty_pool, _)).
-instrpool_tree([Instr], Tree, Depth) :-
-	( Instr = subcat_tags_instrs(Subcat, _Tags, Instrs) ->
-		instrpool_tree(Instrs, Tree0, Depth),
-		Tree = subtree(Subcat, Tree0)
-	;
-		Tree = leaf(Instr), Depth = 0
-	).
+instrpool_tree([subcat_tags_instrs(Subcat, _Tags, Instrs)], subtree(Subcat, Tree), Depth) :- !,
+	instrpool_tree(Instrs, Tree, Depth),
+end.
+instrpool_tree([Instr], leaf(Instr), 0).
 instrpool_tree(Pool, node(LeftTree, SplitTag, RightTree), MaxBits) :-
 	Pool = [_, _ | _],
-	pool_all_tags(Pool, Tags0),
-	pool_tags_consolidated(Pool, Tags0, Tags),
-	maplist({Pool}/[Tag, Score-Tag]>>(
-		pool_tag_score(Pool, Tag, Score)
-	), Tags, ScoresTags),
-	predsort(cmp_score_ascending, ScoresTags, SortedScoresTags),
-	member(_SplitScore-SplitTag, SortedScoresTags), % Generate many solns here... <1> 
-    partition(tag_instr(SplitTag), Pool, RightPool, LeftPool),
-	LeftPool \= Pool, RightPool \= Pool, % <1> ...because some split tags may need to be skipped.
+	pool_split_left_right(Pool, SplitTag, LeftPool, RightPool),
     instrpool_tree(LeftPool, LeftTree, MaxBitsLeft),
     instrpool_tree(RightPool, RightTree, MaxBitsRight),
 	#MaxBits #= max(#MaxBitsLeft, #MaxBitsRight) + 1,
 end.
+
+pool_split_left_right(Pool, SplitTag, LeftPool, RightPool) :-
+	pool_consolidatedtags(Pool, Tags),
+	pool_tags_splittag(Pool, Tags, SplitTag),
+    partition(tag_instr(SplitTag), Pool, RightPool, LeftPool),
+	LeftPool \= Pool, RightPool \= Pool, % <1> ...because some split tags may need to be skipped.
+end.
+
+pool_consolidatedtags(Pool, Tags) :-
+	pool_all_tags(Pool, Tags0),
+	pool_tags_consolidated(Pool, Tags0, Tags),
+end.
+
+%! pool_tags_splittag(+Pool, +Tags, -SplitTag) is multi.
+pool_tags_splittag(Pool, Tags, SplitTag) :-
+	pool_tags_scored(Pool, Tags, ScoresTags),
+	predsort(cmp_score_ascending, ScoresTags, SortedScoresTags),
+	member(_SplitScore-SplitTag, SortedScoresTags), % Generate many solns here... <1> 
+end.
+
+pool_tags_scored(Pool, Tags, ScoresTags) :-
+	maplist({Pool}/[Tag, Score-Tag]>>(
+		pool_tag_score(Pool, Tag, Score)
+	), Tags, ScoresTags),
+end.
+
 
 fmt_all_instrs(Fmt, Instrs) :-
     aggregate_all(bag(Instr), fmt_instr(Fmt, Instr), Instrs).
@@ -63,28 +80,31 @@ pool_instr_tag(Pool, Instr, Tag) :-
     member(Tag, [instr(Instr) | Info.tags]).
 
 pool_all_tags(Pool, Tags) :-
-    aggregate_all(set(Tag), (
+	   aggregate_all(set(Tag), (
 		pool_instr_tag(Pool, _Instr, Tag)
 	), Tags).
 
 dedupe(Original, Deduped) :- sort(Original, Deduped).
 
+%% Remove all instrs in `Pool` that are members of any subcat; replace with
+%% one psuedo-instr `subcat_tags_instrs(_,_,_)` for each subcat.
 pool_tags_consolidated(Pool, Tags0, Tags) :-
 	partition(=(aligned_subcat(_)), Tags0, SubcatTags, NonSubcatTags0), 
 	maplist([aligned_subcat(Subcat), Subcat]>>true, SubcatTags, Subcats0),
 	dedupe(Subcats0, Subcats),
 	dedupe(NonSubcatTags0, NonSubcatTags),
 	maplist(pool_subcat_consolidated(Pool), Subcats, ConsolidatedSubcats),
-	append(NonSubcatTags, ConsolidatedSubcats, Tags).
+	append(NonSubcatTags, ConsolidatedSubcats, Tags),
+end.
 
+%% Remove all instrs in `Pool` that are members of `Subcat`; replace with one
+%% psuedo-instr `subcat_tags_instrs(_,_,_)`.
 pool_subcat_consolidated(Pool, Subcat, subcat_tags_instrs(Subcat, Tags, Instrs)) :-
 	maplist(instr_normaltags, Pool, TagLists),
 	flatten(TagLists, TagsWithDups),
 	dedupe(TagsWithDups, Tags),
 	include(
-		{Subcat}/[Instr]>>(instr_tag(Instr, aligned_subcat(Subcat))),
-		% Using `@-lambda` library this would be:
-		% @instr_tag(@0, aligned_subcat(Subcat))
+		{Subcat}/[Instr]>>instr_tag(Instr, aligned_subcat(Subcat)),
 		Pool,
 		Instrs
 	),
@@ -96,8 +116,12 @@ instr_normaltags(Instr, Tags) :-
 	exclude(=(aligned_subcat(_)), Info.tags, Tags).
 
 
+% `Occurrances` is the number of instructions in `Pool` that have the tag `Tag`.
 pool_tag_occurrances(Pool, Tag, Occurrances) :-
-    aggregate_all(count, pool_instr_tag(Pool, _Instr, Tag), Occurrances).
+    aggregate_all(count, Instr,
+		pool_instr_tag(Pool, Instr, Tag),
+	Occurrances),
+end.
 
 
 pool_subcat_instrs([], _Subcat, []).
