@@ -5,7 +5,7 @@
 :- use_module(sem).
 :- use_module(markdown).
 :- use_module(utils).
-:- use_module(optree).
+:- use_module(optree2).
 :- use_module(library(clpfd)).
 :- op(20, fx, #).
 
@@ -196,7 +196,7 @@ display_instr_specification_under_gfmt(Lvl, GFmt) :-
     markdown:emit_heading(Lvl, 'Instruction Format `~k`', [GFmt]),
     
     GFmt \= ext,
-    optree:fmt_tree(GFmt, OpTree), % Format being ext makes fmt_tree throw error about empty pool
+    optree2:fmt_tree(GFmt, OpTree), % Format being ext makes fmt_tree throw error about empty pool
 
     forall(
         isa:fmt_genericfmt(Fmt, GFmt),
@@ -232,7 +232,7 @@ display_instr_specification(Lvl, Fmt, Instr, OpTree) :-
     % bagof(I, Fmt^fmt_instr(Fmt, I), InstrsInFmt),
     % once(nth0(OpcodeIndex, InstrsInFmt, Instr)),
     ( Fmt \= ext ->
-        optree:optree_instr_prefix(OpTree, Instr, Opcode)
+        optree2:optree_instr_prefix(OpTree, Instr, Opcode)
     ;
         Opcode = 'NONE'
     ),
