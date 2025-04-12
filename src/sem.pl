@@ -690,7 +690,7 @@ instr_info(addcy, info{
         bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
         bit($$cc, #overflow_flag_bit) <- attr(cpu/alu/overflow)
     ),
-    tags: [arith, carry, add],
+    tags: [arith, carry, add, aligned_subcat(alu)],
 	module: [base]
 }).
 instr_info(subcy, info{
@@ -704,7 +704,7 @@ instr_info(subcy, info{
         bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
         bit($$cc, #overflow_flag_bit) <- attr(cpu/alu/overflow)
     ),
-    tags: [arith, carry, sub],
+    tags: [arith, carry, sub, aligned_subcat(alu)],
 	module: [base]
 }).
 instr_info(tl, info{
