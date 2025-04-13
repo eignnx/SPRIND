@@ -1,6 +1,0 @@
-digraph "Format r(3)" {
-  graph [dpi = 100, bgcolor="#111", fontcolor="white", rankdir=LR, pad="0.25"];
-  node [fontname = "Courier", fontsize="15pt", color="white", fontcolor="white"];
-  edge [fontname = "Courier", color="white", fontcolor="white"];
-// Empty Tree
-}

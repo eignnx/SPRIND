@@ -23,13 +23,17 @@ fmt_tree(Fmt, Tree) :-
 
 fmt_tree_maxbits(Fmt, Tree, MaxBits) :-
 	fmt_all_instrs(Fmt, Pool),
-	catch(
-		instrpool_tree_maxdepth(Pool, Tree, MaxBits),
-		error(empty_pool, Loc),
-		throw(error(while_building_optree(
-			fmt(Fmt),
-			'empty pool passed to `isntrpool_tree`'
-		), Loc))
+	( Pool = [] ->
+		Tree = empty
+	;
+		catch(
+			instrpool_tree_maxdepth(Pool, Tree, MaxBits),
+			error(empty_pool, Loc),
+			throw(error(while_building_optree(
+				fmt(Fmt),
+				'empty pool passed to `isntrpool_tree_maxbits`'
+			), Loc))
+		)
 	),
 end.
 
@@ -103,7 +107,6 @@ dedupe(Original, Deduped) :- sort(Original, Deduped).
 % one psuedo-instr `subcat_tags_instrs(_,_,_)` for each subcat.
 % Also remove all `aligned_subcat(_)` tags.
 pool_tags_consolidated(Pool0, Tags0, Pool-Tags) :-
-
 	partition(=(aligned_subcat(_)), Tags0, SubcatTags, NonSubcatTags0), 
 	maplist([aligned_subcat(Subcat), Subcat]>>true, SubcatTags, Subcats0),
 	dedupe(Subcats0, Subcats),
@@ -192,6 +195,7 @@ end.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+optree_instr_prefix(empty, _, _) :- throw(error(empty_tree, _)).
 optree_instr_prefix(Tree, Instr, Prefix) :-
     phrase(optree_instr_prefix_(Tree, Instr), Prefix).
 

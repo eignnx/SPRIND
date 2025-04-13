@@ -195,15 +195,16 @@ display_instr_specifications(Lvl) :-
 display_instr_specification_under_gfmt(Lvl, GFmt) :-
     markdown:emit_heading(Lvl, 'Instruction Format `~k`', [GFmt]),
     
-    GFmt \= ext,
-    optree2:fmt_tree(GFmt, OpTree), % Format being ext makes fmt_tree throw error about empty pool
-
     forall(
-        isa:fmt_genericfmt(Fmt, GFmt),
-        display_instr_specification_under_fmt(s(Lvl), Fmt, OpTree)
+		% Format being `ext` makes fmt_tree throw error about empty pool
+		(isa:fmt_genericfmt(Fmt, GFmt), Fmt \= ext),
+        display_instr_specification_under_fmt(s(Lvl), Fmt)
     ).
 
-display_instr_specification_under_fmt(Lvl, Fmt, OpTree) :-
+display_instr_specification_under_fmt(Lvl, Fmt) :-
+	derive:fmt_layout(Fmt, Layout),
+	bitlayout_opcodebits(Layout, _OpcodeBits),
+    optree2:fmt_tree_maxbits(Fmt, OpTree, _),
     markdown:emit_heading(Lvl, 'Format `~k`', [Fmt]),
     markdown:emit_image('../assets/~k.svg', [Fmt]),
     forall(
@@ -229,8 +230,6 @@ display_instr_specification(Lvl, Fmt, Instr, OpTree) :-
 
     markdown:emit_heading(s(Lvl), 'Layout'),
     once(derive:fmt_prefix(Fmt, Prefix)),
-    % bagof(I, Fmt^fmt_instr(Fmt, I), InstrsInFmt),
-    % once(nth0(OpcodeIndex, InstrsInFmt, Instr)),
     ( Fmt \= ext ->
         optree2:optree_instr_prefix(OpTree, Instr, Opcode)
     ;
@@ -290,7 +289,7 @@ display_detailed_instr_layout(Fmt, Instr, Prefix, Opcode, Layout) :-
 
     markdown:emit_table_row([
         fmt('`~q` = 0b~s', Fmt, Prefix),
-        a(OpcodeBin),
+        fmt('`~q` = ~w', Instr, OpcodeBin),
         fmt('~w', RenderedLayout)
         | MaybeImmRange
     ]),
