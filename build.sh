@@ -7,7 +7,7 @@ TIMEFORMAT='[%Es]'
 echo "Generating markdown documents..."
 swipl --quiet --on-error=halt -f none -t generate_spec src/gen_spec.pl
 echo "Generating opcode tree graphs..."
-swipl --quiet --on-error=halt -f none -t print_dottrees src/optree2.pl
+swipl --quiet --on-error=halt -f none -t print_dottrees src/optree.pl
 
 generate_svgs () {
     # Process all .dot files in assets/graphs and generate .svg files in assets
