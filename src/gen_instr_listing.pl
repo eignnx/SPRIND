@@ -5,7 +5,7 @@
 :- use_module(sem).
 :- use_module(markdown).
 :- use_module(utils).
-:- use_module(optree2).
+:- use_module(optree).
 :- use_module(library(clpfd)).
 :- op(20, fx, #).
 
@@ -204,7 +204,7 @@ display_instr_specification_under_gfmt(Lvl, GFmt) :-
 display_instr_specification_under_fmt(Lvl, Fmt) :-
 	derive:fmt_layout(Fmt, Layout),
 	bitlayout_opcodebits(Layout, _OpcodeBits),
-    optree2:fmt_tree_maxbits(Fmt, OpTree, _),
+    optree:fmt_tree_maxbits(Fmt, OpTree, _),
     markdown:emit_heading(Lvl, 'Format `~k`', [Fmt]),
     markdown:emit_image('../assets/~k.svg', [Fmt]),
     forall(
@@ -231,7 +231,7 @@ display_instr_specification(Lvl, Fmt, Instr, OpTree) :-
     markdown:emit_heading(s(Lvl), 'Layout'),
     once(derive:fmt_prefix(Fmt, Prefix)),
     ( Fmt \= ext ->
-        optree2:optree_instr_prefix(OpTree, Instr, Opcode)
+        optree:optree_instr_prefix(OpTree, Instr, Opcode)
     ;
         Opcode = 'NONE'
     ),
