@@ -600,6 +600,18 @@ instr_info(sbitm, info{
     tags: [ts, bit, bitwise, set, mem],
 	module: [bittests]
 }).
+instr_info(tpopm, info{
+	title: 'Pop Bit into Memory',
+	descr: 'Pop a bit from the test stack ($TS) and write it into memory at the given address with the given bit offset.',
+	ex: ['tpopm [x], 3'],
+	operands: [imm(?imm), reg(r, ?rs)],
+	syntax: { [reg(r, ?rs)], imm(?imm) },
+	sem: (
+		bit([?rs], ?imm) <- b_pop($$ts)
+    ),
+    tags: [ts, bit, bitwise, set, mem, pop],
+	module: [bittests]
+}).
 
 instr_info(add, info{
 	title: 'Add',
@@ -893,6 +905,26 @@ instr_info('wr.gp', info{
 	sem: $$gp <- ?rs,
     tags: [wr, data, gp],
 	module: [globals]
+}).
+instr_info('rd.ts', info{
+	title: 'Read $TS',
+	descr: 'Read the value in the system `$TS` register into a general purpose register.',
+	ex: ['rd.ts x'],
+	operands: [reg(r, ?rs)],
+	syntax: { reg(r, ?rs) },
+    sem: ?rs <- $$ts,
+    tags: [rd, data, ts],
+	module: [tsops]
+}).
+instr_info('wr.ts', info{
+	title: 'Write $TS',
+	descr: 'Write a value to the system `$TS` register from a general purpose register.',
+	ex: ['wr.gp x'],
+	operands: [reg(r, ?rs)],
+	syntax: { reg(r, ?rs) },
+	sem: $$ts <- ?rs,
+    tags: [wr, data, ts],
+	module: [tsops]
 }).
 
 instr_info('NONEXE0', info{

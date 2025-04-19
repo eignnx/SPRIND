@@ -38,15 +38,15 @@ version(0, 2, 1).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%% Instructions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 fmt_operands_description(rri,   [i, s, r], 'Register-register-immediate').
-fmt_operands_description(subr,  [i],       'Subroutine Call').        
-fmt_operands_description(li,    [i, r],    'Load Immediate').         
-fmt_operands_description(b,     [i],       'Branch').                 
-fmt_operands_description(ri(_), [i, r],    'Register-immediate').     
+fmt_operands_description(subr,  [i],       'Subroutine Call').
+fmt_operands_description(li,    [i, r],    'Load Immediate').
+fmt_operands_description(b,     [i],       'Branch').
+fmt_operands_description(ri(_), [i, r],    'Register-immediate').
 fmt_operands_description(rrr,   [t, s, r], 'Register-register-register').
 fmt_operands_description(rr(_), [s, r],    'Register-register').
-fmt_operands_description(r(_),  [r],       'Register').               
-fmt_operands_description(o,     [],        'Opcode').                 
-fmt_operands_description(ext,   [],        'Reserved for Extension'). 
+fmt_operands_description(r(_),  [r],       'Register').
+fmt_operands_description(o,     [],        'Opcode').
+fmt_operands_description(ext,   [],        'Reserved for Extension').
 
 % A cons-cell based tree representation of the encoding space. The program uses
 % this tree to construct prefix codes for the different instruction formats.
@@ -73,13 +73,13 @@ fmt_huffman_enc([
     [
         ri(1),
         ri(2),
-        ext,
         rrr,
         rr(1),
         rr(2),
         rr(3),
         r(1),
-        r(2)
+        r(2),
+        r(3)
     |
         o
     ]
@@ -155,6 +155,7 @@ fmt_instr_title(ri(1), asr, 'Arithmetic Shift Right').
 fmt_instr_title(ri(1), tbitm, 'Test Bit in Memory').
 fmt_instr_title(ri(1), cbitm, 'Clear Bit in Memory').
 fmt_instr_title(ri(1), sbitm, 'Set Bit in Memory').
+fmt_instr_title(ri(1), tpopm, 'Pop Bit into Memory').
 
 fmt_instr_title(rr(1), add, 'Add').
 fmt_instr_title(rr(1), sub, 'Subtract').
@@ -181,10 +182,12 @@ fmt_instr_title(r(1), callr, 'Call Register').
 fmt_instr_title(r(1), jr, 'Jump Register').
 fmt_instr_title(r(1), neg, 'Negate').
 fmt_instr_title(r(1), seb, 'Sign Extend Byte').
-fmt_instr_title(r(2), 'rd.mp.lo', 'Read $MP.lo').
-fmt_instr_title(r(2), 'rd.mp.hi', 'Read $MP.hi').
-fmt_instr_title(r(2), 'rd.gp', 'Read $GP').
-fmt_instr_title(r(2), 'wr.gp', 'Write $GP').
+fmt_instr_title(r(1), 'rd.mp.lo', 'Read $MP.lo').
+fmt_instr_title(r(1), 'rd.mp.hi', 'Read $MP.hi').
+fmt_instr_title(r(1), 'rd.gp', 'Read $GP').
+fmt_instr_title(r(1), 'wr.gp', 'Write $GP').
+fmt_instr_title(r(1), 'rd.ts', 'Read $TS').
+fmt_instr_title(r(1), 'wr.ts', 'Write $TS').
 
 fmt_instr_title(o, 'NONEXE0', 'Non-executable (0''s Version)').
 fmt_instr_title(o, 'UNIMPL', 'Unimplemented').

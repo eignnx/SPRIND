@@ -1,0 +1,29 @@
+#include "../SPRIND.customasm"
+
+; Serializes the contents of register `a` into bit 0 of mmio address `b`.
+; Serialization happens from LSB to MSB i.e. at t=0, LSB is sent; at t=15, MSB is sent.
+serialize_into_mmio_bit0_from_lsb_to_msb: ; subr(data => a, mmio_address => b)
+    wr.ts a
+
+    tpopm b, 0
+    tpopm b, 0
+    tpopm b, 0
+    tpopm b, 0
+
+    tpopm b, 0
+    tpopm b, 0
+    tpopm b, 0
+    tpopm b, 0
+
+    tpopm b, 0
+    tpopm b, 0
+    tpopm b, 0
+    tpopm b, 0
+
+    tpopm b, 0
+    tpopm b, 0
+    tpopm b, 0
+    tpopm b, 0
+
+    ret
+
