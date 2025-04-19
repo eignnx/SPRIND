@@ -20,10 +20,10 @@
 :- op(150, yfx, \).
 
 report :-
-	heading,
-	register_definitions,
-	instruction_definitions,
-	constant_definitions,
+    heading,
+    register_definitions,
+    instruction_definitions,
+    constant_definitions,
 end.
 
 heading :-
@@ -60,76 +60,76 @@ end.
 
 instruction_ruledef -->
     `#ruledef Instruction {`, nl,
-	foreach(instr_info(Instr, Info), instr_arm(Instr, Info)),
-	nl,
-	synthetic_instruction_definitions,
+    foreach(instr_info(Instr, Info), instr_arm(Instr, Info)),
+    nl,
+    synthetic_instruction_definitions,
     `}`,
 end.
 
 instr_arm(Instr, Info) -->
-	{ instr_syntax_ctx(Instr, Info.syntax, Ctx) },
-	`\t`, expand_syntax(Info.syntax, Ctx), nl,
+    { instr_syntax_ctx(Instr, Info.syntax, Ctx) },
+    `\t`, expand_syntax(Info.syntax, Ctx), nl,
 end.
 
 
 instr_syntax_ctx(Instr, Syntax, Ctx) :-
-	isa:fmt_instr(Fmt, Instr),
+    isa:fmt_instr(Fmt, Instr),
 
-	% Get prefix
-	derive:fmt_prefix(Fmt, PrefixChars),
-	atom_chars(Prefix, PrefixChars),
+    % Get prefix
+    derive:fmt_prefix(Fmt, PrefixChars),
+    atom_chars(Prefix, PrefixChars),
 
-	% Get opcode
-	once(optree:fmt_tree(Fmt, OpTree)),
-	optree:optree_instr_prefix(OpTree, Instr, OpcodeChars),
-	atom_chars(Opcode, OpcodeChars),
+    % Get opcode
+    once(optree:fmt_tree(Fmt, OpTree)),
+    optree:optree_instr_prefix(OpTree, Instr, OpcodeChars),
+    atom_chars(Opcode, OpcodeChars),
 
-	% Get imm and opcode bit counts
-	derive:fmt_opcodebits_immbits(Fmt, OBits, IBits),
-	once(clpfd:label([OBits, IBits])),
+    % Get imm and opcode bit counts
+    derive:fmt_opcodebits_immbits(Fmt, OBits, IBits),
+    once(clpfd:label([OBits, IBits])),
 
-	% Get name of immediate variable (if any)
-	syntax_components(Syntax, Lhs, _),
-	(
-		member(imm(?ImmVar), Lhs), ! ;
-		member(simm(?ImmVar), Lhs), ! ;
-		ImmVar = '<none>'
-	),
+    % Get name of immediate variable (if any)
+    syntax_components(Syntax, Lhs, _),
+    (
+        member(imm(?ImmVar), Lhs), ! ;
+        member(simm(?ImmVar), Lhs), ! ;
+        ImmVar = '<none>'
+    ),
 
 
-	Ctx = ctx{
-		fmt: Fmt,
-		instr: Instr,
-		prefix: Prefix,
-		opcode: Opcode,
-		obits: OBits,
-		ibits: IBits,
-		immvar: ImmVar
-	},
+    Ctx = ctx{
+        fmt: Fmt,
+        instr: Instr,
+        prefix: Prefix,
+        opcode: Opcode,
+        obits: OBits,
+        ibits: IBits,
+        immvar: ImmVar
+    },
 end.
 
 expand_syntax(Syntax, Ctx) -->
-	{ syntax_components(Syntax, Lhs, Rhs) },
-	expand_syntax_ast(Lhs -> Rhs, Ctx),
+    { syntax_components(Syntax, Lhs, Rhs) },
+    expand_syntax_ast(Lhs -> Rhs, Ctx),
 end.
 
 syntax_components({}, [], auto).
 syntax_components({LhsCommas}, Lhs, auto) :- comma_list(LhsCommas, Lhs).
 syntax_components({LhsCommas} -> RhsSemis, Lhs, Rhs) :-
-	comma_list(LhsCommas, Lhs),
-	semicolon_list(RhsSemis, Rhs),
+    comma_list(LhsCommas, Lhs),
+    semicolon_list(RhsSemis, Rhs),
 end.
 
 expand_syntax_ast(Lhs -> auto, Ctx) --> !,
-	atom(Ctx.instr), ` `, sequence(flip(expand_lhs(Ctx)), `, `, Lhs),
-	` => `,
-	autoexpand_rhs_args(Lhs, Ctx),
+    atom(Ctx.instr), ` `, sequence(flip(expand_lhs(Ctx)), `, `, Lhs),
+    ` => `,
+    autoexpand_rhs_args(Lhs, Ctx),
 end.
 expand_syntax_ast(Lhs -> Rhs, Ctx) -->
-	atom(Ctx.instr), ` `, sequence(flip(expand_lhs(Ctx)), `, `, Lhs),
-	` => `, `{`, nl,
-		expand_rhs_stmts(Rhs, Ctx),
-	`\t}`,
+    atom(Ctx.instr), ` `, sequence(flip(expand_lhs(Ctx)), `, `, Lhs),
+    ` => `, `{`, nl,
+        expand_rhs_stmts(Rhs, Ctx),
+    `\t}`,
 end.
 
 expand_lhs([Syntax], Ctx) --> `[`, expand_lhs(Syntax, Ctx), `]`.
@@ -137,15 +137,15 @@ expand_lhs(A:B, Ctx) --> `(`, expand_lhs(A, Ctx), `,`, expand_lhs(B, Ctx), `)`.
 expand_lhs(Syn1 + Syn2, Ctx) --> expand_lhs(Syn1, Ctx), ` + `, expand_lhs(Syn2, Ctx).
 expand_lhs(reg(_RegField, ?Ident), _Ctx) --> decl_reg(Ident).
 expand_lhs(imm(?Ident), Ctx) -->
-	decl(Ident, u\Ctx.ibits).
+    decl(Ident, u\Ctx.ibits).
 expand_lhs(simm(?Ident), Ctx) -->
-	decl(Ident, s\Ctx.ibits).
+    decl(Ident, s\Ctx.ibits).
 
 autoexpand_rhs_args(Args, Ctx) -->
-	{ phrase(flatten_args(Args), ArgsFlat) },
-	{ predsort(order_args, ArgsFlat, ArgsSorted) },
-	{ Items = [prefix(Ctx.prefix), opcode(Ctx.opcode) | ArgsSorted] },
-	sequence(flip(expand_rhs_from_lhs(Ctx)), ` @ `, Items),
+    { phrase(flatten_args(Args), ArgsFlat) },
+    { predsort(order_args, ArgsFlat, ArgsSorted) },
+    { Items = [prefix(Ctx.prefix), opcode(Ctx.opcode) | ArgsSorted] },
+    sequence(flip(expand_rhs_from_lhs(Ctx)), ` @ `, Items),
 end.
 
 flatten_args([]) --> [].
@@ -160,16 +160,16 @@ flatten_arg(A - B) --> flatten_arg(A), flatten_arg(B).
 flatten_arg(A:B) --> flatten_arg(A), flatten_arg(B).
 
 order_args(Delta, A, B) :-
-	List = [
-		imm(_),
-		simm(_),
-		reg(t, _),
-		reg(s, _),
-		reg(r, _)
-	],
-	nth0(IdxA, List, A),
-	nth0(IdxB, List, B),
-	compare(Delta, IdxA, IdxB),
+    List = [
+        imm(_),
+        simm(_),
+        reg(t, _),
+        reg(s, _),
+        reg(r, _)
+    ],
+    nth0(IdxA, List, A),
+    nth0(IdxB, List, B),
+    compare(Delta, IdxA, IdxB),
 end.
 
 
@@ -180,55 +180,55 @@ expand_rhs_from_lhs(imm(?Ident), _Ctx) --> atom(Ident).
 expand_rhs_from_lhs(simm(?Ident), _Ctx) --> atom(Ident).
 expand_rhs_from_lhs(prefix(Bits), _Ctx) --> `0b`, atom(Bits).
 expand_rhs_from_lhs(opcode(Bits), Ctx) -->
-	{ format(codes(Padded), '~`0t~w~*|', [Bits, Ctx.obits]) },
-	`0b`, Padded, `\``, integer(Ctx.obits),
+    { format(codes(Padded), '~`0t~w~*|', [Bits, Ctx.obits]) },
+    `0b`, Padded, `\``, integer(Ctx.obits),
 end.
 
 expand_rhs_stmts([], _) --> ``.
 expand_rhs_stmts([Line | Lines], Ctx) -->
-	`\t\t`, expand_rhs_stmt(Ctx, Line), nl,
-	expand_rhs_stmts(Lines, Ctx),
+    `\t\t`, expand_rhs_stmt(Ctx, Line), nl,
+    expand_rhs_stmts(Lines, Ctx),
 end.
 
 expand_rhs_stmt(Ctx, (?Ident = Rhs)) -->
-	atom(Ident), ` = `, expand_rhs(Ctx, Rhs),
+    atom(Ident), ` = `, expand_rhs(Ctx, Rhs),
 end.
 expand_rhs_stmt(Ctx, {CommaList}) -->
-	{ comma_list(CommaList, List) },
-	expand_rhs_concat_expr(List, Ctx),
+    { comma_list(CommaList, List) },
+    expand_rhs_concat_expr(List, Ctx),
 end.
 
 expand_rhs(Ctx, A - B) -->
-	expand_rhs(Ctx, A), ` - `, expand_rhs(Ctx, B),
+    expand_rhs(Ctx, A), ` - `, expand_rhs(Ctx, B),
 end.
 expand_rhs(Ctx, A + B) -->
-	expand_rhs(Ctx, A), ` + `, expand_rhs(Ctx, B),
+    expand_rhs(Ctx, A), ` + `, expand_rhs(Ctx, B),
 end.
 expand_rhs(Ctx, ?Ident) -->
-	atom(Ident),
-	( { Ctx.immvar = Ident } -> `\``, integer(Ctx.ibits) ; [] ),
+    atom(Ident),
+    ( { Ctx.immvar = Ident } -> `\``, integer(Ctx.ibits) ; [] ),
 end.
 expand_rhs(_Ctx, #Value) -->
-	( { integer(Value) } ->
-		integer(Value)
-	; { Value = asm_pc } ->
-		`$`
-	),
+    ( { integer(Value) } ->
+        integer(Value)
+    ; { Value = asm_pc } ->
+        `$`
+    ),
 end.
 expand_rhs(Ctx, {CommaList}) -->
-	{ comma_list(CommaList, Items) },
-	sequence(expand_rhs(Ctx), ` @ `, Items),
+    { comma_list(CommaList, Items) },
+    sequence(expand_rhs(Ctx), ` @ `, Items),
 end.
 
 
 expand_rhs_concat_expr(Items0, Ctx) -->
-	{ dif(Ctx.obits, 0) ->
-		Items1 = [opcode(Ctx.opcode) | Items0]
-	;
-		Items1 = Items0
-	},
-	{ Items = [prefix(Ctx.prefix) | Items1] },
-	sequence(flip(expand_concat_item(Ctx)), ` @ `, Items),
+    { dif(Ctx.obits, 0) ->
+        Items1 = [opcode(Ctx.opcode) | Items0]
+    ;
+        Items1 = Items0
+    },
+    { Items = [prefix(Ctx.prefix) | Items1] },
+    sequence(flip(expand_concat_item(Ctx)), ` @ `, Items),
 end.
 
 expand_concat_item(?Ident, _Ctx) --> atom(Ident).
@@ -239,18 +239,18 @@ expand_concat_item(?Ident\size(imm), Ctx) --> atom(Ident), `\``, integer(Ctx.ibi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 synthetic_instruction_definitions -->
-	foreach(isa:synthinstr_info(Instr, Info), synthinstr(Instr-Info), nl),
-	nl,
+    foreach(isa:synthinstr_info(Instr, Info), synthinstr(Instr-Info), nl),
+    nl,
 end.
 
 synthinstr(InstrTerm-Info) -->
-	{ InstrTerm =.. [Instr | Args] },
-	{ Info.expansion =.. [ExpInstr | ExpArgs] },
-	`\t`, atom(Instr), ` `, sequence(synthinstr_arg, `, `, Args),
-	` => `,
-	`asm { `,
-	atom(ExpInstr), ` `, sequence(synthinstr_exparg, `, `, ExpArgs),
-	` }`,
+    { InstrTerm =.. [Instr | Args] },
+    { Info.expansion =.. [ExpInstr | ExpArgs] },
+    `\t`, atom(Instr), ` `, sequence(synthinstr_arg, `, `, Args),
+    ` => `,
+    `asm { `,
+    atom(ExpInstr), ` `, sequence(synthinstr_exparg, `, `, ExpArgs),
+    ` }`,
 end.
 
 synthinstr_arg(Symbol) --> decl_reg(Symbol).
@@ -293,14 +293,14 @@ A\B --> A, `\``, integer(B).
 :- meta_predicate(flip(3, ?)).
 
 flip(Expr0, Arg1) :-
-	Expr0 =.. [Functor, Arg2],
-	Expr =.. [Functor, Arg1, Arg2],
-	call(Expr).
+    Expr0 =.. [Functor, Arg2],
+    Expr =.. [Functor, Arg1, Arg2],
+    call(Expr).
 
 flip(Dcg0, Arg1) -->
-	{ Dcg0 =.. [Functor, Arg2] },
-	{ Dcg =.. [Functor, Arg1, Arg2] },
-	Dcg.
+    { Dcg0 =.. [Functor, Arg2] },
+    { Dcg =.. [Functor, Arg1, Arg2] },
+    Dcg.
 
 % #bankdef rom {
 %       #bits 8

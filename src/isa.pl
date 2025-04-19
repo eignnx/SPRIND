@@ -11,7 +11,7 @@
     regname_uses/2,
     reguse_description/2,
     sysregname_name_size_description/4,
-	synthinstr_info/2,
+    synthinstr_info/2,
     instr/1,
     gfmt/1,
     fmt/1,

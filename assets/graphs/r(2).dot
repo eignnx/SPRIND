@@ -2,5 +2,17 @@ digraph "Format r(2)" {
   graph [dpi = 100, bgcolor="#111", fontcolor="white", rankdir=LR, pad="0.25"];
   node [fontname = "Courier", fontsize="15pt", color="white", fontcolor="white"];
   edge [fontname = "Courier", color="white", fontcolor="white"];
-// Empty Tree
+  "gp_13166642" [label = "gp?", shape = ellipse];
+  "gp_13166642":e -> "rd_12396995":w [label = "1"];
+  "gp_13166642":e -> "hi_11502045":w [label = "0"];
+  "rd_12396995" [label = "rd?", shape = ellipse];
+  "rd_12396995":e -> "'rd.gp'_7170807":w [label = "1"];
+  "rd_12396995":e -> "'wr.gp'_5110024":w [label = "0"];
+  "'rd.gp'_7170807" [label = "'rd.gp'\nRead $GP\n0b11`2", shape = rectangle];
+  "'wr.gp'_5110024" [label = "'wr.gp'\nWrite $GP\n0b10`2", shape = rectangle];
+  "hi_11502045" [label = "hi?", shape = ellipse];
+  "hi_11502045":e -> "'rd.mp.hi'_6753187":w [label = "1"];
+  "hi_11502045":e -> "'rd.mp.lo'_9626836":w [label = "0"];
+  "'rd.mp.hi'_6753187" [label = "'rd.mp.hi'\nRead $MP.hi\n0b01`2", shape = rectangle];
+  "'rd.mp.lo'_9626836" [label = "'rd.mp.lo'\nRead $MP.lo\n0b00`2", shape = rectangle];
 }
