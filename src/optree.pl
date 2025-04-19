@@ -67,18 +67,16 @@ pool_split_left_right_mode(Pool0, SplitTag, LeftPool, RightPool, Mode) :-
     pool_tags_splittag(Pool, Tags, SplitTag),
     partition(tag_instr(SplitTag), Pool, RightPool, LeftPool),
     LeftPool \= Pool, RightPool \= Pool, % <1> ...because some split tags may need to be skipped.
-end.
-
-pool_consolidated(Pool0, Pool-Tags) :-
-    pool_all_tags(Pool0, Tags0),
-    pool_tags_consolidated(Pool0, Tags0, Pool-Tags),
+    format('trying splittag `~q`...~n', [SplitTag]),
+    format('Left: ~q~nRight: ~q~n~n', [LeftPool, RightPool]),
 end.
 
 %! pool_tags_splittag(+Pool, +Tags, -SplitTag) is multi.
 pool_tags_splittag(Pool, Tags, SplitTag) :-
     pool_tags_scored(Pool, Tags, ScoresTags),
     predsort(cmp_score_ascending, ScoresTags, SortedScoresTags),
-    member(_SplitScore-SplitTag, SortedScoresTags), % Generate many solns here... <1> 
+    member(_SplitScore-SplitTag, SortedScoresTags), % Generate many solns here... <1>
+    print_scorestags(SortedScoresTags), %<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<DEBUG
 end.
 
 pool_tags_scored(Pool, Tags, ScoresTags) :-
@@ -102,6 +100,11 @@ pool_all_tags(Pool, Tags) :-
     ), Tags).
 
 dedupe(Original, Deduped) :- sort(Original, Deduped).
+
+pool_consolidated(Pool0, Pool-Tags) :-
+    pool_all_tags(Pool0, Tags0),
+    pool_tags_consolidated(Pool0, Tags0, Pool-Tags),
+end.
 
 % Remove all instrs in `Pool` that are members of any subcat; replace with
 % one psuedo-instr `subcat_tags_instrs(_,_,_)` for each subcat.
@@ -195,6 +198,21 @@ end.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+print_scorestags(ScoresTags) :-
+    format('~|~`-t~80|~n', []),
+    maplist([Score-Tag]>>(
+        ScorePct is round(100 * Score),
+        BarLength is round(80 * Score),
+        format('~q~t~0f%~30|  ~|~`#t~*+~n', [Tag, ScorePct, BarLength])
+    ), ScoresTags),
+end.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%% optree_instr_prefix(+Tree, +Instr, -Prefix:list) is det
+%
 optree_instr_prefix(empty, _, _) :- throw(error(empty_tree, _)).
 optree_instr_prefix(Tree, Instr, Prefix) :-
     phrase(optree_instr_prefix_(Tree, Instr), Prefix).
@@ -207,71 +225,3 @@ optree_instr_prefix_(node(Left, _SplitTag, Right), Instr) -->
     ; ['1'], optree_instr_prefix_(Right, Instr) -> []
     ).
 
-dotprint_tree(Fmt, Tree) :-
-    format('digraph "Format ~k" {~n', [Fmt]),
-    format('  graph [dpi = 100, bgcolor="#111", fontcolor="white", rankdir=LR, pad="0.25"];~n'),
-    format('  node [fontname = "Courier", fontsize="15pt", color="white", fontcolor="white"];~n'),
-    format('  edge [fontname = "Courier", color="white", fontcolor="white"];~n'),
-    ( Tree \= empty -> dotprint_tree_(Tree, ``) ; format('// Empty Tree~n') ),
-    format('}~n').
-
-dotprint_tree_(leaf(Instr), Prefix) :-
-    node_id_label(leaf(Instr), Id, _),
-    instr_info(Instr, Info),
-    length(Prefix, PLen),
-    format(atom(Label), '~k\\n~w\\n0b~s`~d', [Instr, Info.title, Prefix, PLen]),
-    format('  ~w [label = "~w", shape = rectangle];~n', [Id, Label]).
-dotprint_tree_(subtree(Split, Tree), Prefix) :-
-    node_id_label(subtree(Split, Tree), Id, Label),
-    node_id_label(Tree, TreeId, _),
-    format('  ~w [label = ~w, shape = ellipse];~n', [Id, Label]),
-    format('  ~w:e -> ~w:w;~n', [Id, TreeId]),
-    dotprint_tree_(Tree, Prefix).
-dotprint_tree_(node(Left, Split, Right), Prefix) :-
-    node_id_label(node(Left, Split, Right), Id, Label),
-    node_id_label(Left, LeftId, _),
-    node_id_label(Right, RightId, _),
-    format('  ~w [label = ~w, shape = ellipse];~n', [Id, Label]),
-    format('  ~w:e -> ~w:w [label = "1"];~n', [Id, RightId]),
-    format('  ~w:e -> ~w:w [label = "0"];~n', [Id, LeftId]),
-    append(Prefix, `0`, LeftPrefix),
-    append(Prefix, `1`, RightPrefix),
-    dotprint_tree_(Right, RightPrefix),
-    dotprint_tree_(Left, LeftPrefix).
-
-node_id_label(leaf(Instr), Id, Label) :-
-    term_hash(leaf(Instr), Hash),
-    format(atom(Id), '"~k_~d"', [Instr, Hash]),
-    format(atom(Label), '"~k"', [Instr]).
-node_id_label(subtree(Split, Tree), Id, Label) :-
-    term_hash(subtree(Split, Tree), Hash),
-    format(atom(Id), '"~k_~d"', [Split, Hash]),
-    format(atom(Label), '"subtree(~k)"', [Split]).
-node_id_label(node(Left, Split, Right), Id, Label) :-
-    term_hash(node(Left, Split, Right), Hash),
-    format(atom(Id), '"~k_~d"', [Split, Hash]),
-    format(atom(Label), '"~k?"', [Split]).
-
-print_dottree(Fmt) :-
-    catch(
-        once(fmt_tree_maxbits(Fmt, Tree, _)),
-        error(_, _),
-        Tree = empty
-    ),
-    dotprint_tree(Fmt, Tree).
-
-print_dottrees :-
-    call_time(
-        foreach(
-            (
-                isa:fmt(Fmt),
-                Fmt \= ext,
-                format(atom(Path), 'assets/graphs/~k.dot', [Fmt])
-            ),
-            utils:output_to_file(Path, optree:print_dottree(Fmt))
-        ),
-        Time
-    ),
-    format('[`print_dottrees` ran in ~3fs]~n', Time.wall).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
