@@ -86,7 +86,7 @@ Instructions related to testing specific bits of a register or memory.
 
 #### Instructions
 
-[`tbit`](instruction-listing.md#the-tbit-instruction), [`cbit`](instruction-listing.md#the-cbit-instruction), [`sbit`](instruction-listing.md#the-sbit-instruction), [`tbitm`](instruction-listing.md#the-tbitm-instruction), [`cbitm`](instruction-listing.md#the-cbitm-instruction), [`sbitm`](instruction-listing.md#the-sbitm-instruction), 
+[`tbit`](instruction-listing.md#the-tbit-instruction), [`cbit`](instruction-listing.md#the-cbit-instruction), [`sbit`](instruction-listing.md#the-sbit-instruction), [`tbitm`](instruction-listing.md#the-tbitm-instruction), [`cbitm`](instruction-listing.md#the-cbitm-instruction), [`sbitm`](instruction-listing.md#the-sbitm-instruction), [`tpopm`](instruction-listing.md#the-tpopm-instruction), 
 ### `dbg`
 
 **Debugging**
@@ -184,4 +184,4 @@ Instructions for manipulating the test-stack (`$TS`).
 
 #### Instructions
 
-[`tpush0`](instruction-listing.md#the-tpush0-instruction), [`tpush1`](instruction-listing.md#the-tpush1-instruction), [`tnot`](instruction-listing.md#the-tnot-instruction), [`tand`](instruction-listing.md#the-tand-instruction), [`tor`](instruction-listing.md#the-tor-instruction), [`tdup`](instruction-listing.md#the-tdup-instruction), 
+[`rd.ts`](instruction-listing.md#the-rdts-instruction), [`wr.ts`](instruction-listing.md#the-wrts-instruction), [`tpush0`](instruction-listing.md#the-tpush0-instruction), [`tpush1`](instruction-listing.md#the-tpush1-instruction), [`tnot`](instruction-listing.md#the-tnot-instruction), [`tand`](instruction-listing.md#the-tand-instruction), [`tor`](instruction-listing.md#the-tor-instruction), [`tdup`](instruction-listing.md#the-tdup-instruction), 
