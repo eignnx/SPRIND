@@ -30,6 +30,7 @@ run_validations :-
     disprove('undefined constant in semantic definition'(_, _)),
     disprove(tyck:'incompatible bit sizes'(_, _)),
     disprove('use of undefined module'(_)),
+    disprove('use of undefined format'(_, _)),
 end.
 
 disprove(NegativeCheck) :-
@@ -63,6 +64,10 @@ disprove(NegativeCheck) :-
     sem:instr_info(_Instr, Info),
     [Module] = Info.module,
     \+ sem:module_info(Module, _).
+
+'use of undefined format'(fmt(Fmt), instr(Instr)) :-
+    isa:fmt_instr_title(Fmt, Instr, _),
+    \+ fmt(Fmt).
 
 
 end.
