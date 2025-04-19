@@ -2,13 +2,5 @@ digraph "Format b" {
   graph [dpi = 100, bgcolor="#111", fontcolor="white", rankdir=LR, pad="0.25"];
   node [fontname = "Courier", fontsize="15pt", color="white", fontcolor="white"];
   edge [fontname = "Courier", color="white", fontcolor="white"];
-  "cond_8106848" [label = "cond?", shape = ellipse];
-  "cond_8106848":e -> "instr(bf)_3124220":w [label = "1"];
-  "cond_8106848":e -> "b_5886451":w [label = "0"];
-  "instr(bf)_3124220" [label = "instr(bf)?", shape = ellipse];
-  "instr(bf)_3124220":e -> "bf_8755250":w [label = "1"];
-  "instr(bf)_3124220":e -> "bt_15089679":w [label = "0"];
-  "bf_8755250" [label = "bf\nBranch If False\n0b11`2", shape = rectangle];
-  "bt_15089679" [label = "bt\nBranch If True\n0b10`2", shape = rectangle];
-  "b_5886451" [label = "b\nBranch\n0b0`1", shape = rectangle];
+// Empty Tree
 }

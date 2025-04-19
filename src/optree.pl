@@ -4,8 +4,6 @@
 % in the subcategory.
 
 :- module(optree, [
-    print_dottrees/0,
-    print_dottree/1,
     fmt_tree/2,
     fmt_tree_maxbits/3,
     optree_instr_prefix/3

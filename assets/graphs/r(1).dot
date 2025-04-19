@@ -2,33 +2,5 @@ digraph "Format r(1)" {
   graph [dpi = 100, bgcolor="#111", fontcolor="white", rankdir=LR, pad="0.25"];
   node [fontname = "Courier", fontsize="15pt", color="white", fontcolor="white"];
   edge [fontname = "Courier", color="white", fontcolor="white"];
-  "sp_11244832" [label = "sp?", shape = ellipse];
-  "sp_11244832":e -> "byte_11388536":w [label = "1"];
-  "sp_11244832":e -> "arith_8397043":w [label = "0"];
-  "byte_11388536" [label = "byte?", shape = ellipse];
-  "byte_11388536":e -> "pop_13701219":w [label = "1"];
-  "byte_11388536":e -> "pop_11052152":w [label = "0"];
-  "pop_13701219" [label = "pop?", shape = ellipse];
-  "pop_13701219":e -> "popb_9607987":w [label = "1"];
-  "pop_13701219":e -> "pushb_7132072":w [label = "0"];
-  "popb_9607987" [label = "popb\nPop Byte\n0b111`3", shape = rectangle];
-  "pushb_7132072" [label = "pushb\nPush Byte\n0b110`3", shape = rectangle];
-  "pop_11052152" [label = "pop?", shape = ellipse];
-  "pop_11052152":e -> "popw_1825455":w [label = "1"];
-  "pop_11052152":e -> "pushw_9011362":w [label = "0"];
-  "popw_1825455" [label = "popw\nPop Word\n0b101`3", shape = rectangle];
-  "pushw_9011362" [label = "pushw\nPush Word\n0b100`3", shape = rectangle];
-  "arith_8397043" [label = "arith?", shape = ellipse];
-  "arith_8397043":e -> "sxt_1516934":w [label = "1"];
-  "arith_8397043":e -> "ra_11984613":w [label = "0"];
-  "sxt_1516934" [label = "sxt?", shape = ellipse];
-  "sxt_1516934":e -> "seb_8359608":w [label = "1"];
-  "sxt_1516934":e -> "neg_298820":w [label = "0"];
-  "seb_8359608" [label = "seb\nSign Extend Byte\n0b011`3", shape = rectangle];
-  "neg_298820" [label = "neg\nNegate\n0b010`3", shape = rectangle];
-  "ra_11984613" [label = "ra?", shape = ellipse];
-  "ra_11984613":e -> "callr_11085822":w [label = "1"];
-  "ra_11984613":e -> "jr_14350230":w [label = "0"];
-  "callr_11085822" [label = "callr\nCall Register\n0b001`3", shape = rectangle];
-  "jr_14350230" [label = "jr\nJump Register\n0b000`3", shape = rectangle];
+// Empty Tree
 }

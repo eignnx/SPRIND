@@ -2,35 +2,5 @@ digraph "Format rr(1)" {
   graph [dpi = 100, bgcolor="#111", fontcolor="white", rankdir=LR, pad="0.25"];
   node [fontname = "Courier", fontsize="15pt", color="white", fontcolor="white"];
   edge [fontname = "Courier", color="white", fontcolor="white"];
-  "add_11972669" [label = "add?", shape = ellipse];
-  "add_11972669":e -> "alu_3557152":w [label = "1"];
-  "add_11972669":e -> "mov_8131765":w [label = "0"];
-  "alu_3557152" [label = "subtree(alu)", shape = ellipse];
-  "alu_3557152":e -> "arith_5163191":w;
-  "arith_5163191" [label = "arith?", shape = ellipse];
-  "arith_5163191":e -> "add_14925082":w [label = "1"];
-  "arith_5163191":e -> "and_12585412":w [label = "0"];
-  "add_14925082" [label = "add?", shape = ellipse];
-  "add_14925082":e -> "carry_14418308":w [label = "1"];
-  "add_14925082":e -> "carry_5674031":w [label = "0"];
-  "carry_14418308" [label = "carry?", shape = ellipse];
-  "carry_14418308":e -> "addcy_9991314":w [label = "1"];
-  "carry_14418308":e -> "add_13179919":w [label = "0"];
-  "addcy_9991314" [label = "addcy\nAdd with Carry\n0b1111`4", shape = rectangle];
-  "add_13179919" [label = "add\nAdd\n0b1110`4", shape = rectangle];
-  "carry_5674031" [label = "carry?", shape = ellipse];
-  "carry_5674031":e -> "subcy_4746204":w [label = "1"];
-  "carry_5674031":e -> "sub_2133549":w [label = "0"];
-  "subcy_4746204" [label = "subcy\nSubtract with Carry\n0b1101`4", shape = rectangle];
-  "sub_2133549" [label = "sub\nSubtract\n0b1100`4", shape = rectangle];
-  "and_12585412" [label = "and?", shape = ellipse];
-  "and_12585412":e -> "and_14333479":w [label = "1"];
-  "and_12585412":e -> "or_4344319":w [label = "0"];
-  "and_14333479" [label = "and\nAND\n0b101`3", shape = rectangle];
-  "or_4344319" [label = "or?", shape = ellipse];
-  "or_4344319":e -> "or_13437499":w [label = "1"];
-  "or_4344319":e -> "xor_16442135":w [label = "0"];
-  "or_13437499" [label = "or\nOR\n0b1001`4", shape = rectangle];
-  "xor_16442135" [label = "xor\nXOR\n0b1000`4", shape = rectangle];
-  "mov_8131765" [label = "mov\nMove\n0b0`1", shape = rectangle];
+// Empty Tree
 }

@@ -2,5 +2,5 @@ digraph "Format subr" {
   graph [dpi = 100, bgcolor="#111", fontcolor="white", rankdir=LR, pad="0.25"];
   node [fontname = "Courier", fontsize="15pt", color="white", fontcolor="white"];
   edge [fontname = "Courier", color="white", fontcolor="white"];
-  "call_16130939" [label = "call\nCall Subroutine\n0b`0", shape = rectangle];
+// Empty Tree
 }

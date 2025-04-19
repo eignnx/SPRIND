@@ -3,6 +3,9 @@
     print_dottrees/0
 ]).
 
+:- use_module(isa).
+:- use_module(utils).
+
 
 dotprint_tree(Fmt, Tree) :-
     format('digraph "Format ~k" {~n', [Fmt]),
