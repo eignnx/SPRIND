@@ -110,6 +110,14 @@ inference(Tcx, A - B, TyA) :-
     inference(Tcx, A, TyA),
     inference(Tcx, B, TyB),
     TyA = TyB.
+inference(Tcx, A * B, TyA) :-
+    inference(Tcx, A, TyA),
+    inference(Tcx, B, TyB),
+    TyA = TyB.
+inference(Tcx, A div B, TyA) :-
+    inference(Tcx, A, TyA),
+    inference(Tcx, B, TyB),
+    TyA = TyB.
 inference(Tcx, A == B, i\1) :-
     inference(Tcx, A, TyA),
     inference(Tcx, B, TyB),
@@ -303,7 +311,7 @@ stmt_inference(Tcx, if(Cond, Consq, Alt), Tcx) :-
     stmt_inference(Tcx, Alt, _).
 
 stmt_inference(Tcx0, First ; Rest, Tcx) :-
-    ( First = (?Var = Expr) ->
+    ( First = (?Var := Expr) ->
         ( inference(Tcx0, Expr, ExprTy) -> true
         ; throw(error('bad binding expression'(Expr)))
         ),

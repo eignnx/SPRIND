@@ -36,9 +36,11 @@ rval_(#Term) --> % Constant or Immediate
     ; { integer(Term) } -> [] % Numeric Literal
     ).
 rval_(-(A)) --> rval(A).
-rval_(~(A)) --> rval(A).
+rval_(~(A)) --> rval(A). % Bitwise complement
 rval_(A + B) --> rval(A), rval(B).
 rval_(A - B) --> rval(A), rval(B).
+rval_(A ^ B) --> rval(A), rval(B). % Exponentiation
+rval_(A div B) --> rval(A), rval(B). % Truncating division
 rval_(A << B) --> rval(A), rval(B).
 rval_(A >> B) --> rval(A), rval(B).
 rval_(A == B) --> rval(A), rval(B).
@@ -46,13 +48,23 @@ rval_(A \= B) --> rval(A), rval(B).
 rval_(A and B) --> rval(A), rval(B).
 rval_(A or B) --> rval(A), rval(B).
 rval_(A xor B) --> rval(A), rval(B).
-rval_(!(A)) --> rval(A).
-rval_(~(A)) --> rval(A).
 rval_(b_pop(LVal)) --> lval(LVal).
 rval_(zxt(RVal)) --> rval(RVal).
 rval_(sxt(RVal)) --> rval(RVal).
 rval_(compare(A, RelOp, B)) --> { relop(RelOp) }, rval(A), rval(B).
-rval_(RVal\Coersion) --> rval(RVal), { member(Coersion, [u, s, i]) ; integer(Coersion) }.
+rval_(RVal\Coersion) -->
+    rval(RVal),
+    {
+        % Coerce bit pattern to a different representation.
+        member(Coersion, [u, s, i])
+    ;
+        % Truncate or extend an integer.
+        % - `Value_20bits\13` is the same as `Value_20bits mod 2^13`
+        % - `?negative12_s20 := (-12)\20; ?negative12_s20\64` is the same as
+        %   `(-12)\64`. Performs sign-extension on signed values, zero-extension
+        %   on unsigned values or bitvectors (`i\_`).
+        integer(Coersion)
+    }.
 
 relop(<(IntTy)) :- int_ty(IntTy).
 relop(>(IntTy)) :- int_ty(IntTy).
@@ -90,7 +102,7 @@ stmt_(if(Cond, Consq)) --> rval(Cond), stmt(Consq).
 stmt_(if(Cond, Consq, Alt)) --> rval(Cond), stmt(Consq), stmt(Alt).
 stmt_(Dst <- Src) --> lval(Dst), rval(Src).
 stmt_(S1 ; S2) -->
-    { S1 = (?Var = RVal) } ->
+    { S1 = (?Var := RVal) } ->
         { atom(Var) }, rval(RVal), stmt(S2)
     ;
         stmt(S1), stmt(S2).
@@ -120,14 +132,12 @@ def(#carry_flag_idx, _).
 ]).
 
 user:portray(Dst <- Src) :- print(Dst), format(' <- '), print(Src).
-user:portray(Dst = Src) :- format('let '), print(Dst), format(' := '), print(Src).
-% user:portray(A\B) :- print(A), format('\\'), print(B).
+user:portray(Dst := Src) :- format('let '), print(Dst), format(' := '), print(Src).
+user:portray(A\B) :- print(A), format('\\'), print(B).
 % user:portray(A + B) :- print(A), format(' + '), print(B).
 % user:portray(A - B) :- print(A), format(' - '), print(B).
 % user:portray(A == B) :- print(A), format(' == '), print(B).
 % user:portray(A \= B) :- print(A), format(' != '), print(B).
-% user:portray(A >> B) :- print(A), format(' >> '), print(B).
-% user:portray(A << B) :- print(A), format(' << '), print(B).
 % user:portray(A and B) :- write_term(A and B, [])
 % user:portray(A or B) :- print(A), format(' or '), print(B).
 % user:portray(A xor B) :- print(A), format(' xor '), print(B).
@@ -161,8 +171,6 @@ emit_semantics_codeblock(Info) :-
     op(600, yfx, xor),
     op(600, yfx, and),
     op(600, yfx, or),
-    op(600, yfx, <<),
-    op(600, yfx, >>),
     op(150, yfx, \),
 
     format(codes(OperandsCodes), '~p', [Info.operands]),
@@ -187,7 +195,7 @@ instr_info(lb, info{
     operands: [simm(?simm), reg(r, ?rs), reg(s, ?rd)],
     syntax: { reg(r, ?rs), [reg(s, ?rd) + simm(?simm)] },
     sem: (
-        ?ptr = (?rs\s + sxt(?simm))\u;
+        ?ptr := (?rs\s + sxt(?simm))\u;
         ?rd <- zxt([?ptr])
     ),
     tags: [mem, load, byte],
@@ -200,7 +208,7 @@ instr_info(lw, info{
     operands: [simm(?simm), reg(r, ?rs), reg(s, ?rd)],
     syntax: { reg(r, ?rs), [reg(s, ?rd) + simm(?simm)] },
     sem: (
-        ?ptr = ((?rs\s + sxt(?simm)) and #(-2)\16)\u;
+        ?ptr := ((?rs\s + sxt(?simm)) and #(-2)\16)\u;
         ?rd <- {[?ptr + #1], [?ptr]}
     ),
     tags: [mem, load, word],
@@ -213,7 +221,7 @@ instr_info(sb, info{
     operands: [simm(?simm), reg(r, ?rd), reg(s, ?rs)],
     syntax: { [reg(r, ?rd) + simm(?simm)], reg(s, ?rs) },
     sem: (
-        ?ptr = ?rd\s + sxt(?simm);
+        ?ptr := ?rd\s + sxt(?simm);
         [?ptr\u] <- lo(?rs)
     ),
     tags: [mem, store, byte],
@@ -226,7 +234,7 @@ instr_info(sw, info{
     operands: [simm(?simm), reg(r, ?rd), reg(s, ?rs)],
     syntax: { [reg(r, ?rd) + simm(?simm)], reg(s, ?rs) },
     sem: (
-        ?ptr = ((?rd\s + sxt(?simm)) and #0b1111111111111110)\u;
+        ?ptr := ((?rd\s + sxt(?simm)) and #0b1111111111111110)\u;
         [?ptr] <- lo(?rs);
         [?ptr + #1] <- hi(?rs)
     ),
@@ -240,7 +248,7 @@ instr_info(call, info{
     ex: ['call SOME_LABEL'],
     operands: [simm(?simm)],
     syntax: { simm(?abs_lbl) } -> (
-        ?rel_lbl = ?abs_lbl - #asm_pc;
+        ?rel_lbl := ?abs_lbl - #asm_pc;
         { ?rel_lbl\size(imm) }
     ),
     sem: (
@@ -257,7 +265,7 @@ instr_info(b, info{
     ex: ['b SOME_LABEL'],
     operands: [simm(?offset)],
     syntax: { simm(?abs_lbl) } -> (
-        ?rel_lbl = ?abs_lbl - #asm_pc;
+        ?rel_lbl := ?abs_lbl - #asm_pc;
         { ?rel_lbl\size(imm) }
     ),
     sem: $$pc <- $$pc\s + sxt(?offset),
@@ -270,7 +278,7 @@ instr_info(bt, info{
     ex: ['bt SOME_LABEL'],
     operands: [simm(?offset)],
     syntax: { simm(?abs_lbl) } -> (
-        ?rel_lbl = ?abs_lbl - #asm_pc;
+        ?rel_lbl := ?abs_lbl - #asm_pc;
         { ?rel_lbl\size(imm) }
     ),
     sem: if(b_pop($$ts),
@@ -285,10 +293,10 @@ instr_info(bf, info{
     ex: ['bf SOME_LABEL'],
     operands: [simm(?offset)],
     syntax: { simm(?abs_lbl) } -> (
-        ?rel_lbl = ?abs_lbl - #asm_pc;
+        ?rel_lbl := ?abs_lbl - #asm_pc;
         { ?rel_lbl\size(imm) }
     ),
-    sem: if(!(b_pop($$ts)),
+    sem: if(~b_pop($$ts),
         $$pc <- $$pc\s + sxt(?offset)
     ),
     tags: [pc, cond],
@@ -311,7 +319,7 @@ instr_info(szi, info{
     ex: ['szi x, 0xB3'],
     operands: [imm(?imm), reg(r, ?rd)],
     syntax: { reg(r, ?rd), imm(?imm) },
-    sem: ?rd <- (?rd << #8) or zxt(?imm),
+    sem: ?rd <- (?rd << #8)\16 or zxt(?imm),
     tags: [zxt, data, shift],
     module: [base]
 }).
@@ -333,7 +341,7 @@ instr_info(lgw, info{
     operands: [imm(?disp), reg(r, ?rd)],
     syntax: { reg(r, ?rd), [reg(s, ?rs) + imm(?disp)] },
     sem: (
-        ?ptr = (($$gp\u + zxt(?disp)) and #0b1111111111111110)\u;
+        ?ptr := (($$gp\u + zxt(?disp)) and #0b1111111111111110)\u;
         ?rd <- {[?ptr + #1], [?ptr]}
     ),
     tags: [mem, load, global, word],
@@ -356,7 +364,7 @@ instr_info(sgw, info{
     operands: [imm(?disp), reg(r, ?rs)],
     syntax: { [reg(r, ?rd) + imm(?disp)], reg(s, ?rs) },
     sem: (
-        ?ptr = (($$gp\u + zxt(?disp)) and #0b1111111111111110)\u;
+        ?ptr := (($$gp\u + zxt(?disp)) and #0b1111111111111110)\u;
         {[?ptr + #1], [?ptr]} <- ?rs
     ),
     tags: [mem, store, global, word],
@@ -369,8 +377,8 @@ instr_info(tbit, info{
     operands: [imm(?bit_idx), reg(r, ?rs)],
     syntax: { imm(?bit_idx), reg(r, ?rs) },
     sem: (
-        ?shamt = bitslice(?bit_idx, #3 .. #0);
-        ?bit = (?rs >> ?shamt\u) and #1;
+        ?shamt := bitslice(?bit_idx, #3 .. #0);
+        ?bit := (?rs >> ?shamt\u) and #1;
         b_push($$ts, ?bit == #1)
     ),
     tags: [ts, bit, bitwise],
@@ -383,8 +391,8 @@ instr_info(cbit, info{
     operands: [imm(?bit_idx), reg(r, ?rd)],
     syntax: { imm(?bit_idx), reg(r, ?rd) },
     sem: (
-        ?idx = bitslice(?bit_idx, #3 .. #0)\u;
-        ?mask = ~(#1 << ?idx);
+        ?idx := bitslice(?bit_idx, #3 .. #0)\u;
+        ?mask := ~(#1 << ?idx);
         ?rd <- ?rd and ?mask
     ),
     tags: [bit, bitwise, clear],
@@ -397,8 +405,8 @@ instr_info(sbit, info{
     operands: [imm(?bit_idx), reg(r, ?rd)],
     syntax: { imm(?bit_idx), reg(r, ?rd) },
     sem: (
-        ?idx = bitslice(?bit_idx, #3 .. #0)\u;
-        ?mask = ~(#1 << ?idx);
+        ?idx := bitslice(?bit_idx, #3 .. #0)\u;
+        ?mask := ~(#1 << ?idx);
         ?rd <- ?rd or ?mask
     ),
     tags: [bit, bitwise, set],
@@ -549,10 +557,16 @@ instr_info(lsl, info{
     ex: ['lsl x, 8'],
     operands: [imm(?imm), reg(r, ?rd)],
     syntax: { reg(r, ?rd), imm(?imm) },
-    sem: ?rd <- ?rd << ?imm,
+    sem: (
+        bit($$cc, #carry_flag_bit) <- bit(?rd, #16 - ?imm);
+        ?rd <- (?rd << ?imm)\i\16
+    ),
     tags: [zxt, bitwise, shift, left],
     module: [base]
 }).
+
+% This is a comment
+
 instr_info(asr, info{
     title: 'Arithmetic Shift Right',
     descr: 'Perform an arithmetic shift right on a register by an immediate value.',
@@ -560,7 +574,7 @@ instr_info(asr, info{
     operands: [imm(?imm), reg(r, ?rd)],
     syntax: { reg(r, ?rd), imm(?imm) },
     sem: (
-        ?sign_extension = (sxt(bit(?rd, #15) - #1)) << (#reg_size_bits - ?imm);
+        ?sign_extension := (sxt(bit(?rd, #15) - #1)) << (#reg_size_bits - ?imm);
         ?rd <- (?rd >> ?imm) or ?sign_extension 
     ),
     tags: [sxt, bitwise, shift, right],
@@ -757,15 +771,15 @@ instr_info(mulstep, info{
     operands: [reg(r, ?multiplicand_hi), reg(s, ?multiplicand_lo), reg(t, ?multiplier)],
     syntax: { reg(t, ?multiplicand_hi):reg(s, ?multiplicand_lo), reg(r, ?multiplier) },
     sem: (
-        ?mask = ~((?multiplier and #1) - #1);
-        ?masked_lo = ?multiplicand_lo and ?mask;
-        ?masked_hi = ?multiplicand_hi and ?mask;
+        ?mask := ~((?multiplier and #1) - #1);
+        ?masked_lo := ?multiplicand_lo and ?mask;
+        ?masked_hi := ?multiplicand_hi and ?mask;
         lo($$mp) <- lo($$mp) + ?masked_lo;
         hi($$mp) <- hi($$mp) + ?masked_hi + attr(cpu/alu/carryout);
-        ?shift_cout = bit(?multiplicand_lo, (#reg_size_bits - #1));
+        ?shift_cout := bit(?multiplicand_lo, (#reg_size_bits - #1));
         ?multiplicand_lo <- ?multiplicand_lo << #1;
         ?multiplicand_hi <- ?multiplicand_hi << #1 + ?shift_cout;
-        ?multiplier <- ?multiplier >> #1
+        ?multiplier <- ?multiplier div #2
     ),
     tags: [arith, shift],
     module: [mul]

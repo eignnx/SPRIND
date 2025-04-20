@@ -140,7 +140,7 @@
 ```
 [simm(simm), reg(r, rs), reg(s, rd)]
 ------------------------------------
-let ptr := (rs\s+sxt(simm))\u;
+let ptr := rs\s+sxt(simm)\u;
 rd <- zxt([ptr])
 ```
 
@@ -169,8 +169,8 @@ rd <- zxt([ptr])
 
 ```
 [simm(simm), reg(r, rs), reg(s, rd)]
---------------------------------------
-let ptr := (rs\s+sxt(simm)and-2\16)\u;
+------------------------------------
+let ptr := rs\s+sxt(simm)and-2\16\u;
 rd <- {[ptr+1], [ptr]}
 ```
 
@@ -229,8 +229,8 @@ let ptr := rd\s+sxt(simm);
 
 ```
 [simm(simm), reg(r, rd), reg(s, rs)]
---------------------------------------
-let ptr := (rd\s+sxt(simm)and65534)\u;
+------------------------------------
+let ptr := rd\s+sxt(simm)and65534\u;
 [ptr] <- lo(rs);
 [ptr+1] <- hi(rs)
 ```
@@ -268,8 +268,8 @@ let ptr := (rd\s+sxt(simm)and65534)\u;
 
 ```
 [simm(simm)]
--------------------------------------
-$PC <- $PC\s+(sxt(simm)<<subr_align);
+-----------------------------------
+$PC <- $PC\s+sxt(simm)<<subr_align;
 $RA <- $PC+2
 ```
 
@@ -367,7 +367,7 @@ if b_pop($TS) {
 ```
 [simm(offset)]
 ----------------------------
-if !(b_pop($TS)) {
+if ~b_pop($TS) {
     $PC <- $PC\s+sxt(offset)
 }
 ```
@@ -434,8 +434,8 @@ rd <- sxt(simm)
 
 ```
 [imm(imm), reg(r, rd)]
------------------------
-rd <- rd<<8 or zxt(imm)
+--------------------------
+rd <- rd<<8\16 or zxt(imm)
 ```
 
 ###### Module
@@ -500,8 +500,8 @@ rd <- zxt([$GP\u+zxt(disp)])
 
 ```
 [imm(disp), reg(r, rd)]
----------------------------------------
-let ptr := ($GP\u+zxt(disp)and65534)\u;
+-------------------------------------
+let ptr := $GP\u+zxt(disp)and65534\u;
 rd <- {[ptr+1], [ptr]}
 ```
 
@@ -559,8 +559,8 @@ rd <- {[ptr+1], [ptr]}
 
 ```
 [imm(disp), reg(r, rs)]
----------------------------------------
-let ptr := ($GP\u+zxt(disp)and65534)\u;
+-------------------------------------
+let ptr := $GP\u+zxt(disp)and65534\u;
 {[ptr+1], [ptr]} <- rs
 ```
 
@@ -1063,8 +1063,9 @@ rd <- rd>>imm
 
 ```
 [imm(imm), reg(r, rd)]
-----------------------
-rd <- rd<<imm
+--------------------------------------------
+bit($CC, carry_flag_bit) <- bit(rd, 16-imm);
+rd <- rd<<imm\i\16
 ```
 
 ###### Module
@@ -1092,8 +1093,8 @@ rd <- rd<<imm
 
 ```
 [imm(imm), reg(r, rd)]
-------------------------------------------------------------
-let sign_extension := sxt(bit(rd, 15)-1)<<reg_size_bits-imm;
+--------------------------------------------------------------
+let sign_extension := sxt(bit(rd, 15)-1)<<(reg_size_bits-imm);
 rd <- rd>>imm or sign_extension
 ```
 
@@ -1181,7 +1182,7 @@ b_push($TS, bit([rs], imm))
 ```
 [imm(imm), reg(r, rs)]
 ----------------------
-[rs] <- [rs]or(1<<imm)
+[rs] <- [rs]or1<<imm
 ```
 
 ###### Module
@@ -1230,8 +1231,8 @@ lo($MP) <- lo($MP)+masked_lo;
 hi($MP) <- hi($MP)+masked_hi+attr(cpu/alu/carryout);
 let shift_cout := bit(multiplicand_lo, reg_size_bits-1);
 multiplicand_lo <- multiplicand_lo<<1;
-multiplicand_hi <- multiplicand_hi<<1+shift_cout;
-multiplier <- multiplier>>1
+multiplicand_hi <- multiplicand_hi<<(1+shift_cout);
+multiplier <- multiplier div 2
 ```
 
 ###### Module

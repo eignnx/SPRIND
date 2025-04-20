@@ -190,7 +190,7 @@ expand_rhs_stmts([Line | Lines], Ctx) -->
     expand_rhs_stmts(Lines, Ctx),
 end.
 
-expand_rhs_stmt(Ctx, (?Ident = Rhs)) -->
+expand_rhs_stmt(Ctx, (?Ident := Rhs)) -->
     atom(Ident), ` = `, expand_rhs(Ctx, Rhs),
 end.
 expand_rhs_stmt(Ctx, {CommaList}) -->
