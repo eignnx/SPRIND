@@ -38,15 +38,15 @@ version(0, 2, 1).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%% Instructions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 fmt_operands_description(rri,   [i, s, r], 'Register-register-immediate').
-fmt_operands_description(subr,  [i],       'Subroutine Call').        
-fmt_operands_description(li,    [i, r],    'Load Immediate').         
-fmt_operands_description(b,     [i],       'Branch').                 
-fmt_operands_description(ri(_), [i, r],    'Register-immediate').     
+fmt_operands_description(subr,  [i],       'Subroutine Call').
+fmt_operands_description(li,    [i, r],    'Load Immediate').
+fmt_operands_description(b,     [i],       'Branch').
+fmt_operands_description(ri(_), [i, r],    'Register-immediate').
 fmt_operands_description(rrr,   [t, s, r], 'Register-register-register').
 fmt_operands_description(rr(_), [s, r],    'Register-register').
-fmt_operands_description(r(_),  [r],       'Register').               
-fmt_operands_description(o,     [],        'Opcode').                 
-fmt_operands_description(ext,   [],        'Reserved for Extension'). 
+fmt_operands_description(r(_),  [r],       'Register').
+fmt_operands_description(o,     [],        'Opcode').
+fmt_operands_description(ext,   [],        'Reserved for Extension').
 
 % A cons-cell based tree representation of the encoding space. The program uses
 % this tree to construct prefix codes for the different instruction formats.
