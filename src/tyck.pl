@@ -27,9 +27,10 @@
     sem:instr_info(Instr, Info),
     isa:fmt_instr(Fmt, Instr),
     derive:fmt_opcodebits_immbits(Fmt, _, ImmBits),
+    sem:syntax_operands(Info.syntax, Operands),
     maplist(
         {ImmBits}/[Op, OpName-OpTy]>>operand_immbits_name_type(Op, ImmBits, OpName, OpTy),
-        Info.operands,
+        Operands,
         Tcx
     ),
     catch(

@@ -276,12 +276,12 @@ display_detailed_instr_layout(Fmt, Instr, Prefix, Opcode, Layout) :-
             OpcodeBin = 'NONE'
     ),
 
-    ( fmt_operands(Fmt, Operands), member(i, Operands) ->
-        ( sem:instr_info(Instr, Info), member(simm(_), Info.operands) ->
-            immbits_simmrange(IBits, ImmRange)
-        ;
-            immbits_immrange(IBits, ImmRange)
-        ),
+    ( sem:instr_operand(Instr, simm(_)) ->
+        immbits_simmrange(IBits, ImmRange),
+        format(atom(Range), '`~p`', [ImmRange]),
+        MaybeImmRange = [d(IBits), a(Range)]
+    ; sem:instr_operand(Instr, imm(_)) ->
+        immbits_immrange(IBits, ImmRange),
         format(atom(Range), '`~p`', [ImmRange]),
         MaybeImmRange = [d(IBits), a(Range)]
     ;
