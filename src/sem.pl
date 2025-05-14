@@ -530,7 +530,10 @@ instr_info(lsr, info{
     descr: 'Perform a logical shift right on a register by an immediate value.',
     ex: ['lsr x, 15'],
     syntax: { reg(r, ?rd), imm(?imm) },
-    sem: ?rd <- ?rd >> ?imm,
+    sem: (
+        bit($$cc, #carry_flag_bit) <- bit(?rd, ?imm - #1);
+        ?rd <- (?rd >> ?imm)\i\16
+    ),
     tags: [bitwise, shift, right],
     module: [base]
 }).
@@ -555,7 +558,9 @@ instr_info(asr, info{
     ex: ['asr x, 3'],
     syntax: { reg(r, ?rd), imm(?imm) },
     sem: (
-        ?sign_extension := (sxt(bit(?rd, #15) - #1)) << (#reg_size_bits - ?imm);
+        ?sign := bit(?rd, #15);
+        ?sign_extension := (sxt(?sign - #1)) << (#reg_size_bits - ?imm);
+        bit($$cc, #carry_flag_bit) <- bit(?rd, ?imm - #1);
         ?rd <- (?rd >> ?imm) or ?sign_extension 
     ),
     tags: [sxt, bitwise, shift, right],
@@ -598,7 +603,10 @@ instr_info(add, info{
     descr: 'Add the values of two registers.',
     ex: ['add x, y'],
     syntax: { reg(r, ?rd), reg(s, ?rs) },
-    sem: ?rd <- ?rd + ?rs,
+    sem: (
+        bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
+        ?rd <- ?rd + ?rs
+    ),
     tags: [arith, add],
     module: [base]
 }).

@@ -1038,8 +1038,9 @@ bit($CC, overflow_flag_bit) <- attr(cpu/alu/overflow)
 
 ```
 [reg(r, rd), imm(imm)]
-----------------------
-rd <- rd>>imm
+-------------------------------------------
+bit($CC, carry_flag_bit) <- bit(rd, imm-1);
+rd <- rd>>imm\i\16
 ```
 
 ###### Module
@@ -1097,8 +1098,10 @@ rd <- rd<<imm\i\16
 
 ```
 [reg(r, rd), imm(imm)]
---------------------------------------------------------------
-let sign_extension := sxt(bit(rd, 15)-1)<<(reg_size_bits-imm);
+-------------------------------------------------------
+let sign := bit(rd, 15);
+let sign_extension := sxt(sign-1)<<(reg_size_bits-imm);
+bit($CC, carry_flag_bit) <- bit(rd, imm-1);
 rd <- rd>>imm or sign_extension
 ```
 
@@ -1272,7 +1275,8 @@ multiplier <- multiplier div 2
 
 ```
 [reg(r, rd), reg(s, rs)]
-------------------------
+---------------------------------------------------
+bit($CC, carry_flag_bit) <- attr(cpu/alu/carryout);
 rd <- rd+rs
 ```
 

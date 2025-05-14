@@ -1,5 +1,5 @@
 %%
-%% Builds a decision tree to categorize by tag instructions within a generic 
+%% Builds a decision tree to categorize by tag instructions within a generic
 %% instruction format. Uses the decision tree to assign opcodes within a
 %% generic instruction format.
 %%
@@ -160,7 +160,7 @@ optree_instr_prefix_(node(Left, _SplitTag, Right), Instr) -->
     ).
 
 
-print_tree(Tree) :- 
+print_tree(Tree) :-
     format('~`-t~40|~n'),
     print_tree(Tree, 0, ``),
     format('~`-t~40|~n').

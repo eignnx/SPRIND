@@ -79,7 +79,7 @@ ord_inference(<, i\Bits, N) :- -1 * 2 ^ (#Bits - 1) #< #N.
 ord_inference(=, u\Bits, 0) :- Bits in 1 .. sup.
 ord_inference(=, s\Bits, 0) :- Bits in 1 .. sup.
 ord_inference(=, i\Bits, 0) :- Bits in 1 .. sup.
-    
+
 kind(u).
 kind(s).
 kind(i).
@@ -163,7 +163,6 @@ inference(Tcx, ~(A), i\Bits) :-
 inference(Tcx, !(A), i\1) :-
     inference(Tcx, A, _\1).
 
-%% meet(Lhs:ty, Meeting:ty, Rhs:ty).
 meet(u\Bits, i\Bits, i\Bits).
 meet(s\Bits, i\Bits, i\Bits).
 meet(i\Bits, i\Bits, i\Bits).
@@ -261,7 +260,7 @@ fold_concat_element_tys(Tcx, [X | Xs], i\N) :-
     _\XBits = XTy,
     #N #= #N0 + #XBits,
     fold_concat_element_tys(Tcx, Xs, i\N0).
-    
+
 
 inference(Tcx, bit(LVal, Index), i\1) :-
     inference(Tcx, LVal, _\LValBits),
