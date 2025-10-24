@@ -46,14 +46,14 @@ This is good justification for the following layout:
 
 | Register ID | Register Name |  Description   | RVC Register Name |
 | :---------: | :-----------: | :------------: | :---------------: |
-|      0      |      sp       | stack pointer  |        s0         |
-|      1      |      rv       | ret val / temp |        s1         |
-|      2      |       x       |   arg / temp   |        v0         |
-|      3      |       y       |   arg / temp   |        v1         |
-|      4      |       z       |   arg / temp   |        a0         |
-|      5      |       w       |   arg / temp   |        a1         |
-|      6      |       a       |     saved      |        a2         |
-|      7      |       b       |     saved      |       zero        |
+|      0      |      sp       | stack pointer  |        sp         |
+|      1      |      rv       | ret val / temp |        v0         |
+|      2      |       x       |   arg / temp   |        a0         |
+|      3      |       y       |   arg / temp   |        a1         |
+|      4      |       z       |   arg / temp   |        a2         |
+|      5      |       w       |   arg / temp   |        a3         |
+|      6      |       a       |     saved      |        s0         |
+|      7      |       b       |     saved      |        s1         |
 
 
 
