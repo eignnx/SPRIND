@@ -15,4 +15,4 @@ arr_sum: ; subr(arr_addr: *i16 => x, len: u16 => y) -> (sum: i16 => v)
 			taei y, 1
 			bt .loop
 	ret
-                  
+

@@ -98,7 +98,7 @@ fmt_immsizeconstraint(li, Bits) :-
     #Bits #>= #RegBits div 2. % 8-bit immediates allow 16-bit immediates to be loaded in two instructions.
 fmt_immsizeconstraint(ri(_), Bits) :-
     #Bits #>= 4, % Allows shift and individual bit manipulation instructions to refer to any of the 16 bits.
-    % Size bits seems to be a sweet spot for evenly distributing opcode space among formats. According 
+    % Six bits seems to be a sweet spot for evenly distributing opcode space among formats. According 
     % to the RISC-V study (see `design.md`), it should be enough 70% of the time.
     #Bits #= 6.
 
@@ -217,17 +217,71 @@ fmt_instr_title(o, vijt, 'Valid Indirect Jump Target').
 
 %%%%%%%%%%%%%%%%%%%%%%%%% Synthetic Instructions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-synthinstr_info(clr(r),      info{descr: 'Clear a register',                   expansion: xor(r, r),     reversability: reversable}).
-synthinstr_info(nop,         info{descr: 'The no-op instruction',              expansion: ori($(sp), 0), reversability: reversable}).
-synthinstr_info(incr(r),     info{descr: 'Increment a register',               expansion: addi(r, 1),    reversability: reversable}).
-synthinstr_info(decr(r),     info{descr: 'Increment a register',               expansion: addi(r, -1),   reversability: reversable}).
-synthinstr_info(inv(r),      info{descr: 'Bitwise inversion (complement)',     expansion: xori(r, -1),   reversability: reversable}).
-synthinstr_info(not(r),      info{descr: 'Invert a boolean (0 or 1)',          expansion: xori(r, 1),    reversability: reversable}).
-synthinstr_info(tg(r1, r2),  info{descr: 'Test greater-than',                  expansion: tl(r2, r1),    reversability: one_way}).
-synthinstr_info(tle(r1, r2), info{descr: 'Test Less-than or Equal',            expansion: tge(r2, r1),   reversability: one_way}).
-synthinstr_info(ta(r1, r2),  info{descr: 'Test Above',                         expansion: ta(r2, r1),    reversability: one_way}).
-synthinstr_info(tbe(r1, r2), info{descr: 'Test Below or Equal',                expansion: tae(r2, r1),   reversability: one_way}).
-synthinstr_info('HALT',      info{descr: 'Halt the processor (infinite loop)', expansion: b(0),          reversability: reversable}).
+synthinstr_info(clr(r), info{
+    descr: 'Clear a register',
+    expansion: xor(r, r),
+    reversability: reversable
+}).
+synthinstr_info(nop,  info{
+    descr: 'The no-op instruction',
+    expansion: ori($(sp), 0),
+    reversability: reversable
+}).
+synthinstr_info(incr(r), info{
+    descr: 'Increment a register',
+    expansion: addi(r, 1),
+    reversability: reversable
+}).
+synthinstr_info(decr(r), info{
+    descr: 'Increment a register',
+    expansion: addi(r, -1),
+    reversability: reversable
+}).
+synthinstr_info(inv(r), info{
+    descr: 'Bitwise inversion (complement)',
+    expansion: xori(r, -1),
+    reversability: reversable
+}).
+synthinstr_info(not(r), info{
+    descr: 'Invert a boolean (0 or 1)',
+    expansion: xori(r, 1),
+    reversability: reversable
+}).
+synthinstr_info(tg(r1, r2), info{
+    descr: 'Test greater-than',
+    expansion: tl(r2, r1),
+    reversability: one_way
+}).
+synthinstr_info(tle(r1, r2), info{
+    descr: 'Test Less-than or Equal',
+    expansion: tge(r2, r1),
+    reversability: one_way
+}).
+synthinstr_info(ta(r1, r2), info{
+    descr: 'Test Above',
+    expansion: ta(r2, r1),
+    reversability: one_way
+}).
+synthinstr_info(tbe(r1, r2), info{
+    descr: 'Test Below or Equal',
+    expansion: tae(r2, r1),
+    reversability: one_way
+}).
+synthinstr_info(trpush(r), info{
+    descr: 'Push bool in Register onto Test stack',
+    expansion: tnei(r, 0),
+    reversability: reversable
+}).
+synthinstr_info('trpush.not'(r), info{
+    descr: 'Push negation of bool in Register onto Test stack',
+    expansion: teqi(r, 0),    
+    reversability: reversable
+}).
+synthinstr_info('HALT', info{
+    descr: 'Halt the processor (infinite loop)',
+    expansion: b(0),
+    reversability: reversable
+}).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Registers %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

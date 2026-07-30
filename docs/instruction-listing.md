@@ -70,6 +70,8 @@
 | `tle r1, r2` | Test Less-than or Equal | `tge r2, r1` | One Way |
 | `ta r1, r2` | Test Above | `ta r2, r1` | One Way |
 | `tbe r1, r2` | Test Below or Equal | `tae r2, r1` | One Way |
+| `trpush r` | Push bool in Register onto Test stack | `tnei r, 0` | Reversable |
+| `trpush.not r` | Push negation of bool in Register onto Test stack | `teqi r, 0` | Reversable |
 | `HALT` | Halt the processor (infinite loop) | `b 0` | Reversable |
 
 ## Instruction Format Breakdown

@@ -1,0 +1,13 @@
+0.7
+2020.2
+Nov  8 2024
+22:36:57
+C:/Users/gideo/Documents/Asm/SPRIND/hdl/sprind/sprind.sim/sim_1/behav/xsim/glbl.v,1724786426,verilog,,,,glbl,,uvm,,,,,,
+C:/Users/gideo/Documents/Asm/SPRIND/hdl/sprind/sprind.srcs/sim_1/new/top_tb.sv,1765693389,systemVerilog,,,,top_tb,,uvm,,,,,,
+C:/Users/gideo/Documents/Asm/SPRIND/hdl/sprind/sprind.srcs/sources_1/new/clock.sv,1765476373,systemVerilog,C:/Users/gideo/Documents/Asm/SPRIND/hdl/sprind/sprind.srcs/sim_1/new/top_tb.sv;C:/Users/gideo/Documents/Asm/SPRIND/hdl/sprind/sprind.srcs/sources_1/new/debounce.sv;C:/Users/gideo/Documents/Asm/SPRIND/hdl/sprind/sprind.srcs/sources_1/new/programcounter.sv;C:/Users/gideo/Documents/Asm/SPRIND/hdl/sprind/sprind.srcs/sources_1/new/quadhexdisplay.sv;C:/Users/gideo/Documents/Asm/SPRIND/hdl/sprind/sprind.srcs/sources_1/new/reset.sv;C:/Users/gideo/Documents/Asm/SPRIND/hdl/sprind/sprind.srcs/sources_1/new/sevenseg.sv;C:/Users/gideo/Documents/Asm/SPRIND/hdl/sprind/sprind.srcs/sources_1/new/top.sv,C:/Users/gideo/Documents/Asm/SPRIND/hdl/sprind/sprind.srcs/sources_1/new/debounce.sv,,$unit_clock_sv_1761470427;ClockModule,,uvm,,,,,,
+C:/Users/gideo/Documents/Asm/SPRIND/hdl/sprind/sprind.srcs/sources_1/new/debounce.sv,1765350749,systemVerilog,,C:/Users/gideo/Documents/Asm/SPRIND/hdl/sprind/sprind.srcs/sources_1/new/programcounter.sv,,Debounce,,uvm,,,,,,
+C:/Users/gideo/Documents/Asm/SPRIND/hdl/sprind/sprind.srcs/sources_1/new/programcounter.sv,1765476397,systemVerilog,,C:/Users/gideo/Documents/Asm/SPRIND/hdl/sprind/sprind.srcs/sources_1/new/quadhexdisplay.sv,,ProgramCounter,,uvm,,,,,,
+C:/Users/gideo/Documents/Asm/SPRIND/hdl/sprind/sprind.srcs/sources_1/new/quadhexdisplay.sv,1765441828,systemVerilog,,C:/Users/gideo/Documents/Asm/SPRIND/hdl/sprind/sprind.srcs/sources_1/new/reset.sv,,QuadHexDisplay,,uvm,,,,,,
+C:/Users/gideo/Documents/Asm/SPRIND/hdl/sprind/sprind.srcs/sources_1/new/reset.sv,1765483483,systemVerilog,,C:/Users/gideo/Documents/Asm/SPRIND/hdl/sprind/sprind.srcs/sources_1/new/sevenseg.sv,,Reset,,uvm,,,,,,
+C:/Users/gideo/Documents/Asm/SPRIND/hdl/sprind/sprind.srcs/sources_1/new/sevenseg.sv,1765437766,systemVerilog,,C:/Users/gideo/Documents/Asm/SPRIND/hdl/sprind/sprind.srcs/sources_1/new/top.sv,,SevenSegDecoder,,uvm,,,,,,
+C:/Users/gideo/Documents/Asm/SPRIND/hdl/sprind/sprind.srcs/sources_1/new/top.sv,1765476426,systemVerilog,,C:/Users/gideo/Documents/Asm/SPRIND/hdl/sprind/sprind.srcs/sim_1/new/top_tb.sv,,top,,uvm,,,,,,

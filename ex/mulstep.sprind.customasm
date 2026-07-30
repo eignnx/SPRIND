@@ -1,5 +1,4 @@
 #include "../sprind.customasm"
-#bank rom
 
 #align SPRIND_SUBR_ALIGN
 ;= subr(operand1 => x, operand2 => y) -> (u32 in MP) {

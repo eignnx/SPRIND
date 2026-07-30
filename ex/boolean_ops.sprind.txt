@@ -1,0 +1,65 @@
+# outp | addr | data (base 16)
+
+#   0:0 |    0 
+# cond:
+     
+#   0:0 |    0 
+# trpush.not x
+0x48 0x01
+#   2:0 |    2 
+# trpush x
+0x4a 0x01
+#   4:0 |    4 
+# trpush y
+0x4a 0x02
+#   6:0 |    6 
+# tand
+0x00 0x07
+#   8:0 |    8 
+# tor
+0x00 0x0c
+#   a:0 |    a 
+# trpush x
+0x4a 0x01
+#   c:0 |    c 
+# trpush.not y
+0x48 0x02
+#   e:0 |    e 
+# tand
+0x00 0x07
+#  10:0 |   10 
+# trpush z
+0x4a 0x03
+#  12:0 |   12 
+# tand
+0x00 0x07
+#  14:0 |   14 
+# tor
+0x00 0x0c
+#  16:0 |   16 
+# func:
+     
+#  16:0 |   16 
+# call cond
+0xbf 0xea
+#  18:0 |   18 
+# bf .else
+0x9c 0x06
+#  1a:0 |   1a 
+# li x, 123
+0x83 0xd9
+#  1c:0 |   1c 
+# ret
+0x00 0x04
+#  1e:0 |   1e 
+# .else:
+     
+#  1e:0 |   1e 
+# li x, HI(987)
+0x80 0x19
+#  20:0 |   20 
+# szi x, LO(987)
+0x8e 0xd9
+#  22:0 |   22 
+# ret
+0x00 0x04

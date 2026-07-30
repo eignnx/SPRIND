@@ -1,0 +1,2 @@
+Breakpoint File Version 1.0
+35,true,"C:/Users/gideo/Documents/Asm/SPRIND/hdl/sprind/sprind.srcs/sim_1/new/top_tb.sv"

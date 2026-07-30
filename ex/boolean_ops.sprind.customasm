@@ -1,0 +1,44 @@
+#include "../sprind.customasm"
+
+; ```haskell
+; cond x y z = not x || x && y || x && not y && z
+; func x y z =
+;   if cond x y z
+;     then 123
+;     else 987
+; ```
+
+#align SPRIND_SUBR_ALIGN
+cond: ;= subr(x, y, z) -> (u1 in TS) {
+
+    ; Note: this is NOT short-circuiting.
+    ; (not x || x && y) || x && not y && z
+
+    trpush.not x ; teqi x, 0
+
+    trpush x ; tnei x, 0
+    trpush y
+        tand
+            tor
+
+    trpush x
+    trpush.not y
+        tand
+    trpush z
+        tand
+            tor
+;= }
+
+#fn LO(val) => val[7:0]
+#fn HI(val) => val[15:8]
+
+func: ;= subr(x, y, z) -> u16 {
+    call cond
+    bf .else
+        li x, 123
+        ret
+    .else:
+        li x, HI(987)
+        szi x, LO(987)
+        ret
+;= }
