@@ -267,12 +267,12 @@ synthinstr_info(tbe(r1, r2), info{
     expansion: tae(r2, r1),
     reversability: one_way
 }).
-synthinstr_info(trpush(r), info{
+synthinstr_info(tpushr(r), info{
     descr: 'Push bool in Register onto Test stack',
     expansion: tnei(r, 0),
     reversability: reversable
 }).
-synthinstr_info('trpush.not'(r), info{
+synthinstr_info('tpushr.not'(r), info{
     descr: 'Push negation of bool in Register onto Test stack',
     expansion: teqi(r, 0),    
     reversability: reversable

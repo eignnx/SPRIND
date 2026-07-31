@@ -137,8 +137,8 @@
 	tle {r1: Reg}, {r2: Reg} => asm { tge {r2}, {r1} }
 	ta {r1: Reg}, {r2: Reg} => asm { ta {r2}, {r1} }
 	tbe {r1: Reg}, {r2: Reg} => asm { tae {r2}, {r1} }
-	trpush {r: Reg} => asm { tnei {r}, 0 }
-	trpush.not {r: Reg} => asm { teqi {r}, 0 }
+	tpushr {r: Reg} => asm { tnei {r}, 0 }
+	tpushr.not {r: Reg} => asm { teqi {r}, 0 }
 	HALT  => asm { b 0 }
 }
 

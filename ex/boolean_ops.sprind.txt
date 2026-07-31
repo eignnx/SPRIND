@@ -4,13 +4,13 @@
 # cond:
      
 #   0:0 |    0 
-# trpush.not x
+# tpushr.not x
 0x48 0x01
 #   2:0 |    2 
-# trpush x
+# tpushr x
 0x4a 0x01
 #   4:0 |    4 
-# trpush y
+# tpushr y
 0x4a 0x02
 #   6:0 |    6 
 # tand
@@ -19,16 +19,16 @@
 # tor
 0x00 0x0c
 #   a:0 |    a 
-# trpush x
+# tpushr x
 0x4a 0x01
 #   c:0 |    c 
-# trpush.not y
+# tpushr.not y
 0x48 0x02
 #   e:0 |    e 
 # tand
 0x00 0x07
 #  10:0 |   10 
-# trpush z
+# tpushr z
 0x4a 0x03
 #  12:0 |   12 
 # tand

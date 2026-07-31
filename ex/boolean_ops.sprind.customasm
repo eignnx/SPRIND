@@ -14,17 +14,17 @@ cond: ;= subr(x, y, z) -> (u1 in TS) {
     ; Note: this is NOT short-circuiting.
     ; (not x || x && y) || x && not y && z
 
-    trpush.not x ; teqi x, 0
+    tpushr.not x ; teqi x, 0
 
-    trpush x ; tnei x, 0
-    trpush y
+    tpushr x ; tnei x, 0
+    tpushr y
         tand
             tor
 
-    trpush x
-    trpush.not y
+    tpushr x
+    tpushr.not y
         tand
-    trpush z
+    tpushr z
         tand
             tor
 ;= }
