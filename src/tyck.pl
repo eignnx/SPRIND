@@ -177,13 +177,13 @@ inference(Tcx, compare(A, RelOp, B), i\1) :-
     ; throw(error('failure to infer `compare` operand'(A)))
     ),
     ( TyA = Ty -> true
-    ; throw(error('`compare` operand type doesn''t match operator type'(compare(A\TyA, RelOp, B\TyB))))
+    ; throw(error('`compare` operand type doesn\'t match operator type'(compare(A\TyA, RelOp, B\TyB))))
     ),
     ( inference(Tcx, B, TyB) -> true
     ; throw(error('failure to infer `compare` operand'(B)))
     ),
     ( TyB = Ty -> true
-    ; throw(error('`compare` operand type doesn''t match operator type'(compare(A\TyA, RelOp, B\TyB))))
+    ; throw(error('`compare` operand type doesn\'t match operator type'(compare(A\TyA, RelOp, B\TyB))))
     ).
 
 relop(<(Ty), Ty) :- int_ty(Ty).

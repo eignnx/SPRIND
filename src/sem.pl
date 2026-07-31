@@ -79,10 +79,10 @@ int_ty(i\N) :- N in 1 .. sup.
 
 rval(RVal) --> rval_(RVal) -> [] ; [error(invalid_rval(RVal))].
 
-lval([Term]) --> rval(Term).
-lval($Reg) --> { isa:gprreg(Reg) }.
-lval($$Reg) --> { isa:sysreg(Reg) }.
-lval(?Var) --> { atom(Var) }.
+lval([Term]) --> rval(Term). % Memory access
+lval($Reg) --> { isa:gprreg(Reg) }. % General purpose register
+lval($$Reg) --> { isa:sysreg(Reg) }. % System register
+lval(?Var) --> { atom(Var) }. % Variable; stands for a parameter of an instruction
 lval(attr(Path)) --> path(Path), [constant(attr(Path))].
 lval(hi(RVal)) --> rval(RVal).
 lval(lo(RVal)) --> rval(RVal).
@@ -104,7 +104,7 @@ stmt_(if(Cond, Consq)) --> rval(Cond), stmt(Consq).
 stmt_(if(Cond, Consq, Alt)) --> rval(Cond), stmt(Consq), stmt(Alt).
 stmt_(Dst <- Src) --> lval(Dst), rval(Src).
 stmt_(S1 ; S2) -->
-    { S1 = (?Var := RVal) } ->
+    { S1 = (?Var := RVal) } -> % `X := Y` is a local specification-time let-binding.
         { atom(Var) }, rval(RVal), stmt(S2)
     ;
         stmt(S1), stmt(S2).
@@ -133,21 +133,75 @@ def(#carry_flag_idx, _).
     spacing(next_argument)
 ]).
 
-user:portray(Dst <- Src) :- print(Dst), format(' <- '), print(Src).
+zero_deference_expr(#_).
+zero_deference_expr($_).
+zero_deference_expr($$_).
+zero_deference_expr(?_).
+zero_deference_expr({_}).
+zero_deference_expr([_]).
+zero_deference_expr(compare(_,_,_)).
+zero_deference_expr(hi(_)).
+zero_deference_expr(lo(_)).
+zero_deference_expr(reg(_,_)).
+zero_deference_expr(simm(_)).
+zero_deference_expr(imm(_)).
+zero_deference_expr(sxt(_)).
+zero_deference_expr(zxt(_)).
+zero_deference_expr(bit(_,_)).
+zero_deference_expr(bitslice(_,_)).
+zero_deference_expr(b_push(_,_)).
+zero_deference_expr(b_pop(_)).
+zero_deference_expr(attr(_)).
+zero_deference_expr(Value) :- atom(Value) ; integer(Value).
+
+expr_operator_deference(Value, Deference) :-
+    ( once(zero_deference_expr(Value)) -> Deference = 0
+    ; Value =.. [Op | _Args], current_op(Deference, _, Op) -> true
+    ; throw(error(unknown_operator_in_semantic_expression(Value), _))
+    ).
+
+no_space_around_operator('\\').
+
+binopexpr(Expr) :-
+    Expr =.. [Op | _],
+    current_op(_, OpType, Op),
+    memberchk(OpType, [xfx, xfy, yfx]).
+
+binop_portray(Arg1, Operator, Arg2) :-
+    binop_portray(Arg1, Operator, Arg2, Operator).
+
+binop_portray(Arg1, Operator, Arg2, AltGlyph) :-
+    current_op(Deference, _, Operator),
+    expr_operator_deference(Arg1, D1),
+    expr_operator_deference(Arg2, D2),
+    ( D1 > Deference -> print_parenthesized(Arg1) ; print(Arg1) ),
+    ( no_space_around_operator(Operator) -> print(AltGlyph) ; print_spaced(AltGlyph) ),
+    ( D2 > Deference -> print_parenthesized(Arg2) ; print(Arg2) ).
+
+print_parenthesized(Value) :- format('('), print(Value), format(')').
+print_spaced(Value) :- format(' '), print(Value), format(' ').
+
+user:portray(Dst <- Src) :- print(Dst), format(' ← '), print(Src).
 user:portray(Dst := Src) :- format('let '), print(Dst), format(' := '), print(Src).
-user:portray(A\B) :- print(A), format('\\'), print(B).
-% user:portray(A + B) :- print(A), format(' + '), print(B).
-% user:portray(A - B) :- print(A), format(' - '), print(B).
-% user:portray(A == B) :- print(A), format(' == '), print(B).
-% user:portray(A \= B) :- print(A), format(' != '), print(B).
-% user:portray(A and B) :- write_term(A and B, [])
-% user:portray(A or B) :- print(A), format(' or '), print(B).
-% user:portray(A xor B) :- print(A), format(' xor '), print(B).
+user:portray(A\B) :- binop_portray(A, '\\', B).
+user:portray(A + B) :- binop_portray(A, +, B).
+user:portray(A - B) :- binop_portray(A, -, B).
+user:portray(A \= B) :- binop_portray(A, \=, B, ≠).
+user:portray(A \= B) :- binop_portray(A, \=, B).
+user:portray(A and B) :- binop_portray(A, and, B).
+user:portray(A or B) :- binop_portray(A, or, B).
+user:portray(A xor B) :- binop_portray(A, xor, B).
+user:portray(A .. B) :- binop_portray(A, '..', B).
 user:portray(S1 ; S2) :- print(S1), format(';~n'), print(S2).
-user:portray(S1 .. S2) :- print(S1), format('..'), print(S2).
-user:portray(#X) :- print(X).
-user:portray($X) :- format('$'), print(X).
+user:portray(#X) :-
+    ( integer(X) ->
+        ( between(65500, 65535, X) -> format('0b~2r', [X])
+        ; format('~d', [X])
+        )
+    ; format('#~w', [X])
+    ).
 user:portray($$X) :- upcase_atom(X, XUpper), format('$~w', [XUpper]).
+user:portray($X) :- format('$~w', [X]).
 user:portray(?X) :- print(X).
 user:portray(if(Cond, Consq)) :-
     format('if ~p {~n', [Cond]),

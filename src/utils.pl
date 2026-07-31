@@ -82,7 +82,10 @@ output_to_file(Path, Goal) :-
     setup_call_cleanup(
         (
             format('Writing to `~w`...', [Path]),
-            open(Path, write, S, [create([read, write])])
+            open(Path, write, S, [
+                create([read, write]),
+                encoding(utf8)
+            ])
         ),
         (
             call_time(with_output_to(S, Goal), Time),
