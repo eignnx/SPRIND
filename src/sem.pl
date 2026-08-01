@@ -1285,3 +1285,5 @@ module_info(tsops, info{
     descr: 'Instructions for manipulating the test-stack (`$TS`).',
     deps: [base]
 }).
+
+end.
