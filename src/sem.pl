@@ -186,12 +186,13 @@ user:portray(Dst := Src) :- format('let '), print(Dst), format(' := '), print(Sr
 user:portray(A\B) :- binop_portray(A, '\\', B).
 user:portray(A + B) :- binop_portray(A, +, B).
 user:portray(A - B) :- binop_portray(A, -, B).
+user:portray(A == B) :- binop_portray(A, ==, B).
 user:portray(A \= B) :- binop_portray(A, \=, B, ≠).
-user:portray(A \= B) :- binop_portray(A, \=, B).
-user:portray(A and B) :- binop_portray(A, and, B).
-user:portray(A or B) :- binop_portray(A, or, B).
-user:portray(A xor B) :- binop_portray(A, xor, B).
-user:portray(A .. B) :- binop_portray(A, '..', B).
+user:portray(A and B) :- binop_portray(A, and, B, 'AND').
+user:portray(A or B) :- binop_portray(A, or, B, 'OR').
+user:portray(A xor B) :- binop_portray(A, xor, B, 'XOR').
+user:portray(A .. B) :- binop_portray(A, '..', B, '..').
+user:portray(bitslice(Value, Hi..Lo)) :- format('bitslice(~p, ~p..~p)', [Value, Hi, Lo]).
 user:portray(S1 ; S2) :- print(S1), format(';~n'), print(S2).
 user:portray(#X) :-
     ( integer(X) ->
@@ -203,6 +204,11 @@ user:portray(#X) :-
 user:portray($$X) :- upcase_atom(X, XUpper), format('$~w', [XUpper]).
 user:portray($X) :- format('$~w', [X]).
 user:portray(?X) :- print(X).
+user:portray(~X) :-
+    current_op(Deference, _, ~),
+    expr_operator_deference(X, D),
+    format('~~'),
+    ( D > Deference -> print_parenthesized(X) ; print(X) ).
 user:portray(if(Cond, Consq)) :-
     format('if ~p {~n', [Cond]),
     format(codes(ConsqCodes), '~p', [Consq]),

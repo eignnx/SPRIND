@@ -172,7 +172,7 @@ rd ← zxt([ptr])
 ```
 [reg(r, rs), reg(s, rd) + simm(simm)]
 ------------------------------------------
-let ptr := (rs\s + sxt(simm) and -2\16)\u;
+let ptr := (rs\s + sxt(simm) AND -2\16)\u;
 rd ← {[ptr + 1], [ptr]}
 ```
 
@@ -232,7 +232,7 @@ let ptr := rd\s + sxt(simm);
 ```
 [reg(r, rd) + simm(simm), reg(s, rs)]
 -------------------------------------------------------
-let ptr := (rd\s + sxt(simm) and 0b1111111111111110)\u;
+let ptr := (rd\s + sxt(simm) AND 0b1111111111111110)\u;
 [ptr] ← lo(rs);
 [ptr + 1] ← hi(rs)
 ```
@@ -441,7 +441,7 @@ rd ← sxt(simm)
 ```
 [reg(r, rd), imm(imm)]
 ---------------------------
-rd ← (rd<<8)\16 or zxt(imm)
+rd ← (rd<<8)\16 OR zxt(imm)
 ```
 
 ###### Module
@@ -507,7 +507,7 @@ rd ← zxt([$GP\u + zxt(disp)])
 ```
 [reg(r, rd), reg(s, rs) + imm(disp)]
 --------------------------------------------------------
-let ptr := ($GP\u + zxt(disp) and 0b1111111111111110)\u;
+let ptr := ($GP\u + zxt(disp) AND 0b1111111111111110)\u;
 rd ← {[ptr + 1], [ptr]}
 ```
 
@@ -566,7 +566,7 @@ rd ← {[ptr + 1], [ptr]}
 ```
 [reg(r, rd) + imm(disp), reg(s, rs)]
 --------------------------------------------------------
-let ptr := ($GP\u + zxt(disp) and 0b1111111111111110)\u;
+let ptr := ($GP\u + zxt(disp) AND 0b1111111111111110)\u;
 {[ptr + 1], [ptr]} ← rs
 ```
 
@@ -595,10 +595,10 @@ let ptr := ($GP\u + zxt(disp) and 0b1111111111111110)\u;
 
 ```
 [imm(bit_idx), reg(r, rs)]
------------------------------------------
-let shamt := bitslice(bit_idx, ..(3, 0));
-let bit := rs>>shamt\u and 1;
-b_push($TS, bit==1)
+-------------------------------------
+let shamt := bitslice(bit_idx, 3..0);
+let bit := rs>>shamt\u AND 1;
+b_push($TS, bit == 1)
 ```
 
 ###### Module
@@ -626,10 +626,10 @@ b_push($TS, bit==1)
 
 ```
 [imm(bit_idx), reg(r, rd)]
------------------------------------------
-let idx := bitslice(bit_idx, ..(3, 0))\u;
-let mask := ~ (1<<idx);
-rd ← rd and mask
+-------------------------------------
+let idx := bitslice(bit_idx, 3..0)\u;
+let mask := ~(1<<idx);
+rd ← rd AND mask
 ```
 
 ###### Module
@@ -657,10 +657,10 @@ rd ← rd and mask
 
 ```
 [imm(bit_idx), reg(r, rd)]
------------------------------------------
-let idx := bitslice(bit_idx, ..(3, 0))\u;
-let mask := ~ (1<<idx);
-rd ← rd or mask
+-------------------------------------
+let idx := bitslice(bit_idx, 3..0)\u;
+let mask := ~(1<<idx);
+rd ← rd OR mask
 ```
 
 ###### Module
@@ -833,8 +833,8 @@ b_push($TS, rs\s ≠ sxt(simm))
 
 ```
 [reg(r, rs), simm(simm)]
-----------------------------
-b_push($TS, rs\s==sxt(simm))
+------------------------------
+b_push($TS, rs\s == sxt(simm))
 ```
 
 ###### Module
@@ -892,7 +892,7 @@ rd ← rd\s + sxt(simm)
 ```
 [reg(r, rd), simm(simm)]
 ------------------------
-rd ← rd and sxt(simm)
+rd ← rd AND sxt(simm)
 ```
 
 ###### Module
@@ -921,7 +921,7 @@ rd ← rd and sxt(simm)
 ```
 [reg(r, rd), simm(simm)]
 ------------------------
-rd ← rd or sxt(simm)
+rd ← rd OR sxt(simm)
 ```
 
 ###### Module
@@ -950,7 +950,7 @@ rd ← rd or sxt(simm)
 ```
 [reg(r, rd), simm(simm)]
 ------------------------
-rd ← rd xor sxt(simm)
+rd ← rd XOR sxt(simm)
 ```
 
 ###### Module
@@ -1104,7 +1104,7 @@ rd ← (rd<<imm)\i\16
 let sign := bit(rd, 15);
 let sign_extension := sxt(sign - 1)<<#reg_size_bits - imm;
 bit($CC, #carry_flag_bit) ← bit(rd, imm - 1);
-rd ← rd>>imm or sign_extension
+rd ← rd>>imm OR sign_extension
 ```
 
 ###### Module
@@ -1161,8 +1161,8 @@ b_push($TS, bit([rs], imm))
 
 ```
 [reg(r, rs), imm(imm)]
---------------------------
-[rs] ← [rs] and ~ (1<<imm)
+-------------------------
+[rs] ← [rs] AND ~(1<<imm)
 ```
 
 ###### Module
@@ -1191,7 +1191,7 @@ b_push($TS, bit([rs], imm))
 ```
 [reg(r, rs), imm(imm)]
 ----------------------
-[rs] ← [rs] or 1<<imm
+[rs] ← [rs] OR 1<<imm
 ```
 
 ###### Module
@@ -1233,9 +1233,9 @@ b_push($TS, bit([rs], imm))
 ```
 [reg(t, multiplicand_hi):reg(s, multiplicand_lo), reg(r, multiplier)]
 ---------------------------------------------------------------------
-let mask := ~(multiplier and 1) - 1;
-let masked_lo := multiplicand_lo and mask;
-let masked_hi := multiplicand_hi and mask;
+let mask := ~(multiplier AND 1) - 1;
+let masked_lo := multiplicand_lo AND mask;
+let masked_hi := multiplicand_hi AND mask;
 lo($MP) ← lo($MP) + masked_lo;
 hi($MP) ← hi($MP) + masked_hi + attr(cpu/alu/carryout);
 let shift_cout := bit(multiplicand_lo, #reg_size_bits - 1);
@@ -1337,7 +1337,7 @@ rd ← rd - rs
 ```
 [reg(r, rd), reg(s, rs)]
 ------------------------
-rd ← rd and rs
+rd ← rd AND rs
 ```
 
 ###### Module
@@ -1366,7 +1366,7 @@ rd ← rd and rs
 ```
 [reg(r, rd), reg(s, rs)]
 ------------------------
-rd ← rd or rs
+rd ← rd OR rs
 ```
 
 ###### Module
@@ -1395,7 +1395,7 @@ rd ← rd or rs
 ```
 [reg(r, rd), reg(s, rs)]
 ------------------------
-rd ← rd xor rs
+rd ← rd XOR rs
 ```
 
 ###### Module
@@ -1670,7 +1670,7 @@ b_push($TS, r1 ≠ r2)
 ```
 [reg(r, r1), reg(s, r2)]
 ------------------------
-b_push($TS, r1==r2)
+b_push($TS, r1 == r2)
 ```
 
 ###### Module
