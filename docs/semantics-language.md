@@ -24,7 +24,7 @@ The `simm(_)` term works similarly, but there is only ever one immediate value e
 
 Below the bar is a formula describing the instruction's semantics. `li` is pretty simple: `rd ← sxt(simm)` means "take the immediate value called `simm`, sign extend (`sxt`) it to register width (16 bits), and store it in the register referred to by `rd`."
 
-## Sizes and Signedness
+## Sizes and Kinds
 
 All semantic formulas are run through a type checker to verify that each value's bit-size and signed or unsigned-ness make sense given the value's use.
 
