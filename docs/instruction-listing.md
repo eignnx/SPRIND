@@ -671,7 +671,7 @@ rd ← rd OR mask
 
 ##### The `tli` Instruction
 
-**Test Less-than Immediate** --- Test if a register value is less than an immediate value.
+**Test Less-than Immediate** --- Test if a register value is less than an immediate value via signed comparison.
 
 ###### Examples
 
@@ -700,7 +700,7 @@ b_push($TS, compare(rs\s, <(s\16), sxt(simm)))
 
 ##### The `tgei` Instruction
 
-**Test Greater-than or Equal Immediate** --- Test if a register value is greater than or equal to an immediate value.
+**Test Greater-than or Equal Immediate** --- Test if a register value is greater than or equal to an immediate value via signed comparison.
 
 ###### Examples
 
@@ -729,7 +729,7 @@ b_push($TS, compare(rs\s, >=(s\16), sxt(simm)))
 
 ##### The `tbi` Instruction
 
-**Test Below Immediate** --- Test if a register value is below an immediate value.
+**Test Below Immediate** --- Test if a register value is below an immediate value via unsigned comparison.
 
 ###### Examples
 
@@ -758,7 +758,7 @@ b_push($TS, compare(rs\u, <(u\16), zxt(imm)))
 
 ##### The `taei` Instruction
 
-**Test Above or Equal** --- Test if a register value is above or equal to an immediate value.
+**Test Above or Equal** --- Test if a register value is above or equal to an immediate value via unsigned comparison.
 
 ###### Examples
 

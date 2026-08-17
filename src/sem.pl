@@ -470,7 +470,7 @@ instr_info(sbit, info{
 }).
 instr_info(tli, info{
     title: 'Test Less-than Immediate',
-    descr: 'Test if a register value is less than an immediate value.',
+    descr: 'Test if a register value is less than an immediate value via signed comparison.',
     ex: ['tli x, -5'],
     syntax: { reg(r, ?rs), simm(?simm) },
     sem: b_push($$ts, compare(?rs\s, <(s\16), sxt(?simm))),
@@ -479,7 +479,7 @@ instr_info(tli, info{
 }).
 instr_info(tgei, info{
     title: 'Test Greater-than or Equal Immediate',
-    descr: 'Test if a register value is greater than or equal to an immediate value.',
+    descr: 'Test if a register value is greater than or equal to an immediate value via signed comparison.',
     ex: ['tgei x, -5'],
     syntax: { reg(r, ?rs), simm(?simm) },
     sem: b_push($$ts, compare(?rs\s, >=(s\16), sxt(?simm))),
@@ -488,7 +488,7 @@ instr_info(tgei, info{
 }).
 instr_info(tbi, info{
     title: 'Test Below Immediate',
-    descr: 'Test if a register value is below an immediate value.',
+    descr: 'Test if a register value is below an immediate value via unsigned comparison.',
     ex: ['tbi x, 10'],
     syntax: { reg(r, ?rs), imm(?imm) },
     sem: b_push($$ts, compare(?rs\u, <(u\16), zxt(?imm))),
@@ -497,7 +497,7 @@ instr_info(tbi, info{
 }).
 instr_info(taei, info{
     title: 'Test Above or Equal',
-    descr: 'Test if a register value is above or equal to an immediate value.',
+    descr: 'Test if a register value is above or equal to an immediate value via unsigned comparison.',
     ex: ['taei x, 10'],
     syntax: { reg(r, ?rs), imm(?imm) },
     sem: b_push($$ts, compare(?rs\u, >=(u\16), zxt(?imm))),
@@ -609,8 +609,6 @@ instr_info(lsl, info{
     tags: [zxt, bitwise, shift, left],
     module: [base]
 }).
-
-% This is a comment
 
 instr_info(asr, info{
     title: 'Arithmetic Shift Right',
@@ -951,7 +949,7 @@ instr_info('UNIMPL', info{
     descr: 'Unimplemented instruction.',
     ex: ['UNIMPL'],
     syntax: {},
-    sem: $$pc <- #unimpl_isr, 
+    sem: $$pc <- #unimpl_isr,
     tags: [exc, dbg],
     module: [dbg]
 }).

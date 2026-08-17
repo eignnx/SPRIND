@@ -1,3 +1,8 @@
+/** <module> sim
+Based on the semantics language used in Donald Knuth's "MMIX - A RISC Computer
+for the New Millenium."
+*/
+
 :- module(sim, [
     op(5, fx, $),
     op(5, fx, $$),
@@ -9,6 +14,7 @@
 :- use_module(library(clpfd)).
 :- use_module(library(assoc)).
 :- use_module(library(dcg/high_order)).
+:- use_module(isa).
 
 :- encoding(utf8).
 
@@ -88,45 +94,84 @@ set_sysreg(Reg, Value) -->
 set_memaddr(Addr, Value) -->
     get(Before),
     { MemNext = Before.get(next/mem) },
-    { get_assoc(Addr, Before.next.mem, AlreadySet) ->
-        throw(error(signal_already_set(next/mem/Addr, AlreadySet), _))
+    { AddrFit #= Addr mod 2^16 },
+    { get_assoc(AddrFit, Before.next.mem, AlreadySet) ->
+        throw(error(signal_already_set(next/mem/AddrFit, AlreadySet), _))
     ;
-        put_assoc(Addr, MemNext, Value, NewMemNext),
+        put_assoc(AddrFit, MemNext, Value, NewMemNext),
         After = Before.put(next/mem, NewMemNext)
     },
+    put(After).
+
+add_binding(Var, Val, Ty) -->
+    get(Before),
+    { After = Before.put(bindings, [Var-Val-Ty | Before.bindings]) },
     put(After).
 
 
 % :- det(<- // 2).
 
-% X is set to the bit pattern for which u(X) = Rhs.
-( u($Reg) <- Rhs0 ) -->
-    term_eval_type(Rhs0, Rhs, RhsTy),
-    term_compatible_types(u($Reg) <- Rhs0, u\16, RhsTy),
-    set_reg(Reg, Rhs).
+/*
+In `u(X) <- u(A) + #1`,
 
-( u($$Reg) <- Rhs0 ) -->
-    term_eval_type(Rhs0, Rhs, RhsTy),
-    term_compatible_types(u($$Reg) <- Rhs0, u\16, RhsTy),
-    set_sysreg(Reg, Rhs).
+                '<-':ZZ->ZZ->{State}Void
+      u:?                 +:ZZ->ZZ->ZZ
+      X:Bits\_       u:Bits\_->ZZ    #1:ZZ
+                   A:Bits\_
 
-( s($Reg) <- Rhs0 ) -->
-    term_eval_type(Rhs0, Rhs, RhsTy),
-    term_compatible_types(s($Reg) <- Rhs0, s\16, RhsTy),
-    set_reg(Reg, Rhs).
+That is, arithmetic expressions are only allowed on integers (`ZZ`). Bit strings
+must undergo some transformation to be turned into integers, and integers must
+undergo some (fallible) transformation to be turned back into a bit string.
+*/
 
-( s($$Reg) <- Rhs0 ) -->
-    term_eval_type(Rhs0, Rhs, RhsTy),
-    term_compatible_types(s($$Reg) <- Rhs0, s\16, RhsTy),
-    set_sysreg(Reg, Rhs).
+my_type_error(Expected, SrcTerm, Type) :-
+    throw(error(wrong_type_error(#{
+        expected_type: Expected,
+        received_type: Type,
+        src_term: SrcTerm
+    }), _)).
 
+must_be_type(Expected, SrcTerm, Type) :-
+    ( Type = Expected -> true ;
+        my_type_error(Expected, SrcTerm, Type)
+    ).
 
-( m(Addr0) <- Rhs0 ) -->
+must_be_z(SrcTerm, Type) :- must_be_type(z, SrcTerm, Type).
+must_be_i(SrcTerm, Type) :- must_be_type(i(_), SrcTerm, Type).
+
+:- det(lhs_size/2).
+lhs_size($_, Size) :- isa:register_size(Size).
+lhs_size($$Reg, Size) :- isa:sysregname_name_size_description(Reg, _, Size, _).
+lhs_size(m(_), 8).
+
+assign_lhs($Reg, Val) --> set_reg(Reg, Val).
+assign_lhs($$SysReg, Val) --> set_sysreg(SysReg, Val).
+assign_lhs(m(Addr0), Val) -->
     term_eval_type(Addr0, Addr, AddrTy),
-    term_compatible_types(m(Addr0), u\16, AddrTy),
+    { must_be_z(Addr0, AddrTy) },
+    set_memaddr(Addr, Val).
+
+:- det(<- // 2).
+
+% X is set to the bit pattern for which u(X) = Rhs. `Err` is an `i(1)` boolean.
+% If Rhs does not fit in Lhs, set Err to 1, set Lhs to Rhs mod 2^sizeof(Lhs).
+( u(Lhs, ?ErrVar) <- Rhs0 ) -->
     term_eval_type(Rhs0, Rhs, RhsTy),
-    term_compatible_types(m(Addr0) <- Rhs0, _\8, RhsTy),
-    set_memaddr(Addr, Rhs).
+    { must_be_z(Rhs0, RhsTy) },
+    { lhs_size(Lhs, LhsSize) },
+    { unsigned_size(Rhs, LhsSize) -> Err = 0 ; Err = 1 },
+    { RhsFit #= Rhs mod 2^LhsSize },
+    assign_lhs(Lhs, RhsFit),
+    add_binding(ErrVar, Err, i(1)).
+
+( s(Lhs, ?ErrVar) <- Rhs0 ) -->
+    term_eval_type(Rhs0, Rhs, RhsTy),
+    { must_be_z(Rhs0, RhsTy) },
+    { lhs_size(Lhs, LhsSize) },
+    { signed_size(Rhs, LhsSize) -> Err = 0 ; Err = 1 },
+    { RhsFit #= Rhs mod 2^LhsSize },
+    assign_lhs(Lhs, RhsFit),
+    add_binding(ErrVar, Err, i(1)).
 
 
 let(?Var, Rhs0) -->
@@ -170,53 +215,84 @@ term_compatible_types(SrcExpr, KindA\SizeA, KindB\SizeB) -->
         throw(error(domain_error(AType, B), context(interpretation_of_operator(Op), Msg)))
     }.
 
-% :- det(term_eval_type//3).
 
-term_eval_type(#N, N, Type) --> { possible_type(N, Type) }.
-term_eval_type(?Var, Val, Type) --> get(State), { memberchk(Var-Val-Type, State.bindings) }.
-term_eval_type($Reg, Value, i\16) --> get(State), { Value = State.get(curr/regs/Reg) }.
-term_eval_type($$Reg, Value, i\16) --> get(State), { Value = State.get(curr/sysregs/Reg) }. % TODO: handle 32-bit sysregs
-term_eval_type(u(A0), A, u\Size) -->
-    term_eval_type(A0, A1, OldKind\Size),
-    { OldKind = u -> A = A1
-    ; OldKind = i -> A = A1
-    ; OldKind = s -> signed_unsigned(A1, A, Size)
-    }.
-term_eval_type(s(A0), A, s\Size) -->
-    term_eval_type(A0, A1, OldKind\Size),
-    { OldKind = s -> A = A1
-    ; OldKind = i -> signed_unsigned(A, A1, Size)
-    ; OldKind = u -> signed_unsigned(A, A1, Size)
-    }.
-term_eval_type(m(Addr0), Value, i\8) -->
-    term_eval_type(Addr0, Addr, AddrSize),
-    term_compatible_types(m(Addr0), AddrSize, u\16),
+:- det(term_eval_type//3).
+
+% Construct a "number", allow context to infer if it's a bit-string or integer.
+term_eval_type(#N, N, Ty) --> { possible_type(N, Ty) }.
+
+% Construct a bit-string with a specified size.
+term_eval_type(i(N, Size), N, i(Size)) --> { unsigned_size(N, Size) }.
+
+term_eval_type(?Var, Val, Ty) -->
+    get(State),
+    % Use memberchk/2 to allow variable shadowing
+    { memberchk(Var-Val-Ty, State.bindings) }.
+
+term_eval_type($Reg, Value, i(Bits)) -->
+    { isa:gprreg(Reg) -> true ;
+        bagof(R, isa:gprreg(R), Rs),
+        type_error(oneof(Rs), Reg)
+    },
+    { isa:register_size(Bits) },
+    get(State), { Value = State.get(curr/regs/Reg) }.
+
+term_eval_type($$Reg, Value, i(Bits)) -->
+    { isa:sysregname_name_size_description(Reg, _, Bits, _) -> true ;
+        bagof(R, isa:sysreg(R), Rs),
+        type_error(oneof(Rs), Reg)
+    },
+    get(State), { Value = State.get(curr/sysregs/Reg) }.
+
+term_eval_type(u(A0), A, z) -->
+    term_eval_type(A0, A, OldTy),
+    { OldTy = i(_) -> true ; my_type_error(i(_), A0, OldTy) }.
+
+term_eval_type(s(A0), A, z) -->
+    term_eval_type(A0, A1, OldTy),
+    { OldTy = i(_) -> true ; my_type_error(i(_), A0, OldTy) },
+    % I'm representing a bit string as a Prolog integer which ought to always
+    % be non-negative (therefore, convert from "unsigned" to signed).
+    { i(Size) = OldTy, once(signed_unsigned(A, A1, Size)) }.
+
+term_eval_type(m(Addr0), Value, i(8)) -->
+    term_eval_type(Addr0, Addr, AddrTy),
+    { must_be_z(Addr0, AddrTy) },
     get(State),
     { get_assoc(Addr, State.curr.mem, Value) -> true ; Value = 0 }.
-term_eval_type(A0 + B0, Sum, Kind\Size) -->
+
+term_eval_type(A0 + B0, Sum, z) -->
     term_eval_type(A0, A, TA),
     term_eval_type(B0, B, TB),
-    term_compatible_types(A0 + B0, TA, TB),
-    { Kind\Size = TA },
+    { must_be_z(A0, TA), must_be_z(B0, TB) },
     { Sum #= A + B }.
-term_eval_type(A0 /\ B0, Sum, Kind\Size) -->
+
+term_eval_type(A0 /\ B0, Sum, i(Size)) -->
     term_eval_type(A0, A, TA),
     term_eval_type(B0, B, TB),
-    term_compatible_types(A0 /\ B0, TA, TB),
-    { Kind\Size = TA },
+    { must_be_i(A0, TA), must_be_i(B0, TB) },
+    { TA = i(Size), i(Size) = TB -> true ;
+        throw(error('arguments to /\\ must be same size bit strings'(TA, TB), _))
+    },
     { Sum #= A /\ B }.
-term_eval_type(A0 \/ B0, Sum, Kind\Size) -->
+
+term_eval_type(A0 \/ B0, Sum, i(Size)) -->
     term_eval_type(A0, A, TA),
     term_eval_type(B0, B, TB),
-    term_compatible_types(A0 \/ B0, TA, TB),
-    { Kind\Size = TA },
+    { must_be_i(A0, TA), must_be_i(B0, TB) },
+    { TA = i(Size), i(Size) = TB -> true ;
+        throw(error('arguments to \\/ must be same size bit strings'(TA, TB), _))
+    },
     { Sum #= A \/ B }.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-kind(X) :- kind(X, [i, s, u]).
+ty(X) :- ty(X, [
+    i(_N), % The type of length-N bit-strings ({0, 1}^N).
+    z      % The type of mathematical integers (ℤ).
+]).
 
-kind(X, Possibilities) :-
+ty(X, Possibilities) :-
     ( var(Possibilities) ->
         get_attr(X, sim, Possibilities)
     ;
@@ -236,23 +312,25 @@ attr_unify_hook(XDomain, Y) :-
     ; var(Y) -> % Y is a non-attributed variable
         put_attr(Y, sim, XDomain) % Its domain ought to be just X's domain
     ; % Else, Y is a nonvar
-        ord_memberchk(Y, XDomain) % Succeed if Y's value is in X's domain of possibilities
+        % Succeed iff Y's value is in X's domain of possibilities
+        memberchk(Y, XDomain)
+        % NOTE: We're not using ord_memberchk/2 since it compares via == which
+        %       will not bind variables (if `i(N)` is in the set, `i(2)` is
+        %       considered not in the set).
+        % NOTE: It's safe to use memberchk instead of member since Y is a nonvar
+        %       and since the only possible values (z and i(_)) are non-unifiable
+        %       with each other. We won't be missing out on additional solutions.
     ).
 
 attribute_goals(X) -->
     { get_attr(X, sim, Domain) },
-    ( { Domain = [i, s, u] } -> [kind(X)]
-    ; [kind(X, Domain)]
-    ).
+    [ty(X, Domain)].
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 possible_type(N, Ty) :-
     integer_sign(N, Sign),
     possible_type_(Sign, N, Ty).
-
-possible_type_(+, N, Kind\Size) :- Size in 1 .. sup, 2^Size #> N, kind(Kind).
-possible_type_(-, N, s\Size) :- -1 * 2^(Size - 1) #=< N.
 
 integer_sign(N, Sign) :-
     SignBit #<==> N #< 0,
@@ -262,8 +340,19 @@ integer_sign(N, Sign) :-
 bit_sign(0, +).
 bit_sign(1, -).
 
-signed_size(S, Size) :- -1 * 2^(Size-1) #=< S, S #< 2^(Size-1).
-unsigned_size(U, Size) :- 0 #=< U, U #< 2^Size.
+possible_type_(-, _, z).
+possible_type_(+, N, Ty) :-
+    Size in 1 .. sup,
+    N #< 2^Size,
+    ty(Ty, [i(Size), z]).
+
+
+signed_size(S, Size) :-
+    must_be((integer;var), S),
+    -1 * 2^(Size-1) #=< S, S #< 2^(Size-1).
+unsigned_size(U, Size) :-
+    must_be((integer;var), U),
+    0 #=< U, U #< 2^Size.
 
 signed_unsigned(S, U, Size) :-
     signed_size(S, Size),
@@ -294,7 +383,7 @@ instr_info(lw, info{
     syntax: { reg(r, ?rs), [reg(s, ?rd) + simm(?simm)] },
     sem: (
         let(?ptr, u((s(?rs) + s(?simm)) /\ #(-2)\16)),
-        u(?rd) <- u(m(?ptr + #1)) * #256 \/ u(m(?ptr)) % Defined as little-endian
+        u(?rd, ?e1) <- u(m(?ptr + #1)) * #256 \/ u(m(?ptr)) % Defined as little-endian
     ),
     tags: [mem, load, word],
     module: [base]
@@ -308,18 +397,34 @@ instr_info(li, info{
     tags: [sxt, data],
     module: [base]
 }).
-
-
-term_evaluation(Lhs <- Rhs) -->
-    get(S0),
-    { Prev = S0.get(signals/Lhs) ->
-        throw(error('signal assigned more than once'(Lhs, Prev), _))
-    ;
-        S1 = S0.put(signals/Lhs, Rhs)
-    },
-    put(S1).
-
-term_evaluation(A ; B) -->
-    term_evaluation(A),
-    term_evaluation(B).
-
+instr_info(mulstep, info{
+    title: 'Unsigned Multiplication Step',
+    descr: 'Computes one step in a full 16-bit by 16-bit unsigned multiplication.',
+    ex: ['mulstep x:y, z'],
+    syntax: { reg(t, ?multiplicand_hi):reg(s, ?multiplicand_lo), reg(r, ?multiplier) },
+    sem: (
+        let(?mask, ~((?multiplier /\ #1) - #1)),
+        let(?masked_lo, ?multiplicand_lo /\ ?mask),
+        let(?masked_hi, ?multiplicand_hi /\ ?mask),
+        lo($$mp) <- lo($$mp) + ?masked_lo,
+        hi($$mp) <- hi($$mp) + ?masked_hi + attr(cpu/alu/carryout),
+        let(?shift_cout, bit(?multiplicand_lo, (#reg_size_bits - #1))),
+        ?multiplicand_lo <- ?multiplicand_lo << #1,
+        ?multiplicand_hi <- ?multiplicand_hi << #1 + ?shift_cout,
+        ?multiplier <- ?multiplier >> #1
+    ),
+    tags: [arith, shift],
+    module: [mul]
+}).
+instr_info(lw, info{
+    title: 'Load Word',
+    descr: 'Load a word from memory into a register.',
+    ex: ['lw w, [sp+12]'],
+    syntax: { reg(r, ?rs), [reg(s, ?rd) + simm(?simm)] },
+    sem: (
+        let(?ptr, ((s(?rs) + s(?simm)) /\ #(-2)\16)\u),
+        ?rd <- {m(?ptr + #1), m(?ptr)}
+    ),
+    tags: [mem, load, word],
+    module: [base]
+}).
