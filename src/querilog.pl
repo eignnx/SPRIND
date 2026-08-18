@@ -10,27 +10,28 @@ A Verilog-like specification language embedded in Prolog syntax.
 :- op(500, yfx, and).
 :- op(500, yfx, or).
 
-%! bv(?Bv:nonempty_list(oneof([0, 1]))).
+%! bv(?Bv:compound(bv(nonempty_list(oneof([0, 1]))))).
 %
 % Describes a bit vector; a non-empty fixed-length sequence of bits.
-bv([B | Bs]) :-
-    B in 0..1,
-    maplist([X]>>(X in 0..1), Bs).
+bv(bv([B | Bs])) :- bit(B), maplist(bit, Bs).
 
-must_be_bv(Bv) :- bv(Bv) -> true ; type_error(nonempty_list(oneof([0,1])), Bv).
+bit(B) :-
+    B in 0..1.
 
-bv_same_len(A, B) :-
+must_be_bv(Bv) :- bv(Bv) -> true ; type_error(compound(bv(nonempty_list(oneof([0,1])))), Bv).
+
+bv_same_len(bv(A), bv(B)) :-
     same_length(A, B) -> true ;
-    domain_error('two bitvectors of the same length', A-B).
+    domain_error('two bitvectors of the same length', bv(A)-bv(B)).
 
-bv_bitwise_unop(UnaryOp, A, B) :-
-    must_be_bv(A),
+bv_bitwise_unop(UnaryOp, bv(A), bv(B)) :-
+    must_be_bv(bv(A)),
     maplist(UnaryOp, A, B).
 bv_bitwise_complement(A, B) :-
     bv_bitwise_unop([X, Y]>>(Y #= 1 - X), A, B).
 
-bv_bitwise_binop(BinOp, A, B, C) :-
-    ( must_be_bv(A), must_be_bv(B), bv_same_len(A, B) ),
+bv_bitwise_binop(BinOp, bv(A), bv(B), bv(C)) :-
+    ( must_be_bv(bv(A)), must_be_bv(bv(B)), bv_same_len(bv(A), bv(B)) ),
     maplist(BinOp, A, B, C).
 
 bv_bitwise_and(A, B, C) :-
@@ -44,9 +45,9 @@ bv_logical_shift_right(A, Shamt, C) :-
 bv_arithmetic_shift_right(A, Shamt, C) :-
     bv_shift_right_signexttype(A, Shamt, C, sign).
 
-bv_shift_right_signexttype(A, Shamt, C, SExtTy) :-
-    ( must_be_bv(A), must_be_bv(Shamt) ),
-    bv_unsigned(Shamt, ShamtInt),
+bv_shift_right_signexttype(bv(A), bv(Shamt), bv(C), SExtTy) :-
+    ( must_be_bv(bv(A)), must_be_bv(bv(Shamt)) ),
+    bv_unsigned(bv(Shamt), ShamtInt),
     [SignBit|_] = A,
     signexttype_signbit_extbit(SExtTy, SignBit, ExtBit),
     length(A, ALen),
@@ -73,9 +74,8 @@ ord_n_list_firstn_rest(<, N, [X|Tail], [X|FirstN], Rest) :-
 ord_n_list_firstn_rest(=, _, Rest, [], Rest).
 
 
-bv_unsigned(Bv, U) :-
-    U #>= 0,
-    bv(Bv),
+bv_unsigned(bv(Bv), U) :-
+    bv(bv(Bv)),
     U in 0 .. sup,
     bv_unsigned_(Bv, _, U).
 bv_unsigned_([], 0, 0).
@@ -84,8 +84,8 @@ bv_unsigned_([B|Bs], N, U) :-
     N #= N0 + 1,
     bv_unsigned_(Bs, N0, U0).
 
-bv_signed([SignBit|Bv], S) :-
-    bv([SignBit|Bv]),
+bv_signed(bv([SignBit|Bv]), S) :-
+    bv(bv([SignBit|Bv])),
     length(Bv, N),
     bv_unsigned_(Bv, _, U),
     S #= (-1 * SignBit * 2^N) + U.
@@ -94,6 +94,15 @@ bv_signed([SignBit|Bv], S) :-
 full_adder(A, B, Cin, Sum, Cout) :-
     Sum #= A #\ B #\ Cin,
     Cout #= (A /\ B) \/ (Cin /\ (A #\ B)).
+
+:- dynamic portray/1.
+:- multifile portray/1.
+
+portray(bv(Bv)) :-
+    bv(bv(Bv)),
+    bv_unsigned(bv(Bv), U),
+    length(Bv, N),
+    format('#~d\\~d', [U, N]).
 
 ql_op_info(>>>, #{
     title: "Arithmetic Right Shift",
