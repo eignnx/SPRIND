@@ -5,6 +5,7 @@ A Verilog-like specification language embedded in Prolog syntax.
 :- module(querilog).
 
 :- use_module(library(clpfd)).
+:- use_module(library(dcg/high_order)).
 
 :- op(400, yfx, >>>).
 :- op(500, yfx, and).
@@ -126,6 +127,10 @@ bv_sub(A, B, C, Cout) :-
 
 bv_concat(bv(A), bv(B), bv(C)) :- append(A, B, C).
 
+bv_concat(Es0, E) :-
+    reverse(Es0, [E1|Es1]),
+    foldl(bv_concat, Es1, E1, E).
+
 bv_slice(bv(B), Start, End, bv(Slice)) :-
     length(B, N),
     EndDropCount #= N - End,
@@ -149,38 +154,122 @@ bv_sign_extend(Bv0, NewSize, Bv) :-
     maplist(=(SignBit), Padding),
     bv_concat(bv(Padding), Bv0, Bv).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%% INTERPRETER %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% STATE MONAD %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- det(term_eval_type/3).
+init_state(#{
+    bindings: [],
+    curr: #{
+        regs: #{
+            sp: Zero16,
+            x:  Zero16,
+            y:  Zero16,
+            z:  Zero16,
+            w:  Zero16,
+            v:  Zero16,
+            a:  Zero16,
+            b:  Zero16
+        },
+        sysregs: #{
+            pc: Zero16,
+            ra: Zero16,
+            ts: Zero16,
+            cc: Zero16,
+            gp: Zero16,
+            kr: Zero16,
+            mp: Zero32
+        },
+        mem: MemCurr
+    },
+    next: #{
+        regs: #{},
+        sysregs: #{},
+        mem: MemNext
+    }
+}) :-
+    bv_unsigned(Zero16, 0, 16),
+    bv_unsigned(Zero32, 0, 32),
+    list_to_assoc([], MemCurr),
+    list_to_assoc([], MemNext).
 
-term_eval_type(#N\Size, Bv, bv(Size)) :-
-    ( N #>= 0 ->
+interpretation(Program, NextState) :-
+    init_state(InitState),
+    phrase(Program, [InitState], [NextState]).
+
+before_after(Old, New), [New] --> [Old].
+get(State) --> before_after(State, State).
+put(State) --> before_after(_, State).
+
+set_reg(Reg, Value) -->
+    get(Before),
+    { AlreadySet = Before.get(next/regs/Reg) ->
+        throw(error(signal_already_set(next/regs/Reg, AlreadySet), _))
+    ;
+        After = Before.put(next/regs/Reg, Value)
+    },
+    put(After).
+
+set_sysreg(Reg, Value) -->
+    get(Before),
+    { AlreadySet = Before.get(next/sysregs/Reg) ->
+        throw(error(signal_already_set(next/sysregs/Reg, AlreadySet), _))
+    ;
+        After = Before.put(next/sysregs/Reg, Value)
+    },
+    put(After).
+
+set_memaddr(AddrBv, Value) -->
+    get(Before),
+    { MemNext = Before.get(next/mem) },
+    { bv_unsigned(AddrBv, Addr, 16) },
+    { get_assoc(Addr, Before.next.mem, AlreadySet) ->
+        throw(error(signal_already_set(next/mem/Addr, AlreadySet), _))
+    ;
+        put_assoc(Addr, MemNext, Value, NewMemNext),
+        After = Before.put(next/mem, NewMemNext)
+    },
+    put(After).
+
+add_binding(Var, Val, Ty) -->
+    get(Before),
+    { After = Before.put(bindings, [Var-Val-Ty | Before.bindings]) },
+    put(After).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% EVALUATOR %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+:- det(term_eval_type//3).
+
+term_eval_type(#N\Size, Bv, bv(Size)) -->
+    { N #>= 0 ->
         bv_unsigned(Bv, N, Size)
     ;
         bv_signed(Bv, N, Size)
-    ).
+    }.
 
-term_eval_type(sxt(E0), E, bv(Size)) :-
+term_eval_type(sxt(E0), E, bv(Size)) -->
     term_eval_type(E0, E1, bv(_E1Size)),
-    bv_sign_extend(E1, Size, E).
+    { bv_sign_extend(E1, Size, E) }.
 
-term_eval_type(zxt(E0), E, bv(Size)) :-
+term_eval_type(zxt(E0), E, bv(Size)) -->
     term_eval_type(E0, E1, bv(_E1Size)),
-    bv_zero_extend(E1, Size, E).
+    { bv_zero_extend(E1, Size, E) }.
 
-term_eval_type({Es0}, E, bv(Size)) :-
-    comma_list(Es0, Es1),
-    reverse(Es1, Es2),
-    maplist(term_eval_type, Es2, [E3|Es3], _Types),
-    foldl(bv_concat, Es3, E3, E),
-    bv_size(E, Size).
+term_eval_type({Es0}, E, bv(Size)) -->
+    { comma_list(Es0, Es1) },
+    eval_all(Es1, Es2),
+    { bv_concat(Es2, E) },
+    { bv_size(E, Size) }.
 
-term_eval_type(A0 + B0, Sum, bv(Size)) :-
+term_eval_type(A0 + B0, Sum, bv(Size)) -->
     term_eval_type(A0, A, bv(ASize)),
     term_eval_type(B0, B, bv(BSize)),
-    ( ASize = BSize -> true ; throw(error(incompatible_sizes(+, ASize, BSize), _)) ),
-    Size = ASize,
-    bv_add(A, B, Sum).
+    { ASize = BSize -> true ; throw(error(incompatible_sizes(+, ASize, BSize), _)) },
+    { Size = ASize },
+    { bv_add(A, B, Sum) }.
+
+eval_all([], []) --> [].
+eval_all([E0|Es0], [E|Es]) -->
+    term_eval_type(E0, E, _Ty),
+    eval_all(Es0, Es).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%% PORTRAY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
