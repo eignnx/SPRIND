@@ -7,11 +7,16 @@ A Verilog-like specification language embedded in Prolog syntax.
 :- use_module(library(clpfd)).
 :- use_module(library(dcg/high_order)).
 
+:- op(5, fx, $).
+:- op(5, fx, $$).
+:- op(5, fx, ?).
 :- op(400, yfx, >>>).
 :- op(500, yfx, and).
 :- op(500, yfx, or).
 :- op(50, fx, #).
 :- op(25, xfx, \).
+:- op(950, xfx, <-).
+:- op(900, fx, let).
 
 %! bv(?Bv:compound(bv(nonempty_list(oneof([0, 1]))))).
 %
@@ -229,6 +234,11 @@ set_memaddr(AddrBv, Value) -->
     },
     put(After).
 
+get_memaddr(AddrBv, Value) -->
+    get(State),
+    { bv_unsigned(AddrBv, Addr, 16) },
+    { get_assoc(Addr, State.curr.mem, Value) }.
+
 add_binding(Var, Val, Ty) -->
     get(Before),
     { After = Before.put(bindings, [Var-Val-Ty | Before.bindings]) },
@@ -262,9 +272,38 @@ term_eval_type({Es0}, E, bv(Size)) -->
 term_eval_type(A0 + B0, Sum, bv(Size)) -->
     term_eval_type(A0, A, bv(ASize)),
     term_eval_type(B0, B, bv(BSize)),
-    { ASize = BSize -> true ; throw(error(incompatible_sizes(+, ASize, BSize), _)) },
+    { ASize = BSize -> true ;
+        throw(error(incompatible_sizes(+, ASize, BSize), _))
+    },
     { Size = ASize },
     { bv_add(A, B, Sum) }.
+
+
+stmt_eval( (A ; B) ) --> stmt_eval(A), stmt_eval(B).
+
+stmt_eval(let ?Var = Rhs0) -->
+    term_eval_type(Rhs0, Rhs, RhsTy),
+    get(State),
+    add_binding(Var, Rhs, RhsTy).
+
+stmt_eval(Lhs <- Rhs0) -->
+    term_eval_type(Rhs0, Rhs, RhsTy)
+    assign_lhs(Lhs, Rhs).
+
+
+assign_lhs($Reg, Val) --> set_reg(Reg, Val).
+assign_lhs($$SysReg, Val) --> set_sysreg(SysReg, Val).
+assign_lhs(m(Addr0), Val) -->
+    term_eval_type(Addr0, Addr, AddrTy),
+    { AddrTy = bv(16) -> true ;
+        throw(error(incompatible_types(m(_), #{
+            term: Addr0,
+            required: bv(16),
+            recieved: AddrTy
+        }), _))
+    },
+    set_memaddr(Addr, Val).
+
 
 eval_all([], []) --> [].
 eval_all([E0|Es0], [E|Es]) -->
@@ -323,10 +362,18 @@ ql_op_info(<<, #{
 
 
 
-/*
-sem(
-    idx := bit_idx(3:0);
-    mask := ~(1 << idx);
-    rd <- rd \/ mask
-).
-*/
+ex_instr(b, (
+    let ?offset = ?arg;
+    $$pc <- $$pc + sxt(?offset)
+)).
+instr_info(bt, (
+    if(b_pop($$ts),
+        let ?offset = ?arg;
+        $$pc <- $$pc + sxt(?offset)
+    )
+)).
+instr_info(sbit, (
+    let ?idx = bitslice(?bit_idx, #3 .. #0);
+    let ?mask = ~(#1 << ?idx);
+    ?rd <- ?rd or ?mask
+)).
