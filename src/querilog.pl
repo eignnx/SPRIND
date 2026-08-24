@@ -2,10 +2,22 @@
 A Verilog-like specification language embedded in Prolog syntax.
 */
 
-:- module(querilog).
+:- module(querilog, [
+    op(5, fx, $),
+    op(5, fx, $$),
+    op(5, fx, ?),
+    op(400, yfx, >>>),
+    op(500, yfx, and),
+    op(500, yfx, or),
+    op(50, fx, #),
+    op(25, xfx, \),
+    op(950, xfx, <-)
+]).
 
 :- use_module(library(clpfd)).
 :- use_module(library(dcg/high_order)).
+:- use_module(isa).
+:- use_module(sem).
 
 :- op(5, fx, $).
 :- op(5, fx, $$).
@@ -16,7 +28,6 @@ A Verilog-like specification language embedded in Prolog syntax.
 :- op(50, fx, #).
 :- op(25, xfx, \).
 :- op(950, xfx, <-).
-:- op(900, fx, let).
 
 %! bv(?Bv:compound(bv(nonempty_list(oneof([0, 1]))))).
 %
@@ -44,6 +55,7 @@ ord_n_list_front_lastn(=, _, Rest, [], Rest).
 
 
 bv_unsigned(bv(Bv), U, Size) :-
+    %( (var(Size) ; var(Bv) ) -> U #< 2^Size ; true ),
     length(Bv, Size),
     bv_unsigned(bv(Bv), U).
 bv_unsigned(bv(Bv), U) :-
@@ -152,6 +164,7 @@ bv_zero_extend(Bv0, NewSize, Bv) :-
     bv_concat(bv(Padding), Bv0, Bv).
 
 bv_sign_extend(Bv0, NewSize, Bv) :-
+    ( var(Bv0) -> instantiation_error(Bv0) ; true ),
     bv([SignBit|_]) = Bv0,
     bv_size(Bv0, Bv0Size),
     PadSize #= NewSize - Bv0Size, PadSize #>= 0,
@@ -161,7 +174,7 @@ bv_sign_extend(Bv0, NewSize, Bv) :-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% STATE MONAD %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-init_state(#{
+init_state(interpstate{
     bindings: [],
     curr: #{
         regs: #{
@@ -196,7 +209,11 @@ init_state(#{
     list_to_assoc([], MemCurr),
     list_to_assoc([], MemNext).
 
-interpretation(Program, NextState) :-
+interpretation(Program0, NextState) :-
+    % First type-check and resolve inferred sizes:
+    term_size_resolved(Program0, _, Program),
+
+    % Then run the interpreter
     init_state(InitState),
     phrase(Program, [InitState], [NextState]).
 
@@ -244,16 +261,92 @@ add_binding(Var, Val, Ty) -->
     { After = Before.put(bindings, [Var-Val-Ty | Before.bindings]) },
     put(After).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% EVALUATOR %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TYPE CHECKER %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- det(term_eval_type//3).
-
-term_eval_type(#N\Size, Bv, bv(Size)) -->
-    { N #>= 0 ->
+choose_integer(Bv, N, Size) :-
+    ( N #>= 0 ->
         bv_unsigned(Bv, N, Size)
     ;
         bv_signed(Bv, N, Size)
+    ).
+
+%! term_size_resolved(+Term0, -Size:nonneg, -Term) is det.
+%
+% Removes unsized integer literals like `#123` by inferring their size. Also
+% performs type checking.
+%
+term_size_resolved(#Term0, Size, Term) :-
+    ( N\Size = Term0 ->
+        ( choose_integer(_Bv, N, Size) -> Term = #N\Size ;
+            format(atom(Msg), 'Integer ~d does not fit in ~d bits', [N, Size]),
+            throw(error(syntax_error(Msg, #N\Size), _))
+        )
+    ; integer(Term0), N = Term0 ->
+        Size in 0..sup,
+        -1 * 2^(Size - 1) #=< N, N #< 2^Size, % Widest possible bounds -> Size approx(>=) lg(|N|)
+        Term = #N\Size % Defer size inference for later
+    ; atom(Term0), Const = Term0 ->
+        sem:def(#Const, N),
+        Size in 0..sup,
+        -1 * 2^(Size - 1) #=< N, N #< 2^Size, % Widest possible bounds -> Size approx(>=) lg(|N|)
+        Term = #N\Size % Defer size inference for later
+    ).
+
+term_size_resolved(A0 + B0, Size, A + B) :-
+    term_size_resolved(A0, ZA, A),
+    term_size_resolved(B0, ZB, B),
+    ( ZA = ZB -> true ;
+        throw(error(incompatible_sizes(#{op: +, subterms: [A0, B0], subterm_sizes: [ZA, ZB]}), _))
+    ),
+    Size = ZA.
+
+term_size_resolved(m(Addr0), 8, m(Addr)) :-
+    term_size_resolved(Addr0, ZAddr, Addr),
+    ( ZAddr = 16 -> true ;
+        throw(error(incompatible_size(#{op: m, subterm: [Addr0], expected_size: 16, actual_size: [ZAddr]}), _))
+    ).
+
+term_size_resolved(sxt(E0), Size, sxt(E)) :-
+    term_size_resolved(E0, ZE, E),
+    Size in 0..sup,
+    ( ZE #< Size -> true ;
+        % Unreachable?
+        throw(error(unsatisfiable_size_constraint(#{constraint: ZE #< Size, term: sxt(E0)}), _))
+    ).
+
+term_size_resolved(zxt(E0), Size, zxt(E)) :-
+    term_size_resolved(E0, ZE, E),
+    Size in 0..sup,
+    ( ZE #< Size -> true ;
+        % Unreachable?
+        throw(error(unsatisfiable_size_constraint(#{constraint: ZE #< Size, term: zxt(E0)}), _))
+    ).
+
+term_size_resolved({Es0}, Size, {Es}) :-
+    comma_list(Es0, Es1),
+    maplist(term_size_resolved, Es1, [S|Sizes], Es),
+    foldl([A, B, C]>>(A + B #= C), Sizes, S, Size).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% EVALUATOR %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+:- det(term_eval_type//3).
+:- discontiguous(term_eval_type//3).
+
+term_eval_type(#Term, Eval, Ty) -->
+    poundsign_eval_type(Term, Eval, Ty).
+
+poundsign_eval_type(N, Bv, bv(Size)) -->
+    { integer(N) }, !,
+    { N #>= 0 -> bv_unsigned(Bv, N, Size) ; bv_signed(Bv, N, Size) }.
+poundsign_eval_type(N\Size, Bv, bv(Size)) -->
+    { integer(N) }, !,
+    { ( N #>= 0 -> bv_unsigned(Bv, N, Size) ; bv_signed(Bv, N, Size) ) -> true ;
+        format(atom(Msg), 'Integer ~d does not fit in ~d bits', [N, Size]),
+        throw(error(syntax_error(Msg, #N\Size), _))
     }.
+poundsign_eval_type(Const, Bv, bv(Size)) -->
+    { sem:def(#Const, Val) }, !,
+    { bv_unsigned(Bv, Val, Size) }.
 
 term_eval_type(sxt(E0), E, bv(Size)) -->
     term_eval_type(E0, E1, bv(_E1Size)),
@@ -278,22 +371,46 @@ term_eval_type(A0 + B0, Sum, bv(Size)) -->
     { Size = ASize },
     { bv_add(A, B, Sum) }.
 
+term_eval_type(bitslice(A0, Lo..Hi), Slice, bv(Size)) -->
+    {integer(Lo), integer(Hi) -> true ; throw(error(constant_slice_index_required,_)) },
+    term_eval_type(A0, A, _ATy),
+    { Size #= Hi - Lo },
+    { bv_slice(A, Lo, Hi, Slice) }.
+
 
 stmt_eval( (A ; B) ) --> stmt_eval(A), stmt_eval(B).
 
-stmt_eval(let ?Var = Rhs0) -->
+stmt_eval(?Var := Rhs0) -->
     term_eval_type(Rhs0, Rhs, RhsTy),
-    get(State),
     add_binding(Var, Rhs, RhsTy).
 
-stmt_eval(Lhs <- Rhs0) -->
-    term_eval_type(Rhs0, Rhs, RhsTy)
+stmt_eval(Lhs <- Rhs) -->
     assign_lhs(Lhs, Rhs).
 
 
-assign_lhs($Reg, Val) --> set_reg(Reg, Val).
-assign_lhs($$SysReg, Val) --> set_sysreg(SysReg, Val).
-assign_lhs(m(Addr0), Val) -->
+assign_lhs($Reg, Rhs0) -->
+    term_eval_type(Rhs0, Rhs, RhsTy),
+    { isa:register_size(RegSize) },
+    { RhsTy = bv(RegSize) -> true ;
+        throw(error(incompatible_types($Reg, #{
+            term: Rhs0,
+            required: bv(RegSize),
+            recieved: RhsTy
+        }), _))
+    },
+    set_reg(Reg, Rhs).
+assign_lhs($$SysReg, Rhs0) -->
+    term_eval_type(Rhs0, Rhs, RhsTy),
+    { isa:sysregname_name_size_description(SysReg, _, Size, _) },
+    { RhsTy = bv(Size) -> true ;
+        throw(error(incompatible_types($$SysReg, #{
+            term: Rhs0,
+            required: bv(Size),
+            recieved: RhsTy
+        }), _))
+    },
+    set_sysreg(SysReg, Rhs).
+assign_lhs(m(Addr0), Rhs0) -->
     term_eval_type(Addr0, Addr, AddrTy),
     { AddrTy = bv(16) -> true ;
         throw(error(incompatible_types(m(_), #{
@@ -302,7 +419,15 @@ assign_lhs(m(Addr0), Val) -->
             recieved: AddrTy
         }), _))
     },
-    set_memaddr(Addr, Val).
+    term_eval_type(Rhs0, Rhs, RhsTy),
+    { RhsTy = bv(8) -> true ;
+        throw(error(incompatible_types((m(_) <- _), #{
+            term: Rhs0,
+            required: bv(8),
+            recieved: RhsTy
+        }), _))
+    },
+    set_memaddr(Addr, Rhs).
 
 
 eval_all([], []) --> [].
@@ -319,24 +444,24 @@ eval_all([E0|Es0], [E|Es]) -->
     bin
 ]))]).
 
-:- dynamic portray/1.
-:- multifile portray/1.
-
-portray(bv(Bv)) :-
-    Bv = [_|_],
-    ( maplist(integer, Bv) ->
-        length(Bv, N),
-        current_prolog_flag(bv_portray_base, Base),
-        ( Base = signed_dec ->
-            bv_signed(bv(Bv), Int),
-            portray_ground_bv_base(dec, Int, N)
-        ;
-            bv_unsigned(bv(Bv), Int),
-            portray_ground_bv_base(Base, Int, N)
-        )
-    ;
-        format('bv(~w)', [Bv])
-    ).
+%:- dynamic portray/1.
+%:- multifile portray/1.
+%
+%portray(bv(Bv)) :-
+%    Bv = [_|_],
+%    ( maplist(integer, Bv) ->
+%        length(Bv, N),
+%        current_prolog_flag(bv_portray_base, Base),
+%        ( Base = signed_dec ->
+%            bv_signed(bv(Bv), Int),
+%            portray_ground_bv_base(dec, Int, N)
+%        ;
+%            bv_unsigned(bv(Bv), Int),
+%            portray_ground_bv_base(Base, Int, N)
+%        )
+%    ;
+%        format('bv(~w)', [Bv])
+%    ).
 
 portray_ground_bv_base(dec, U, N) :- format('#~I\\~d', [U, N]).
 portray_ground_bv_base(hex, U, N) :- format('#0x~16R\\~d', [U, N]).
@@ -363,17 +488,17 @@ ql_op_info(<<, #{
 
 
 ex_instr(b, (
-    let ?offset = ?arg;
+    ?offset := ?arg;
     $$pc <- $$pc + sxt(?offset)
 )).
-instr_info(bt, (
+ex_instr(bt, (
     if(b_pop($$ts),
-        let ?offset = ?arg;
+        ?offset := ?arg;
         $$pc <- $$pc + sxt(?offset)
     )
 )).
-instr_info(sbit, (
-    let ?idx = bitslice(?bit_idx, #3 .. #0);
-    let ?mask = ~(#1 << ?idx);
+ex_instr(sbit, (
+    ?idx := bitslice(?bit_idx, #3 .. #0);
+    ?mask := ~(#1 << ?idx);
     ?rd <- ?rd or ?mask
 )).
