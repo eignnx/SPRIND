@@ -181,51 +181,53 @@ binop_portray(Arg1, Operator, Arg2, AltGlyph) :-
 print_parenthesized(Value) :- format('('), print(Value), format(')').
 print_spaced(Value) :- format(' '), print(Value), format(' ').
 
-user:portray(Dst <- Src) :- print(Dst), format(' ← '), print(Src).
-user:portray(Dst := Src) :- format('let '), print(Dst), format(' := '), print(Src).
-user:portray(A\B) :- binop_portray(A, '\\', B).
-user:portray(A + B) :- binop_portray(A, +, B).
-user:portray(A - B) :- binop_portray(A, -, B).
-user:portray(A == B) :- binop_portray(A, ==, B).
-user:portray(A \= B) :- binop_portray(A, \=, B, ≠).
-user:portray(A and B) :- binop_portray(A, and, B, 'AND').
-user:portray(A or B) :- binop_portray(A, or, B, 'OR').
-user:portray(A xor B) :- binop_portray(A, xor, B, 'XOR').
-user:portray(A .. B) :- binop_portray(A, '..', B, '..').
-user:portray(bitslice(Value, Hi..Lo)) :- format('bitslice(~p, ~p..~p)', [Value, Hi, Lo]).
-user:portray(S1 ; S2) :- print(S1), format(';~n'), print(S2).
-user:portray(#X) :-
-    ( integer(X) ->
-        ( between(65500, 65535, X) -> format('0b~2r', [X])
-        ; format('~d', [X])
-        )
-    ; format('#~w', [X])
-    ).
-user:portray($$X) :- upcase_atom(X, XUpper), format('$~w', [XUpper]).
-user:portray($X) :- format('$~w', [X]).
-user:portray(?X) :- print(X).
-user:portray(~X) :-
-    current_op(Deference, _, ~),
-    expr_operator_deference(X, D),
-    format('~~'),
-    ( D > Deference -> print_parenthesized(X) ; print(X) ).
-user:portray(if(Cond, Consq)) :-
-    format('if ~p {~n', [Cond]),
-    format(codes(ConsqCodes), '~p', [Consq]),
-    indent_lines('    ', ConsqCodes, ConsqIndented),
-    format('~w~n', [ConsqIndented]),
-    format('}').
+% BUG: portray of + and - cause exception to be thrown when printing clpfd constraints in swipl
 
-user:portray(if(Cond, Consq, Alt)) :-
-    format('if ~p {~n', [Cond]),
-    format(codes(ConsqCodes), '~p', [Consq]),
-    indent_lines('    ', ConsqCodes, ConsqIndented),
-    format('~w~n', [ConsqIndented]),
-    format('} else {~n'),
-    format(codes(AltCodes), '~p', [Alt]),
-    indent_lines('    ', AltCodes, AltIndented),
-    format('~w~n', [AltIndented]),
-    format('}').
+%user:portray(Dst <- Src) :- print(Dst), format(' ← '), print(Src).
+%user:portray(Dst := Src) :- format('let '), print(Dst), format(' := '), print(Src).
+%user:portray(A\B) :- binop_portray(A, '\\', B).
+%user:portray(A + B) :- binop_portray(A, +, B).
+%user:portray(A - B) :- binop_portray(A, -, B).
+%user:portray(A == B) :- binop_portray(A, ==, B).
+%user:portray(A \= B) :- binop_portray(A, \=, B, ≠).
+%user:portray(A and B) :- binop_portray(A, and, B, 'AND').
+%user:portray(A or B) :- binop_portray(A, or, B, 'OR').
+%user:portray(A xor B) :- binop_portray(A, xor, B, 'XOR').
+%user:portray(A .. B) :- binop_portray(A, '..', B, '..').
+%user:portray(bitslice(Value, Hi..Lo)) :- format('bitslice(~p, ~p..~p)', [Value, Hi, Lo]).
+%user:portray(S1 ; S2) :- print(S1), format(';~n'), print(S2).
+%user:portray(#X) :-
+%    ( integer(X) ->
+%        ( between(65500, 65535, X) -> format('0b~2r', [X])
+%        ; format('~d', [X])
+%        )
+%    ; format('#~w', [X])
+%    ).
+%user:portray($$X) :- upcase_atom(X, XUpper), format('$~w', [XUpper]).
+%user:portray($X) :- format('$~w', [X]).
+%user:portray(?X) :- print(X).
+%user:portray(~X) :-
+%    current_op(Deference, _, ~),
+%    expr_operator_deference(X, D),
+%    format('~~'),
+%    ( D > Deference -> print_parenthesized(X) ; print(X) ).
+%user:portray(if(Cond, Consq)) :-
+%    format('if ~p {~n', [Cond]),
+%    format(codes(ConsqCodes), '~p', [Consq]),
+%    indent_lines('    ', ConsqCodes, ConsqIndented),
+%    format('~w~n', [ConsqIndented]),
+%    format('}').
+%
+%user:portray(if(Cond, Consq, Alt)) :-
+%    format('if ~p {~n', [Cond]),
+%    format(codes(ConsqCodes), '~p', [Consq]),
+%    indent_lines('    ', ConsqCodes, ConsqIndented),
+%    format('~w~n', [ConsqIndented]),
+%    format('} else {~n'),
+%    format(codes(AltCodes), '~p', [Alt]),
+%    indent_lines('    ', AltCodes, AltIndented),
+%    format('~w~n', [AltIndented]),
+%    format('}').
 
 emit_semantics_codeblock(Info) :-
     op(200, fx, ~),

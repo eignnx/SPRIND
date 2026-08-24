@@ -140,10 +140,9 @@
 ###### Semantics
 
 ```
-[reg(r, rs), reg(s, rd) + simm(simm)]
--------------------------------------
-let ptr := (rs\s + sxt(simm))\u;
-rd ← zxt([ptr])
+[reg(r, ?(rs)), reg(s, ?(rd))+simm(?(simm))]
+-----------------------------------------------------
+?(ptr):=(?(rs)\s+sxt(?(simm)))\u;?(rd)<-zxt([?(ptr)])
 ```
 
 ###### Module
@@ -170,10 +169,9 @@ rd ← zxt([ptr])
 ###### Semantics
 
 ```
-[reg(r, rs), reg(s, rd) + simm(simm)]
-------------------------------------------
-let ptr := (rs\s + sxt(simm) AND -2\16)\u;
-rd ← {[ptr + 1], [ptr]}
+[reg(r, ?(rs)), reg(s, ?(rd))+simm(?(simm))]
+-----------------------------------------------------------------------------
+?(ptr):=(?(rs)\s+sxt(?(simm))and#(-2)\16)\u;?(rd)<-{[?(ptr)+ #(1)], [?(ptr)]}
 ```
 
 ###### Module
@@ -200,10 +198,9 @@ rd ← {[ptr + 1], [ptr]}
 ###### Semantics
 
 ```
-[reg(r, rd) + simm(simm), reg(s, rs)]
--------------------------------------
-let ptr := rd\s + sxt(simm);
-[ptr\u] ← lo(rs)
+[reg(r, ?(rd))+simm(?(simm)), reg(s, ?(rs))]
+---------------------------------------------------
+?(ptr):= ?(rd)\s+sxt(?(simm));[?(ptr)\u]<-lo(?(rs))
 ```
 
 ###### Module
@@ -230,11 +227,9 @@ let ptr := rd\s + sxt(simm);
 ###### Semantics
 
 ```
-[reg(r, rd) + simm(simm), reg(s, rs)]
--------------------------------------------------------
-let ptr := (rd\s + sxt(simm) AND 0b1111111111111110)\u;
-[ptr] ← lo(rs);
-[ptr + 1] ← hi(rs)
+[reg(r, ?(rd))+simm(?(simm)), reg(s, ?(rs))]
+-----------------------------------------------------------------------------------------
+?(ptr):=(?(rd)\s+sxt(?(simm))and#(65534))\u;[?(ptr)]<-lo(?(rs));[?(ptr)+ #(1)]<-hi(?(rs))
 ```
 
 ###### Module
@@ -269,11 +264,9 @@ let ptr := (rd\s + sxt(simm) AND 0b1111111111111110)\u;
 ###### Semantics
 
 ```
-[simm(arg)]
------------------------------------------
-let offset := arg;
-$PC ← $PC\s + (sxt(offset)<<#subr_align);
-$RA ← $PC + 2
+[simm(?(arg))]
+-----------------------------------------------------------------------------------------
+?(offset):= ?(arg);$$(pc)<- $$(pc)\s+sxt(?(offset))<< #(subr_align);$$(ra)<- $$(pc)+ #(2)
 ```
 
 ###### Module
@@ -308,10 +301,9 @@ $RA ← $PC + 2
 ###### Semantics
 
 ```
-[simm(arg)]
--------------------------
-let offset := arg;
-$PC ← $PC\s + sxt(offset)
+[simm(?(arg))]
+---------------------------------------------------
+?(offset):= ?(arg);$$(pc)<- $$(pc)\s+sxt(?(offset))
 ```
 
 ###### Module
@@ -338,12 +330,9 @@ $PC ← $PC\s + sxt(offset)
 ###### Semantics
 
 ```
-[simm(arg)]
------------------------------
-if b_pop($TS) {
-    let offset := arg;
-    $PC ← $PC\s + sxt(offset)
-}
+[simm(?(arg))]
+------------------------------------------------------------------------
+if(b_pop($$(ts)), (?(offset):= ?(arg);$$(pc)<- $$(pc)\s+sxt(?(offset))))
 ```
 
 ###### Module
@@ -370,12 +359,9 @@ if b_pop($TS) {
 ###### Semantics
 
 ```
-[simm(arg)]
------------------------------
-if ~b_pop($TS) {
-    let offset := arg;
-    $PC ← $PC\s + sxt(offset)
-}
+[simm(?(arg))]
+-------------------------------------------------------------------------
+if(~b_pop($$(ts)), (?(offset):= ?(arg);$$(pc)<- $$(pc)\s+sxt(?(offset))))
 ```
 
 ###### Module
@@ -410,9 +396,9 @@ if ~b_pop($TS) {
 ###### Semantics
 
 ```
-[reg(r, rd), simm(simm)]
-------------------------
-rd ← sxt(simm)
+[reg(r, ?(rd)), simm(?(simm))]
+------------------------------
+?(rd)<-sxt(?(simm))
 ```
 
 ###### Module
@@ -439,9 +425,9 @@ rd ← sxt(simm)
 ###### Semantics
 
 ```
-[reg(r, rd), imm(imm)]
----------------------------
-rd ← (rd<<8)\16 OR zxt(imm)
+[reg(r, ?(rd)), imm(?(imm))]
+---------------------------------------
+?(rd)<-(?(rd)<< #(8))\16 or zxt(?(imm))
 ```
 
 ###### Module
@@ -476,9 +462,9 @@ rd ← (rd<<8)\16 OR zxt(imm)
 ###### Semantics
 
 ```
-[reg(r, rd), reg(s, rs) + imm(disp)]
-------------------------------------
-rd ← zxt([$GP\u + zxt(disp)])
+[reg(r, ?(rd)), reg(s, ?(rs))+imm(?(disp))]
+-------------------------------------------
+?(rd)<-zxt([$$(gp)\u+zxt(?(disp))])
 ```
 
 ###### Module
@@ -505,10 +491,9 @@ rd ← zxt([$GP\u + zxt(disp)])
 ###### Semantics
 
 ```
-[reg(r, rd), reg(s, rs) + imm(disp)]
---------------------------------------------------------
-let ptr := ($GP\u + zxt(disp) AND 0b1111111111111110)\u;
-rd ← {[ptr + 1], [ptr]}
+[reg(r, ?(rd)), reg(s, ?(rs))+imm(?(disp))]
+------------------------------------------------------------------------------
+?(ptr):=($$(gp)\u+zxt(?(disp))and#(65534))\u;?(rd)<-{[?(ptr)+ #(1)], [?(ptr)]}
 ```
 
 ###### Module
@@ -535,9 +520,9 @@ rd ← {[ptr + 1], [ptr]}
 ###### Semantics
 
 ```
-[reg(r, rd) + imm(disp), reg(s, rs)]
-------------------------------------
-[$GP\u + zxt(disp)] ← lo(rs)
+[reg(r, ?(rd))+imm(?(disp)), reg(s, ?(rs))]
+-------------------------------------------
+[$$(gp)\u+zxt(?(disp))]<-lo(?(rs))
 ```
 
 ###### Module
@@ -564,10 +549,9 @@ rd ← {[ptr + 1], [ptr]}
 ###### Semantics
 
 ```
-[reg(r, rd) + imm(disp), reg(s, rs)]
---------------------------------------------------------
-let ptr := ($GP\u + zxt(disp) AND 0b1111111111111110)\u;
-{[ptr + 1], [ptr]} ← rs
+[reg(r, ?(rd))+imm(?(disp)), reg(s, ?(rs))]
+-------------------------------------------------------------------------------
+?(ptr):=($$(gp)\u+zxt(?(disp))and#(65534))\u;{[?(ptr)+ #(1)], [?(ptr)]}<- ?(rs)
 ```
 
 ###### Module
@@ -594,11 +578,9 @@ let ptr := ($GP\u + zxt(disp) AND 0b1111111111111110)\u;
 ###### Semantics
 
 ```
-[imm(bit_idx), reg(r, rs)]
--------------------------------------
-let shamt := bitslice(bit_idx, 3..0);
-let bit := rs>>shamt\u AND 1;
-b_push($TS, bit == 1)
+[imm(?(bit_idx)), reg(r, ?(rs))]
+-----------------------------------------------------------------------------------------------------------------
+?(shamt):=bitslice(?(bit_idx), ..(#(3), #(0)));?(bit):= ?(rs)>> ?(shamt)\u and #(1);b_push($$(ts), ?(bit)== #(1))
 ```
 
 ###### Module
@@ -625,11 +607,9 @@ b_push($TS, bit == 1)
 ###### Semantics
 
 ```
-[imm(bit_idx), reg(r, rd)]
--------------------------------------
-let idx := bitslice(bit_idx, 3..0)\u;
-let mask := ~(1<<idx);
-rd ← rd AND mask
+[imm(?(bit_idx)), reg(r, ?(rd))]
+--------------------------------------------------------------------------------------------------
+?(idx):=bitslice(?(bit_idx), ..(#(3), #(0)))\u;?(mask):= ~ (#(1)<< ?(idx));?(rd)<- ?(rd)and?(mask)
 ```
 
 ###### Module
@@ -656,11 +636,9 @@ rd ← rd AND mask
 ###### Semantics
 
 ```
-[imm(bit_idx), reg(r, rd)]
--------------------------------------
-let idx := bitslice(bit_idx, 3..0)\u;
-let mask := ~(1<<idx);
-rd ← rd OR mask
+[imm(?(bit_idx)), reg(r, ?(rd))]
+-------------------------------------------------------------------------------------------------
+?(idx):=bitslice(?(bit_idx), ..(#(3), #(0)))\u;?(mask):= ~ (#(1)<< ?(idx));?(rd)<- ?(rd)or?(mask)
 ```
 
 ###### Module
@@ -687,9 +665,9 @@ rd ← rd OR mask
 ###### Semantics
 
 ```
-[reg(r, rs), simm(simm)]
-----------------------------------------------
-b_push($TS, compare(rs\s, <(s\16), sxt(simm)))
+[reg(r, ?(rs)), simm(?(simm))]
+-------------------------------------------------------
+b_push($$(ts), compare(?(rs)\s, <(s\16), sxt(?(simm))))
 ```
 
 ###### Module
@@ -716,9 +694,9 @@ b_push($TS, compare(rs\s, <(s\16), sxt(simm)))
 ###### Semantics
 
 ```
-[reg(r, rs), simm(simm)]
------------------------------------------------
-b_push($TS, compare(rs\s, >=(s\16), sxt(simm)))
+[reg(r, ?(rs)), simm(?(simm))]
+--------------------------------------------------------
+b_push($$(ts), compare(?(rs)\s, >=(s\16), sxt(?(simm))))
 ```
 
 ###### Module
@@ -745,9 +723,9 @@ b_push($TS, compare(rs\s, >=(s\16), sxt(simm)))
 ###### Semantics
 
 ```
-[reg(r, rs), imm(imm)]
----------------------------------------------
-b_push($TS, compare(rs\u, <(u\16), zxt(imm)))
+[reg(r, ?(rs)), imm(?(imm))]
+------------------------------------------------------
+b_push($$(ts), compare(?(rs)\u, <(u\16), zxt(?(imm))))
 ```
 
 ###### Module
@@ -774,9 +752,9 @@ b_push($TS, compare(rs\u, <(u\16), zxt(imm)))
 ###### Semantics
 
 ```
-[reg(r, rs), imm(imm)]
-----------------------------------------------
-b_push($TS, compare(rs\u, >=(u\16), zxt(imm)))
+[reg(r, ?(rs)), imm(?(imm))]
+-------------------------------------------------------
+b_push($$(ts), compare(?(rs)\u, >=(u\16), zxt(?(imm))))
 ```
 
 ###### Module
@@ -803,9 +781,9 @@ b_push($TS, compare(rs\u, >=(u\16), zxt(imm)))
 ###### Semantics
 
 ```
-[reg(r, rs), simm(simm)]
------------------------------
-b_push($TS, rs\s ≠ sxt(simm))
+[reg(r, ?(rs)), simm(?(simm))]
+-------------------------------------
+b_push($$(ts), ?(rs)\s\=sxt(?(simm)))
 ```
 
 ###### Module
@@ -832,9 +810,9 @@ b_push($TS, rs\s ≠ sxt(simm))
 ###### Semantics
 
 ```
-[reg(r, rs), simm(simm)]
-------------------------------
-b_push($TS, rs\s == sxt(simm))
+[reg(r, ?(rs)), simm(?(simm))]
+-------------------------------------
+b_push($$(ts), ?(rs)\s==sxt(?(simm)))
 ```
 
 ###### Module
@@ -861,9 +839,9 @@ b_push($TS, rs\s == sxt(simm))
 ###### Semantics
 
 ```
-[reg(r, rd), simm(simm)]
-------------------------
-rd ← rd\s + sxt(simm)
+[reg(r, ?(rd)), simm(?(simm))]
+------------------------------
+?(rd)<- ?(rd)\s+sxt(?(simm))
 ```
 
 ###### Module
@@ -890,9 +868,9 @@ rd ← rd\s + sxt(simm)
 ###### Semantics
 
 ```
-[reg(r, rd), simm(simm)]
-------------------------
-rd ← rd AND sxt(simm)
+[reg(r, ?(rd)), simm(?(simm))]
+------------------------------
+?(rd)<- ?(rd)and sxt(?(simm))
 ```
 
 ###### Module
@@ -919,9 +897,9 @@ rd ← rd AND sxt(simm)
 ###### Semantics
 
 ```
-[reg(r, rd), simm(simm)]
-------------------------
-rd ← rd OR sxt(simm)
+[reg(r, ?(rd)), simm(?(simm))]
+------------------------------
+?(rd)<- ?(rd)or sxt(?(simm))
 ```
 
 ###### Module
@@ -948,9 +926,9 @@ rd ← rd OR sxt(simm)
 ###### Semantics
 
 ```
-[reg(r, rd), simm(simm)]
-------------------------
-rd ← rd XOR sxt(simm)
+[reg(r, ?(rd)), simm(?(simm))]
+------------------------------
+?(rd)<- ?(rd)xor sxt(?(simm))
 ```
 
 ###### Module
@@ -977,11 +955,9 @@ rd ← rd XOR sxt(simm)
 ###### Semantics
 
 ```
-[reg(r, rd), simm(simm)]
--------------------------------------------------------
-rd ← rd\s + sxt(simm) + bit($CC, #carry_flag_bit)\16\s;
-bit($CC, #carry_flag_bit) ← attr(cpu/alu/carryout);
-bit($CC, #overflow_flag_bit) ← attr(cpu/alu/overflow)
+[reg(r, ?(rd)), simm(?(simm))]
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+?(rd)<- ?(rd)\s+sxt(?(simm))+bit($$(cc), #(carry_flag_bit))\16\s;bit($$(cc), #(carry_flag_bit))<-attr(cpu/alu/carryout);bit($$(cc), #(overflow_flag_bit))<-attr(cpu/alu/overflow)
 ```
 
 ###### Module
@@ -1008,11 +984,9 @@ bit($CC, #overflow_flag_bit) ← attr(cpu/alu/overflow)
 ###### Semantics
 
 ```
-[reg(r, rd), simm(simm)]
--------------------------------------------------------
-rd ← rd\s - sxt(simm) - bit($CC, #carry_flag_bit)\16\s;
-bit($CC, #carry_flag_bit) ← attr(cpu/alu/carryout);
-bit($CC, #overflow_flag_bit) ← attr(cpu/alu/overflow)
+[reg(r, ?(rd)), simm(?(simm))]
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+?(rd)<- ?(rd)\s-sxt(?(simm))-bit($$(cc), #(carry_flag_bit))\16\s;bit($$(cc), #(carry_flag_bit))<-attr(cpu/alu/carryout);bit($$(cc), #(overflow_flag_bit))<-attr(cpu/alu/overflow)
 ```
 
 ###### Module
@@ -1039,10 +1013,9 @@ bit($CC, #overflow_flag_bit) ← attr(cpu/alu/overflow)
 ###### Semantics
 
 ```
-[reg(r, rd), imm(imm)]
----------------------------------------------
-bit($CC, #carry_flag_bit) ← bit(rd, imm - 1);
-rd ← (rd>>imm)\i\16
+[reg(r, ?(rd)), imm(?(imm))]
+-------------------------------------------------------------------------------------
+bit($$(cc), #(carry_flag_bit))<-bit(?(rd), ?(imm)- #(1));?(rd)<-(?(rd)>> ?(imm))\i\16
 ```
 
 ###### Module
@@ -1069,10 +1042,9 @@ rd ← (rd>>imm)\i\16
 ###### Semantics
 
 ```
-[reg(r, rd), imm(imm)]
-----------------------------------------------
-bit($CC, #carry_flag_bit) ← bit(rd, 16 - imm);
-rd ← (rd<<imm)\i\16
+[reg(r, ?(rd)), imm(?(imm))]
+--------------------------------------------------------------------------------------
+bit($$(cc), #(carry_flag_bit))<-bit(?(rd), #(16)- ?(imm));?(rd)<-(?(rd)<< ?(imm))\i\16
 ```
 
 ###### Module
@@ -1099,12 +1071,9 @@ rd ← (rd<<imm)\i\16
 ###### Semantics
 
 ```
-[reg(r, rd), imm(imm)]
-----------------------------------------------------------
-let sign := bit(rd, 15);
-let sign_extension := sxt(sign - 1)<<#reg_size_bits - imm;
-bit($CC, #carry_flag_bit) ← bit(rd, imm - 1);
-rd ← rd>>imm OR sign_extension
+[reg(r, ?(rd)), imm(?(imm))]
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+?(sign):=bit(?(rd), #(15));?(sign_extension):=sxt(?(sign)- #(1))<<(#(reg_size_bits)- ?(imm));bit($$(cc), #(carry_flag_bit))<-bit(?(rd), ?(imm)- #(1));?(rd)<- ?(rd)>> ?(imm)or?(sign_extension)
 ```
 
 ###### Module
@@ -1131,9 +1100,9 @@ rd ← rd>>imm OR sign_extension
 ###### Semantics
 
 ```
-[reg(r, rs), imm(imm)]
----------------------------
-b_push($TS, bit([rs], imm))
+[reg(r, ?(rs)), imm(?(imm))]
+------------------------------------
+b_push($$(ts), bit([?(rs)], ?(imm)))
 ```
 
 ###### Module
@@ -1160,9 +1129,9 @@ b_push($TS, bit([rs], imm))
 ###### Semantics
 
 ```
-[reg(r, rs), imm(imm)]
--------------------------
-[rs] ← [rs] AND ~(1<<imm)
+[reg(r, ?(rs)), imm(?(imm))]
+------------------------------------
+[?(rs)]<-[?(rs)]and~ (#(1)<< ?(imm))
 ```
 
 ###### Module
@@ -1189,9 +1158,9 @@ b_push($TS, bit([rs], imm))
 ###### Semantics
 
 ```
-[reg(r, rs), imm(imm)]
-----------------------
-[rs] ← [rs] OR 1<<imm
+[reg(r, ?(rs)), imm(?(imm))]
+-------------------------------
+[?(rs)]<-[?(rs)]or#(1)<< ?(imm)
 ```
 
 ###### Module
@@ -1231,17 +1200,9 @@ b_push($TS, bit([rs], imm))
 ###### Semantics
 
 ```
-[reg(t, multiplicand_hi):reg(s, multiplicand_lo), reg(r, multiplier)]
----------------------------------------------------------------------
-let mask := ~(multiplier AND 1) - 1;
-let masked_lo := multiplicand_lo AND mask;
-let masked_hi := multiplicand_hi AND mask;
-lo($MP) ← lo($MP) + masked_lo;
-hi($MP) ← hi($MP) + masked_hi + attr(cpu/alu/carryout);
-let shift_cout := bit(multiplicand_lo, #reg_size_bits - 1);
-multiplicand_lo ← multiplicand_lo<<1;
-multiplicand_hi ← multiplicand_hi<<1 + shift_cout;
-multiplier ← multiplier div 2
+[reg(t, ?(multiplicand_hi)):reg(s, ?(multiplicand_lo)), reg(r, ?(multiplier))]
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+?(mask):= ~ ((?(multiplier)and#(1))- #(1));?(masked_lo):= ?(multiplicand_lo)and?(mask);?(masked_hi):= ?(multiplicand_hi)and?(mask);lo($$(mp))<-lo($$(mp))+ ?(masked_lo);hi($$(mp))<-hi($$(mp))+ ?(masked_hi)+attr(cpu/alu/carryout);?(shift_cout):=bit(?(multiplicand_lo), #(reg_size_bits)- #(1));?(multiplicand_lo)<- ?(multiplicand_lo)<< #(1);?(multiplicand_hi)<- ?(multiplicand_hi)<<(#(1)+ ?(shift_cout));?(multiplier)<- ?(multiplier)div#(2)
 ```
 
 ###### Module
@@ -1276,10 +1237,9 @@ multiplier ← multiplier div 2
 ###### Semantics
 
 ```
-[reg(r, rd), reg(s, rs)]
----------------------------------------------------
-bit($CC, #carry_flag_bit) ← attr(cpu/alu/carryout);
-rd ← rd + rs
+[reg(r, ?(rd)), reg(s, ?(rs))]
+---------------------------------------------------------------------------
+bit($$(cc), #(carry_flag_bit))<-attr(cpu/alu/carryout);?(rd)<- ?(rd)+ ?(rs)
 ```
 
 ###### Module
@@ -1306,9 +1266,9 @@ rd ← rd + rs
 ###### Semantics
 
 ```
-[reg(r, rd), reg(s, rs)]
-------------------------
-rd ← rd - rs
+[reg(r, ?(rd)), reg(s, ?(rs))]
+------------------------------
+?(rd)<- ?(rd)- ?(rs)
 ```
 
 ###### Module
@@ -1335,9 +1295,9 @@ rd ← rd - rs
 ###### Semantics
 
 ```
-[reg(r, rd), reg(s, rs)]
-------------------------
-rd ← rd AND rs
+[reg(r, ?(rd)), reg(s, ?(rs))]
+------------------------------
+?(rd)<- ?(rd)and?(rs)
 ```
 
 ###### Module
@@ -1364,9 +1324,9 @@ rd ← rd AND rs
 ###### Semantics
 
 ```
-[reg(r, rd), reg(s, rs)]
-------------------------
-rd ← rd OR rs
+[reg(r, ?(rd)), reg(s, ?(rs))]
+------------------------------
+?(rd)<- ?(rd)or?(rs)
 ```
 
 ###### Module
@@ -1393,9 +1353,9 @@ rd ← rd OR rs
 ###### Semantics
 
 ```
-[reg(r, rd), reg(s, rs)]
-------------------------
-rd ← rd XOR rs
+[reg(r, ?(rd)), reg(s, ?(rs))]
+------------------------------
+?(rd)<- ?(rd)xor?(rs)
 ```
 
 ###### Module
@@ -1422,9 +1382,9 @@ rd ← rd XOR rs
 ###### Semantics
 
 ```
-[reg(r, rd), reg(s, rs)]
-------------------------
-rd ← rs
+[reg(r, ?(rd)), reg(s, ?(rs))]
+------------------------------
+?(rd)<- ?(rs)
 ```
 
 ###### Module
@@ -1451,11 +1411,9 @@ rd ← rs
 ###### Semantics
 
 ```
-[reg(r, rd), reg(s, rs)]
------------------------------------------------------
-rd ← rd + rs + bit($CC, #carry_flag_bit)\16;
-bit($CC, #carry_flag_bit) ← attr(cpu/alu/carryout);
-bit($CC, #overflow_flag_bit) ← attr(cpu/alu/overflow)
+[reg(r, ?(rd)), reg(s, ?(rs))]
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+?(rd)<- ?(rd)+ ?(rs)+bit($$(cc), #(carry_flag_bit))\16;bit($$(cc), #(carry_flag_bit))<-attr(cpu/alu/carryout);bit($$(cc), #(overflow_flag_bit))<-attr(cpu/alu/overflow)
 ```
 
 ###### Module
@@ -1482,11 +1440,9 @@ bit($CC, #overflow_flag_bit) ← attr(cpu/alu/overflow)
 ###### Semantics
 
 ```
-[reg(r, rd), reg(s, rs)]
------------------------------------------------------
-rd ← rd - rs - bit($CC, #carry_flag_bit)\16;
-bit($CC, #carry_flag_bit) ← attr(cpu/alu/carryout);
-bit($CC, #overflow_flag_bit) ← attr(cpu/alu/overflow)
+[reg(r, ?(rd)), reg(s, ?(rs))]
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+?(rd)<- ?(rd)- ?(rs)-bit($$(cc), #(carry_flag_bit))\16;bit($$(cc), #(carry_flag_bit))<-attr(cpu/alu/carryout);bit($$(cc), #(overflow_flag_bit))<-attr(cpu/alu/overflow)
 ```
 
 ###### Module
@@ -1518,9 +1474,9 @@ bit($CC, #overflow_flag_bit) ← attr(cpu/alu/overflow)
 ###### Semantics
 
 ```
-[reg(r, r1), reg(s, r2)]
--------------------------------------
-b_push($TS, compare(r1, <(s\16), r2))
+[reg(r, ?(r1)), reg(s, ?(r2))]
+----------------------------------------------
+b_push($$(ts), compare(?(r1), <(s\16), ?(r2)))
 ```
 
 ###### Module
@@ -1547,9 +1503,9 @@ b_push($TS, compare(r1, <(s\16), r2))
 ###### Semantics
 
 ```
-[reg(r, r1), reg(s, r2)]
---------------------------------------
-b_push($TS, compare(r1, >=(s\16), r2))
+[reg(r, ?(r1)), reg(s, ?(r2))]
+-----------------------------------------------
+b_push($$(ts), compare(?(r1), >=(s\16), ?(r2)))
 ```
 
 ###### Module
@@ -1576,9 +1532,9 @@ b_push($TS, compare(r1, >=(s\16), r2))
 ###### Semantics
 
 ```
-[reg(r, r1), reg(s, r2)]
--------------------------------------
-b_push($TS, compare(r1, <(u\16), r2))
+[reg(r, ?(r1)), reg(s, ?(r2))]
+----------------------------------------------
+b_push($$(ts), compare(?(r1), <(u\16), ?(r2)))
 ```
 
 ###### Module
@@ -1605,9 +1561,9 @@ b_push($TS, compare(r1, <(u\16), r2))
 ###### Semantics
 
 ```
-[reg(r, r1), reg(s, r2)]
---------------------------------------
-b_push($TS, compare(r1, >=(u\16), r2))
+[reg(r, ?(r1)), reg(s, ?(r2))]
+-----------------------------------------------
+b_push($$(ts), compare(?(r1), >=(u\16), ?(r2)))
 ```
 
 ###### Module
@@ -1639,9 +1595,9 @@ b_push($TS, compare(r1, >=(u\16), r2))
 ###### Semantics
 
 ```
-[reg(r, r1), reg(s, r2)]
-------------------------
-b_push($TS, r1 ≠ r2)
+[reg(r, ?(r1)), reg(s, ?(r2))]
+------------------------------
+b_push($$(ts), ?(r1)\= ?(r2))
 ```
 
 ###### Module
@@ -1668,9 +1624,9 @@ b_push($TS, r1 ≠ r2)
 ###### Semantics
 
 ```
-[reg(r, r1), reg(s, r2)]
-------------------------
-b_push($TS, r1 == r2)
+[reg(r, ?(r1)), reg(s, ?(r2))]
+------------------------------
+b_push($$(ts), ?(r1)== ?(r2))
 ```
 
 ###### Module
@@ -1705,8 +1661,8 @@ b_push($TS, r1 == r2)
 ###### Semantics
 
 ```
-[reg(r, rs)]
-------------
+[reg(r, ?(rs))]
+---------------
 todo
 ```
 
@@ -1734,8 +1690,8 @@ todo
 ###### Semantics
 
 ```
-[reg(r, rs)]
-------------
+[reg(r, ?(rs))]
+---------------
 todo
 ```
 
@@ -1763,8 +1719,8 @@ todo
 ###### Semantics
 
 ```
-[reg(r, rd)]
-------------
+[reg(r, ?(rd))]
+---------------
 todo
 ```
 
@@ -1792,8 +1748,8 @@ todo
 ###### Semantics
 
 ```
-[reg(r, rd)]
-------------
+[reg(r, ?(rd))]
+---------------
 todo
 ```
 
@@ -1821,10 +1777,9 @@ todo
 ###### Semantics
 
 ```
-[reg(r, abs_lbl)]
------------------
-$PC ← abs_lbl;
-$RA ← $PC + 2
+[reg(r, ?(abs_lbl))]
+-----------------------------------------
+$$(pc)<- ?(abs_lbl);$$(ra)<- $$(pc)+ #(2)
 ```
 
 ###### Module
@@ -1851,9 +1806,9 @@ $RA ← $PC + 2
 ###### Semantics
 
 ```
-[reg(r, abs_lbl)]
------------------
-$PC ← abs_lbl
+[reg(r, ?(abs_lbl))]
+--------------------
+$$(pc)<- ?(abs_lbl)
 ```
 
 ###### Module
@@ -1880,9 +1835,9 @@ $PC ← abs_lbl
 ###### Semantics
 
 ```
-[reg(r, rd)]
-------------
-rd ← -rd
+[reg(r, ?(rd))]
+---------------
+?(rd)<- - ?(rd)
 ```
 
 ###### Module
@@ -1909,9 +1864,9 @@ rd ← -rd
 ###### Semantics
 
 ```
-[reg(r, rd)]
---------------
-rd ← sxt(rd\8)
+[reg(r, ?(rd))]
+-------------------
+?(rd)<-sxt(?(rd)\8)
 ```
 
 ###### Module
@@ -1943,9 +1898,9 @@ rd ← sxt(rd\8)
 ###### Semantics
 
 ```
-[reg(r, rd)]
-------------
-rd ← lo($MP)
+[reg(r, ?(rd))]
+-----------------
+?(rd)<-lo($$(mp))
 ```
 
 ###### Module
@@ -1972,9 +1927,9 @@ rd ← lo($MP)
 ###### Semantics
 
 ```
-[reg(r, rd)]
-------------
-rd ← hi($MP)
+[reg(r, ?(rd))]
+-----------------
+?(rd)<-hi($$(mp))
 ```
 
 ###### Module
@@ -2001,9 +1956,9 @@ rd ← hi($MP)
 ###### Semantics
 
 ```
-[reg(r, rd)]
-------------
-rd ← $GP
+[reg(r, ?(rd))]
+---------------
+?(rd)<- $$(gp)
 ```
 
 ###### Module
@@ -2030,9 +1985,9 @@ rd ← $GP
 ###### Semantics
 
 ```
-[reg(r, rs)]
-------------
-$GP ← rs
+[reg(r, ?(rs))]
+---------------
+$$(gp)<- ?(rs)
 ```
 
 ###### Module
@@ -2068,8 +2023,8 @@ $GP ← rs
 
 ```
 []
-------------------
-$PC ← #nonexe0_isr
+-----------------------
+$$(pc)<- #(nonexe0_isr)
 ```
 
 ###### Module
@@ -2097,8 +2052,8 @@ $PC ← #nonexe0_isr
 
 ```
 []
------------------
-$PC ← #unimpl_isr
+----------------------
+$$(pc)<- #(unimpl_isr)
 ```
 
 ###### Module
@@ -2126,8 +2081,8 @@ $PC ← #unimpl_isr
 
 ```
 []
-----------------
-$PC ← #break_isr
+---------------------
+$$(pc)<- #(break_isr)
 ```
 
 ###### Module
@@ -2155,8 +2110,8 @@ $PC ← #break_isr
 
 ```
 []
----------
-$PC ← $KR
+---------------
+$$(pc)<- $$(kr)
 ```
 
 ###### Module
@@ -2184,10 +2139,8 @@ $PC ← $KR
 
 ```
 []
---------------
-$KR ← $PC + 2;
-$PC ← $v;
-todo
+--------------------------------------
+$$(kr)<- $$(pc)+ #(2);$$(pc)<- $v;todo
 ```
 
 ###### Module
@@ -2215,8 +2168,8 @@ todo
 
 ```
 []
----------
-$PC ← $RA
+---------------
+$$(pc)<- $$(ra)
 ```
 
 ###### Module
@@ -2244,8 +2197,8 @@ $PC ← $RA
 
 ```
 []
------------------------------------------
-b_push($TS, bit($CC, #overflow_flag_idx))
+-------------------------------------------------
+b_push($$(ts), bit($$(cc), #(overflow_flag_idx)))
 ```
 
 ###### Module
@@ -2273,8 +2226,8 @@ b_push($TS, bit($CC, #overflow_flag_idx))
 
 ```
 []
---------------------------------------
-b_push($TS, bit($CC, #carry_flag_idx))
+----------------------------------------------
+b_push($$(ts), bit($$(cc), #(carry_flag_idx)))
 ```
 
 ###### Module
@@ -2302,8 +2255,8 @@ b_push($TS, bit($CC, #carry_flag_idx))
 
 ```
 []
------------------------------
-bit($CC, #carry_flag_idx) ← 0
+-------------------------------------
+bit($$(cc), #(carry_flag_idx))<- #(0)
 ```
 
 ###### Module
@@ -2331,8 +2284,8 @@ bit($CC, #carry_flag_idx) ← 0
 
 ```
 []
------------------------------
-bit($CC, #carry_flag_idx) ← 1
+-------------------------------------
+bit($$(cc), #(carry_flag_idx))<- #(1)
 ```
 
 ###### Module
@@ -2360,8 +2313,8 @@ bit($CC, #carry_flag_idx) ← 1
 
 ```
 []
---------------
-b_push($TS, 0)
+--------------------
+b_push($$(ts), #(0))
 ```
 
 ###### Module
@@ -2389,8 +2342,8 @@ b_push($TS, 0)
 
 ```
 []
---------------
-b_push($TS, 1)
+--------------------
+b_push($$(ts), #(1))
 ```
 
 ###### Module
@@ -2418,8 +2371,8 @@ b_push($TS, 1)
 
 ```
 []
-------------------------
-b_push($TS, ~b_pop($TS))
+------------------------------
+b_push($$(ts), ~b_pop($$(ts)))
 ```
 
 ###### Module
@@ -2809,14 +2762,8 @@ todo
 
 ```
 []
-------------------------------------------------------
-if bit($CC, #jmp_tgt_validation_en_flag_bit) {
-    if bit($CC, #jmp_tgt_validation_req_flag_bit) {
-        bit($CC, #jmp_tgt_validation_req_flag_bit) ← 0
-    } else {
-        exception(ILLINSTR)
-    }
-}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+if(bit($$(cc), #(jmp_tgt_validation_en_flag_bit)), if(bit($$(cc), #(jmp_tgt_validation_req_flag_bit)), (bit($$(cc), #(jmp_tgt_validation_req_flag_bit))<- #(0)), exception(ILLINSTR)))
 ```
 
 ###### Module
