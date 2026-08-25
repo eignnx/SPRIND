@@ -7,7 +7,10 @@
     output_to_file/2,
     atom_slugified/2,
     codes_slugified/2,
-    write_phrase/1
+    write_phrase/1,
+    before_after//2,
+    get//1,
+    put//1
 ]).
 
 :- use_module(library(clpfd)).
@@ -121,6 +124,11 @@ write_phrase(Nonterminal) :-
     phrase(Nonterminal, Codes),
     format('~s', [Codes]),
 end.
+
+
+before_after(Old, New), [New] --> [Old].
+get(State) --> before_after(State, State).
+put(State) --> before_after(_, State).
 
 
 end.
