@@ -17,6 +17,7 @@
     fmt/1,
     gprreg/1,
     sysreg/1,
+    sysreg_size/2,
     fmt_instr/2,
     fmt_genericfmt/2,
     cpu_exception/1
@@ -355,6 +356,7 @@ gfmt(GFmt) :-
 
 gprreg(R) :- regname_uses(R, _).
 sysreg(Name) :- sysregname_name_size_description(Name, _, _, _).
+sysreg_size(Name, Size) :- sysregname_name_size_description(Name, _, Size, _).
 
 fmt_instr(Fmt, Instr) :- fmt_instr_title(Fmt, Instr, _).
 

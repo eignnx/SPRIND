@@ -60,10 +60,6 @@ bv_signed(bv(BvS), S, SizeS) :-
     bv_unsigned_(BvU, SizeU, U),
     S #= -1 * SignBit * 2^SizeU + U.
 
-signbit_compare(SignBit, N) :-
-    SignBit #<==> 0 #< N,
-    label([SignBit]).
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 bv_bitwise_unop(UnaryOp, bv(A), bv(B)) :-
@@ -139,6 +135,20 @@ bv_slice(bv(B), Start, End, bv(Slice)) :-
     n_list_front_lastn(Len, EndDropped, _, Slice),
 true.
 
+% We require that `size(Tgt) == 2^size(Idx)`.
+% We could return a default (either 0 or 1) when the index is out of
+% bounds, but that choice would be arbitrary. If Tgt was an unsigned value, 0
+% should be the default, while if it represents a signed value, 1 should be the
+% default. So basically, you should just use `zxt_log2` or `sxt_log2` on Tgt
+% before using this predicate.
+bv_bit(bv(Tgt), bv(Idx), Bit) :-
+    bv_unsigned(bv(Idx), IdxU),
+    ( nth0(IdxU, Tgt, Bit) -> true ;
+        bv_size(bv(Tgt), TgtSz),
+        succ(MaxIdx, TgtSz),
+        type_error(between(0, MaxIdx), IdxU)
+    ).
+
 bv_zero_extend(Bv0, NewSize, Bv) :-
     bv_size(Bv0, Bv0Size),
     PadSize #= NewSize - Bv0Size, PadSize #>= 0,
@@ -152,6 +162,28 @@ bv_sign_extend(Bv0, NewSize, Bv) :-
     bv_size(Bv0, Bv0Size),
     PadSize #= NewSize - Bv0Size, PadSize #>= 0,
     length(Padding, PadSize),
+    maplist(=(SignBit), Padding),
+    bv_concat(bv(Padding), Bv0, Bv).
+
+% Zero-extends the value until it's size is a power of 2. If already a power of
+% 2, do nothing.
+bv_zero_extend_log2(Bv0, NewSize, Bv) :-
+    bv_signbit_extend_log2(Bv0, NewSize, Bv, 0).
+
+bv_sign_extend_log2(Bv0, NewSize, Bv) :-
+    bv([SignBit|_]) = Bv0,
+    bv_signbit_extend_log2(Bv0, NewSize, Bv, SignBit).
+
+:- det(bv_signbit_extend_log2/4).
+bv_signbit_extend_log2(Bv0, NewSize, Bv, SignBit) :-
+    bv_size(Bv0, OldSize),
+    N in 1..sup,
+    2^(N-1) #< OldSize, OldSize #=< 2^N,
+    NewSize #= 2^N,
+    PaddingSz in 0..sup,
+    PaddingSz #= NewSize - OldSize,
+    label([PaddingSz]),
+    length(Padding, PaddingSz),
     maplist(=(SignBit), Padding),
     bv_concat(bv(Padding), Bv0, Bv).
 
@@ -200,25 +232,25 @@ interpretation(Program, NextState) :-
     phrase(Program, [InitState], [NextState]).
 
 set_reg(Reg, Value) -->
-    get(Before),
+    get_state(Before),
     { AlreadySet = Before.get(next/regs/Reg) ->
         throw(error(signal_already_set(next/regs/Reg, AlreadySet), _))
     ;
         After = Before.put(next/regs/Reg, Value)
     },
-    put(After).
+    put_state(After).
 
 set_sysreg(Reg, Value) -->
-    get(Before),
+    get_state(Before),
     { AlreadySet = Before.get(next/sysregs/Reg) ->
         throw(error(signal_already_set(next/sysregs/Reg, AlreadySet), _))
     ;
         After = Before.put(next/sysregs/Reg, Value)
     },
-    put(After).
+    put_state(After).
 
 set_memaddr(AddrBv, Value) -->
-    get(Before),
+    get_state(Before),
     { MemNext = Before.get(next/mem) },
     { bv_unsigned(AddrBv, Addr, 16) },
     { get_assoc(Addr, Before.next.mem, AlreadySet) ->
@@ -227,17 +259,17 @@ set_memaddr(AddrBv, Value) -->
         put_assoc(Addr, MemNext, Value, NewMemNext),
         After = Before.put(next/mem, NewMemNext)
     },
-    put(After).
+    put_state(After).
 
 get_memaddr(AddrBv, Value) -->
-    get(State),
+    get_state(State),
     { bv_unsigned(AddrBv, Addr, 16) },
     { get_assoc(Addr, State.curr.mem, Value) }.
 
 add_binding(Var, Val, Ty) -->
-    get(Before),
+    get_state(Before),
     { After = Before.put(bindings, [Var-Val-Ty | Before.bindings]) },
-    put(After).
+    put_state(After).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% EVALUATOR %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

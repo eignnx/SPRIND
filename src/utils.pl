@@ -9,8 +9,9 @@
     codes_slugified/2,
     write_phrase/1,
     before_after//2,
-    get//1,
-    put//1
+    get_state//1,
+    put_state//1,
+    signbit_compare/2
 ]).
 
 :- use_module(library(clpfd)).
@@ -127,8 +128,15 @@ end.
 
 
 before_after(Old, New), [New] --> [Old].
-get(State) --> before_after(State, State).
-put(State) --> before_after(_, State).
+get_state(State) --> before_after(State, State).
+put_state(State) --> before_after(_, State).
 
+
+%! signbit_compare(SignBit:oneof([0,1]), N:integer) is det.
+%
+% Like `zcompare` but for negative/nonnegative only.
+signbit_compare(SignBit, N) :-
+    SignBit #<==> 0 #< N,
+    label([SignBit]).
 
 end.
