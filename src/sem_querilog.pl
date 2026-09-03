@@ -10,7 +10,7 @@ instr_info(lb, info{
     ex: ['lb w, [sp+12]'],
     syntax: { reg(r, ?rs), [reg(s, ?rd) + simm(?simm)] },
     sem: (
-        ?ptr := (?rs\s + sxt(?simm))\u;
+        ?ptr := (?rs + sxt(?simm));
         ?rd <- zxt(mem(?ptr))
     ),
     tags: [mem, load, byte],
@@ -22,7 +22,7 @@ instr_info(lw, info{
     ex: ['lw w, [sp+12]'],
     syntax: { reg(r, ?rs), [reg(s, ?rd) + simm(?simm)] },
     sem: (
-        ?ptr := ((?rs\s + sxt(?simm)) and #(-2)\16)\u;
+        ?ptr := ((?rs + sxt(?simm)) and #(-2)\16);
         ?rd <- {mem(?ptr + #1), mem(?ptr)}
     ),
     tags: [mem, load, word],
@@ -34,8 +34,8 @@ instr_info(sb, info{
     ex: ['sb [sp-20], x'],
     syntax: { [reg(r, ?rd) + simm(?simm)], reg(s, ?rs) },
     sem: (
-        ?ptr := ?rd\s + sxt(?simm);
-        [?ptr\u] <- lo(?rs)
+        ?ptr := ?rd + sxt(?simm);
+        mem(?ptr) <- lo(?rs)
     ),
     tags: [mem, store, byte],
     module: [base]
@@ -46,9 +46,9 @@ instr_info(sw, info{
     ex: ['sw [sp-20], x'],
     syntax: { [reg(r, ?rd) + simm(?simm)], reg(s, ?rs) },
     sem: (
-        ?ptr := ((?rd\s + sxt(?simm)) and #0b1111111111111110)\u;
-        [?ptr] <- lo(?rs);
-        [?ptr + #1] <- hi(?rs)
+        ?ptr := (?rd + sxt(?simm)) and ~(#1\16);
+        mem(?ptr) <- lo(?rs);
+        mem(?ptr + #1) <- hi(?rs)
     ),
     tags: [mem, store, word],
     module: [base]
@@ -65,7 +65,7 @@ instr_info(call, info{
     )),
     sem: (
         ?offset := ?arg;
-        $$pc <- $$pc\s + (sxt(?offset) << #subr_align);
+        $$pc <- $$pc + (sxt(?offset) << #subr_align);
         $$ra <- $$pc + #2
     ),
     tags: [pc, ra],
@@ -83,7 +83,7 @@ instr_info(b, info{
     )),
     sem: (
         ?offset := ?arg;
-        $$pc <- $$pc\s + sxt(?offset)
+        $$pc <- $$pc + sxt(?offset)
     ),
     tags: [pc],
     module: [base]
@@ -92,14 +92,16 @@ instr_info(bt, info{
     title: 'Branch If True',
     descr: 'Branch to the specified address if the condition is true by adding the immediate offset to `$PC`.',
     ex: ['bt SOME_LABEL'],
-    syntax: { simm(?arg) } -> (
+    syntax: ({ simm(?arg) } -> (
         ?abs_lbl := ?arg;
         ?rel_lbl := ?abs_lbl - #asm_pc;
         { ?rel_lbl\size(imm) }
-    ),
-    sem: if(b_pop($$ts),
+    )),
+    sem: (
         ?offset := ?arg;
-        $$pc <- $$pc\s + sxt(?offset)
+        ?tos := bit($$ts, #0);
+        $$ts <- $$ts >> #1;
+        $$pc <- if(?tos, $$pc + sxt(?offset), $$pc)
     ),
     tags: [pc, cond],
     module: [base]
@@ -113,9 +115,11 @@ instr_info(bf, info{
         ?rel_lbl := ?abs_lbl - #asm_pc;
         { ?rel_lbl\size(imm) }
     ),
-    sem: if(~b_pop($$ts),
+    sem: (
         ?offset := ?arg;
-        $$pc <- $$pc\s + sxt(?offset)
+        ?tos := bit($$ts, #0);
+        $$ts <- $$ts >> #1;
+        $$pc <- if(?tos, $$pc, $$pc + sxt(?offset))
     ),
     tags: [pc, cond],
     module: [base]
@@ -135,7 +139,7 @@ instr_info(szi, info{
     descr: 'Left-shift a zero-extended immediate value into a register.',
     ex: ['szi x, 0xB3'],
     syntax: { reg(r, ?rd), imm(?imm) },
-    sem: ?rd <- (?rd << #8)\16 or zxt(?imm),
+    sem: ?rd <- (?rd << #8) or zxt(?imm),
     tags: [zxt, data, shift],
     module: [base]
 }).
@@ -145,7 +149,10 @@ instr_info(lgb, info{
     descr: 'Load a byte from a memory address offset from `$GP`.',
     ex: ['lgb x, [gp+8]'],
     syntax: { reg(r, ?rd), [reg(s, ?rs) + imm(?disp)] },
-    sem: ?rd <- zxt([$$gp\u + zxt(?disp)]),
+    sem: (
+        ?ptr := $$gp + zxt(?disp);
+        ?rd <- zxt(mem(?ptr))
+    ),
     tags: [mem, load, global, byte],
     module: [globals]
 }).
@@ -155,8 +162,8 @@ instr_info(lgw, info{
     ex: ['lgw x, [gp+8]'],
     syntax: { reg(r, ?rd), [reg(s, ?rs) + imm(?disp)] },
     sem: (
-        ?ptr := (($$gp\u + zxt(?disp)) and #0b1111111111111110)\u;
-        ?rd <- {[?ptr + #1], [?ptr]}
+        ?ptr := ($$gp + zxt(?disp)) and ~(#1);
+        ?rd <- {mem(?ptr + #1), mem(?ptr)}
     ),
     tags: [mem, load, global, word],
     module: [globals]
@@ -166,7 +173,10 @@ instr_info(sgb, info{
     descr: 'Store a byte into memory address offset from `$GP`.',
     ex: ['sgb [gp+8], x'],
     syntax: { [reg(r, ?rd) + imm(?disp)], reg(s, ?rs) },
-    sem: [$$gp\u + zxt(?disp)] <- lo(?rs),
+    sem: (
+        ?ptr := $$gp + zxt(?disp);
+        mem(?ptr) <- lo(?rs)
+    ),
     tags: [mem, store, global, byte],
     module: [globals]
 }).
@@ -176,8 +186,8 @@ instr_info(sgw, info{
     ex: ['sgw [gp+8], x'],
     syntax: { [reg(r, ?rd) + imm(?disp)], reg(s, ?rs) },
     sem: (
-        ?ptr := (($$gp\u + zxt(?disp)) and #0b1111111111111110)\u;
-        {[?ptr + #1], [?ptr]} <- ?rs
+        ?ptr := ($$gp + zxt(?disp)) and ~(#1);
+        {mem(?ptr + #1), mem(?ptr)} <- ?rs
     ),
     tags: [mem, store, global, word],
     module: [globals]
@@ -188,9 +198,9 @@ instr_info(tbit, info{
     ex: ['tbit 12, w'],
     syntax: { imm(?bit_idx), reg(r, ?rs) },
     sem: (
-        ?shamt := bitslice(?bit_idx, #3 .. #0);
-        ?bit := (?rs >> ?shamt\u) and #1;
-        b_push($$ts, ?bit == #1)
+        ?shamt := ?bit_idx\4;
+        ?bit := (?rs >> ?shamt) and #1;
+        $$ts <- ($$ts << #1) or ?bit
     ),
     tags: [ts, bit, bitwise],
     module: [bittests]
@@ -201,7 +211,7 @@ instr_info(cbit, info{
     ex: ['cbit 9, v'],
     syntax: { imm(?bit_idx), reg(r, ?rd) },
     sem: (
-        ?idx := bitslice(?bit_idx, #3 .. #0)\u;
+        ?idx := ?bit_idx\4;
         ?mask := ~(#1 << ?idx);
         ?rd <- ?rd and ?mask
     ),
@@ -214,7 +224,7 @@ instr_info(sbit, info{
     ex: ['sbit 15, a'],
     syntax: { imm(?bit_idx), reg(r, ?rd) },
     sem: (
-        ?idx := bitslice(?bit_idx, #3 .. #0)\u;
+        ?idx := ?bit_idx\4;
         ?mask := ~(#1 << ?idx);
         ?rd <- ?rd or ?mask
     ),
@@ -226,7 +236,24 @@ instr_info(tli, info{
     descr: 'Test if a register value is less than an immediate value via signed comparison.',
     ex: ['tli x, -5'],
     syntax: { reg(r, ?rs), simm(?simm) },
-    sem: b_push($$ts, compare(?rs\s, <(s\16), sxt(?simm))),
+    sem: (
+        % Comparison is often implemented with a dummy subtraction, where the
+        % flags in the computer's status register are checked, but the main
+        % result is ignored.
+        adder{
+            x: ?rs, y: ~(sxt(?simm)), carryin: #1,
+            sum: ?diff, signin: ?sin, carryout: ?cout
+        };
+        % Internally, the overflow flag is usually generated by an exclusive or
+        % of the internal carry into and out of the sign bit.
+        ?overflow := ?sin xor ?cout;
+        % If the exclusive-or of the sign and overflow flags is 1, the
+        % subtraction result was less than zero, otherwise the result was zero
+        % or greater.
+        ?sign := bit(?diff, #15);
+        ?bit := ?overflow xor ?sign;
+        $$ts <- ($$ts << #1) or zxt(?bit)
+    ),
     tags: [ts, cmp, inequality, signed, '<'],
     module: [imms]
 }).
@@ -340,12 +367,12 @@ instr_info(subicy, info{
 }).
 instr_info(lsr, info{
     title: 'Logical Shift Right',
-    descr: 'Perform a logical shift right on a register by an immediate value.',
+    descr: 'Perform a logical shift right on a register by a 4-bit immediate value.',
     ex: ['lsr x, 15'],
     syntax: { reg(r, ?rd), imm(?imm) },
     sem: (
-        bit($$cc, #carry_flag_bit) <- bit(?rd, ?imm - #1);
-        ?rd <- (?rd >> ?imm)\i\16
+        bit($$cc, #carry_flag_bit) <- bit(?rd, ?imm\4 - #1);
+        ?rd <- ?rd >> ?imm\4
     ),
     tags: [bitwise, shift, right],
     module: [base]
@@ -356,8 +383,8 @@ instr_info(lsl, info{
     ex: ['lsl x, 8'],
     syntax: { reg(r, ?rd), imm(?imm) },
     sem: (
-        bit($$cc, #carry_flag_bit) <- bit(?rd, bitslice(#16 - ?imm, 0..4));
-        ?rd <- ?rd << ?imm
+        bit($$cc, #carry_flag_bit) <- bit(?rd, #16 - ?imm\4);
+        ?rd <- ?rd << ?imm\4
     ),
     tags: [zxt, bitwise, shift, left],
     module: [base]
@@ -684,7 +711,7 @@ instr_info('NONEXE0', info{
     descr: 'Triggers a "non-executable instruction" exception. The entire instruction is 16 `0`s.',
     ex: ['NONEXE0'],
     syntax: {},
-    sem: $$pc <- #nonexe0_isr,
+    sem: $$pc <- #'isr.nonexe0',
     tags: [], % Giving this no tags ensures it gets sorted into the 0-most branch of the optree.
     module: [base]
 }).
@@ -693,7 +720,7 @@ instr_info('BREAK', info{
     descr: 'Trigger a breakpoint.',
     ex: ['BREAK'],
     syntax: {},
-    sem: $$pc <- #break_isr,
+    sem: $$pc <- #'isr.break',
     tags: [exc, dbg],
     module: [dbg]
 }).
@@ -702,7 +729,7 @@ instr_info('UNIMPL', info{
     descr: 'Unimplemented instruction.',
     ex: ['UNIMPL'],
     syntax: {},
-    sem: $$pc <- #unimpl_isr,
+    sem: $$pc <- #'isr.unimpl',
     tags: [exc, dbg],
     module: [dbg]
 }).
@@ -742,7 +769,7 @@ instr_info(tov, info{
     descr: 'Test for overflow.',
     ex: ['tov'],
     syntax: {},
-    sem: b_push($$ts, bit($$cc, #overflow_flag_idx)),
+    sem: b_push($$ts, bit($$cc, #'cc.overflow_flag_bit')),
     tags: [ts, cc, ov],
     module: [base]
 }).
@@ -751,7 +778,7 @@ instr_info(tcy, info{
     descr: 'Test for carry.',
     ex: ['tcy'],
     syntax: {},
-    sem: b_push($$ts, bit($$cc, #carry_flag_idx)),
+    sem: b_push($$ts, bit($$cc, #'cc.carry_flag_bit')),
     tags: [ts, cc, cy],
     module: [base]
 }).
@@ -760,7 +787,7 @@ instr_info('clr.cy', info{
     descr: 'Clear the carry flag.',
     ex: ['clr.cy'],
     syntax: {},
-    sem: bit($$cc, #carry_flag_idx) <- #0,
+    sem: bit($$cc, #'cc.carry_flag_bit') <- #0,
     tags: [wr, cy],
     module: [base]
 }).
@@ -769,7 +796,7 @@ instr_info('set.cy', info{
     descr: 'Set the carry flag.',
     ex: ['set.cy'],
     syntax: {},
-    sem: bit($$cc, #carry_flag_idx) <- #1,
+    sem: bit($$cc, #'cc.carry_flag_bit') <- #1,
     tags: [wr, cy],
     module: [base]
 }).

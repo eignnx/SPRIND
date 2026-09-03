@@ -106,20 +106,33 @@ full_adder(A, B, Cin, Sum, Cout) :-
     Sum #= A xor B xor Cin,
     Cout #= (A /\ B) \/ (Cin /\ (A xor B)).
 
-bv_add(A, B, C) :- bv_add(A, B, 0, C, _).
-bv_add(A, B, C, Cout) :- bv_add(A, B, 0, C, Cout).
-bv_add(bv(A), bv(B), Cin, bv(C), Cout) :-
-    bv_add_(A, B, Cin, C, Cout).
+bv_add(A, B, C) :- bv_add(A, B, C, #{}).
+%bv_add(A, B, C, Cout) :- bv_add(A, B, 0, C, Cout, _).
+%bv_add(bv([A|As]), bv([B|Bs]), Cin, bv([C|Cs]), Cout, SignIn) :-
+%    bv_add_(As, Bs, Cin, Cs, SignIn),
+%    full_adder(A, B, Cout, C, SignIn).
 bv_add_([], [], Cinout, [], Cinout).
 bv_add_([A|As],[B|Bs],Cin,[C|Cs],Cout) :-
     bv_add_(As, Bs, Cin, Cs, Cout0),
     full_adder(A, B, Cout0, C, Cout).
 
+% Options:
+%   - cin: The carry-in bit. The sum will be A + B + Cin.
+%   - cout: The carry-out bit. 0b10 + 0b10 = 0b100 with a carry-out of 1.
+%   - signin: The carry-in to the sign bit.
+%             ex: 0b0100 + 0b0100 has a sign-in of 1.
+%             ex: 0b0100 + 0b0000 has a sign-in of 0.
+bv_add(bv([A|As]), bv([B|Bs]), bv([C|Cs]), Options) :-
+    #{cout: Cout, signin: SignIn} >:< Options,
+    Cin = Options.get(cin, 0),
+    bv_add_(As, Bs, Cin, Cs, SignIn),
+    full_adder(A, B, SignIn, C, Cout).
+
 bv_sub(A, B, C) :-
     bv_sub(A, B, C, _Carry).
 bv_sub(A, B, C, Cout) :-
     bv_bitwise_complement(B, NotB),
-    bv_add(A, NotB, 1, C, Cout).
+    bv_add(A, NotB, C, #{cin: 1, cout: Cout}).
 
 bv_concat(bv(A), bv(B), bv(C)) :- append(A, B, C).
 
@@ -141,8 +154,12 @@ true.
 % should be the default, while if it represents a signed value, 1 should be the
 % default. So basically, you should just use `zxt_log2` or `sxt_log2` on Tgt
 % before using this predicate.
-bv_bit(bv(Tgt), bv(Idx), Bit) :-
-    bv_unsigned(bv(Idx), IdxU),
+% Note: index 0 is the least significant bit of Tgt.
+bv_bit(bv(Tgt), bv(Idx), bv([Bit])) :-
+    % RevIdx = Size - 1 - Idx = ~Idx (if Size is a power of 2, and Idx has
+    % log2(Size) bits).
+    bv_bitwise_complement(bv(Idx), bv(IdxCompl)),
+    bv_unsigned(bv(IdxCompl), IdxU),
     ( nth0(IdxU, Tgt, Bit) -> true ;
         bv_size(bv(Tgt), TgtSz),
         succ(MaxIdx, TgtSz),
@@ -177,9 +194,7 @@ bv_sign_extend_log2(Bv0, NewSize, Bv) :-
 :- det(bv_signbit_extend_log2/4).
 bv_signbit_extend_log2(Bv0, NewSize, Bv, SignBit) :-
     bv_size(Bv0, OldSize),
-    N in 1..sup,
-    2^(N-1) #< OldSize, OldSize #=< 2^N,
-    NewSize #= 2^N,
+    round_up_to_next_pow2(OldSize, NewSize),
     PaddingSz in 0..sup,
     PaddingSz #= NewSize - OldSize,
     label([PaddingSz]),

@@ -11,10 +11,16 @@
     before_after//2,
     get_state//1,
     put_state//1,
-    signbit_compare/2
+    signbit_compare/2,
+    round_up_to_next_pow2/2,
+    term_clpfd_goals/2,
+    list_enumerated0/2,
+    list_enumerated1/2,
+    template_goal_condition_index/4
 ]).
 
 :- use_module(library(clpfd)).
+:- use_module(library(dcg/high_order)).
 :- op(20, fx, #).
 
 
@@ -136,7 +142,60 @@ put_state(State) --> before_after(_, State).
 %
 % Like `zcompare` but for negative/nonnegative only.
 signbit_compare(SignBit, N) :-
-    SignBit #<==> 0 #< N,
+    SignBit #<==> N #< 0,
     label([SignBit]).
+
+%! round_up_to_next_pow2(Old:positive_integer, New:positive_integer) is det.
+%
+round_up_to_next_pow2(OldSize, NewSize) :-
+    N in 1..sup,
+    2^(N-1) #< OldSize, OldSize #=< 2^N,
+    NewSize #= 2^N.
+
+term_clpfd_goals(Term, Goals) :-
+    term_variables(Term, Vars0),
+    phrase(vars_clpfd_goals_(Vars0), Goals0),
+    term_variables(Goals0, Vars),
+    phrase((Goals0, vars_clpfd_goals_(Vars)), Goals1),
+    sort(Goals1, Goals).
+
+vars_clpfd_goals_([]) --> [].
+vars_clpfd_goals_([V|Vs]) -->
+    ( clpfd:attribute_goals(V), ! | [] ),
+    vars_clpfd_goals_(Vs).
+
+list_enumerated0(List, Enumerated) :-
+    list_enumerated_(List, Enumerated, 0).
+list_enumerated1(List, Enumerated) :-
+    list_enumerated_(List, Enumerated, 1).
+
+list_enumerated_([], [], _).
+list_enumerated_([X|Xs], [N-X|NXs], N) :-
+    PredN #= N + 1,
+    list_enumerated_(Xs, NXs, PredN).
+
+
+:- meta_predicate(template_goal_condition_index(?, 0, +, -)).
+
+template_goal_condition_index(Templ, Goal, Cond, Index) :-
+    setup_call_cleanup(
+        engine_create(Templ, Goal, E),
+        catch(
+            get_answers_(E, Cond, Index, 0),
+            % If engine is finished (no more solns), fail rather than throw.
+            error(existence_error(engine, E), _),
+            fail
+        ),
+        engine_destroy(E)
+    ).
+
+get_answers_(E, Cond, Index, Acc) :-
+    ( engine_next(E, Cond) ->
+        Index = Acc
+    ;
+        Acc1 #= Acc + 1,
+        get_answers_(E, Cond, Index, Acc1)
+    ).
+
 
 end.
