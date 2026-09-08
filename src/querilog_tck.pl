@@ -203,8 +203,8 @@ term_size_resolved(zxt_log2(E0), Size, zxt_log2(E)) --> !,
 
 term_size_resolved({Es0}, Size, {Es}) --> !,
     { comma_list(Es0, Es1) },
-    terms_sizes_resolveds(Es1, [S|Sizes], Es),
-    { foldl([A, B, C]>>(A + B #= C), Sizes, S, Size) }.
+    terms_sizes_resolveds(Es1, Sizes, Es),
+    { clpfd_sumlist(Sizes, Size) }.
 
 binopterm_size_resolved(Op, A0, B0, Size, Term) -->
     term_size_resolved(A0, ASz, A),
@@ -456,6 +456,16 @@ stmt_typechecked((?VarName := Rhs0), (?VarName := Rhs)) --> !,
         decl_var(?VarName, net(local), RhsSz)
     ),
     add_contassign(?VarName).
+stmt_typechecked((Lhs0 := Rhs0), (Lhs := Rhs)) --> !,
+    term_size_resolved(Rhs0, RhsSz, Rhs),
+    contassign_lhs_size_typechecked(Lhs0, LhsSz, Lhs),
+    { RhsSz = LhsSz -> true ;
+        throw_error(incompatible_sizes, #{
+            op: (:=),
+            subterms: [Lhs0, Rhs0],
+            subterm_sizes: [LhsSz, RhsSz]
+        })
+    }.
 
 stmt_typechecked((Lhs0 <- Rhs0), (Lhs <- Rhs)) --> !,
     term_size_resolved(Rhs0, RhsSz, Rhs),
@@ -628,10 +638,22 @@ contassign_lhs_size_typechecked(?VarName, Size, ?VarName) --> !,
     ( is_var_decl(?VarName, _VarKind, Size) -> [] ;
         decl_var(?VarName, net(local), Size)
     ),
-    add_contassign(?VarName),
-[].
+    add_contassign(?VarName).
+contassign_lhs_size_typechecked(Lhs\Size, Size, Lhs\Size) --> !,
+    { integer(Size) -> true ; throw_error(var_size_must_be_const_int(Size)) },
+    contassign_lhs_size_typechecked(Lhs, Size, Lhs).
+contassign_lhs_size_typechecked({Components0}, Size, {Components}) --> !,
+    { comma_list(Components0, Cs0) },
+    contassign_lhs_all(Cs0, Sizes, Cs),
+    { clpfd_sumlist(Sizes, Size) },
+    { comma_list(Components, Cs) }.
 contassign_lhs_size_typechecked(Other, _, _) -->
     { throw_error(contassign_may_only_assign_to_net(Other)) }.
+
+contassign_lhs_all([], [], []) --> [].
+contassign_lhs_all([C0|Cs0], [CSz|CsSz], [C|Cs]) -->
+    contassign_lhs_size_typechecked(C0, CSz, C),
+    contassign_lhs_all(Cs0, CsSz, Cs).
 
 
 clkassign_lhs_size_typechecked($Reg, RegSz, $Reg) --> !,
@@ -831,6 +853,21 @@ test(adder_all_features) :-
         };
         bit($$ts, #0) <- ?cout;
         $z <- zxt(?tmp)
+    )).
+
+test(contassign_to_sized_var) :-
+    typecheck((
+        ?asdf\3 := #(-1)
+    )).
+
+test(contassign_to_brace_components) :-
+    typecheck((
+        {?asdf\3, ?qwer\13} := #(-1)
+    )).
+
+test(instantiation_of_custom_module) :-
+    typecheck((
+        subtr{ x: #123, y: #456, diff: ?d\10, signin: ?sin, carryout: ?cout }
     )).
 
 :- end_tests(querilog_tck).

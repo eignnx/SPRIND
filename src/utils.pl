@@ -16,7 +16,8 @@
     term_clpfd_goals/2,
     list_enumerated0/2,
     list_enumerated1/2,
-    template_goal_condition_index/4
+    template_goal_condition_index/4,
+    clpfd_sumlist/2
 ]).
 
 :- use_module(library(clpfd)).
@@ -196,6 +197,11 @@ get_answers_(E, Cond, Index, Acc) :-
         Acc1 #= Acc + 1,
         get_answers_(E, Cond, Index, Acc1)
     ).
+
+
+clpfd_sumlist([], 0).
+clpfd_sumlist([X|Xs], Total) :-
+    foldl([A, B, C]>>(A + B #= C), Xs, X, Total).
 
 
 end.
