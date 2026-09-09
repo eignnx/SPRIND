@@ -69,9 +69,9 @@ term_size(Term, Size) :-
 tcx_binding_from_syn_operands(ImmBits, Operand, ?VarName-Dir-Size) :-
     operand_immbits_name_size_dir(Operand, ImmBits, VarName, Size, Dir).
 
-operand_immbits_name_size_dir(   imm(?Name), ImmBits, Name, ImmBits, net).
-operand_immbits_name_size_dir(  simm(?Name), ImmBits, Name, ImmBits, net).
-operand_immbits_name_size_dir(reg(_, ?Name),       _, Name,    Bits, _Dir) :-
+operand_immbits_name_size_dir(   imm(?Name), ImmBits, Name, ImmBits, net(param(in))).
+operand_immbits_name_size_dir(  simm(?Name), ImmBits, Name, ImmBits, net(param(in))).
+operand_immbits_name_size_dir(reg(_, ?Name),       _, Name,    Bits, reg) :-
     isa:register_size(Bits).
 
 syntax_operands({}, []).
@@ -229,6 +229,8 @@ term_size_resolved(A0 or B0, Size, Term) --> !,
     binopterm_size_resolved(or, A0, B0, Size, Term).
 term_size_resolved(A0 xor B0, Size, Term) --> !,
     binopterm_size_resolved(xor, A0, B0, Size, Term).
+term_size_resolved(A0 == B0, 1, Term) --> !,
+    binopterm_size_resolved(==, A0, B0, _, Term).
 
 term_size_resolved(A0 << B0, Size, A << B) --> !,
     term_size_resolved(A0, ASz, A),
@@ -779,7 +781,7 @@ throw_error(ErrName, ErrPayload) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% UNIT TESTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- begin_tests(querilog_tck).
+:- begin_tests(test_querilog_tck).
 
 test(save_lit_to_reg) :-
     typecheck((
@@ -812,6 +814,11 @@ test(multi_statement) :-
         $y <- $x
     )).
 
+test(equality_relop) :-
+    typecheck((
+        bit($x, #0) <- #12\8 == #9\8
+    )).
+
 test(bit_select_good) :-
     typecheck((
         $x <- zxt(bit($y, #15\4))
@@ -822,21 +829,45 @@ test(bit_select_bad, [error(incompatible_sizes(_))]) :-
         $x <- zxt(bit($y, #1_000_000\32))
     )).
 
-test(save_to_bit) :-
+test(clkassign_to_bit) :-
     typecheck((
         bit($y, #5\4) <- #1\1
     )).
 
-test(save_to_bit_aliased_reg) :-
-    % TODO: change to `reg` instead of `in` or `out`
-    typecheck([?my_reg-_InOut-16], (
+test(clkassign_to_bit_aliased_reg) :-
+    typecheck([?my_reg-reg-16], (
         bit(?my_reg, #5\4) <- #1\1
+    )).
+
+test('clkassign to local-net fails', [error(wrong_varkind(_))]) :-
+    typecheck([?local_net-net(local)-8], (
+        ?local_net <- #0
+    )).
+
+test('clkassign to in-param-net fails', [error(wrong_varkind(_))]) :-
+    typecheck([?local_net-net(param(in))-8], (
+        ?local_net <- #0
+    )).
+
+test('clkassign to out-param-net fails', [error(wrong_varkind(_))]) :-
+    typecheck([?local_net-net(param(out))-8], (
+        ?local_net <- #0
+    )).
+
+test('contassign to out-param-net') :-
+    typecheck([?local_net-net(param(out))-8], (
+        ?local_net := #0
     )).
 
 test(alias_def_alias_use) :-
     typecheck((
         ?asdf := #0xFF00AA\24;
         $x <- ?asdf\16 + #77
+    )).
+
+test(contassign_to_reg_fails, [error(contassign_may_only_assign_to_net($x))]) :-
+    typecheck((
+        $x := $y
     )).
 
 test(adder_simple) :-
@@ -870,4 +901,4 @@ test(instantiation_of_custom_module) :-
         subtr{ x: #123, y: #456, diff: ?d\10, signin: ?sin, carryout: ?cout }
     )).
 
-:- end_tests(querilog_tck).
+:- end_tests(test_querilog_tck).
