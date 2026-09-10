@@ -9,6 +9,7 @@ A Verilog-like specification language embedded in Prolog syntax.
     op(500, yfx, and),
     op(500, yfx, or),
     op(50, fx, #),
+    op(40, yfx, ::),
     op(60, fx, ~),
     op(25, yfx, \),
     op(950, xfx, <-),

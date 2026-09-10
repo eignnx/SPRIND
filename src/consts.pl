@@ -2,6 +2,7 @@
     def_const/2
 ]).
 
+:- use_module(querilog_syntax).
 :- use_module(utils, [
     template_goal_condition_index/4
 ]).
@@ -19,8 +20,8 @@ def_iota(isr, unimpl).
 
 def_const(subr_align, Align) :- once(derive:subr_byte_alignment(Align)).
 def_const(reg_size_bits, Size) :- isa:register_size(Size).
-def_const(cc:Id, Value) :- iota_index(cc, Id, Value).
-def_const(isr:Id, Value) :- iota_index(isr, Id, Value).
+def_const(cc::Id, Value) :- iota_index(cc, Id, Value).
+def_const(isr::Id, Value) :- iota_index(isr, Id, Value).
 
 
 iota_index(CounterId, ConstId, Index) :-

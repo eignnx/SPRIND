@@ -9,54 +9,30 @@ Glossary:
 - Varkind: The kind of a variable (like ?x). See `varkind/1` for possibilities.
 */
 :- module(querilog_tck, [
+    typecheck/1,
+    typecheck/2,
     stmt_typechecked//2,
-    typecheck_instr_sems/0,
-    querilog_mod/2
+
+    % MULTIFILE INTERFACE PREDICATES
+    gprregister_name_size/2,        % ?Name, -Size
+    sysregister_name_size/2,        % ?Name, -Size
+    querilog_module_name_sig_def/3  % ?Name, -Sig, -Def
 ]).
 
 :- use_module(library(clpfd)).
 :- use_module(library(dcg/high_order), [sequence//2]).
 :- use_module(querilog_syntax).
-:- use_module(isa, [register_size/1]).
 :- use_module(utils).
 :- use_module(derive).
 :- use_module(consts).
 
-:- multifile(querilog_mod/2).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% INTERFACE PREDICATES %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- use_module(sem_querilog, [instr_info/2]).
-typecheck_instr_sems :-
-    findall(Status, typecheck_some_instr_sem(Status), Statuses),
-    exclude(=(success), Statuses, Failures),
-    length(Statuses, NTotal),
-    length(Failures, NFail),
-    utils:list_enumerated1(Failures, FailuresEnum),
-    maplist([N-F]>>(
-        arg(1, F, Instr),
-        format('~t~d.~3| ~p:~t~14|~p~n', [N, Instr, F])
-    ), FailuresEnum),
-    format('RESULTS: ~d failures out of ~d instructions~n', [NFail, NTotal]).
-typecheck_some_instr_sem(Status) :-
-    sem_querilog:instr_info(Instr, Info),
-    Sem = Info.sem,
-    catch(
-        ( typecheck_instr(Instr) ->
-            Status = success
-        ;
-            Status = typechecking_failed(Instr, Sem)
-        ),
-        error(E, _),
-        Status = exception(Instr, E)
-    ).
+:- multifile(gprregister_name_size/2).        % ?Name, -Size
+:- multifile(sysregister_name_size/2).        % ?Name, -Size
+:- multifile(querilog_module_name_sig_def/3). % ?Name, -Sig, -Def
 
-typecheck_instr(Instr) :-
-    sem_querilog:instr_info(Instr, Info),
-    isa:fmt_instr(Fmt, Instr),
-    once(derive:fmt_opcodebits_immbits(Fmt, _, ImmBits)),
-    syntax_operands(Info.syntax, Operands),
-    maplist(tcx_binding_from_syn_operands(ImmBits), Operands, Tcx),
-    init_state(S0, Tcx),
-    phrase(stmt_typechecked(Info.sem, _TypeChecked), [S0], [_S]).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 typecheck(Statements) :- typecheck([], Statements).
 typecheck(Tcx, Statements) :-
@@ -65,27 +41,6 @@ typecheck(Tcx, Statements) :-
 term_size(Term, Size) :-
     init_state(S0),
     phrase(term_size_resolved(Term, Size, _Resolved), [S0], [_S]).
-
-tcx_binding_from_syn_operands(ImmBits, Operand, ?VarName-Dir-Size) :-
-    operand_immbits_name_size_dir(Operand, ImmBits, VarName, Size, Dir).
-
-operand_immbits_name_size_dir(   imm(?Name), ImmBits, Name, ImmBits, net(param(in))).
-operand_immbits_name_size_dir(  simm(?Name), ImmBits, Name, ImmBits, net(param(in))).
-operand_immbits_name_size_dir(reg(_, ?Name),       _, Name,    Bits, reg) :-
-    isa:register_size(Bits).
-
-syntax_operands({}, []).
-syntax_operands({CommaList}, VarDecls) :-
-    comma_list(CommaList, Operands),
-    phrase(operand_vardecl(Operands), VarDecls).
-syntax_operands(Lhs -> _Rhs, Operands) :- syntax_operands(Lhs, Operands).
-
-operand_vardecl([]) --> [].
-operand_vardecl([X|Xs]) -->
-    ( { [Inner] = X } -> expand_bracket_content(Inner) ; [X]),
-    operand_vardecl(Xs).
-expand_bracket_content(A + B) --> !, [A], [B].
-expand_bracket_content(A) --> [A].
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -114,28 +69,31 @@ term_size_resolved(#Term0, Size, Term) --> !,
     ; integer(Term0), N = Term0 ->
         bound_integer_size(N, Size),
         Term = #N\Size % Defer size inference for later
-    ; ( atom(Term0) ; _:_ = Term0 ), Const = Term0 ->
-        once(consts:def_const(Const, N)),
-        !,
+    ; ( atom(Term0) ; _::_ = Term0 ), Const = Term0 ->
+        ( once(consts:def_const(Const, N)) -> true ;
+            throw_error(unknown_const(Term0))
+        ),
         Size in 1..sup,
         % Widest possible bounds -> Size approx(>=) lg(|N|)
         -1 * 2^(Size - 1) #=< N, N #< 2^Size,
         Term = #N\Size % Defer size inference for later
+    ;
+        throw_error(unknown_poundsign_term(Term0))
     }.
 
 term_size_resolved($Reg, Size, $Reg) --> !,
-    ( { isa:gprreg(Reg) } ->
-        { isa:register_size(Size) }
-    ; { Reg = ?Var } ->
-        { isa:gpr_count_bits(GprCountBits) },
-        term_size_resolved(?Var, GprCountBits, _)
-    ).
+    { gprregister_name_size(Reg, Size) -> true ;
+        throw_error(undefined_register($Reg))
+    }.
 
-term_size_resolved($$Reg, Size, $$Reg) --> !, { isa:sysreg_size(Reg, Size) }.
+term_size_resolved($$Reg, Size, $$Reg) --> !,
+    { sysregister_name_size(Reg, Size) -> true ;
+        throw_error(undefined_register($$Reg))
+    }.
 
 term_size_resolved(?Var, Size, ?Var) --> !,
     lookup_var_decl(?Var, Dir, Size),
-    { Dir == reg ->
+    { Dir = net(param(out)) ->
         throw_error(cannot_read_from_out_port(?Var))
     ; true }.
 
@@ -536,9 +494,10 @@ stmt_typechecked(AdderDict0, AdderDict) --> { is_dict(AdderDict0, adder) }, !,
 [].
 
 stmt_typechecked(Dict0, Dict) --> { is_dict(Dict0, ModName) }, !,
-    { mod_sig_body(ModName, Sig, _Body) -> true ;
-        throw_error(instantiation_of_undefined_module(ModName))
-    },
+    ( { 'dynamic(mod_sig_typecheckedbody)'(ModName, Sig, _Body) }, !
+    ; mod_sig_typechecked(ModName, Sig, _Body), !
+    ; { throw_error(instantiation_of_undefined_module(ModName)) }
+    ),
     { dict_pairs(Dict0, ModName, Pairs0) },
     sig_kwargs_typechecked(Pairs0, Sig, Pairs),
     { dict_pairs(Dict, ModName, Pairs) },
@@ -559,7 +518,11 @@ sig_kwargs_typechecked(
     sig_kwargs_typechecked(Kws0, Sig, Kws).
 
 kwarg_dispatch_on_portdir(out, Sig, Kwarg, ExpectedSize, Val0, Val) -->
-    contassign_lhs_size_typechecked(Val0, ValSz, Val),
+    ( { Val0 = ->(Val1) } ->
+        clkassign_lhs_size_typechecked(Val1, ValSz, Val)
+    ;
+        contassign_lhs_size_typechecked(Val0, ValSz, Val)
+    ),
     { ValSz = ExpectedSize -> true ;
         throw_error(incompatible_sizes, #{
             op: mod(Sig),
@@ -632,6 +595,12 @@ out-params, but may subsequently clock-assign that net to a reg:
 ```querilog
 adder { x: ?x, y: ?y, sum: ?new_var };
 $some_reg <- ?new_var
+```
+
+Or as a shorthand for this pattern, use the `->(..)` operator:
+
+```querilog
+adder { x: ?x, y: ?y, sum: ->($some_reg) }
 ```
 */
 
@@ -726,26 +695,18 @@ clkassign_lhs_size_typechecked(Lhs0, _, _) -->
     }.
 
 
-:- dynamic(mod_sig_body/3).
+:- dynamic('dynamic(mod_sig_typecheckedbody)'/3).
 
-/*
-                     module
-              |------------------|
-              |input       output|
-reg or net -->|-->            -->|--> net
-              |net     reg or net|
-              |------------------|
-*/
 mod_sig_typechecked(ModName, Sig, Body) -->
     get_state(Before),
     { init_state(FreshState) },
     put_state(FreshState),
-    { querilog_mod(Sig, Body0), is_dict(Sig, ModName) },
+    { querilog_module_name_sig_def(ModName, Sig, Body0) },
     { dict_pairs(Sig, ModName, PortNamesSpecs) },
     define_ports(PortNamesSpecs),
     stmt_typechecked(Body0, Body),
     { format('Typechecked mod `~p`.~n', [ModName]) },
-    { asserta(mod_sig_body(ModName, Sig, Body)) },
+    { assertz('dynamic(mod_sig_typecheckedbody)'(ModName, Sig, Body)) },
     put_state(Before),
 [].
 
@@ -772,6 +733,12 @@ throw_error(ErrName, ErrPayload) :-
         ;
             Err0 =.. [ErrName, ErrPayload, att_goals(Goals)]
         ),
+        % Copy attributed variables without copying their attributes.
+        %
+        % We need to get rid of the attributes because otherwise numbervars/1
+        % will try to unify a clpfd variable with a compound term `'$VAR'(N)`,
+        % and a type error will be thrown. (The error is something like: "clpfd
+        % variable can only be instantiated to an integer, not a compound")
         copy_term(Err0, Err, _),
         numbervars(Err),
         throw(error(Err, _)).
@@ -782,6 +749,8 @@ throw_error(ErrName, ErrPayload) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 :- begin_tests(test_querilog_tck).
+
+
 
 test(save_lit_to_reg) :-
     typecheck((
@@ -896,7 +865,26 @@ test(contassign_to_brace_components) :-
         {?asdf\3, ?qwer\13} := #(-1)
     )).
 
-test(instantiation_of_custom_module) :-
+test(use_named_const) :-
+    typecheck((
+        ?asdf := #cc::carry_flag_bit
+    )).
+
+
+subtr_def(querilog_tck:'dynamic(mod_sig_typecheckedbody)'(subtr, subtr{
+    x: in, y: in,
+    diff: out, signin: out(1), carryout: out(1)
+}, (
+    adder{
+        x: ?x, y: ~(?y), carryin: #1,
+        sum: ?diff, signin: ?signin, carryout: ?carryout
+    }
+))).
+
+test(instantiation_of_custom_module, [
+    setup((subtr_def(Def), asserta(Def, ClauseRef))),
+    cleanup(erase(ClauseRef))
+]) :-
     typecheck((
         subtr{ x: #123, y: #456, diff: ?d\10, signin: ?sin, carryout: ?cout }
     )).

@@ -1,13 +1,14 @@
-:- module(sem_querilog, [instr_info/2]).
+:- module(sem_querilog, [
+    instr_info/2,
+    mod_def/2
+]).
 
 :- use_module(library(clpfd)).
 :- use_module(querilog_syntax).
-:- use_module(querilog_tck, [querilog_mod/2]).
 
 :- discontiguous(instr_info/2).
-:- multifile(querilog_mod/2).
 
-querilog_tck:querilog_mod(subtr{
+mod_def(subtr{
     x: in, y: in,
     diff: out, signin: out(1), carryout: out(1)
 }, (
@@ -17,7 +18,7 @@ querilog_tck:querilog_mod(subtr{
     }
 )).
 
-querilog_tck:querilog_mod(lessthan{
+mod_def(lessthan{
     x: in, y: in, lessthan: out(1)
 }, (
     subtr{
@@ -33,6 +34,17 @@ querilog_tck:querilog_mod(lessthan{
     ?sign := bit(?diff, #15);
     ?lessthan := ?overflow xor ?sign
 )).
+
+mod_def(b_push{ stack_in: in(N), stack_out: out(N), bit: in(1) },
+    ?stack_out := (?stack_in << #1) and zxt(?bit)
+).
+%mod_def(b_push{ stack: inout, bit: in(1) },
+%    ?stack <- (?stack << #1) and zxt(?bit)
+%).
+mod_def(b_pop{ stack_in: in(N), stack_out: out(N), bit: out(1) },
+    ?bit := ?stack_in\1;
+    ?stack_out := (?stack_in >> #1)
+).
 
 instr_info(lb, info{
     title: 'Load Byte',
@@ -375,9 +387,9 @@ instr_info(addicy, info{
     ex: ['addicy x, 3'],
     syntax: { reg(r, ?rd), simm(?simm) },
     sem: (
-        ?rd <- ?rd\s + sxt(?simm) + bit($$cc, #carry_flag_bit)\16\s;
-        bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
-        bit($$cc, #overflow_flag_bit) <- attr(cpu/alu/overflow)
+        ?rd <- ?rd\s + sxt(?simm) + bit($$cc, #cc::carry_flag_bit)\16\s;
+        bit($$cc, #cc::carry_flag_bit) <- attr(cpu/alu/carryout);
+        bit($$cc, #cc::overflow_flag_bit) <- attr(cpu/alu/overflow)
     ),
     tags: [arith, carry, add],
     module: [imms]
@@ -388,9 +400,9 @@ instr_info(subicy, info{
     ex: ['subicy x, 3'],
     syntax: { reg(r, ?rd), simm(?simm) },
     sem: (
-        ?rd <- ?rd\s - sxt(?simm) - bit($$cc, #carry_flag_bit)\16\s;
-        bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
-        bit($$cc, #overflow_flag_bit) <- attr(cpu/alu/overflow)
+        ?rd <- ?rd\s - sxt(?simm) - bit($$cc, #cc::carry_flag_bit)\16\s;
+        bit($$cc, #cc::carry_flag_bit) <- attr(cpu/alu/carryout);
+        bit($$cc, #cc::overflow_flag_bit) <- attr(cpu/alu/overflow)
     ),
     tags: [arith, carry],
     module: [imms]
@@ -401,7 +413,7 @@ instr_info(lsr, info{
     ex: ['lsr x, 15'],
     syntax: { reg(r, ?rd), imm(?imm) },
     sem: (
-        bit($$cc, #carry_flag_bit) <- bit(?rd, ?imm\4 - #1);
+        bit($$cc, #cc::carry_flag_bit) <- bit(?rd, ?imm\4 - #1);
         ?rd <- ?rd >> ?imm\4
     ),
     tags: [bitwise, shift, right],
@@ -413,7 +425,7 @@ instr_info(lsl, info{
     ex: ['lsl x, 8'],
     syntax: { reg(r, ?rd), imm(?imm) },
     sem: (
-        bit($$cc, #carry_flag_bit) <- bit(?rd, #16 - ?imm\4);
+        bit($$cc, #cc::carry_flag_bit) <- bit(?rd, #16 - ?imm\4);
         ?rd <- ?rd << ?imm\4
     ),
     tags: [zxt, bitwise, shift, left],
@@ -428,7 +440,7 @@ instr_info(asr, info{
     sem: (
         ?sign := bit(?rd, #15);
         ?sign_extension := (sxt(?sign - #1)) << (#reg_size_bits - ?imm);
-        bit($$cc, #carry_flag_bit) <- bit(?rd, ?imm - #1);
+        bit($$cc, #cc::carry_flag_bit) <- bit(?rd, ?imm - #1);
         ?rd <- (?rd >> ?imm) or ?sign_extension 
     ),
     tags: [sxt, bitwise, shift, right],
@@ -472,7 +484,7 @@ instr_info(add, info{
     ex: ['add x, y'],
     syntax: { reg(r, ?rd), reg(s, ?rs) },
     sem: (
-        bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
+        bit($$cc, #cc::carry_flag_bit) <- attr(cpu/alu/carryout);
         ?rd <- ?rd + ?rs
     ),
     tags: [arith, add],
@@ -529,9 +541,9 @@ instr_info(addcy, info{
     ex: ['addcy x, y'],
     syntax: { reg(r, ?rd), reg(s, ?rs) },
     sem: (
-        ?rd <- ?rd + ?rs + bit($$cc, #carry_flag_bit)\16;
-        bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
-        bit($$cc, #overflow_flag_bit) <- attr(cpu/alu/overflow)
+        ?rd <- ?rd + ?rs + bit($$cc, #cc::carry_flag_bit)\16;
+        bit($$cc, #cc::carry_flag_bit) <- attr(cpu/alu/carryout);
+        bit($$cc, #cc::overflow_flag_bit) <- attr(cpu/alu/overflow)
     ),
     tags: [arith, carry, add],
     module: [base]
@@ -542,9 +554,9 @@ instr_info(subcy, info{
     ex: ['subcy x, y'],
     syntax: { reg(r, ?rd), reg(s, ?rs) },
     sem: (
-        ?rd <- ?rd - ?rs - bit($$cc, #carry_flag_bit)\16;
-        bit($$cc, #carry_flag_bit) <- attr(cpu/alu/carryout);
-        bit($$cc, #overflow_flag_bit) <- attr(cpu/alu/overflow)
+        ?rd <- ?rd - ?rs - bit($$cc, #cc::carry_flag_bit)\16;
+        bit($$cc, #cc::carry_flag_bit) <- attr(cpu/alu/carryout);
+        bit($$cc, #cc::overflow_flag_bit) <- attr(cpu/alu/overflow)
     ),
     tags: [arith, carry],
     module: [base]
@@ -618,7 +630,7 @@ instr_info(mulstep, info{
         ?shift_cout := bit(?multiplicand_lo, (#reg_size_bits - #1));
         ?multiplicand_lo <- ?multiplicand_lo << #1;
         ?multiplicand_hi <- ?multiplicand_hi << #1 + ?shift_cout;
-        ?multiplier <- ?multiplier div #2
+        ?multiplier <- ?multiplier >> #1
     ),
     tags: [arith, shift],
     module: [mul]
@@ -629,7 +641,11 @@ instr_info(pushb, info{
     descr: 'Push a byte from a register onto the stack.',
     ex: ['pushb x'],
     syntax: { reg(r, ?rs) },
-    sem: todo,
+    sem: (
+        ?new_sp := $sp - #1;
+        mem(?new_sp) <- ?rs\8;
+        $sp <- ?new_sp
+    ),
     tags: [sp, push, byte],
     module: [stack]
 }).
@@ -741,7 +757,7 @@ instr_info('NONEXE0', info{
     descr: 'Triggers a "non-executable instruction" exception. The entire instruction is 16 `0`s.',
     ex: ['NONEXE0'],
     syntax: {},
-    sem: $$pc <- #'isr.nonexe0',
+    sem: $$pc <- #isr::nonexe0,
     tags: [], % Giving this no tags ensures it gets sorted into the 0-most branch of the optree.
     module: [base]
 }).
@@ -750,7 +766,7 @@ instr_info('BREAK', info{
     descr: 'Trigger a breakpoint.',
     ex: ['BREAK'],
     syntax: {},
-    sem: $$pc <- #'isr.break',
+    sem: $$pc <- #isr::break,
     tags: [exc, dbg],
     module: [dbg]
 }).
@@ -759,7 +775,7 @@ instr_info('UNIMPL', info{
     descr: 'Unimplemented instruction.',
     ex: ['UNIMPL'],
     syntax: {},
-    sem: $$pc <- #'isr.unimpl',
+    sem: $$pc <- #isr::unimpl,
     tags: [exc, dbg],
     module: [dbg]
 }).
@@ -799,7 +815,11 @@ instr_info(tov, info{
     descr: 'Test for overflow.',
     ex: ['tov'],
     syntax: {},
-    sem: b_push($$ts, bit($$cc, #'cc.overflow_flag_bit')),
+    sem: b_push{
+        stack_in: $$ts,
+        bit: bit($$cc, #cc::overflow_flag_bit),
+        stack_out: ->($$ts)
+    },
     tags: [ts, cc, ov],
     module: [base]
 }).
@@ -808,7 +828,11 @@ instr_info(tcy, info{
     descr: 'Test for carry.',
     ex: ['tcy'],
     syntax: {},
-    sem: b_push($$ts, bit($$cc, #'cc.carry_flag_bit')),
+    sem: b_push{
+        stack_in: $$ts,
+        bit: bit($$cc, #cc::carry_flag_bit),
+        stack_out: ->($$ts)
+    },
     tags: [ts, cc, cy],
     module: [base]
 }).
@@ -817,7 +841,7 @@ instr_info('clr.cy', info{
     descr: 'Clear the carry flag.',
     ex: ['clr.cy'],
     syntax: {},
-    sem: bit($$cc, #'cc.carry_flag_bit') <- #0,
+    sem: bit($$cc, #cc::carry_flag_bit) <- #0,
     tags: [wr, cy],
     module: [base]
 }).
@@ -826,7 +850,7 @@ instr_info('set.cy', info{
     descr: 'Set the carry flag.',
     ex: ['set.cy'],
     syntax: {},
-    sem: bit($$cc, #'cc.carry_flag_bit') <- #1,
+    sem: bit($$cc, #cc::carry_flag_bit) <- #1,
     tags: [wr, cy],
     module: [base]
 }).
@@ -835,7 +859,7 @@ instr_info(tpush0, info{
     descr: 'Push 0 onto the test stack.',
     ex: ['tpush0'],
     syntax: {},
-    sem: b_push($$ts, #0),
+    sem: b_push{ stack_in: $$ts, bit: #0, stack_out: ->($$ts) },
     tags: [ts, push],
     module: [tsops]
 }).
@@ -844,7 +868,7 @@ instr_info(tpush1, info{
     descr: 'Push 1 onto the test stack.',
     ex: ['tpush1'],
     syntax: {},
-    sem: b_push($$ts, #1),
+    sem: b_push{ stack_in: $$ts, bit: #1, stack_out: ->($$ts) },
     tags: [ts, push],
     module: [tsops]
 }).
@@ -853,7 +877,10 @@ instr_info(tnot, info{
     descr: 'Perform a NOT operation on the test stack.',
     ex: ['tnot'],
     syntax: {},
-    sem: b_push($$ts, ~(b_pop($$ts))),
+    sem: (
+        b_pop{ stack_in: $$ts, stack_out: ?ts1, bit: ?bit };
+        b_push{ stack_in: ?ts1, bit: ~(?bit), stack_out: ->($$ts) }
+    ),
     tags: [ts, boolean],
     module: [tsops]
 }).
@@ -862,7 +889,11 @@ instr_info(tand, info{
     descr: 'Perform an AND operation on the test stack.',
     ex: ['tand'],
     syntax: {},
-    sem: todo,
+    sem: (
+        b_pop{ stack_in: $$ts, stack_out: ?ts1, bit: ?a };
+        b_pop{ stack_in: ?ts1, stack_out: ?ts2, bit: ?b };
+        b_push{ stack_in: ?ts2, bit: (?a and ?b), stack_out: ->($$ts) }
+    ),
     tags: [ts, boolean],
     module: [tsops]
 }).
@@ -871,7 +902,11 @@ instr_info(tor, info{
     descr: 'Perform an OR operation on the test stack.',
     ex: ['tor'],
     syntax: {},
-    sem: todo,
+    sem: (
+        b_pop{ stack_in: $$ts, stack_out: ?ts1, bit: ?a };
+        b_pop{ stack_in: ?ts1, stack_out: ?ts2, bit: ?b };
+        b_push{ stack_in: ?ts2, bit: (?a or ?b), stack_out: ->($$ts) }
+    ),
     tags: [ts, boolean],
     module: [tsops]
 }).
@@ -880,7 +915,9 @@ instr_info(tdup, info{
     descr: 'Duplicate the top value on the test stack.',
     ex: ['tdup'],
     syntax: {},
-    sem: todo,
+    sem: (
+        b_push{ stack_in: $$ts, bit: $$ts\1, stack_out: ->($$ts) }
+    ),
     tags: [ts, data],
     module: [tsops]
 }).
