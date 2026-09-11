@@ -12,7 +12,7 @@
 
 run_validations :-
     disprove('instr_info is not one-to-one with fmt_instr'(_)),
-    % disprove('ill-formed instruction semantics'(_, _)),
+    disprove('ill-formed instruction semantics'(_, _)),
     disprove('use of undefined module'(_)),
     disprove('use of undefined format'(_, _)),
 true.

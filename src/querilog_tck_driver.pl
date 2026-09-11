@@ -10,6 +10,7 @@
 ]).
 
 :- use_module(isa).
+:- use_module(utils, [throw_error/1]).
 :- use_module(sem, [instr_info/2]).
 
 
@@ -45,7 +46,7 @@ true.
 typecheck_some_instr_sem(Status) :-
     sem:instr_info(Instr, Info),
     Sem = Info.sem,
-    ( Sem = todo -> Status = todo ;
+    ( (Sem = todo ; Sem = todo(_)) -> Status = todo ;
         catch(
             ( typecheck_instr(Instr) ->
                 Status = success
@@ -61,13 +62,17 @@ typecheck_instr(Instr) :-
     sem:instr_info(Instr, Info),
     isa:fmt_instr(Fmt, Instr),
     once(derive:fmt_opcodebits_immbits(Fmt, _, ImmBits)),
-    syntax_operands(Info.syntax, Operands),
+    ( syntax_operands(Info.syntax, Operands) -> true ;
+        throw_error(could_not_parse_instr_syntax_spec(Info.syntax))
+    ),
     maplist(tcx_binding_from_syn_operands(ImmBits), Operands, Tcx),
     querilog_tck:init_state(S0, Tcx),
     phrase(querilog_tck:stmt_typechecked(Info.sem, _TypeChecked), [S0], [_S]).
 
 tcx_binding_from_syn_operands(ImmBits, Operand, ?VarName-Dir-Size) :-
-    operand_immbits_name_size_dir(Operand, ImmBits, VarName, Size, Dir).
+    ( operand_immbits_name_size_dir(Operand, ImmBits, VarName, Size, Dir) -> true ;
+        throw_error(could_not_build_tcx_from_syn_operand(Operand))
+    ).
 
 operand_immbits_name_size_dir(   imm(?Name), ImmBits, Name, ImmBits, net(param(in))).
 operand_immbits_name_size_dir(  simm(?Name), ImmBits, Name, ImmBits, net(param(in))).
@@ -82,8 +87,13 @@ syntax_operands(Lhs -> _Rhs, Operands) :- syntax_operands(Lhs, Operands).
 
 operand_vardecl([]) --> [].
 operand_vardecl([X|Xs]) -->
-    ( { [Inner] = X } -> expand_bracket_content(Inner) ; [X]),
+    ( { [Inner] = X } ->
+        expand_bracket_content(Inner)
+    ;
+        expand_bracket_content(X)
+    ),
     operand_vardecl(Xs).
 expand_bracket_content(A + B) --> !, [A], [B].
+expand_bracket_content(A:B) --> !, [A], [B].
 expand_bracket_content(A) --> [A].
 

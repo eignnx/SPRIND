@@ -433,9 +433,14 @@ instr_info(addicy, info{
     ex: ['addicy x, 3'],
     syntax: { reg(r, ?rd), simm(?simm) },
     sem: (
-        ?rd <- ?rd + sxt(?simm) + zxt(bit($$cc, #cc::carry_flag_bit));
-        bit($$cc, #cc::carry_flag_bit) <- attr(cpu/alu/carryout);
-        bit($$cc, #cc::overflow_flag_bit) <- attr(cpu/alu/overflow)
+        adder{
+            sum: ->(?rd), x: ?rd, y: sxt(?simm),
+            carryin: bit($$cc, #cc::carry_flag_bit),
+            carryout: ?cout, signin: ?sin
+        };
+        ?overflow := ?sin xor ?cout;
+        bit($$cc, #cc::carry_flag_bit) <- ?cout;
+        bit($$cc, #cc::overflow_flag_bit) <- ?overflow
     ),
     tags: [arith, carry, add],
     module: [imms]
@@ -445,7 +450,10 @@ instr_info(subicy, info{
     descr: 'Sutract an immediate value and the carry bit from a register.',
     ex: ['subicy x, 3'],
     syntax: { reg(r, ?rd), simm(?simm) },
-    sem: (
+    sem: todo(
+        subtr{
+            diff: ->(?rd), x: ?rd, y: ?simm
+        };
         ?rd <- ?rd\s - sxt(?simm) - bit($$cc, #cc::carry_flag_bit)\16\s;
         bit($$cc, #cc::carry_flag_bit) <- attr(cpu/alu/carryout);
         bit($$cc, #cc::overflow_flag_bit) <- attr(cpu/alu/overflow)
@@ -471,7 +479,7 @@ instr_info(lsl, info{
     ex: ['lsl x, 8'],
     syntax: { reg(r, ?rd), imm(?imm) },
     sem: (
-        bit($$cc, #cc::carry_flag_bit) <- bit(?rd, #16 - ?imm\4);
+        bit($$cc, #cc::carry_flag_bit) <- bit(?rd, (#reg_size_bits - ?imm)\4);
         ?rd <- ?rd << ?imm\4
     ),
     tags: [zxt, bitwise, shift, left],
@@ -484,10 +492,10 @@ instr_info(asr, info{
     ex: ['asr x, 3'],
     syntax: { reg(r, ?rd), imm(?imm) },
     sem: (
-        ?sign := bit(?rd, #15);
-        ?sign_extension := (sxt(?sign - #1)) << (#reg_size_bits - ?imm);
-        bit($$cc, #cc::carry_flag_bit) <- bit(?rd, ?imm - #1);
-        ?rd <- (?rd >> ?imm) or ?sign_extension 
+        ?sign := bit(?rd, (#reg_size_bits - #1)\4);
+        ?sign_extension := (sxt(?sign - #1)) << (#reg_size_bits - ?imm)\4;
+        bit($$cc, #cc::carry_flag_bit) <- bit(?rd, (?imm - #1)\4);
+        ?rd <- (?rd >> ?imm\4) or ?sign_extension 
     ),
     tags: [sxt, bitwise, shift, right],
     module: [base]
@@ -497,7 +505,7 @@ instr_info(tbitm, info{
     descr: '',
     ex: ['tbitm [x], 3'],
     syntax: { [reg(r, ?rs)], imm(?imm) },
-    sem: b_push($$ts, bit([?rs], ?imm)),
+    sem: b_push{ stack_in: $$ts, bit: bit(mem(?rs), ?imm\3), stack_out: ->($$ts) },
     tags: [ts, bit, bitwise, mem],
     module: [bittests]
 }).
@@ -507,7 +515,7 @@ instr_info(cbitm, info{
     ex: ['cbitm [x], 3'],
     syntax: { [reg(r, ?rs)], imm(?imm) },
     sem: (
-        [?rs] <- [?rs] and ~(#1 << ?imm)
+        mem(?rs) <- mem(?rs) and ~(#1 << ?imm\3)
     ),
     tags: [ts, bit, bitwise, clear, mem],
     module: [bittests]
@@ -518,7 +526,7 @@ instr_info(sbitm, info{
     ex: ['sbitm [x], 3'],
     syntax: { [reg(r, ?rs)], imm(?imm) },
     sem: (
-        [?rs] <- [?rs] or (#1 << ?imm)
+        mem(?rs) <- mem(?rs) or (#1 << ?imm\3)
     ),
     tags: [ts, bit, bitwise, set, mem],
     module: [bittests]
@@ -529,10 +537,10 @@ instr_info(add, info{
     descr: 'Add the values of two registers.',
     ex: ['add x, y'],
     syntax: { reg(r, ?rd), reg(s, ?rs) },
-    sem: (
-        bit($$cc, #cc::carry_flag_bit) <- attr(cpu/alu/carryout);
-        ?rd <- ?rd + ?rs
-    ),
+    sem: adder{
+        x: ?rd, y: ?rs, sum: ->(?rd),
+        carryout: ->(bit($$cc, #cc::carry_flag_bit))
+    },
     tags: [arith, add],
     module: [base]
 }).
@@ -541,7 +549,7 @@ instr_info(sub, info{
     descr: 'Subtract the value of one register from another.',
     ex: ['sub x, y'],
     syntax: { reg(r, ?rd), reg(s, ?rs) },
-    sem: ?rd <- ?rd - ?rs,
+    sem: todo(?rd <- ?rd - ?rs),
     tags: [arith],
     module: [base]
 }).
@@ -587,9 +595,13 @@ instr_info(addcy, info{
     ex: ['addcy x, y'],
     syntax: { reg(r, ?rd), reg(s, ?rs) },
     sem: (
-        ?rd <- ?rd + ?rs + bit($$cc, #cc::carry_flag_bit)\16;
-        bit($$cc, #cc::carry_flag_bit) <- attr(cpu/alu/carryout);
-        bit($$cc, #cc::overflow_flag_bit) <- attr(cpu/alu/overflow)
+        adder{
+            x: ?rd, y: ?rs, sum: ->(?rd),
+            carryout: ?cout, signin: ?sin,
+            carryin: bit($$cc, #cc::carry_flag_bit)
+        };
+        bit($$cc, #cc::carry_flag_bit) <- ?cout;
+        bit($$cc, #cc::overflow_flag_bit) <- ?sin xor ?cout % SHOULD ERROR
     ),
     tags: [arith, carry, add],
     module: [base]
@@ -599,7 +611,7 @@ instr_info(subcy, info{
     descr: 'Subtract the value of one register from another with carry.',
     ex: ['subcy x, y'],
     syntax: { reg(r, ?rd), reg(s, ?rs) },
-    sem: (
+    sem: todo(
         ?rd <- ?rd - ?rs - bit($$cc, #cc::carry_flag_bit)\16;
         bit($$cc, #cc::carry_flag_bit) <- attr(cpu/alu/carryout);
         bit($$cc, #cc::overflow_flag_bit) <- attr(cpu/alu/overflow)
@@ -612,7 +624,7 @@ instr_info(tl, info{
     descr: 'Test if the value of one register is less than another.',
     ex: ['tl x, y'],
     syntax: { reg(r, ?r1), reg(s, ?r2) },
-    sem: b_push($$ts, compare(?r1, <(s\16), ?r2)),
+    sem: todo(b_push($$ts, compare(?r1, <(s\16), ?r2))),
     tags: [ts, cmp, inequality, signed, '<'],
     module: [base]
 }).
@@ -621,7 +633,7 @@ instr_info(tge, info{
     descr: 'Test if the value of one register is greater than or equal to another.',
     ex: ['tge x, y'],
     syntax: { reg(r, ?r1), reg(s, ?r2) },
-    sem: b_push($$ts, compare(?r1, >=(s\16), ?r2)),
+    sem: todo(b_push($$ts, compare(?r1, >=(s\16), ?r2))),
     tags: [ts, cmp, inequality, signed, '>='],
     module: [base]
 }).
@@ -630,7 +642,7 @@ instr_info(tb, info{
     descr: 'Test if the value of one register is below another.',
     ex: ['tb x, y'],
     syntax: { reg(r, ?r1), reg(s, ?r2) },
-    sem: b_push($$ts, compare(?r1, <(u\16), ?r2)),
+    sem: todo(b_push($$ts, compare(?r1, <(u\16), ?r2))),
     tags: [ts, cmp, inequality, unsigned, '<'],
     module: [base]
 }).
@@ -639,7 +651,7 @@ instr_info(tae, info{
     descr: 'Test if the value of one register is above or equal to another.',
     ex: ['tae x, y'],
     syntax: { reg(r, ?r1), reg(s, ?r2) },
-    sem: b_push($$ts, compare(?r1, >=(u\16), ?r2)),
+    sem: todo(b_push($$ts, compare(?r1, >=(u\16), ?r2))),
     tags: [ts, cmp, inequality, unsigned, '>='],
     module: [base]
 }).
@@ -648,7 +660,7 @@ instr_info(tne, info{
     descr: 'Test if the value of one register is not equal to another.',
     ex: ['tne x, y'],
     syntax: { reg(r, ?r1), reg(s, ?r2) },
-    sem: b_push($$ts, ?r1 \= ?r2),
+    sem: todo(b_push($$ts, ?r1 \= ?r2)),
     tags: [ts, cmp, equality, not],
     module: [base]
 }).
@@ -657,7 +669,7 @@ instr_info(teq, info{
     descr: 'Test if the value of one register is equal to another.',
     ex: ['teq x, y'],
     syntax: { reg(r, ?r1), reg(s, ?r2) },
-    sem: b_push($$ts, ?r1 == ?r2),
+    sem: todo(b_push($$ts, ?r1 == ?r2)),
     tags: [ts, cmp, equality],
     module: [base]
 }).
@@ -667,16 +679,17 @@ instr_info(mulstep, info{
     descr: 'Computes one step in a full 16-bit by 16-bit unsigned multiplication.',
     ex: ['mulstep x:y, z'],
     syntax: { reg(t, ?multiplicand_hi):reg(s, ?multiplicand_lo), reg(r, ?multiplier) },
-    sem: (
-        ?mask := ~((?multiplier and #1) - #1);
-        ?masked_lo := ?multiplicand_lo and ?mask;
-        ?masked_hi := ?multiplicand_hi and ?mask;
-        lo($$mp) <- lo($$mp) + ?masked_lo;
-        hi($$mp) <- hi($$mp) + ?masked_hi + attr(cpu/alu/carryout);
-        ?shift_cout := bit(?multiplicand_lo, (#reg_size_bits - #1));
-        ?multiplicand_lo <- ?multiplicand_lo << #1;
-        ?multiplicand_hi <- ?multiplicand_hi << #1 + ?shift_cout;
-        ?multiplier <- ?multiplier >> #1
+    sem: todo(
+        todo
+        %?mask := ~((?multiplier and #1) - #1);
+        %?masked_lo := ?multiplicand_lo and ?mask;
+        %?masked_hi := ?multiplicand_hi and ?mask;
+        %lo($$mp) <- lo($$mp) + ?masked_lo;
+        %hi($$mp) <- hi($$mp) + ?masked_hi + attr(cpu/alu/carryout);
+        %?shift_cout := bit(?multiplicand_lo, (#reg_size_bits - #1));
+        %?multiplicand_lo <- ?multiplicand_lo << #1;
+        %?multiplicand_hi <- ?multiplicand_hi << #1 + ?shift_cout;
+        %?multiplier <- ?multiplier >> #1
     ),
     tags: [arith, shift],
     module: [mul]
@@ -748,7 +761,7 @@ instr_info(neg, info{
     descr: 'Negate the value in a register.',
     ex: ['neg x'],
     syntax: { reg(r, ?rd) },
-    sem: ?rd <- -(?rd),
+    sem: todo(?rd <- -(?rd)),
     tags: [arith],
     module: [imms]
 }).
@@ -1071,7 +1084,7 @@ instr_info(vijt, info{
     descr: 'When `$CC.jt` is `1`, the `callr` and `jr` instructions must jump to one of these instructions or an exception is raised.',
     ex: [],
     syntax: {},
-    sem: (
+    sem: todo(
         if(bit($$cc, #jmp_tgt_validation_en_flag_bit),
             if(bit($$cc, #jmp_tgt_validation_req_flag_bit),
                 bit($$cc, #jmp_tgt_validation_req_flag_bit) <- #0,
@@ -1096,9 +1109,15 @@ syntax_operands({CommaList}, VarDecls) :-
     phrase(operand_vardecl(Operands), VarDecls).
 syntax_operands(Lhs -> _Rhs, Operands) :- syntax_operands(Lhs, Operands).
 
-operand_vardecl([]) --> [].
+operand_vardecl([]) --> !, [].
+operand_vardecl([ [Inner] |Xs]) --> !,
+    [Inner],
+    operand_vardecl(Xs).
+operand_vardecl([A:B|Xs]) --> !,
+    [A, B],
+    operand_vardecl(Xs).
 operand_vardecl([X|Xs]) -->
-    ( { [Inner] = X } -> [Inner] ; [X]),
+    [X],
     operand_vardecl(Xs).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -17,7 +17,9 @@
     list_enumerated0/2,
     list_enumerated1/2,
     template_goal_condition_index/4,
-    clpfd_sumlist/2
+    clpfd_sumlist/2,
+    throw_error/1,
+    throw_error/2
 ]).
 
 :- use_module(library(clpfd)).
@@ -202,6 +204,28 @@ get_answers_(E, Cond, Index, Acc) :-
 clpfd_sumlist([], 0).
 clpfd_sumlist([X|Xs], Total) :-
     foldl([A, B, C]>>(A + B #= C), Xs, X, Total).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% THROW_ERROR %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+throw_error(ErrNameAndPayload) :-
+    throw(error(ErrNameAndPayload, _)).
+throw_error(ErrName, ErrPayload) :-
+        term_clpfd_goals(ErrPayload, Goals),
+        ( Goals = [] ->
+            Err0 =.. [ErrName, ErrPayload]
+        ;
+            Err0 =.. [ErrName, ErrPayload, att_goals(Goals)]
+        ),
+        % Copy attributed variables without copying their attributes.
+        %
+        % We need to get rid of the attributes because otherwise numbervars/1
+        % will try to unify a clpfd variable with a compound term `'$VAR'(N)`,
+        % and a type error will be thrown. (The error is something like: "clpfd
+        % variable can only be instantiated to an integer, not a compound")
+        copy_term(Err0, Err, _),
+        numbervars(Err),
+        throw(error(Err, _)).
+
 
 
 end.

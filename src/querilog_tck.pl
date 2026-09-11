@@ -397,6 +397,7 @@ add_pending_clkassign(Lhs) --> !,
 %
 % Same as `term_size_resolved` except for statements.
 stmt_typechecked(todo, todo) --> !.
+stmt_typechecked(todo(X), todo(X)) --> !.
 
 stmt_typechecked((A0 ; B0), (A ; B)) --> !,
     stmt_typechecked(A0, A),
@@ -454,7 +455,7 @@ stmt_typechecked(AdderDict0, AdderDict) --> { is_dict(AdderDict0, adder) }, !,
             subterm_sizes: [XSz, YSz]
         })
     },
-    contassign_lhs_size_typechecked(Sum0, SumSz, Sum),
+    assign_lhs_size_typechecked(Sum0, SumSz, Sum),
     { XSz = SumSz -> true ;
         throw_error(incompatible_sizes, #{
             op: adder{x:_, sum: _},
@@ -473,7 +474,7 @@ stmt_typechecked(AdderDict0, AdderDict) --> { is_dict(AdderDict0, adder) }, !,
         { Rest0 = Rest1 }
     ),
     ( { Cout0 = AdderDict0.get(carryout) } ->
-        contassign_lhs_size_typechecked(Cout0, CoutSz, Cout),
+        assign_lhs_size_typechecked(Cout0, CoutSz, Cout),
         { CoutSz = 1 -> true ;
             throw_error(must_be_one_bit(carry_out, got_size(CoutSz)))
         },
@@ -482,7 +483,7 @@ stmt_typechecked(AdderDict0, AdderDict) --> { is_dict(AdderDict0, adder) }, !,
         { Rest1 = Rest2 }
     ),
     ( { SignIn0 = AdderDict0.get(signin) } ->
-        contassign_lhs_size_typechecked(SignIn0, SignInSz, SignIn),
+        assign_lhs_size_typechecked(SignIn0, SignInSz, SignIn),
         { SignInSz = 1 -> true ;
             throw_error(must_be_one_bit(sign_in, got_size(SignInSz)))
         },
@@ -503,6 +504,13 @@ stmt_typechecked(Dict0, Dict) --> { is_dict(Dict0, ModName) }, !,
     { dict_pairs(Dict, ModName, Pairs) },
 [].
 
+assign_lhs_size_typechecked(Term0, TermSz, Term) -->
+    ( { Term0 = ->(Term1) } ->
+        clkassign_lhs_size_typechecked(Term1, TermSz, Term)
+    ;
+        contassign_lhs_size_typechecked(Term0, TermSz, Term)
+    ).
+
 % Typechecks a module instantiation (module use/when one is wired up).
 sig_kwargs_typechecked([], _Sig, []) --> [].
 sig_kwargs_typechecked(
@@ -518,11 +526,7 @@ sig_kwargs_typechecked(
     sig_kwargs_typechecked(Kws0, Sig, Kws).
 
 kwarg_dispatch_on_portdir(out, Sig, Kwarg, ExpectedSize, Val0, Val) -->
-    ( { Val0 = ->(Val1) } ->
-        clkassign_lhs_size_typechecked(Val1, ValSz, Val)
-    ;
-        contassign_lhs_size_typechecked(Val0, ValSz, Val)
-    ),
+    assign_lhs_size_typechecked(Val0, ValSz, Val),
     { ValSz = ExpectedSize -> true ;
         throw_error(incompatible_sizes, #{
             op: mod(Sig),
@@ -720,28 +724,6 @@ portspec_dir_size(       in,  in, Size) :- Size in 1..sup.
 portspec_dir_size(      out, out, Size) :- Size in 1..sup.
 portspec_dir_size( in(Size),  in, Size) :- Size in 1..sup.
 portspec_dir_size(out(Size), out, Size) :- Size in 1..sup.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% THROW_ERROR %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-throw_error(ErrNameAndPayload) :-
-    throw(error(ErrNameAndPayload, _)).
-throw_error(ErrName, ErrPayload) :-
-        term_clpfd_goals(ErrPayload, Goals),
-        ( Goals = [] ->
-            Err0 =.. [ErrName, ErrPayload]
-        ;
-            Err0 =.. [ErrName, ErrPayload, att_goals(Goals)]
-        ),
-        % Copy attributed variables without copying their attributes.
-        %
-        % We need to get rid of the attributes because otherwise numbervars/1
-        % will try to unify a clpfd variable with a compound term `'$VAR'(N)`,
-        % and a type error will be thrown. (The error is something like: "clpfd
-        % variable can only be instantiated to an integer, not a compound")
-        copy_term(Err0, Err, _),
-        numbervars(Err),
-        throw(error(Err, _)).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
