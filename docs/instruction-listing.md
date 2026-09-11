@@ -11,13 +11,13 @@
 | [`subr`](#instruction-format-subr) | Subroutine Call | 1 | 1 | 100% |
 | [`b`](#instruction-format-b) | Branch | 4 | 3 | 75% |
 | [`li`](#instruction-format-li) | Load Immediate | 2 | 2 | 100% |
-| [`ri(_)`](#instruction-format-ri_) | Register-immediate | 48 | 25 | 52% |
+| [`ri(_)`](#instruction-format-ri_) | Register-immediate | 48 | 29 | 60% |
 | [`ext`](#instruction-format-ext) | Reserved for Extension | 4096 | 0 | 0% |
 | [`rrr`](#instruction-format-rrr) | Register-register-register | 4 | 1 | 25% |
 | [`rr(_)`](#instruction-format-rr_) | Register-register | 28 | 14 | 50% |
 | [`r(_)`](#instruction-format-r_) | Register | 24 | 12 | 50% |
 | [`o`](#instruction-format-o) | Opcode | 64 | 28 | 44% |
-|  | **Totals (excluding `ext`)** | **179** | **90** | **50%** |
+|  | **Totals (excluding `ext`)** | **179** | **94** | **53%** |
 
 
 
@@ -34,26 +34,27 @@
 |  |  |  |  | [`cbit`](#the-cbit-instruction) |  | [`mov`](#the-mov-instruction) | [`jr`](#the-jr-instruction) | [`ret`](#the-ret-instruction) |
 |  |  |  |  | [`sbit`](#the-sbit-instruction) |  | [`addcy`](#the-addcy-instruction) | [`neg`](#the-neg-instruction) | [`tov`](#the-tov-instruction) |
 |  |  |  |  | [`tli`](#the-tli-instruction) |  | [`subcy`](#the-subcy-instruction) | [`seb`](#the-seb-instruction) | [`tcy`](#the-tcy-instruction) |
-|  |  |  |  | [`tgei`](#the-tgei-instruction) |  | [`tl`](#the-tl-instruction) | [`rd.mp.lo`](#the-rdmplo-instruction) | [`clr.cy`](#the-clrcy-instruction) |
-|  |  |  |  | [`tbi`](#the-tbi-instruction) |  | [`tge`](#the-tge-instruction) | [`rd.mp.hi`](#the-rdmphi-instruction) | [`set.cy`](#the-setcy-instruction) |
-|  |  |  |  | [`taei`](#the-taei-instruction) |  | [`tb`](#the-tb-instruction) | [`rd.gp`](#the-rdgp-instruction) | [`tpush0`](#the-tpush0-instruction) |
-|  |  |  |  | [`tnei`](#the-tnei-instruction) |  | [`tae`](#the-tae-instruction) | [`wr.gp`](#the-wrgp-instruction) | [`tpush1`](#the-tpush1-instruction) |
-|  |  |  |  | [`teqi`](#the-teqi-instruction) |  | [`tne`](#the-tne-instruction) |  | [`tnot`](#the-tnot-instruction) |
-|  |  |  |  | [`addi`](#the-addi-instruction) |  | [`teq`](#the-teq-instruction) |  | [`tand`](#the-tand-instruction) |
-|  |  |  |  | [`andi`](#the-andi-instruction) |  |  |  | [`tor`](#the-tor-instruction) |
-|  |  |  |  | [`ori`](#the-ori-instruction) |  |  |  | [`tdup`](#the-tdup-instruction) |
-|  |  |  |  | [`xori`](#the-xori-instruction) |  |  |  | [`prsv.mp`](#the-prsvmp-instruction) |
-|  |  |  |  | [`addicy`](#the-addicy-instruction) |  |  |  | [`rstr.mp`](#the-rstrmp-instruction) |
-|  |  |  |  | [`subicy`](#the-subicy-instruction) |  |  |  | [`prsv.ts`](#the-prsvts-instruction) |
-|  |  |  |  | [`lsr`](#the-lsr-instruction) |  |  |  | [`rstr.ts`](#the-rstrts-instruction) |
-|  |  |  |  | [`lsl`](#the-lsl-instruction) |  |  |  | [`prsv.ra`](#the-prsvra-instruction) |
-|  |  |  |  | [`asr`](#the-asr-instruction) |  |  |  | [`rstr.ra`](#the-rstrra-instruction) |
-|  |  |  |  | [`tbitm`](#the-tbitm-instruction) |  |  |  | [`prsv.gp`](#the-prsvgp-instruction) |
-|  |  |  |  | [`cbitm`](#the-cbitm-instruction) |  |  |  | [`rstr.gp`](#the-rstrgp-instruction) |
-|  |  |  |  | [`sbitm`](#the-sbitm-instruction) |  |  |  | [`prsv.cc`](#the-prsvcc-instruction) |
-|  |  |  |  |  |  |  |  | [`rstr.cc`](#the-rstrcc-instruction) |
-|  |  |  |  |  |  |  |  | [`sleep`](#the-sleep-instruction) |
-|  |  |  |  |  |  |  |  | [`vijt`](#the-vijt-instruction) |
+|  |  |  |  | [`tgi`](#the-tgi-instruction) |  | [`tl`](#the-tl-instruction) | [`rd.mp.lo`](#the-rdmplo-instruction) | [`clr.cy`](#the-clrcy-instruction) |
+|  |  |  |  | [`tgei`](#the-tgei-instruction) |  | [`tge`](#the-tge-instruction) | [`rd.mp.hi`](#the-rdmphi-instruction) | [`set.cy`](#the-setcy-instruction) |
+|  |  |  |  | [`tlei`](#the-tlei-instruction) |  | [`tb`](#the-tb-instruction) | [`rd.gp`](#the-rdgp-instruction) | [`tpush0`](#the-tpush0-instruction) |
+|  |  |  |  | [`tbi`](#the-tbi-instruction) |  | [`tae`](#the-tae-instruction) | [`wr.gp`](#the-wrgp-instruction) | [`tpush1`](#the-tpush1-instruction) |
+|  |  |  |  | [`tai`](#the-tai-instruction) |  | [`tne`](#the-tne-instruction) |  | [`tnot`](#the-tnot-instruction) |
+|  |  |  |  | [`taei`](#the-taei-instruction) |  | [`teq`](#the-teq-instruction) |  | [`tand`](#the-tand-instruction) |
+|  |  |  |  | [`tbei`](#the-tbei-instruction) |  |  |  | [`tor`](#the-tor-instruction) |
+|  |  |  |  | [`tnei`](#the-tnei-instruction) |  |  |  | [`tdup`](#the-tdup-instruction) |
+|  |  |  |  | [`teqi`](#the-teqi-instruction) |  |  |  | [`prsv.mp`](#the-prsvmp-instruction) |
+|  |  |  |  | [`addi`](#the-addi-instruction) |  |  |  | [`rstr.mp`](#the-rstrmp-instruction) |
+|  |  |  |  | [`andi`](#the-andi-instruction) |  |  |  | [`prsv.ts`](#the-prsvts-instruction) |
+|  |  |  |  | [`ori`](#the-ori-instruction) |  |  |  | [`rstr.ts`](#the-rstrts-instruction) |
+|  |  |  |  | [`xori`](#the-xori-instruction) |  |  |  | [`prsv.ra`](#the-prsvra-instruction) |
+|  |  |  |  | [`addicy`](#the-addicy-instruction) |  |  |  | [`rstr.ra`](#the-rstrra-instruction) |
+|  |  |  |  | [`subicy`](#the-subicy-instruction) |  |  |  | [`prsv.gp`](#the-prsvgp-instruction) |
+|  |  |  |  | [`lsr`](#the-lsr-instruction) |  |  |  | [`rstr.gp`](#the-rstrgp-instruction) |
+|  |  |  |  | [`lsl`](#the-lsl-instruction) |  |  |  | [`prsv.cc`](#the-prsvcc-instruction) |
+|  |  |  |  | [`asr`](#the-asr-instruction) |  |  |  | [`rstr.cc`](#the-rstrcc-instruction) |
+|  |  |  |  | [`tbitm`](#the-tbitm-instruction) |  |  |  | [`sleep`](#the-sleep-instruction) |
+|  |  |  |  | [`cbitm`](#the-cbitm-instruction) |  |  |  | [`vijt`](#the-vijt-instruction) |
+|  |  |  |  | [`sbitm`](#the-sbitm-instruction) |  |  |  |  |
 
 ## Synthetic Instructions
 
@@ -68,7 +69,7 @@
 | `not r` | Invert a boolean (0 or 1) | `xori r, 1` | Reversable |
 | `tg r1, r2` | Test greater-than | `tl r2, r1` | One Way |
 | `tle r1, r2` | Test Less-than or Equal | `tge r2, r1` | One Way |
-| `ta r1, r2` | Test Above | `ta r2, r1` | One Way |
+| `ta r1, r2` | Test Above | `tb r2, r1` | One Way |
 | `tbe r1, r2` | Test Below or Equal | `tae r2, r1` | One Way |
 | `tpushr r` | Push bool in Register onto Test stack | `tnei r, 0` | Reversable |
 | `tpushr.not r` | Push negation of bool in Register onto Test stack | `teqi r, 0` | Reversable |
@@ -82,12 +83,12 @@
 
 | Format | [Bit Pattern](#legend) | Opcodes Available | Assigned | Utilization | Range of Immediate |
 |:----|:---:|:---:|:---:|:---:|:---:|
-| [`rri`](#format-rri) | `11ooiiiiiisssrrr` | 4 | 4 | 100% | `imm6` in `[-32, 31]` or `[0, 63]` |
-| [`subr`](#format-subr) | `101iiiiiiiiiiiii` | 1 | 1 | 100% | `imm13` in `[-4096, 4095]` or `[0, 8191]` |
-| [`b`](#format-b) | `1001ooiiiiiiiiii` | 4 | 3 | 75% | `imm10` in `[-512, 511]` or `[0, 1023]` |
-| [`li`](#format-li) | `1000oiiiiiiiirrr` | 2 | 2 | 100% | `imm8` in `[-128, 127]` or `[0, 255]` |
-| [`ri(1)`](#format-ri1) | `01oooooiiiiiirrr` | 32 | 25 | 78% | `imm6` in `[-32, 31]` or `[0, 63]` |
-| [`ri(2)`](#format-ri2) | `001ooooiiiiiirrr` | 16 | 0 | 0% | `imm6` in `[-32, 31]` or `[0, 63]` |
+| [`rri`](#format-rri) | `11ooiiiiiisssrrr` | 4 | 4 | 100% | `imm6` in `[-32,31]` or `[0,63]` |
+| [`subr`](#format-subr) | `101iiiiiiiiiiiii` | 1 | 1 | 100% | `imm13` in `[-4096,4095]` or `[0,8191]` |
+| [`b`](#format-b) | `1001ooiiiiiiiiii` | 4 | 3 | 75% | `imm10` in `[-512,511]` or `[0,1023]` |
+| [`li`](#format-li) | `1000oiiiiiiiirrr` | 2 | 2 | 100% | `imm8` in `[-128,127]` or `[0,255]` |
+| [`ri(1)`](#format-ri1) | `01oooooiiiiiirrr` | 32 | 29 | 91% | `imm6` in `[-32,31]` or `[0,63]` |
+| [`ri(2)`](#format-ri2) | `001ooooiiiiiirrr` | 16 | 0 | 0% | `imm6` in `[-32,31]` or `[0,63]` |
 | [`ext`](#format-ext) | `0001oooooooooooo` | 4096 | 0 | 0% |  |
 | [`rrr`](#format-rrr) | `00001ootttsssrrr` | 4 | 1 | 25% |  |
 | [`rr(1)`](#format-rr1) | `000001oooosssrrr` | 16 | 8 | 50% |  |
@@ -140,9 +141,9 @@
 ###### Semantics
 
 ```
-[reg(r, ?(rs)), reg(s, ?(rd))+simm(?(simm))]
------------------------------------------------------
-?(ptr):=(?(rs)\s+sxt(?(simm)))\u;?(rd)<-zxt([?(ptr)])
+[reg(r,?(rs)),reg(s,?(rd))+simm(?(simm))]
+------------------------------------------------------
+?(ptr):= ?(rs)+sxt(?(simm));<-(?(rd),zxt(mem(?(ptr))))
 ```
 
 ###### Module
@@ -169,9 +170,9 @@
 ###### Semantics
 
 ```
-[reg(r, ?(rs)), reg(s, ?(rd))+simm(?(simm))]
------------------------------------------------------------------------------
-?(ptr):=(?(rs)\s+sxt(?(simm))and#(-2)\16)\u;?(rd)<-{[?(ptr)+ #(1)], [?(ptr)]}
+[reg(r,?(rs)),reg(s,?(rd))+simm(?(simm))]
+-------------------------------------------------------------------------------------
+?(ptr):=and(?(rs)+sxt(?(simm)),\(#(-2),16));<-(?(rd),{mem(?(ptr)+ #(1)),mem(?(ptr))})
 ```
 
 ###### Module
@@ -198,9 +199,9 @@
 ###### Semantics
 
 ```
-[reg(r, ?(rd))+simm(?(simm)), reg(s, ?(rs))]
----------------------------------------------------
-?(ptr):= ?(rd)\s+sxt(?(simm));[?(ptr)\u]<-lo(?(rs))
+[reg(r,?(rd))+simm(?(simm)),reg(s,?(rs))]
+-----------------------------------------------------
+?(ptr):= ?(rd)+sxt(?(simm));<-(mem(?(ptr)),lo(?(rs)))
 ```
 
 ###### Module
@@ -227,9 +228,9 @@
 ###### Semantics
 
 ```
-[reg(r, ?(rd))+simm(?(simm)), reg(s, ?(rs))]
------------------------------------------------------------------------------------------
-?(ptr):=(?(rd)\s+sxt(?(simm))and#(65534))\u;[?(ptr)]<-lo(?(rs));[?(ptr)+ #(1)]<-hi(?(rs))
+[reg(r,?(rd))+simm(?(simm)),reg(s,?(rs))]
+-------------------------------------------------------------------------------------------------------
+?(ptr):=and(?(rd)+sxt(?(simm)),~(#(\(1,16))));<-(mem(?(ptr)),lo(?(rs)));<-(mem(?(ptr)+ #(1)),hi(?(rs)))
 ```
 
 ###### Module
@@ -259,14 +260,14 @@
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `subr` = 0b101 | NONE | `101iiiiiiiiiiiii` | 13 | `[-4096, 4095]` |
+| `subr` = 0b101 | NONE | `101iiiiiiiiiiiii` | 13 | `[-4096,4095]` |
 
 ###### Semantics
 
 ```
 [simm(?(arg))]
------------------------------------------------------------------------------------------
-?(offset):= ?(arg);$$(pc)<- $$(pc)\s+sxt(?(offset))<< #(subr_align);$$(ra)<- $$(pc)+ #(2)
+-------------------------------------------------------------------------------------------
+?(offset):= ?(arg);<-($$(pc),$$(pc)+sxt(?(offset))<< #(subr_align));<-($$(ra),$$(pc)+ #(2))
 ```
 
 ###### Module
@@ -296,14 +297,14 @@
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `b` = 0b1001 | 0b00 | `100100iiiiiiiiii` | 10 | `[-512, 511]` |
+| `b` = 0b1001 | 0b00 | `100100iiiiiiiiii` | 10 | `[-512,511]` |
 
 ###### Semantics
 
 ```
 [simm(?(arg))]
 ---------------------------------------------------
-?(offset):= ?(arg);$$(pc)<- $$(pc)\s+sxt(?(offset))
+?(offset):= ?(arg);<-($$(pc),$$(pc)+sxt(?(offset)))
 ```
 
 ###### Module
@@ -325,14 +326,14 @@
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `b` = 0b1001 | 0b10 | `100110iiiiiiiiii` | 10 | `[-512, 511]` |
+| `b` = 0b1001 | 0b10 | `100110iiiiiiiiii` | 10 | `[-512,511]` |
 
 ###### Semantics
 
 ```
 [simm(?(arg))]
-------------------------------------------------------------------------
-if(b_pop($$(ts)), (?(offset):= ?(arg);$$(pc)<- $$(pc)\s+sxt(?(offset))))
+-------------------------------------------------------------------------------------------------------------------------------
+?(offset):= ?(arg);b_pop{bit: ?(tos),stack_in: $$(ts),stack_out: ->($$(ts))};<-($$(pc),if(?(tos),$$(pc)+sxt(?(offset)),$$(pc)))
 ```
 
 ###### Module
@@ -354,14 +355,14 @@ if(b_pop($$(ts)), (?(offset):= ?(arg);$$(pc)<- $$(pc)\s+sxt(?(offset))))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `b` = 0b1001 | 0b11 | `100111iiiiiiiiii` | 10 | `[-512, 511]` |
+| `b` = 0b1001 | 0b11 | `100111iiiiiiiiii` | 10 | `[-512,511]` |
 
 ###### Semantics
 
 ```
 [simm(?(arg))]
--------------------------------------------------------------------------
-if(~b_pop($$(ts)), (?(offset):= ?(arg);$$(pc)<- $$(pc)\s+sxt(?(offset))))
+-------------------------------------------------------------------------------------------------------------------------------
+?(offset):= ?(arg);b_pop{bit: ?(tos),stack_in: $$(ts),stack_out: ->($$(ts))};<-($$(pc),if(?(tos),$$(pc),$$(pc)+sxt(?(offset))))
 ```
 
 ###### Module
@@ -391,14 +392,14 @@ if(~b_pop($$(ts)), (?(offset):= ?(arg);$$(pc)<- $$(pc)\s+sxt(?(offset))))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `li` = 0b1000 | 0b0 | `10000iiiiiiiirrr` | 8 | `[-128, 127]` |
+| `li` = 0b1000 | 0b0 | `10000iiiiiiiirrr` | 8 | `[-128,127]` |
 
 ###### Semantics
 
 ```
-[reg(r, ?(rd)), simm(?(simm))]
-------------------------------
-?(rd)<-sxt(?(simm))
+[reg(r,?(rd)),simm(?(simm))]
+----------------------------
+<-(?(rd),sxt(?(simm)))
 ```
 
 ###### Module
@@ -420,14 +421,14 @@ if(~b_pop($$(ts)), (?(offset):= ?(arg);$$(pc)<- $$(pc)\s+sxt(?(offset))))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `li` = 0b1000 | 0b1 | `10001iiiiiiiirrr` | 8 | `[0, 255]` |
+| `li` = 0b1000 | 0b1 | `10001iiiiiiiirrr` | 8 | `[0,255]` |
 
 ###### Semantics
 
 ```
-[reg(r, ?(rd)), imm(?(imm))]
----------------------------------------
-?(rd)<-(?(rd)<< #(8))\16 or zxt(?(imm))
+[reg(r,?(rd)),imm(?(imm))]
+--------------------------------------
+<-(?(rd),or(?(rd)<< #(8),zxt(?(imm))))
 ```
 
 ###### Module
@@ -462,9 +463,9 @@ if(~b_pop($$(ts)), (?(offset):= ?(arg);$$(pc)<- $$(pc)\s+sxt(?(offset))))
 ###### Semantics
 
 ```
-[reg(r, ?(rd)), reg(s, ?(rs))+imm(?(disp))]
--------------------------------------------
-?(rd)<-zxt([$$(gp)\u+zxt(?(disp))])
+[reg(r,?(rd)),reg(s,?(rs))+imm(?(disp))]
+-------------------------------------------------------
+?(ptr):= $$(gp)+zxt(?(disp));<-(?(rd),zxt(mem(?(ptr))))
 ```
 
 ###### Module
@@ -491,9 +492,9 @@ if(~b_pop($$(ts)), (?(offset):= ?(arg);$$(pc)<- $$(pc)\s+sxt(?(offset))))
 ###### Semantics
 
 ```
-[reg(r, ?(rd)), reg(s, ?(rs))+imm(?(disp))]
-------------------------------------------------------------------------------
-?(ptr):=($$(gp)\u+zxt(?(disp))and#(65534))\u;?(rd)<-{[?(ptr)+ #(1)], [?(ptr)]}
+[reg(r,?(rd)),reg(s,?(rs))+imm(?(disp))]
+----------------------------------------------------------------------------------
+?(ptr):=and($$(gp)+zxt(?(disp)),~(#(1)));<-(?(rd),{mem(?(ptr)+ #(1)),mem(?(ptr))})
 ```
 
 ###### Module
@@ -520,9 +521,9 @@ if(~b_pop($$(ts)), (?(offset):= ?(arg);$$(pc)<- $$(pc)\s+sxt(?(offset))))
 ###### Semantics
 
 ```
-[reg(r, ?(rd))+imm(?(disp)), reg(s, ?(rs))]
--------------------------------------------
-[$$(gp)\u+zxt(?(disp))]<-lo(?(rs))
+[reg(r,?(rd))+imm(?(disp)),reg(s,?(rs))]
+------------------------------------------------------
+?(ptr):= $$(gp)+zxt(?(disp));<-(mem(?(ptr)),lo(?(rs)))
 ```
 
 ###### Module
@@ -549,9 +550,9 @@ if(~b_pop($$(ts)), (?(offset):= ?(arg);$$(pc)<- $$(pc)\s+sxt(?(offset))))
 ###### Semantics
 
 ```
-[reg(r, ?(rd))+imm(?(disp)), reg(s, ?(rs))]
--------------------------------------------------------------------------------
-?(ptr):=($$(gp)\u+zxt(?(disp))and#(65534))\u;{[?(ptr)+ #(1)], [?(ptr)]}<- ?(rs)
+[reg(r,?(rd))+imm(?(disp)),reg(s,?(rs))]
+----------------------------------------------------------------------------------
+?(ptr):=and($$(gp)+zxt(?(disp)),~(#(1)));<-({mem(?(ptr)+ #(1)),mem(?(ptr))},?(rs))
 ```
 
 ###### Module
@@ -573,14 +574,14 @@ if(~b_pop($$(ts)), (?(offset):= ?(arg);$$(pc)<- $$(pc)\s+sxt(?(offset))))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b11000 | `0111000iiiiiirrr` | 6 | `[0, 63]` |
+| `ri(1)` = 0b01 | 0b01000 | `0101000iiiiiirrr` | 6 | `[0,63]` |
 
 ###### Semantics
 
 ```
-[imm(?(bit_idx)), reg(r, ?(rs))]
------------------------------------------------------------------------------------------------------------------
-?(shamt):=bitslice(?(bit_idx), ..(#(3), #(0)));?(bit):= ?(rs)>> ?(shamt)\u and #(1);b_push($$(ts), ?(bit)== #(1))
+[imm(?(bit_idx)),reg(r,?(rs))]
+-------------------------------------------------------------------------------------------------
+?(shamt):= \(?(bit_idx),4);?(bit):=and(?(rs)>> ?(shamt),#(1));<-($$(ts),or($$(ts)<< #(1),?(bit)))
 ```
 
 ###### Module
@@ -602,14 +603,14 @@ if(~b_pop($$(ts)), (?(offset):= ?(arg);$$(pc)<- $$(pc)\s+sxt(?(offset))))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b01101 | `0101101iiiiiirrr` | 6 | `[0, 63]` |
+| `ri(1)` = 0b01 | 0b01011 | `0101011iiiiiirrr` | 6 | `[0,63]` |
 
 ###### Semantics
 
 ```
-[imm(?(bit_idx)), reg(r, ?(rd))]
---------------------------------------------------------------------------------------------------
-?(idx):=bitslice(?(bit_idx), ..(#(3), #(0)))\u;?(mask):= ~ (#(1)<< ?(idx));?(rd)<- ?(rd)and?(mask)
+[imm(?(bit_idx)),reg(r,?(rd))]
+--------------------------------------------------------------------------------
+?(idx):= \(?(bit_idx),4);?(mask):= ~(#(1)<< ?(idx));<-(?(rd),and(?(rd),?(mask)))
 ```
 
 ###### Module
@@ -631,14 +632,14 @@ if(~b_pop($$(ts)), (?(offset):= ?(arg);$$(pc)<- $$(pc)\s+sxt(?(offset))))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b11001 | `0111001iiiiiirrr` | 6 | `[0, 63]` |
+| `ri(1)` = 0b01 | 0b01010 | `0101010iiiiiirrr` | 6 | `[0,63]` |
 
 ###### Semantics
 
 ```
-[imm(?(bit_idx)), reg(r, ?(rd))]
--------------------------------------------------------------------------------------------------
-?(idx):=bitslice(?(bit_idx), ..(#(3), #(0)))\u;?(mask):= ~ (#(1)<< ?(idx));?(rd)<- ?(rd)or?(mask)
+[imm(?(bit_idx)),reg(r,?(rd))]
+-------------------------------------------------------------------------------
+?(idx):= \(?(bit_idx),4);?(mask):= ~(#(1)<< ?(idx));<-(?(rd),or(?(rd),?(mask)))
 ```
 
 ###### Module
@@ -660,14 +661,43 @@ if(~b_pop($$(ts)), (?(offset):= ?(arg);$$(pc)<- $$(pc)\s+sxt(?(offset))))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b01111 | `0101111iiiiiirrr` | 6 | `[-32, 31]` |
+| `ri(1)` = 0b01 | 0b01111 | `0101111iiiiiirrr` | 6 | `[-32,31]` |
 
 ###### Semantics
 
 ```
-[reg(r, ?(rs)), simm(?(simm))]
--------------------------------------------------------
-b_push($$(ts), compare(?(rs)\s, <(s\16), sxt(?(simm))))
+[reg(r,?(rs)),simm(?(simm))]
+---------------------------------------------------------------------------------------------------------
+lessthan{lessthan: ?(bit),x: ?(rs),y: ?(simm)};b_push{bit: ?(bit),stack_in: $$(ts),stack_out: ->($$(ts))}
+```
+
+###### Module
+
+**`imms`**
+
+--------------
+
+##### The `tgi` Instruction
+
+**Test Greater-than Immediate** --- Test if a register value is greater than an immediate value via signed comparison.
+
+###### Examples
+
+- `tgi x, -5`
+
+###### Layout
+
+
+| Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
+|:---:|:---:|:---:|:---:|:---:|
+| `ri(1)` = 0b01 | 0b111001 | `01111001iiiiiirrr` | 6 | `[-32,31]` |
+
+###### Semantics
+
+```
+[reg(r,?(rs)),simm(?(simm))]
+---------------------------------------------------------------------------------------------------------
+lessthan{lessthan: ?(bit),x: ?(simm),y: ?(rs)};b_push{bit: ?(bit),stack_in: $$(ts),stack_out: ->($$(ts))}
 ```
 
 ###### Module
@@ -689,14 +719,43 @@ b_push($$(ts), compare(?(rs)\s, <(s\16), sxt(?(simm))))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b01101 | `0101101iiiiiirrr` | 6 | `[-32, 31]` |
+| `ri(1)` = 0b01 | 0b111000 | `01111000iiiiiirrr` | 6 | `[-32,31]` |
 
 ###### Semantics
 
 ```
-[reg(r, ?(rs)), simm(?(simm))]
---------------------------------------------------------
-b_push($$(ts), compare(?(rs)\s, >=(s\16), sxt(?(simm))))
+[reg(r,?(rs)),simm(?(simm))]
+------------------------------------------------------------------------------------------------------------
+lessthan{lessthan: ?(bit),x: ?(rs),y: ?(simm)};b_push{bit: ~(?(bit)),stack_in: $$(ts),stack_out: ->($$(ts))}
+```
+
+###### Module
+
+**`imms`**
+
+--------------
+
+##### The `tlei` Instruction
+
+**Test Less-than or Equal Immediate** --- Test if a register value is less than or equal to an immediate value via signed comparison.
+
+###### Examples
+
+- `tlei x, -5`
+
+###### Layout
+
+
+| Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
+|:---:|:---:|:---:|:---:|:---:|
+| `ri(1)` = 0b01 | 0b11101 | `0111101iiiiiirrr` | 6 | `[-32,31]` |
+
+###### Semantics
+
+```
+[reg(r,?(rs)),simm(?(simm))]
+------------------------------------------------------------------------------------------------------------
+lessthan{lessthan: ?(bit),x: ?(simm),y: ?(rs)};b_push{bit: ~(?(bit)),stack_in: $$(ts),stack_out: ->($$(ts))}
 ```
 
 ###### Module
@@ -718,14 +777,43 @@ b_push($$(ts), compare(?(rs)\s, >=(s\16), sxt(?(simm))))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b01110 | `0101110iiiiiirrr` | 6 | `[0, 63]` |
+| `ri(1)` = 0b01 | 0b01101 | `0101101iiiiiirrr` | 6 | `[0,63]` |
 
 ###### Semantics
 
 ```
-[reg(r, ?(rs)), imm(?(imm))]
-------------------------------------------------------
-b_push($$(ts), compare(?(rs)\u, <(u\16), zxt(?(imm))))
+[reg(r,?(rs)),imm(?(imm))]
+--------------------------
+todo
+```
+
+###### Module
+
+**`imms`**
+
+--------------
+
+##### The `tai` Instruction
+
+**Test Above Immediate** --- Test if a register value is above an immediate value via unsigned comparison.
+
+###### Examples
+
+- `tai x, 10`
+
+###### Layout
+
+
+| Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
+|:---:|:---:|:---:|:---:|:---:|
+| `ri(1)` = 0b01 | 0b110001 | `01110001iiiiiirrr` | 6 | `[0,63]` |
+
+###### Semantics
+
+```
+[reg(r,?(rs)),imm(?(imm))]
+--------------------------
+todo
 ```
 
 ###### Module
@@ -747,14 +835,43 @@ b_push($$(ts), compare(?(rs)\u, <(u\16), zxt(?(imm))))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b01100 | `0101100iiiiiirrr` | 6 | `[0, 63]` |
+| `ri(1)` = 0b01 | 0b110000 | `01110000iiiiiirrr` | 6 | `[0,63]` |
 
 ###### Semantics
 
 ```
-[reg(r, ?(rs)), imm(?(imm))]
--------------------------------------------------------
-b_push($$(ts), compare(?(rs)\u, >=(u\16), zxt(?(imm))))
+[reg(r,?(rs)),imm(?(imm))]
+--------------------------
+todo
+```
+
+###### Module
+
+**`imms`**
+
+--------------
+
+##### The `tbei` Instruction
+
+**Test Below or Equal** --- Test if a register value is below or equal to an immediate value via unsigned comparison.
+
+###### Examples
+
+- `tbei x, 10`
+
+###### Layout
+
+
+| Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
+|:---:|:---:|:---:|:---:|:---:|
+| `ri(1)` = 0b01 | 0b11001 | `0111001iiiiiirrr` | 6 | `[0,63]` |
+
+###### Semantics
+
+```
+[reg(r,?(rs)),imm(?(imm))]
+--------------------------
+todo
 ```
 
 ###### Module
@@ -776,14 +893,14 @@ b_push($$(ts), compare(?(rs)\u, >=(u\16), zxt(?(imm))))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b00101 | `0100101iiiiiirrr` | 6 | `[-32, 31]` |
+| `ri(1)` = 0b01 | 0b10011 | `0110011iiiiiirrr` | 6 | `[-32,31]` |
 
 ###### Semantics
 
 ```
-[reg(r, ?(rs)), simm(?(simm))]
--------------------------------------
-b_push($$(ts), ?(rs)\s\=sxt(?(simm)))
+[reg(r,?(rs)),simm(?(simm))]
+--------------------------------------------------------------------------
+b_push{bit: ~(?(rs)==sxt(?(simm))),stack_in: $$(ts),stack_out: ->($$(ts))}
 ```
 
 ###### Module
@@ -805,14 +922,14 @@ b_push($$(ts), ?(rs)\s\=sxt(?(simm)))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b00100 | `0100100iiiiiirrr` | 6 | `[-32, 31]` |
+| `ri(1)` = 0b01 | 0b10010 | `0110010iiiiiirrr` | 6 | `[-32,31]` |
 
 ###### Semantics
 
 ```
-[reg(r, ?(rs)), simm(?(simm))]
--------------------------------------
-b_push($$(ts), ?(rs)\s==sxt(?(simm)))
+[reg(r,?(rs)),simm(?(simm))]
+-----------------------------------------------------------------------
+b_push{bit: ?(rs)==sxt(?(simm)),stack_in: $$(ts),stack_out: ->($$(ts))}
 ```
 
 ###### Module
@@ -834,14 +951,14 @@ b_push($$(ts), ?(rs)\s==sxt(?(simm)))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b00000 | `0100000iiiiiirrr` | 6 | `[-32, 31]` |
+| `ri(1)` = 0b01 | 0b00000 | `0100000iiiiiirrr` | 6 | `[-32,31]` |
 
 ###### Semantics
 
 ```
-[reg(r, ?(rd)), simm(?(simm))]
-------------------------------
-?(rd)<- ?(rd)\s+sxt(?(simm))
+[reg(r,?(rd)),simm(?(simm))]
+----------------------------
+<-(?(rd),?(rd)+sxt(?(simm)))
 ```
 
 ###### Module
@@ -863,14 +980,14 @@ b_push($$(ts), ?(rs)\s==sxt(?(simm)))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b01011 | `0101011iiiiiirrr` | 6 | `[-32, 31]` |
+| `ri(1)` = 0b01 | 0b00111 | `0100111iiiiiirrr` | 6 | `[-32,31]` |
 
 ###### Semantics
 
 ```
-[reg(r, ?(rd)), simm(?(simm))]
-------------------------------
-?(rd)<- ?(rd)and sxt(?(simm))
+[reg(r,?(rd)),simm(?(simm))]
+---------------------------------
+<-(?(rd),and(?(rd),sxt(?(simm))))
 ```
 
 ###### Module
@@ -892,14 +1009,14 @@ b_push($$(ts), ?(rs)\s==sxt(?(simm)))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b10100 | `0110100iiiiiirrr` | 6 | `[-32, 31]` |
+| `ri(1)` = 0b01 | 0b01100 | `0101100iiiiiirrr` | 6 | `[-32,31]` |
 
 ###### Semantics
 
 ```
-[reg(r, ?(rd)), simm(?(simm))]
-------------------------------
-?(rd)<- ?(rd)or sxt(?(simm))
+[reg(r,?(rd)),simm(?(simm))]
+--------------------------------
+<-(?(rd),or(?(rd),sxt(?(simm))))
 ```
 
 ###### Module
@@ -921,14 +1038,14 @@ b_push($$(ts), ?(rs)\s==sxt(?(simm)))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b10101 | `0110101iiiiiirrr` | 6 | `[-32, 31]` |
+| `ri(1)` = 0b01 | 0b01101 | `0101101iiiiiirrr` | 6 | `[-32,31]` |
 
 ###### Semantics
 
 ```
-[reg(r, ?(rd)), simm(?(simm))]
-------------------------------
-?(rd)<- ?(rd)xor sxt(?(simm))
+[reg(r,?(rd)),simm(?(simm))]
+-------------------------------
+<-(?(rd),?(rd)xor sxt(?(simm)))
 ```
 
 ###### Module
@@ -950,14 +1067,14 @@ b_push($$(ts), ?(rs)\s==sxt(?(simm)))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b00011 | `0100011iiiiiirrr` | 6 | `[-32, 31]` |
+| `ri(1)` = 0b01 | 0b00011 | `0100011iiiiiirrr` | 6 | `[-32,31]` |
 
 ###### Semantics
 
 ```
-[reg(r, ?(rd)), simm(?(simm))]
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-?(rd)<- ?(rd)\s+sxt(?(simm))+bit($$(cc), #(carry_flag_bit))\16\s;bit($$(cc), #(carry_flag_bit))<-attr(cpu/alu/carryout);bit($$(cc), #(overflow_flag_bit))<-attr(cpu/alu/overflow)
+[reg(r,?(rd)),simm(?(simm))]
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<-(?(rd),?(rd)+sxt(?(simm))+zxt(bit($$(cc),#(::(cc,carry_flag_bit)))));<-(bit($$(cc),#(::(cc,carry_flag_bit))),attr(cpu/alu/carryout));<-(bit($$(cc),#(::(cc,overflow_flag_bit))),attr(cpu/alu/overflow))
 ```
 
 ###### Module
@@ -979,14 +1096,14 @@ b_push($$(ts), ?(rs)\s==sxt(?(simm)))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b00010 | `0100010iiiiiirrr` | 6 | `[-32, 31]` |
+| `ri(1)` = 0b01 | 0b00010 | `0100010iiiiiirrr` | 6 | `[-32,31]` |
 
 ###### Semantics
 
 ```
-[reg(r, ?(rd)), simm(?(simm))]
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-?(rd)<- ?(rd)\s-sxt(?(simm))-bit($$(cc), #(carry_flag_bit))\16\s;bit($$(cc), #(carry_flag_bit))<-attr(cpu/alu/carryout);bit($$(cc), #(overflow_flag_bit))<-attr(cpu/alu/overflow)
+[reg(r,?(rd)),simm(?(simm))]
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<-(?(rd),\(?(rd),s)-sxt(?(simm))- \(\(bit($$(cc),#(::(cc,carry_flag_bit))),16),s));<-(bit($$(cc),#(::(cc,carry_flag_bit))),attr(cpu/alu/carryout));<-(bit($$(cc),#(::(cc,overflow_flag_bit))),attr(cpu/alu/overflow))
 ```
 
 ###### Module
@@ -997,7 +1114,7 @@ b_push($$(ts), ?(rs)\s==sxt(?(simm)))
 
 ##### The `lsr` Instruction
 
-**Logical Shift Right** --- Perform a logical shift right on a register by an immediate value.
+**Logical Shift Right** --- Perform a logical shift right on a register by a 4-bit immediate value.
 
 ###### Examples
 
@@ -1008,14 +1125,14 @@ b_push($$(ts), ?(rs)\s==sxt(?(simm)))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b10010 | `0110010iiiiiirrr` | 6 | `[0, 63]` |
+| `ri(1)` = 0b01 | 0b010010 | `01010010iiiiiirrr` | 6 | `[0,63]` |
 
 ###### Semantics
 
 ```
-[reg(r, ?(rd)), imm(?(imm))]
--------------------------------------------------------------------------------------
-bit($$(cc), #(carry_flag_bit))<-bit(?(rd), ?(imm)- #(1));?(rd)<-(?(rd)>> ?(imm))\i\16
+[reg(r,?(rd)),imm(?(imm))]
+---------------------------------------------------------------------------------------------------
+<-(bit($$(cc),#(::(cc,carry_flag_bit))),bit(?(rd),\(?(imm),4)- #(1)));<-(?(rd),?(rd)>> \(?(imm),4))
 ```
 
 ###### Module
@@ -1037,14 +1154,14 @@ bit($$(cc), #(carry_flag_bit))<-bit(?(rd), ?(imm)- #(1));?(rd)<-(?(rd)>> ?(imm))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b01000 | `0101000iiiiiirrr` | 6 | `[0, 63]` |
+| `ri(1)` = 0b01 | 0b01000 | `0101000iiiiiirrr` | 6 | `[0,63]` |
 
 ###### Semantics
 
 ```
-[reg(r, ?(rd)), imm(?(imm))]
---------------------------------------------------------------------------------------
-bit($$(cc), #(carry_flag_bit))<-bit(?(rd), #(16)- ?(imm));?(rd)<-(?(rd)<< ?(imm))\i\16
+[reg(r,?(rd)),imm(?(imm))]
+----------------------------------------------------------------------------------------------------
+<-(bit($$(cc),#(::(cc,carry_flag_bit))),bit(?(rd),#(16)- \(?(imm),4)));<-(?(rd),?(rd)<< \(?(imm),4))
 ```
 
 ###### Module
@@ -1066,14 +1183,14 @@ bit($$(cc), #(carry_flag_bit))<-bit(?(rd), #(16)- ?(imm));?(rd)<-(?(rd)<< ?(imm)
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b10011 | `0110011iiiiiirrr` | 6 | `[0, 63]` |
+| `ri(1)` = 0b01 | 0b010011 | `01010011iiiiiirrr` | 6 | `[0,63]` |
 
 ###### Semantics
 
 ```
-[reg(r, ?(rd)), imm(?(imm))]
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-?(sign):=bit(?(rd), #(15));?(sign_extension):=sxt(?(sign)- #(1))<<(#(reg_size_bits)- ?(imm));bit($$(cc), #(carry_flag_bit))<-bit(?(rd), ?(imm)- #(1));?(rd)<- ?(rd)>> ?(imm)or?(sign_extension)
+[reg(r,?(rd)),imm(?(imm))]
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+?(sign):=bit(?(rd),#(15));?(sign_extension):=sxt(?(sign)- #(1))<<(#(reg_size_bits)- ?(imm));<-(bit($$(cc),#(::(cc,carry_flag_bit))),bit(?(rd),?(imm)- #(1)));<-(?(rd),or(?(rd)>> ?(imm),?(sign_extension)))
 ```
 
 ###### Module
@@ -1095,14 +1212,14 @@ bit($$(cc), #(carry_flag_bit))<-bit(?(rd), #(16)- ?(imm));?(rd)<-(?(rd)<< ?(imm)
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b11100 | `0111100iiiiiirrr` | 6 | `[0, 63]` |
+| `ri(1)` = 0b01 | 0b10100 | `0110100iiiiiirrr` | 6 | `[0,63]` |
 
 ###### Semantics
 
 ```
-[reg(r, ?(rs)), imm(?(imm))]
-------------------------------------
-b_push($$(ts), bit([?(rs)], ?(imm)))
+[reg(r,?(rs)),imm(?(imm))]
+----------------------------------
+b_push($$(ts),bit([?(rs)],?(imm)))
 ```
 
 ###### Module
@@ -1124,14 +1241,14 @@ b_push($$(ts), bit([?(rs)], ?(imm)))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b01111 | `0101111iiiiiirrr` | 6 | `[0, 63]` |
+| `ri(1)` = 0b01 | 0b01011 | `0101011iiiiiirrr` | 6 | `[0,63]` |
 
 ###### Semantics
 
 ```
-[reg(r, ?(rs)), imm(?(imm))]
-------------------------------------
-[?(rs)]<-[?(rs)]and~ (#(1)<< ?(imm))
+[reg(r,?(rs)),imm(?(imm))]
+-----------------------------------------
+<-([?(rs)],and([?(rs)],~(#(1)<< ?(imm))))
 ```
 
 ###### Module
@@ -1153,14 +1270,14 @@ b_push($$(ts), bit([?(rs)], ?(imm)))
 
 | Format Prefix | Opcode | Bit Layout | Immediate Bits | Immediate Range |
 |:---:|:---:|:---:|:---:|:---:|
-| `ri(1)` = 0b01 | 0b11101 | `0111101iiiiiirrr` | 6 | `[0, 63]` |
+| `ri(1)` = 0b01 | 0b10101 | `0110101iiiiiirrr` | 6 | `[0,63]` |
 
 ###### Semantics
 
 ```
-[reg(r, ?(rs)), imm(?(imm))]
--------------------------------
-[?(rs)]<-[?(rs)]or#(1)<< ?(imm)
+[reg(r,?(rs)),imm(?(imm))]
+-------------------------------------
+<-([?(rs)],or([?(rs)],#(1)<< ?(imm)))
 ```
 
 ###### Module
@@ -1200,9 +1317,9 @@ b_push($$(ts), bit([?(rs)], ?(imm)))
 ###### Semantics
 
 ```
-[reg(t, ?(multiplicand_hi)):reg(s, ?(multiplicand_lo)), reg(r, ?(multiplier))]
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-?(mask):= ~ ((?(multiplier)and#(1))- #(1));?(masked_lo):= ?(multiplicand_lo)and?(mask);?(masked_hi):= ?(multiplicand_hi)and?(mask);lo($$(mp))<-lo($$(mp))+ ?(masked_lo);hi($$(mp))<-hi($$(mp))+ ?(masked_hi)+attr(cpu/alu/carryout);?(shift_cout):=bit(?(multiplicand_lo), #(reg_size_bits)- #(1));?(multiplicand_lo)<- ?(multiplicand_lo)<< #(1);?(multiplicand_hi)<- ?(multiplicand_hi)<<(#(1)+ ?(shift_cout));?(multiplier)<- ?(multiplier)div#(2)
+[reg(t,?(multiplicand_hi)):reg(s,?(multiplicand_lo)),reg(r,?(multiplier))]
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+?(mask):= ~(and(?(multiplier),#(1))- #(1));?(masked_lo):=and(?(multiplicand_lo),?(mask));?(masked_hi):=and(?(multiplicand_hi),?(mask));<-(lo($$(mp)),lo($$(mp))+ ?(masked_lo));<-(hi($$(mp)),hi($$(mp))+ ?(masked_hi)+attr(cpu/alu/carryout));?(shift_cout):=bit(?(multiplicand_lo),#(reg_size_bits)- #(1));<-(?(multiplicand_lo),?(multiplicand_lo)<< #(1));<-(?(multiplicand_hi),?(multiplicand_hi)<< #(1)+ ?(shift_cout));<-(?(multiplier),?(multiplier)>> #(1))
 ```
 
 ###### Module
@@ -1237,9 +1354,9 @@ b_push($$(ts), bit([?(rs)], ?(imm)))
 ###### Semantics
 
 ```
-[reg(r, ?(rd)), reg(s, ?(rs))]
----------------------------------------------------------------------------
-bit($$(cc), #(carry_flag_bit))<-attr(cpu/alu/carryout);?(rd)<- ?(rd)+ ?(rs)
+[reg(r,?(rd)),reg(s,?(rs))]
+--------------------------------------------------------------------------------------
+<-(bit($$(cc),#(::(cc,carry_flag_bit))),attr(cpu/alu/carryout));<-(?(rd),?(rd)+ ?(rs))
 ```
 
 ###### Module
@@ -1266,9 +1383,9 @@ bit($$(cc), #(carry_flag_bit))<-attr(cpu/alu/carryout);?(rd)<- ?(rd)+ ?(rs)
 ###### Semantics
 
 ```
-[reg(r, ?(rd)), reg(s, ?(rs))]
-------------------------------
-?(rd)<- ?(rd)- ?(rs)
+[reg(r,?(rd)),reg(s,?(rs))]
+---------------------------
+<-(?(rd),?(rd)- ?(rs))
 ```
 
 ###### Module
@@ -1295,9 +1412,9 @@ bit($$(cc), #(carry_flag_bit))<-attr(cpu/alu/carryout);?(rd)<- ?(rd)+ ?(rs)
 ###### Semantics
 
 ```
-[reg(r, ?(rd)), reg(s, ?(rs))]
-------------------------------
-?(rd)<- ?(rd)and?(rs)
+[reg(r,?(rd)),reg(s,?(rs))]
+---------------------------
+<-(?(rd),and(?(rd),?(rs)))
 ```
 
 ###### Module
@@ -1324,9 +1441,9 @@ bit($$(cc), #(carry_flag_bit))<-attr(cpu/alu/carryout);?(rd)<- ?(rd)+ ?(rs)
 ###### Semantics
 
 ```
-[reg(r, ?(rd)), reg(s, ?(rs))]
-------------------------------
-?(rd)<- ?(rd)or?(rs)
+[reg(r,?(rd)),reg(s,?(rs))]
+---------------------------
+<-(?(rd),or(?(rd),?(rs)))
 ```
 
 ###### Module
@@ -1353,9 +1470,9 @@ bit($$(cc), #(carry_flag_bit))<-attr(cpu/alu/carryout);?(rd)<- ?(rd)+ ?(rs)
 ###### Semantics
 
 ```
-[reg(r, ?(rd)), reg(s, ?(rs))]
-------------------------------
-?(rd)<- ?(rd)xor?(rs)
+[reg(r,?(rd)),reg(s,?(rs))]
+---------------------------
+<-(?(rd),?(rd)xor?(rs))
 ```
 
 ###### Module
@@ -1382,9 +1499,9 @@ bit($$(cc), #(carry_flag_bit))<-attr(cpu/alu/carryout);?(rd)<- ?(rd)+ ?(rs)
 ###### Semantics
 
 ```
-[reg(r, ?(rd)), reg(s, ?(rs))]
-------------------------------
-?(rd)<- ?(rs)
+[reg(r,?(rd)),reg(s,?(rs))]
+---------------------------
+<-(?(rd),?(rs))
 ```
 
 ###### Module
@@ -1411,9 +1528,9 @@ bit($$(cc), #(carry_flag_bit))<-attr(cpu/alu/carryout);?(rd)<- ?(rd)+ ?(rs)
 ###### Semantics
 
 ```
-[reg(r, ?(rd)), reg(s, ?(rs))]
------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-?(rd)<- ?(rd)+ ?(rs)+bit($$(cc), #(carry_flag_bit))\16;bit($$(cc), #(carry_flag_bit))<-attr(cpu/alu/carryout);bit($$(cc), #(overflow_flag_bit))<-attr(cpu/alu/overflow)
+[reg(r,?(rd)),reg(s,?(rs))]
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<-(?(rd),?(rd)+ ?(rs)+ \(bit($$(cc),#(::(cc,carry_flag_bit))),16));<-(bit($$(cc),#(::(cc,carry_flag_bit))),attr(cpu/alu/carryout));<-(bit($$(cc),#(::(cc,overflow_flag_bit))),attr(cpu/alu/overflow))
 ```
 
 ###### Module
@@ -1440,9 +1557,9 @@ bit($$(cc), #(carry_flag_bit))<-attr(cpu/alu/carryout);?(rd)<- ?(rd)+ ?(rs)
 ###### Semantics
 
 ```
-[reg(r, ?(rd)), reg(s, ?(rs))]
------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-?(rd)<- ?(rd)- ?(rs)-bit($$(cc), #(carry_flag_bit))\16;bit($$(cc), #(carry_flag_bit))<-attr(cpu/alu/carryout);bit($$(cc), #(overflow_flag_bit))<-attr(cpu/alu/overflow)
+[reg(r,?(rd)),reg(s,?(rs))]
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<-(?(rd),?(rd)- ?(rs)- \(bit($$(cc),#(::(cc,carry_flag_bit))),16));<-(bit($$(cc),#(::(cc,carry_flag_bit))),attr(cpu/alu/carryout));<-(bit($$(cc),#(::(cc,overflow_flag_bit))),attr(cpu/alu/overflow))
 ```
 
 ###### Module
@@ -1474,9 +1591,9 @@ bit($$(cc), #(carry_flag_bit))<-attr(cpu/alu/carryout);?(rd)<- ?(rd)+ ?(rs)
 ###### Semantics
 
 ```
-[reg(r, ?(r1)), reg(s, ?(r2))]
+[reg(r,?(r1)),reg(s,?(r2))]
 ----------------------------------------------
-b_push($$(ts), compare(?(r1), <(s\16), ?(r2)))
+b_push($$(ts),compare(?(r1),<(\(s,16)),?(r2)))
 ```
 
 ###### Module
@@ -1503,9 +1620,9 @@ b_push($$(ts), compare(?(r1), <(s\16), ?(r2)))
 ###### Semantics
 
 ```
-[reg(r, ?(r1)), reg(s, ?(r2))]
+[reg(r,?(r1)),reg(s,?(r2))]
 -----------------------------------------------
-b_push($$(ts), compare(?(r1), >=(s\16), ?(r2)))
+b_push($$(ts),compare(?(r1),>=(\(s,16)),?(r2)))
 ```
 
 ###### Module
@@ -1532,9 +1649,9 @@ b_push($$(ts), compare(?(r1), >=(s\16), ?(r2)))
 ###### Semantics
 
 ```
-[reg(r, ?(r1)), reg(s, ?(r2))]
+[reg(r,?(r1)),reg(s,?(r2))]
 ----------------------------------------------
-b_push($$(ts), compare(?(r1), <(u\16), ?(r2)))
+b_push($$(ts),compare(?(r1),<(\(u,16)),?(r2)))
 ```
 
 ###### Module
@@ -1561,9 +1678,9 @@ b_push($$(ts), compare(?(r1), <(u\16), ?(r2)))
 ###### Semantics
 
 ```
-[reg(r, ?(r1)), reg(s, ?(r2))]
+[reg(r,?(r1)),reg(s,?(r2))]
 -----------------------------------------------
-b_push($$(ts), compare(?(r1), >=(u\16), ?(r2)))
+b_push($$(ts),compare(?(r1),>=(\(u,16)),?(r2)))
 ```
 
 ###### Module
@@ -1595,9 +1712,9 @@ b_push($$(ts), compare(?(r1), >=(u\16), ?(r2)))
 ###### Semantics
 
 ```
-[reg(r, ?(r1)), reg(s, ?(r2))]
-------------------------------
-b_push($$(ts), ?(r1)\= ?(r2))
+[reg(r,?(r1)),reg(s,?(r2))]
+----------------------------
+b_push($$(ts),?(r1)\= ?(r2))
 ```
 
 ###### Module
@@ -1624,9 +1741,9 @@ b_push($$(ts), ?(r1)\= ?(r2))
 ###### Semantics
 
 ```
-[reg(r, ?(r1)), reg(s, ?(r2))]
-------------------------------
-b_push($$(ts), ?(r1)== ?(r2))
+[reg(r,?(r1)),reg(s,?(r2))]
+----------------------------
+b_push($$(ts),?(r1)== ?(r2))
 ```
 
 ###### Module
@@ -1661,9 +1778,9 @@ b_push($$(ts), ?(r1)== ?(r2))
 ###### Semantics
 
 ```
-[reg(r, ?(rs))]
----------------
-todo
+[reg(r,?(rs))]
+---------------------------------------------------------------------
+?(new_sp):= $sp- #(1);<-(mem(?(new_sp)),\(?(rs),8));<-($sp,?(new_sp))
 ```
 
 ###### Module
@@ -1690,8 +1807,8 @@ todo
 ###### Semantics
 
 ```
-[reg(r, ?(rs))]
----------------
+[reg(r,?(rs))]
+--------------
 todo
 ```
 
@@ -1719,8 +1836,8 @@ todo
 ###### Semantics
 
 ```
-[reg(r, ?(rd))]
----------------
+[reg(r,?(rd))]
+--------------
 todo
 ```
 
@@ -1748,8 +1865,8 @@ todo
 ###### Semantics
 
 ```
-[reg(r, ?(rd))]
----------------
+[reg(r,?(rd))]
+--------------
 todo
 ```
 
@@ -1777,9 +1894,9 @@ todo
 ###### Semantics
 
 ```
-[reg(r, ?(abs_lbl))]
------------------------------------------
-$$(pc)<- ?(abs_lbl);$$(ra)<- $$(pc)+ #(2)
+[reg(r,?(abs_lbl))]
+---------------------------------------------
+<-($$(pc),?(abs_lbl));<-($$(ra),$$(pc)+ #(2))
 ```
 
 ###### Module
@@ -1806,9 +1923,9 @@ $$(pc)<- ?(abs_lbl);$$(ra)<- $$(pc)+ #(2)
 ###### Semantics
 
 ```
-[reg(r, ?(abs_lbl))]
---------------------
-$$(pc)<- ?(abs_lbl)
+[reg(r,?(abs_lbl))]
+---------------------
+<-($$(pc),?(abs_lbl))
 ```
 
 ###### Module
@@ -1835,9 +1952,9 @@ $$(pc)<- ?(abs_lbl)
 ###### Semantics
 
 ```
-[reg(r, ?(rd))]
----------------
-?(rd)<- - ?(rd)
+[reg(r,?(rd))]
+-----------------
+<-(?(rd),- ?(rd))
 ```
 
 ###### Module
@@ -1864,9 +1981,9 @@ $$(pc)<- ?(abs_lbl)
 ###### Semantics
 
 ```
-[reg(r, ?(rd))]
--------------------
-?(rd)<-sxt(?(rd)\8)
+[reg(r,?(rd))]
+-------------------------
+<-(?(rd),sxt(\(?(rd),8)))
 ```
 
 ###### Module
@@ -1898,9 +2015,9 @@ $$(pc)<- ?(abs_lbl)
 ###### Semantics
 
 ```
-[reg(r, ?(rd))]
------------------
-?(rd)<-lo($$(mp))
+[reg(r,?(rd))]
+--------------------
+<-(?(rd),lo($$(mp)))
 ```
 
 ###### Module
@@ -1927,9 +2044,9 @@ $$(pc)<- ?(abs_lbl)
 ###### Semantics
 
 ```
-[reg(r, ?(rd))]
------------------
-?(rd)<-hi($$(mp))
+[reg(r,?(rd))]
+--------------------
+<-(?(rd),hi($$(mp)))
 ```
 
 ###### Module
@@ -1956,9 +2073,9 @@ $$(pc)<- ?(abs_lbl)
 ###### Semantics
 
 ```
-[reg(r, ?(rd))]
----------------
-?(rd)<- $$(gp)
+[reg(r,?(rd))]
+----------------
+<-(?(rd),$$(gp))
 ```
 
 ###### Module
@@ -1985,9 +2102,9 @@ $$(pc)<- ?(abs_lbl)
 ###### Semantics
 
 ```
-[reg(r, ?(rs))]
----------------
-$$(gp)<- ?(rs)
+[reg(r,?(rs))]
+----------------
+<-($$(gp),?(rs))
 ```
 
 ###### Module
@@ -2023,8 +2140,8 @@ $$(gp)<- ?(rs)
 
 ```
 []
------------------------
-$$(pc)<- #(nonexe0_isr)
+-----------------------------
+<-($$(pc),#(::(isr,nonexe0)))
 ```
 
 ###### Module
@@ -2052,8 +2169,8 @@ $$(pc)<- #(nonexe0_isr)
 
 ```
 []
-----------------------
-$$(pc)<- #(unimpl_isr)
+----------------------------
+<-($$(pc),#(::(isr,unimpl)))
 ```
 
 ###### Module
@@ -2081,8 +2198,8 @@ $$(pc)<- #(unimpl_isr)
 
 ```
 []
----------------------
-$$(pc)<- #(break_isr)
+---------------------------
+<-($$(pc),#(::(isr,break)))
 ```
 
 ###### Module
@@ -2110,8 +2227,8 @@ $$(pc)<- #(break_isr)
 
 ```
 []
----------------
-$$(pc)<- $$(kr)
+-----------------
+<-($$(pc),$$(kr))
 ```
 
 ###### Module
@@ -2139,8 +2256,8 @@ $$(pc)<- $$(kr)
 
 ```
 []
---------------------------------------
-$$(kr)<- $$(pc)+ #(2);$$(pc)<- $v;todo
+------------------------------------------
+<-($$(kr),$$(pc)+ #(2));<-($$(pc),$v);todo
 ```
 
 ###### Module
@@ -2168,8 +2285,8 @@ $$(kr)<- $$(pc)+ #(2);$$(pc)<- $v;todo
 
 ```
 []
----------------
-$$(pc)<- $$(ra)
+-----------------
+<-($$(pc),$$(ra))
 ```
 
 ###### Module
@@ -2197,8 +2314,8 @@ $$(pc)<- $$(ra)
 
 ```
 []
--------------------------------------------------
-b_push($$(ts), bit($$(cc), #(overflow_flag_idx)))
+------------------------------------------------------------------------------------------
+b_push{bit:bit($$(cc),#(::(cc,overflow_flag_bit))),stack_in: $$(ts),stack_out: ->($$(ts))}
 ```
 
 ###### Module
@@ -2226,8 +2343,8 @@ b_push($$(ts), bit($$(cc), #(overflow_flag_idx)))
 
 ```
 []
-----------------------------------------------
-b_push($$(ts), bit($$(cc), #(carry_flag_idx)))
+---------------------------------------------------------------------------------------
+b_push{bit:bit($$(cc),#(::(cc,carry_flag_bit))),stack_in: $$(ts),stack_out: ->($$(ts))}
 ```
 
 ###### Module
@@ -2255,8 +2372,8 @@ b_push($$(ts), bit($$(cc), #(carry_flag_idx)))
 
 ```
 []
--------------------------------------
-bit($$(cc), #(carry_flag_idx))<- #(0)
+---------------------------------------------
+<-(bit($$(cc),#(::(cc,carry_flag_bit))),#(0))
 ```
 
 ###### Module
@@ -2284,8 +2401,8 @@ bit($$(cc), #(carry_flag_idx))<- #(0)
 
 ```
 []
--------------------------------------
-bit($$(cc), #(carry_flag_idx))<- #(1)
+---------------------------------------------
+<-(bit($$(cc),#(::(cc,carry_flag_bit))),#(1))
 ```
 
 ###### Module
@@ -2313,8 +2430,8 @@ bit($$(cc), #(carry_flag_idx))<- #(1)
 
 ```
 []
---------------------
-b_push($$(ts), #(0))
+--------------------------------------------------------
+b_push{bit: #(0),stack_in: $$(ts),stack_out: ->($$(ts))}
 ```
 
 ###### Module
@@ -2342,8 +2459,8 @@ b_push($$(ts), #(0))
 
 ```
 []
---------------------
-b_push($$(ts), #(1))
+--------------------------------------------------------
+b_push{bit: #(1),stack_in: $$(ts),stack_out: ->($$(ts))}
 ```
 
 ###### Module
@@ -2371,8 +2488,8 @@ b_push($$(ts), #(1))
 
 ```
 []
-------------------------------
-b_push($$(ts), ~b_pop($$(ts)))
+-------------------------------------------------------------------------------------------------------------------
+b_pop{bit: ?(bit),stack_in: $$(ts),stack_out: ?(ts1)};b_push{bit: ~(?(bit)),stack_in: ?(ts1),stack_out: ->($$(ts))}
 ```
 
 ###### Module
@@ -2400,8 +2517,8 @@ b_push($$(ts), ~b_pop($$(ts)))
 
 ```
 []
-----
-todo
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+b_pop{bit: ?(a),stack_in: $$(ts),stack_out: ?(ts1)};b_pop{bit: ?(b),stack_in: ?(ts1),stack_out: ?(ts2)};b_push{bit:and(?(a),?(b)),stack_in: ?(ts2),stack_out: ->($$(ts))}
 ```
 
 ###### Module
@@ -2429,8 +2546,8 @@ todo
 
 ```
 []
-----
-todo
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+b_pop{bit: ?(a),stack_in: $$(ts),stack_out: ?(ts1)};b_pop{bit: ?(b),stack_in: ?(ts1),stack_out: ?(ts2)};b_push{bit:or(?(a),?(b)),stack_in: ?(ts2),stack_out: ->($$(ts))}
 ```
 
 ###### Module
@@ -2458,8 +2575,8 @@ todo
 
 ```
 []
-----
-todo
+---------------------------------------------------------------
+b_push{bit: \($$(ts),1),stack_in: $$(ts),stack_out: ->($$(ts))}
 ```
 
 ###### Module
@@ -2762,8 +2879,8 @@ todo
 
 ```
 []
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-if(bit($$(cc), #(jmp_tgt_validation_en_flag_bit)), if(bit($$(cc), #(jmp_tgt_validation_req_flag_bit)), (bit($$(cc), #(jmp_tgt_validation_req_flag_bit))<- #(0)), exception(ILLINSTR)))
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+if(bit($$(cc),#(jmp_tgt_validation_en_flag_bit)),if(bit($$(cc),#(jmp_tgt_validation_req_flag_bit)),<-(bit($$(cc),#(jmp_tgt_validation_req_flag_bit)),#(0)),exception('ILLINSTR')))
 ```
 
 ###### Module

@@ -58,7 +58,7 @@ The minimal set of features needed for general computation.
 
 #### Instructions
 
-[`lb`](instruction-listing.md#the-lb-instruction), [`lw`](instruction-listing.md#the-lw-instruction), [`sb`](instruction-listing.md#the-sb-instruction), [`sw`](instruction-listing.md#the-sw-instruction), [`call`](instruction-listing.md#the-call-instruction), [`b`](instruction-listing.md#the-b-instruction), [`bt`](instruction-listing.md#the-bt-instruction), [`bf`](instruction-listing.md#the-bf-instruction), [`li`](instruction-listing.md#the-li-instruction), [`szi`](instruction-listing.md#the-szi-instruction), [`lsr`](instruction-listing.md#the-lsr-instruction), [`lsl`](instruction-listing.md#the-lsl-instruction), [`asr`](instruction-listing.md#the-asr-instruction), [`add`](instruction-listing.md#the-add-instruction), [`sub`](instruction-listing.md#the-sub-instruction), [`and`](instruction-listing.md#the-and-instruction), [`or`](instruction-listing.md#the-or-instruction), [`xor`](instruction-listing.md#the-xor-instruction), [`mov`](instruction-listing.md#the-mov-instruction), [`addcy`](instruction-listing.md#the-addcy-instruction), [`subcy`](instruction-listing.md#the-subcy-instruction), [`tl`](instruction-listing.md#the-tl-instruction), [`tge`](instruction-listing.md#the-tge-instruction), [`tb`](instruction-listing.md#the-tb-instruction), [`tae`](instruction-listing.md#the-tae-instruction), [`tne`](instruction-listing.md#the-tne-instruction), [`teq`](instruction-listing.md#the-teq-instruction), [`callr`](instruction-listing.md#the-callr-instruction), [`jr`](instruction-listing.md#the-jr-instruction), [`seb`](instruction-listing.md#the-seb-instruction), [`NONEXE0`](instruction-listing.md#the-nonexe0-instruction), [`ret`](instruction-listing.md#the-ret-instruction), [`tov`](instruction-listing.md#the-tov-instruction), [`tcy`](instruction-listing.md#the-tcy-instruction), [`clr.cy`](instruction-listing.md#the-clrcy-instruction), [`set.cy`](instruction-listing.md#the-setcy-instruction), 
+[`lb`](instruction-listing.md#the-lb-instruction), [`lw`](instruction-listing.md#the-lw-instruction), [`sb`](instruction-listing.md#the-sb-instruction), [`sw`](instruction-listing.md#the-sw-instruction), [`call`](instruction-listing.md#the-call-instruction), [`b`](instruction-listing.md#the-b-instruction), [`bt`](instruction-listing.md#the-bt-instruction), [`bf`](instruction-listing.md#the-bf-instruction), [`li`](instruction-listing.md#the-li-instruction), [`szi`](instruction-listing.md#the-szi-instruction), [`lsr`](instruction-listing.md#the-lsr-instruction), [`lsl`](instruction-listing.md#the-lsl-instruction), [`asr`](instruction-listing.md#the-asr-instruction), [`add`](instruction-listing.md#the-add-instruction), [`sub`](instruction-listing.md#the-sub-instruction), [`and`](instruction-listing.md#the-and-instruction), [`or`](instruction-listing.md#the-or-instruction), [`xor`](instruction-listing.md#the-xor-instruction), [`mov`](instruction-listing.md#the-mov-instruction), [`addcy`](instruction-listing.md#the-addcy-instruction), [`subcy`](instruction-listing.md#the-subcy-instruction), [`tl`](instruction-listing.md#the-tl-instruction), [`tge`](instruction-listing.md#the-tge-instruction), [`tb`](instruction-listing.md#the-tb-instruction), [`tae`](instruction-listing.md#the-tae-instruction), [`tne`](instruction-listing.md#the-tne-instruction), [`teq`](instruction-listing.md#the-teq-instruction), [`callr`](instruction-listing.md#the-callr-instruction), [`jr`](instruction-listing.md#the-jr-instruction), [`seb`](instruction-listing.md#the-seb-instruction), [`'NONEXE0'`](instruction-listing.md#the-nonexe0-instruction), [`ret`](instruction-listing.md#the-ret-instruction), [`tov`](instruction-listing.md#the-tov-instruction), [`tcy`](instruction-listing.md#the-tcy-instruction), [`'clr.cy'`](instruction-listing.md#the-clrcy-instruction), [`'set.cy'`](instruction-listing.md#the-setcy-instruction), 
 ### `globals`
 
 **Globals**
@@ -72,7 +72,7 @@ Instructions related to the `$GP` global variable pointer register and gloal var
 
 #### Instructions
 
-[`lgb`](instruction-listing.md#the-lgb-instruction), [`lgw`](instruction-listing.md#the-lgw-instruction), [`sgb`](instruction-listing.md#the-sgb-instruction), [`sgw`](instruction-listing.md#the-sgw-instruction), [`rd.gp`](instruction-listing.md#the-rdgp-instruction), [`wr.gp`](instruction-listing.md#the-wrgp-instruction), [`prsv.gp`](instruction-listing.md#the-prsvgp-instruction), [`rstr.gp`](instruction-listing.md#the-rstrgp-instruction), 
+[`lgb`](instruction-listing.md#the-lgb-instruction), [`lgw`](instruction-listing.md#the-lgw-instruction), [`sgb`](instruction-listing.md#the-sgb-instruction), [`sgw`](instruction-listing.md#the-sgw-instruction), [`'rd.gp'`](instruction-listing.md#the-rdgp-instruction), [`'wr.gp'`](instruction-listing.md#the-wrgp-instruction), [`'prsv.gp'`](instruction-listing.md#the-prsvgp-instruction), [`'rstr.gp'`](instruction-listing.md#the-rstrgp-instruction), 
 ### `bittests`
 
 **Bit Tests**
@@ -100,7 +100,7 @@ Instructions which communicate with a debugger.
 
 #### Instructions
 
-[`BREAK`](instruction-listing.md#the-break-instruction), [`UNIMPL`](instruction-listing.md#the-unimpl-instruction), 
+[`'BREAK'`](instruction-listing.md#the-break-instruction), [`'UNIMPL'`](instruction-listing.md#the-unimpl-instruction), 
 ### `imms`
 
 **Immediates**
@@ -114,7 +114,7 @@ Instructions contain embedded (immediate) values. Generally duplicates of instru
 
 #### Instructions
 
-[`tli`](instruction-listing.md#the-tli-instruction), [`tgei`](instruction-listing.md#the-tgei-instruction), [`tbi`](instruction-listing.md#the-tbi-instruction), [`taei`](instruction-listing.md#the-taei-instruction), [`tnei`](instruction-listing.md#the-tnei-instruction), [`teqi`](instruction-listing.md#the-teqi-instruction), [`addi`](instruction-listing.md#the-addi-instruction), [`andi`](instruction-listing.md#the-andi-instruction), [`ori`](instruction-listing.md#the-ori-instruction), [`xori`](instruction-listing.md#the-xori-instruction), [`addicy`](instruction-listing.md#the-addicy-instruction), [`subicy`](instruction-listing.md#the-subicy-instruction), [`neg`](instruction-listing.md#the-neg-instruction), 
+[`tli`](instruction-listing.md#the-tli-instruction), [`tgi`](instruction-listing.md#the-tgi-instruction), [`tgei`](instruction-listing.md#the-tgei-instruction), [`tlei`](instruction-listing.md#the-tlei-instruction), [`tbi`](instruction-listing.md#the-tbi-instruction), [`tai`](instruction-listing.md#the-tai-instruction), [`taei`](instruction-listing.md#the-taei-instruction), [`tbei`](instruction-listing.md#the-tbei-instruction), [`tnei`](instruction-listing.md#the-tnei-instruction), [`teqi`](instruction-listing.md#the-teqi-instruction), [`addi`](instruction-listing.md#the-addi-instruction), [`andi`](instruction-listing.md#the-andi-instruction), [`ori`](instruction-listing.md#the-ori-instruction), [`xori`](instruction-listing.md#the-xori-instruction), [`addicy`](instruction-listing.md#the-addicy-instruction), [`subicy`](instruction-listing.md#the-subicy-instruction), [`neg`](instruction-listing.md#the-neg-instruction), 
 ### `interrupts`
 
 **Interrupts**
@@ -124,11 +124,11 @@ Instructions for handling and operating during hardware/software interrupts.
 
 #### Dependencies
 
-`[base, stack]`
+`[base,stack]`
 
 #### Instructions
 
-[`kret`](instruction-listing.md#the-kret-instruction), [`kcall`](instruction-listing.md#the-kcall-instruction), [`prsv.ts`](instruction-listing.md#the-prsvts-instruction), [`rstr.ts`](instruction-listing.md#the-rstrts-instruction), [`prsv.ra`](instruction-listing.md#the-prsvra-instruction), [`rstr.ra`](instruction-listing.md#the-rstrra-instruction), [`prsv.cc`](instruction-listing.md#the-prsvcc-instruction), [`rstr.cc`](instruction-listing.md#the-rstrcc-instruction), [`sleep`](instruction-listing.md#the-sleep-instruction), 
+[`kret`](instruction-listing.md#the-kret-instruction), [`kcall`](instruction-listing.md#the-kcall-instruction), [`'prsv.ts'`](instruction-listing.md#the-prsvts-instruction), [`'rstr.ts'`](instruction-listing.md#the-rstrts-instruction), [`'prsv.ra'`](instruction-listing.md#the-prsvra-instruction), [`'rstr.ra'`](instruction-listing.md#the-rstrra-instruction), [`'prsv.cc'`](instruction-listing.md#the-prsvcc-instruction), [`'rstr.cc'`](instruction-listing.md#the-rstrcc-instruction), [`sleep`](instruction-listing.md#the-sleep-instruction), 
 ### `mul`
 
 **Multiply**
@@ -138,11 +138,11 @@ Instructions related to integer multiplication.
 
 #### Dependencies
 
-`[base, stack]`
+`[base,stack]`
 
 #### Instructions
 
-[`mulstep`](instruction-listing.md#the-mulstep-instruction), [`rd.mp.lo`](instruction-listing.md#the-rdmplo-instruction), [`rd.mp.hi`](instruction-listing.md#the-rdmphi-instruction), [`prsv.mp`](instruction-listing.md#the-prsvmp-instruction), [`rstr.mp`](instruction-listing.md#the-rstrmp-instruction), 
+[`mulstep`](instruction-listing.md#the-mulstep-instruction), [`'rd.mp.lo'`](instruction-listing.md#the-rdmplo-instruction), [`'rd.mp.hi'`](instruction-listing.md#the-rdmphi-instruction), [`'prsv.mp'`](instruction-listing.md#the-prsvmp-instruction), [`'rstr.mp'`](instruction-listing.md#the-rstrmp-instruction), 
 ### `security`
 
 **Security**

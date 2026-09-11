@@ -34,7 +34,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% USER EDITABLE SECTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-version(0, 2, 1).
+version(0, 3, 0).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%% Instructions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -139,9 +139,13 @@ fmt_instr_title(ri(1), tbit, 'Test Bit').
 fmt_instr_title(ri(1), cbit, 'Clear Bit').
 fmt_instr_title(ri(1), sbit, 'Set Bit').
 fmt_instr_title(ri(1), tli, 'Test Less-than Immediate').
+fmt_instr_title(ri(1), tgi, 'Test Less-than Immediate').
 fmt_instr_title(ri(1), tgei, 'Test Greater-than or Equal Immediate').
+fmt_instr_title(ri(1), tlei, 'Test Greater-than or Equal Immediate').
 fmt_instr_title(ri(1), tbi, 'Test Below Immediate').
-fmt_instr_title(ri(1), taei, 'Test Above or Equal').
+fmt_instr_title(ri(1), tai, 'Test Below Immediate').
+fmt_instr_title(ri(1), taei, 'Test Above or Equal Immediate').
+fmt_instr_title(ri(1), tbei, 'Test Above or Equal Immediate').
 fmt_instr_title(ri(1), tnei, 'Test Not Equal Immediate').
 fmt_instr_title(ri(1), teqi, 'Test Equal Immediate').
 fmt_instr_title(ri(1), addi, 'Add Immediate').
@@ -187,7 +191,7 @@ fmt_instr_title(r(2), 'rd.mp.hi', 'Read $MP.hi').
 fmt_instr_title(r(2), 'rd.gp', 'Read $GP').
 fmt_instr_title(r(2), 'wr.gp', 'Write $GP').
 
-fmt_instr_title(o, 'NONEXE0', 'Non-executable (0''s Version)').
+fmt_instr_title(o, 'NONEXE0', 'Non-executable (0\'s Version)').
 fmt_instr_title(o, 'UNIMPL', 'Unimplemented').
 fmt_instr_title(o, 'BREAK', 'Breakpoint').
 fmt_instr_title(o, kret, 'Kernel Return').
@@ -260,7 +264,7 @@ synthinstr_info(tle(r1, r2), info{
 }).
 synthinstr_info(ta(r1, r2), info{
     descr: 'Test Above',
-    expansion: ta(r2, r1),
+    expansion: tb(r2, r1),
     reversability: one_way
 }).
 synthinstr_info(tbe(r1, r2), info{
@@ -275,7 +279,7 @@ synthinstr_info(tpushr(r), info{
 }).
 synthinstr_info('tpushr.not'(r), info{
     descr: 'Push negation of bool in Register onto Test stack',
-    expansion: teqi(r, 0),    
+    expansion: teqi(r, 0),
     reversability: reversable
 }).
 synthinstr_info('HALT', info{

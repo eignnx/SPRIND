@@ -1,4 +1,6 @@
-:- module(querilog_tck_driver, []).
+:- module(querilog_tck_driver, [
+    typecheck_instr/1
+]).
 
 :- use_module(querilog_syntax).
 :- use_module(querilog_tck, [
@@ -8,7 +10,7 @@
 ]).
 
 :- use_module(isa).
-:- use_module(sem_querilog).
+:- use_module(sem, [instr_info/2]).
 
 
 querilog_tck:gprregister_name_size(Reg, Size) :-
@@ -19,39 +21,44 @@ querilog_tck:sysregister_name_size(SysReg, Size) :-
     isa:sysreg_size(SysReg, Size).
 
 querilog_tck:querilog_module_name_sig_def(ModName, Sig, Def) :-
-    % TODO: rename module sem_querilog
-    sem_querilog:mod_def(Sig, Def),
+    sem:mod_def(Sig, Def),
     is_dict(Sig, ModName).
 
 
-:- use_module(sem_querilog, [instr_info/2]).
 
 typecheck_instr_sems :-
     findall(Status, typecheck_some_instr_sem(Status), Statuses),
-    exclude(=(success), Statuses, Failures),
+    exclude(=(success), Statuses, NonSuccesses),
+    partition(=(todo), NonSuccesses, Todos, Failures),
     length(Statuses, NTotal),
     length(Failures, NFail),
+    length(Todos, NTodos),
     utils:list_enumerated1(Failures, FailuresEnum),
     maplist([N-F]>>(
         arg(1, F, Instr),
         format('~t~d.~3| ~p:~t~14|~p~n', [N, Instr, F])
     ), FailuresEnum),
-    format('RESULTS: ~d failures out of ~d instructions~n', [NFail, NTotal]).
+    format('RESULTS:~n'),
+    format('  * ~d failures out of ~d instructions~n', [NFail, NTotal]),
+    format('  * ~d todos~n', [NTodos]),
+true.
 typecheck_some_instr_sem(Status) :-
-    sem_querilog:instr_info(Instr, Info),
+    sem:instr_info(Instr, Info),
     Sem = Info.sem,
-    catch(
-        ( typecheck_instr(Instr) ->
-            Status = success
-        ;
-            Status = typechecking_failed(Instr, Sem)
-        ),
-        error(E, _),
-        Status = exception(Instr, E)
+    ( Sem = todo -> Status = todo ;
+        catch(
+            ( typecheck_instr(Instr) ->
+                Status = success
+            ;
+                Status = typechecking_failed(Instr, Sem)
+            ),
+            error(E, _),
+            Status = exception(Instr, E)
+        )
     ).
 
 typecheck_instr(Instr) :-
-    sem_querilog:instr_info(Instr, Info),
+    sem:instr_info(Instr, Info),
     isa:fmt_instr(Fmt, Instr),
     once(derive:fmt_opcodebits_immbits(Fmt, _, ImmBits)),
     syntax_operands(Info.syntax, Operands),

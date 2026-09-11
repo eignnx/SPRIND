@@ -250,7 +250,7 @@ display_instr_specification(Lvl, Fmt, Instr, OpTree) :-
     ),
 
     markdown:emit_heading(s(Lvl), 'Semantics'),
-    sem:emit_semantics_codeblock(Info),
+    emit_semantics_codeblock(Info),
 
     markdown:emit_heading(s(Lvl), 'Module'),
     [Module | _] = Info.module,
@@ -295,6 +295,20 @@ display_detailed_instr_layout(Fmt, Instr, Prefix, Opcode, Layout) :-
         | MaybeImmRange
     ]),
 end.
+
+emit_semantics_codeblock(Info) :-
+    sem:syntax_operands(Info.syntax, Operands),
+    format(codes(OperandsCodes), '~p', [Operands]),
+    length(OperandsCodes, OLen),
+    format(codes(SemanticsCodes), '~p', [Info.sem]),
+    string_lines(SemanticsCodes, SLines),
+    maplist(string_length, SLines, SLens),
+    max_member(MaxLen, [OLen | SLens]),
+    format('```~n'),
+    format('~s~n', [OperandsCodes]),
+    format('~`-t~*|~n', [MaxLen]),
+    format('~s~n', [SemanticsCodes]),
+    format('```~n').
 
 
 bitlayout_operands(BitLayout, Operands) :-

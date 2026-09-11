@@ -5,8 +5,8 @@
 #once
 
 #const ISA_VERSION_MAJOR = 0
-#const ISA_VERSION_MINOR = 2
-#const ISA_VERSION_PATCH = 1
+#const ISA_VERSION_MINOR = 3
+#const ISA_VERSION_PATCH = 0
 
 #subruledef Reg {
   sp => 0b000
@@ -50,27 +50,31 @@
 	lgw {rd: Reg}, [{rs: Reg} + {disp: u6}] => 0b01 @ 0b00101`5 @ disp @ rs @ rd
 	sgb [{rd: Reg} + {disp: u6}], {rs: Reg} => 0b01 @ 0b00110`5 @ disp @ rs @ rd
 	sgw [{rd: Reg} + {disp: u6}], {rs: Reg} => 0b01 @ 0b00100`5 @ disp @ rs @ rd
-	tbit {bit_idx: u6}, {rs: Reg} => 0b01 @ 0b11000`5 @ bit_idx @ rs
-	cbit {bit_idx: u6}, {rd: Reg} => 0b01 @ 0b01101`5 @ bit_idx @ rd
-	sbit {bit_idx: u6}, {rd: Reg} => 0b01 @ 0b11001`5 @ bit_idx @ rd
+	tbit {bit_idx: u6}, {rs: Reg} => 0b01 @ 0b01000`5 @ bit_idx @ rs
+	cbit {bit_idx: u6}, {rd: Reg} => 0b01 @ 0b01011`5 @ bit_idx @ rd
+	sbit {bit_idx: u6}, {rd: Reg} => 0b01 @ 0b01010`5 @ bit_idx @ rd
 	tli {rs: Reg}, {simm: s6} => 0b01 @ 0b01111`5 @ simm @ rs
-	tgei {rs: Reg}, {simm: s6} => 0b01 @ 0b01101`5 @ simm @ rs
-	tbi {rs: Reg}, {imm: u6} => 0b01 @ 0b01110`5 @ imm @ rs
-	taei {rs: Reg}, {imm: u6} => 0b01 @ 0b01100`5 @ imm @ rs
-	tnei {rs: Reg}, {simm: s6} => 0b01 @ 0b00101`5 @ simm @ rs
-	teqi {rs: Reg}, {simm: s6} => 0b01 @ 0b00100`5 @ simm @ rs
+	tgi {rs: Reg}, {simm: s6} => 0b01 @ 0b111001`5 @ simm @ rs
+	tgei {rs: Reg}, {simm: s6} => 0b01 @ 0b111000`5 @ simm @ rs
+	tlei {rs: Reg}, {simm: s6} => 0b01 @ 0b11101`5 @ simm @ rs
+	tbi {rs: Reg}, {imm: u6} => 0b01 @ 0b01101`5 @ imm @ rs
+	tai {rs: Reg}, {imm: u6} => 0b01 @ 0b110001`5 @ imm @ rs
+	taei {rs: Reg}, {imm: u6} => 0b01 @ 0b110000`5 @ imm @ rs
+	tbei {rs: Reg}, {imm: u6} => 0b01 @ 0b11001`5 @ imm @ rs
+	tnei {rs: Reg}, {simm: s6} => 0b01 @ 0b10011`5 @ simm @ rs
+	teqi {rs: Reg}, {simm: s6} => 0b01 @ 0b10010`5 @ simm @ rs
 	addi {rd: Reg}, {simm: s6} => 0b01 @ 0b00000`5 @ simm @ rd
-	andi {rd: Reg}, {simm: s6} => 0b01 @ 0b01011`5 @ simm @ rd
-	ori {rd: Reg}, {simm: s6} => 0b01 @ 0b10100`5 @ simm @ rd
-	xori {rd: Reg}, {simm: s6} => 0b01 @ 0b10101`5 @ simm @ rd
+	andi {rd: Reg}, {simm: s6} => 0b01 @ 0b00111`5 @ simm @ rd
+	ori {rd: Reg}, {simm: s6} => 0b01 @ 0b01100`5 @ simm @ rd
+	xori {rd: Reg}, {simm: s6} => 0b01 @ 0b01101`5 @ simm @ rd
 	addicy {rd: Reg}, {simm: s6} => 0b01 @ 0b00011`5 @ simm @ rd
 	subicy {rd: Reg}, {simm: s6} => 0b01 @ 0b00010`5 @ simm @ rd
-	lsr {rd: Reg}, {imm: u6} => 0b01 @ 0b10010`5 @ imm @ rd
+	lsr {rd: Reg}, {imm: u6} => 0b01 @ 0b010010`5 @ imm @ rd
 	lsl {rd: Reg}, {imm: u6} => 0b01 @ 0b01000`5 @ imm @ rd
-	asr {rd: Reg}, {imm: u6} => 0b01 @ 0b10011`5 @ imm @ rd
-	tbitm [{rs: Reg}], {imm: u6} => 0b01 @ 0b11100`5 @ imm @ rs
-	cbitm [{rs: Reg}], {imm: u6} => 0b01 @ 0b01111`5 @ imm @ rs
-	sbitm [{rs: Reg}], {imm: u6} => 0b01 @ 0b11101`5 @ imm @ rs
+	asr {rd: Reg}, {imm: u6} => 0b01 @ 0b010011`5 @ imm @ rd
+	tbitm [{rs: Reg}], {imm: u6} => 0b01 @ 0b10100`5 @ imm @ rs
+	cbitm [{rs: Reg}], {imm: u6} => 0b01 @ 0b01011`5 @ imm @ rs
+	sbitm [{rs: Reg}], {imm: u6} => 0b01 @ 0b10101`5 @ imm @ rs
 	add {rd: Reg}, {rs: Reg} => 0b000001 @ 0b0110`4 @ rs @ rd
 	sub {rd: Reg}, {rs: Reg} => 0b000001 @ 0b0100`4 @ rs @ rd
 	and {rd: Reg}, {rs: Reg} => 0b000001 @ 0b0001`4 @ rs @ rd
@@ -135,7 +139,7 @@
 	not {r: Reg} => asm { xori {r}, 1 }
 	tg {r1: Reg}, {r2: Reg} => asm { tl {r2}, {r1} }
 	tle {r1: Reg}, {r2: Reg} => asm { tge {r2}, {r1} }
-	ta {r1: Reg}, {r2: Reg} => asm { ta {r2}, {r1} }
+	ta {r1: Reg}, {r2: Reg} => asm { tb {r2}, {r1} }
 	tbe {r1: Reg}, {r2: Reg} => asm { tae {r2}, {r1} }
 	tpushr {r: Reg} => asm { tnei {r}, 0 }
 	tpushr.not {r: Reg} => asm { teqi {r}, 0 }

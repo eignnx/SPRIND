@@ -750,8 +750,6 @@ throw_error(ErrName, ErrPayload) :-
 
 :- begin_tests(test_querilog_tck).
 
-
-
 test(save_lit_to_reg) :-
     typecheck((
         $x <- #123\16
