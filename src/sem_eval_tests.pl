@@ -7,6 +7,7 @@
     bv_unsigned/2,
     bv_unsigned/3
 ]).
+:- use_module(querilog_tck_driver, [typecheck_instr/2]).
 :- use_module(sem, [instr_info/2]).
 :- use_module(utils).
 
@@ -29,22 +30,23 @@ setup_initialstate([$$Reg=Value | Rest], S) :-
 run_instrs_([], Current, Current).
 run_instrs_([Instr | Instrs], Before0, After) :-
     functor(Instr, InstrName, _Arity),
-    instr_info(InstrName, Info),
+    querilog_tck_driver:typecheck_instr(InstrName, TypeCheckedSem),
     instrcall_bindings(Instr, Bindings),
     Before1 = Before0.put(bindings, Bindings),
-    phrase(querilog_eval:stmt_eval(Info.sem), [Before1], [After0]),
+    phrase(querilog_eval:stmt_eval(TypeCheckedSem), [Before1], [After0]),
     run_instrs_(Instrs, After0, After).
 
 
 /*
 interpstate{ bindings: Bs, curr: Curr, next: Next }
 ==>
-interpstate{ bindings: Bs, ...Next}
+interpstate{ bindings: Bs, ...Next }
+(also all bitvectors have been reinterpreted as Prolog integers)
 */
 state_simplified(S0, S) :-
     maplist(simplify_binding, S0.bindings, Bindings),
-    mapdict(simplify_kv, S0.next.regs, Regs),
-    mapdict(simplify_kv, S0.next.sysregs, SysRegs),
+    mapdict(simplify_kv, S0.next.regs, Regs), is_dict(Regs, #),
+    mapdict(simplify_kv, S0.next.sysregs, SysRegs), is_dict(SysRegs, #),
     S = interpstate{
         bindings: Bindings,
         regs: Regs,
@@ -63,46 +65,88 @@ simplify_binding(Var = bv(Bv), Var = U) :- bv_unsigned(bv(Bv), U).
 instrcall_bindings(InstrCall, Bindings) :-
     InstrCall =.. [InstrName | Args],
     sem:instr_info(InstrName, Info),
-    params_args_bindings(Info.syntax, Args, Bindings).
+    params_args_bindings_instr(Info.syntax, Args, Bindings, InstrName).
 
-params_args_bindings(({ParamsCommaList} -> _), Args, Bindings) :-
-    params_args_bindings(ParamsCommaList, Args, Bindings).
-params_args_bindings({ParamsCommaList}, Args, Bindings) :-
+params_args_bindings_instr(({ParamsCommaList} -> _), Args, Bindings, InstrName) :-
+    params_args_bindings_instr({ParamsCommaList}, Args, Bindings, InstrName).
+params_args_bindings_instr({ParamsCommaList}, Args, Bindings, InstrName) :-
     comma_list(ParamsCommaList, Params),
-    maplist(param_arg_bindings_checked, Params, Args, BindingsNested),
+    maplist(
+        instr_param_arg_bindings_checked(InstrName),
+        Params, Args, BindingsNested
+    ),
     flatten(BindingsNested, Bindings).
 
-param_arg_bindings_checked(Param, Arg, Bindings) :-
-    ( param_arg_bindings(Param, Arg, Bindings) -> true
-    ; throw_error(invalid_instruction_call, #{
+instr_param_arg_bindings_checked(InstrName, Param, Arg, Bindings) :-
+    ( param_arg_instr_bindings(Param, Arg, InstrName, Bindings) -> true
+    ;
+        isa:fmt_instr(Fmt, InstrName),
+        once(derive:fmt_opcodebits_immbits(Fmt, _, ImmBits)),
+        throw_error(invalid_instruction_call, #{
+            instr: InstrName,
+            imm_bits: ImmBits,
             expected_parameter: Param,
             actual_argument: Arg
         })
     ).
 
-param_arg_bindings(reg(_, ?Var), $Reg, [Var = $Reg]).
-param_arg_bindings(imm(?Var), #Int, [Var=Bv]) :- bv_unsigned(Bv, Int).
-param_arg_bindings(simm(?Var), #Int, [Var=Bv]) :- bv_signed(Bv, Int).
-param_arg_bindings([Param], [Arg], Bindings) :-
-    param_arg_bindings(Param, Arg, Bindings).
-param_arg_bindings(P1+P2, A1+A2, [B1, B2]) :-
-    param_arg_bindings(P1, A1, B1Nested), flatten(B1Nested, B1),
-    param_arg_bindings(P2, A2, B2Nested), flatten(B2Nested, B2).
-param_arg_bindings(P1:P2, A1:A2, [B1, B2]) :-
-    param_arg_bindings(P1, A1, B1Nested), flatten(B1Nested, B1),
-    param_arg_bindings(P2, A2, B2Nested), flatten(B2Nested, B2).
+param_arg_instr_bindings(reg(_, ?Var), $Reg, _I, [Var = $Reg]).
+param_arg_instr_bindings(imm(?Var), #Int, Instr, [Var=Bv]) :-
+    isa:fmt_instr(Fmt, Instr),
+    once(derive:fmt_opcodebits_immbits(Fmt, _, ImmBits)),
+    bv_unsigned(Bv, Int, ImmBits).
+param_arg_instr_bindings(simm(?Var), #Int, Instr, [Var=Bv]) :-
+    isa:fmt_instr(Fmt, Instr),
+    once(derive:fmt_opcodebits_immbits(Fmt, _, ImmBits)),
+    bv_signed(Bv, Int, ImmBits).
+param_arg_instr_bindings([Param], [Arg], I, Bindings) :-
+    param_arg_instr_bindings(Param, Arg, I, Bindings).
+param_arg_instr_bindings(P1+P2, A1+A2, I, [B1, B2]) :-
+    param_arg_instr_bindings(P1, A1, I, B1Nested), flatten(B1Nested, B1),
+    param_arg_instr_bindings(P2, A2, I, B2Nested), flatten(B2Nested, B2).
+param_arg_instr_bindings(P1:P2, A1:A2, [B1, B2]) :-
+    param_arg_instr_bindings(P1, A1, I, B1Nested), flatten(B1Nested, B1),
+    param_arg_instr_bindings(P2, A2, I, B2Nested), flatten(B2Nested, B2).
 
 
 :- begin_tests(sem_eval_tests_).
 
-test(li_instr, [true(X == 999)]) :-
-    run_instrs(
-        [$x=12],
-        [
-            li($x, #999)
-        ],
-        State
-    ),
-    X = State.regs.x.
+test(li_instr, [true(X == 127)]) :-
+    run_instrs([$x=99], [
+        li($x, #127)
+    ], State),
+    #{ x: X } :< State.regs,
+true.
+
+test(li_instr_x2, [
+    X == 34,
+    Y == 56
+]) :-
+    run_instrs([$x=12], [
+        li($x, #34),
+        li($y, #56)
+    ], State),
+    #{ x: X, y: Y } :< State.regs,
+true.
+
+test(add_instr, [
+    X == 46,
+    Y == 34
+]) :-
+    run_instrs([$x=12, $y=34], [
+        add($x, $y)
+    ], State),
+    #{ x: X, y: Y } :< State.regs,
+true.
+
+test(b_instr, [
+    Pc == 2026
+]) :-
+    run_instrs([$$pc=2000], [
+        b(#26)
+    ], State),
+    #{ pc: Pc } :< State.sysregs,
+true.
+
 
 :- end_tests(sem_eval_tests_).

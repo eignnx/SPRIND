@@ -1,5 +1,6 @@
 :- module(querilog_tck_driver, [
-    typecheck_instr/1
+    typecheck_instr/1,
+    typecheck_instr/2
 ]).
 
 :- use_module(querilog_syntax).
@@ -58,7 +59,8 @@ typecheck_some_instr_sem(Status) :-
         )
     ).
 
-typecheck_instr(Instr) :-
+typecheck_instr(Instr) :- typecheck_instr(Instr, _).
+typecheck_instr(Instr, TypeChecked) :-
     sem:instr_info(Instr, Info),
     isa:fmt_instr(Fmt, Instr),
     once(derive:fmt_opcodebits_immbits(Fmt, _, ImmBits)),
@@ -67,7 +69,7 @@ typecheck_instr(Instr) :-
     ),
     maplist(tcx_binding_from_syn_operands(ImmBits), Operands, Tcx),
     querilog_tck:init_state(S0, Tcx),
-    phrase(querilog_tck:stmt_typechecked(Info.sem, _TypeChecked), [S0], [_S]).
+    phrase(querilog_tck:stmt_typechecked(Info.sem, TypeChecked), [S0], [_S]).
 
 tcx_binding_from_syn_operands(ImmBits, Operand, ?VarName-Dir-Size) :-
     ( operand_immbits_name_size_dir(Operand, ImmBits, VarName, Size, Dir) -> true ;

@@ -341,11 +341,13 @@ term_eval_size(?Var, Value, Size) -->
     { bv_size(Value, Size) }.
 
 term_eval_size(sxt(E0), E, Size) -->
-    term_eval_size(E0, E1, _E1Size),
+    term_eval_size(E0, E1, E1Sz),
+    { E1Sz #< Size },
     { bv_sign_extend(E1, Size, E) }.
 
 term_eval_size(zxt(E0), E, Size) -->
-    term_eval_size(E0, E1, _E1Size),
+    term_eval_size(E0, E1, E1Sz),
+    { E1Sz #< Size },
     { bv_zero_extend(E1, Size, E) }.
 
 term_eval_size({Es0}, E, Size) -->
@@ -355,12 +357,8 @@ term_eval_size({Es0}, E, Size) -->
     { bv_size(E, Size) }.
 
 term_eval_size(A0 + B0, Sum, Size) -->
-    term_eval_size(A0, A, ASize),
-    term_eval_size(B0, B, BSize),
-    { ASize = BSize -> true ;
-        throw(error(incompatible_sizes(+, ASize, BSize), _))
-    },
-    { Size = ASize },
+    term_eval_size(A0, A, Size),
+    term_eval_size(B0, B, Size),
     { bv_add(A, B, Sum) }.
 
 
