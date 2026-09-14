@@ -3,6 +3,7 @@
 ]).
 
 :- use_module(querilog_syntax).
+:- use_module(derive).
 :- use_module(utils, [
     template_goal_condition_index/4
 ]).

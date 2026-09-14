@@ -1,8 +1,12 @@
 /** <module> querilog_eval
-Interpretor for querilog.
+Interpreter for querilog.
 */
 :- module(querilog_eval, [
-    interpretation/2
+    interpretation/2,
+    bv_signed/2,
+    bv_signed/3,
+    bv_unsigned/2,
+    bv_unsigned/3
 ]).
 
 :- use_module(library(clpfd)).
@@ -10,6 +14,7 @@ Interpretor for querilog.
 :- use_module(querilog_syntax).
 :- use_module(isa).
 :- use_module(sem).
+:- use_module(consts).
 :- use_module(utils).
 
 %! bv(?Bv:compound(bv(nonempty_list(oneof([0, 1]))))).
@@ -36,6 +41,7 @@ ord_n_list_front_lastn(<, N, [X|Tail], [X|FirstN], Rest) :-
     n_list_front_lastn(N, Tail, FirstN, Rest).
 ord_n_list_front_lastn(=, _, Rest, [], Rest).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 bv_unsigned(bv(Bv), U, Size) :-
     %( (var(Size) ; var(Bv) ) -> U #< 2^Size ; true ),
@@ -246,6 +252,10 @@ interpretation(Program, NextState) :-
     init_state(InitState),
     phrase(Program, [InitState], [NextState]).
 
+get_reg(Reg, Value) -->
+    get_state(State),
+    { Value = State.get(curr/regs/Reg) }.
+
 set_reg(Reg, Value) -->
     get_state(Before),
     { AlreadySet = Before.get(next/regs/Reg) ->
@@ -254,6 +264,10 @@ set_reg(Reg, Value) -->
         After = Before.put(next/regs/Reg, Value)
     },
     put_state(After).
+
+get_sysreg(Reg, Value) -->
+    get_state(State),
+    { Value = State.get(curr/sysregs/Reg) }.
 
 set_sysreg(Reg, Value) -->
     get_state(Before),
@@ -281,117 +295,156 @@ get_memaddr(AddrBv, Value) -->
     { bv_unsigned(AddrBv, Addr, 16) },
     { get_assoc(Addr, State.curr.mem, Value) }.
 
-add_binding(Var, Val, Ty) -->
+add_binding(VarName, Value) -->
+    { must_be_bv(Value) },
     get_state(Before),
-    { After = Before.put(bindings, [Var-Val-Ty | Before.bindings]) },
+    { After = Before.put(bindings, [VarName=Value | Before.bindings]) },
     put_state(After).
+
+lookup_binding(VarName, Value) -->
+    get_state(State),
+    { memberchk(VarName=Value, State.bindings) }.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% EVALUATOR %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- det(term_eval_type//3).
-:- discontiguous(term_eval_type//3).
+:- det(term_eval_size//3).
+:- discontiguous(term_eval_size//3).
 
-term_eval_type(#Term, Eval, Ty) -->
-    poundsign_eval_type(Term, Eval, Ty).
+term_eval_size(#Term, Eval, Size) -->
+    poundsign_eval_size(Term, Eval, Size).
 
-poundsign_eval_type(N, Bv, bv(Size)) -->
+poundsign_eval_size(N, Bv, Size) -->
     { integer(N) }, !,
     { N #>= 0 -> bv_unsigned(Bv, N, Size) ; bv_signed(Bv, N, Size) }.
-poundsign_eval_type(N\Size, Bv, bv(Size)) -->
+poundsign_eval_size(N\Size, Bv, Size) -->
     { integer(N) }, !,
     { ( N #>= 0 -> bv_unsigned(Bv, N, Size) ; bv_signed(Bv, N, Size) ) -> true ;
         format(atom(Msg), 'Integer ~d does not fit in ~d bits', [N, Size]),
         throw(error(syntax_error(Msg, #N\Size), _))
     }.
-poundsign_eval_type(Const, Bv, bv(Size)) -->
-    { sem:def(#Const, Val) }, !,
+poundsign_eval_size(Const, Bv, Size) -->
+    { consts:def_const(Const, Val) }, !,
     { bv_unsigned(Bv, Val, Size) }.
 
-term_eval_type(sxt(E0), E, bv(Size)) -->
-    term_eval_type(E0, E1, bv(_E1Size)),
+term_eval_size($Reg, Value, RegSize) -->
+    { isa:register_size(RegSize) },
+    get_state(State),
+    { Value = State.get(curr/regs/Reg) }.
+
+term_eval_size($$SysReg, Value, RegSize) -->
+    { isa:sysreg_size(SysReg, RegSize) },
+    get_state(State),
+    { Value = State.get(curr/sysregs/SysReg) }.
+
+term_eval_size(?Var, Value, Size) -->
+    lookup_binding(Var, Value),
+    { bv_size(Value, Size) }.
+
+term_eval_size(sxt(E0), E, Size) -->
+    term_eval_size(E0, E1, _E1Size),
     { bv_sign_extend(E1, Size, E) }.
 
-term_eval_type(zxt(E0), E, bv(Size)) -->
-    term_eval_type(E0, E1, bv(_E1Size)),
+term_eval_size(zxt(E0), E, Size) -->
+    term_eval_size(E0, E1, _E1Size),
     { bv_zero_extend(E1, Size, E) }.
 
-term_eval_type({Es0}, E, bv(Size)) -->
+term_eval_size({Es0}, E, Size) -->
     { comma_list(Es0, Es1) },
     eval_all(Es1, Es2),
     { bv_concat(Es2, E) },
     { bv_size(E, Size) }.
 
-term_eval_type(A0 + B0, Sum, bv(Size)) -->
-    term_eval_type(A0, A, bv(ASize)),
-    term_eval_type(B0, B, bv(BSize)),
+term_eval_size(A0 + B0, Sum, Size) -->
+    term_eval_size(A0, A, ASize),
+    term_eval_size(B0, B, BSize),
     { ASize = BSize -> true ;
         throw(error(incompatible_sizes(+, ASize, BSize), _))
     },
     { Size = ASize },
     { bv_add(A, B, Sum) }.
 
-term_eval_type(bitslice(A0, Lo..Hi), Slice, bv(Size)) -->
-    {integer(Lo), integer(Hi) -> true ; throw(error(constant_slice_index_required,_)) },
-    term_eval_type(A0, A, _ATy),
-    { Size #= Hi - Lo },
-    { bv_slice(A, Lo, Hi, Slice) }.
 
+:- det(stmt_eval//1).
+:- discontiguous(stmt_eval//1).
 
+stmt_eval(todo) --> [].
+stmt_eval(todo(_)) --> [].
 stmt_eval( (A ; B) ) --> stmt_eval(A), stmt_eval(B).
 
-stmt_eval(?Var := Rhs0) -->
-    term_eval_type(Rhs0, Rhs, RhsTy),
-    add_binding(Var, Rhs, RhsTy).
+stmt_eval(Lhs := Rhs0) -->
+    contassign_lhs(Lhs, Rhs0).
+
+contassign_lhs($Reg, _Rhs0) --> !,
+    { throw_error( cannot_contassign_to($Reg)) }.
+contassign_lhs($$Reg, _Rhs0) --> !,
+    { throw_error(cannot_contassign_to($$Reg)) }.
+contassign_lhs(mem(Addr), _Rhs0) --> !,
+    { throw_error(cannot_contassign_to(mem(Addr))) }.
+contassign_lhs(?Var, Rhs0) --> !,
+    term_eval_size(Rhs0, Rhs, _Size), % Size must be inferred here
+    % Assume typechecking ensures ?Var is not a reg
+    add_binding(Var, Rhs).
 
 stmt_eval(Lhs <- Rhs) -->
-    assign_lhs(Lhs, Rhs).
+    clkassign_lhs(Lhs, Rhs).
 
-
-assign_lhs($Reg, Rhs0) -->
-    term_eval_type(Rhs0, Rhs, RhsTy),
-    { isa:register_size(RegSize) },
-    { RhsTy = bv(RegSize) -> true ;
-        throw(error(incompatible_types($Reg, #{
-            term: Rhs0,
-            required: bv(RegSize),
-            recieved: RhsTy
-        }), _))
+clkassign_lhs(?Var, Rhs0) -->
+    % Assume typechecking ensures ?Var is a reg
+    lookup_binding(Var, ActualLhs),
+    { $_ = ActualLhs -> true ;
+        throw_error(expected_var_to_refer_to_reg, #{
+            var: ?Var,
+            actual_value: ActualLhs
+        })
     },
+    clkassign_lhs(ActualLhs, Rhs0).
+
+clkassign_lhs($Reg, Rhs0) -->
+    { isa:register_size(RegSz) },
+    term_eval_size(Rhs0, Rhs, RegSz),
     set_reg(Reg, Rhs).
-assign_lhs($$SysReg, Rhs0) -->
-    term_eval_type(Rhs0, Rhs, RhsTy),
-    { isa:sysregname_name_size_description(SysReg, _, Size, _) },
-    { RhsTy = bv(Size) -> true ;
-        throw(error(incompatible_types($$SysReg, #{
-            term: Rhs0,
-            required: bv(Size),
-            recieved: RhsTy
-        }), _))
-    },
+clkassign_lhs($$SysReg, Rhs0) -->
+    { isa:sysreg_size(SysReg, RegSz) },
+    term_eval_size(Rhs0, Rhs, RegSz),
     set_sysreg(SysReg, Rhs).
-assign_lhs(m(Addr0), Rhs0) -->
-    term_eval_type(Addr0, Addr, AddrTy),
-    { AddrTy = bv(16) -> true ;
-        throw(error(incompatible_types(m(_), #{
-            term: Addr0,
-            required: bv(16),
-            recieved: AddrTy
-        }), _))
-    },
-    term_eval_type(Rhs0, Rhs, RhsTy),
-    { RhsTy = bv(8) -> true ;
-        throw(error(incompatible_types((m(_) <- _), #{
-            term: Rhs0,
-            required: bv(8),
-            recieved: RhsTy
-        }), _))
-    },
+clkassign_lhs(m(Addr0), Rhs0) -->
+    term_eval_size(Addr0, Addr, 16),
+    { isa:register_size(RegSz) },
+    term_eval_size(Rhs0, Rhs, RegSz),
     set_memaddr(Addr, Rhs).
+clkassign(bit(Tgt, Idx0), Rhs0) -->
+    { [IdxSz, RhsSz] ins 1..sup },
+    { 2^IdxSz #= RhsSz },
+    term_eval_size(Rhs0, Rhs, RhsSz),
+    term_eval_size(Idx0, Idx, IdxSz),
+    ( { Tgt = $Reg } ->
+        get_reg(Reg, OldVal),
+        { set_bit(OldVal, Idx, Rhs, NewVal) },
+        set_reg(Reg, NewVal)
+    ; { Tgt = $$Reg } ->
+        get_sysreg(Reg, OldVal),
+        { set_bit(OldVal, Idx, Rhs, NewVal) },
+        set_sysreg(Reg, NewVal)
+    ; { Tgt = mem(Addr0) } ->
+        term_eval_size(Addr0, Addr, _AddrSz),
+        get_memaddr(Addr, OldVal),
+        { set_bit(OldVal, Idx, Rhs, NewVal) },
+        set_memaddr(Addr, NewVal)
+    ;
+        { throw_error(bad_target_of_bit_lhs(bit(Tgt, _))) }
+    ).
+
+set_bit(OldVal, Idx, Rhs, NewVal) :-
+    bv_unsigned(OldVal, OldValU),
+    bv_unsigned(Idx, IdxU),
+    bv_unsigned(Rhs, RhsU),
+    NewValU #= OldValU /\ ~(1 << IdxU) \/ ((RhsU /\ 1) << IdxU),
+    bv_unsigned(NewVal, NewValU).
 
 
 eval_all([], []) --> [].
 eval_all([E0|Es0], [E|Es]) -->
-    term_eval_type(E0, E, _Ty),
+    term_eval_size(E0, E, _Sz),
     eval_all(Es0, Es).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%% PORTRAY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -403,24 +456,24 @@ eval_all([E0|Es0], [E|Es]) -->
     bin
 ]))]).
 
-%:- dynamic portray/1.
-%:- multifile portray/1.
-%
-%portray(bv(Bv)) :-
-%    Bv = [_|_],
-%    ( maplist(integer, Bv) ->
-%        length(Bv, N),
-%        current_prolog_flag(bv_portray_base, Base),
-%        ( Base = signed_dec ->
-%            bv_signed(bv(Bv), Int),
-%            portray_ground_bv_base(dec, Int, N)
-%        ;
-%            bv_unsigned(bv(Bv), Int),
-%            portray_ground_bv_base(Base, Int, N)
-%        )
-%    ;
-%        format('bv(~w)', [Bv])
-%    ).
+% :- dynamic user:portray/1.
+:- multifile user:portray/1.
+
+user:portray(bv(Bv)) :-
+    Bv = [_|_],
+    ( maplist(integer, Bv) ->
+        length(Bv, N),
+        current_prolog_flag(bv_portray_base, Base),
+        ( Base = signed_dec ->
+            bv_signed(bv(Bv), Int),
+            portray_ground_bv_base(dec, Int, N)
+        ;
+            bv_unsigned(bv(Bv), Int),
+            portray_ground_bv_base(Base, Int, N)
+        )
+    ;
+        format('bv(~w)', [Bv])
+    ).
 
 portray_ground_bv_base(dec, U, N) :- format('#~I\\~d', [U, N]).
 portray_ground_bv_base(hex, U, N) :- format('#0x~16R\\~d', [U, N]).
@@ -432,32 +485,13 @@ bv_portray_hex :- set_prolog_flag(bv_portray_base, hex).
 bv_portray_bin :- set_prolog_flag(bv_portray_base, bin).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% UNIT TESTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-ql_op_info(>>>, #{
-    title: "Arithmetic Right Shift",
-    descr: "Preserves the sign of the value during right shift"
-}).
-ql_op_info(>>, #{
-    title: "Logical Right Shift"
-}).
-ql_op_info(<<, #{
-    title: "Logical Left Shift"
-}).
+:- begin_tests(test_querilog_eval).
 
+test(eval_simple_store, [X == bv([0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1])]) :-
+    interpretation(stmt_eval($x <- #3\16), State),
+    X = State.next.regs.x.
 
-
-ex_instr(b, (
-    ?offset := ?arg;
-    $$pc <- $$pc + sxt(?offset)
-)).
-ex_instr(bt, (
-    if(b_pop($$ts),
-        ?offset := ?arg;
-        $$pc <- $$pc + sxt(?offset)
-    )
-)).
-ex_instr(sbit, (
-    ?idx := bitslice(?bit_idx, #3 .. #0);
-    ?mask := ~(#1 << ?idx);
-    ?rd <- ?rd or ?mask
-)).
+:- end_tests(test_querilog_eval).

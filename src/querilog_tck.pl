@@ -236,21 +236,6 @@ term_size_resolved(bit(Tgt0, Idx0), 1, bit(Tgt, Idx)) --> !,
             violation: not_power_of_2(\+ TgtSz = 2^IdxSz)
         })
     }.
-term_size_resolved(bitslice(Tgt0, Lo..Hi), Size, bitslice(Tgt, Lo..Hi)) --> !,
-    term_size_resolved(Tgt0, TgtSz, Tgt),
-    { integer(Lo) -> true ; throw_error(non_const_bitslice_index(Lo)) },
-    { integer(Hi) -> true ; throw_error(non_const_bitslice_index(Hi)) },
-    { Lo < Hi -> true ; throw_error(reversed_bitslice_bounds(Lo..Hi)) },
-    { TgtSz >= Hi -> true ;
-        throw_error(incompatible_sizes, #{
-            op: bitslice,
-            subterms: [Tgt0, Lo..Hi],
-            subterm_sizes: [TgtSz, Lo..Hi],
-            violation: Hi =< TgtSz
-        })
-    },
-    { Size #= Hi - Lo },
-[].
 
 term_size_resolved(if(Cond0, Consq0, Alt0), Size, if(Cond, Consq, Alt)) --> !,
     term_size_resolved(Cond0, CondSz, Cond),

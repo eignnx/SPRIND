@@ -83,7 +83,7 @@ gt_list_padded([X | Xs0], [X | Xs], N0, Fill) :-
 
 peano_decimal(z, 0).
 peano_decimal(s(P), N) :-
-    N in 0 .. sup,
+    N in 1 .. sup,
     #N #= #N0 + 1,
     peano_decimal(P, N0).
 
