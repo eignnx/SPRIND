@@ -27,6 +27,10 @@ setup_initialstate([$$Reg=Value | Rest], S) :-
     isa:sysreg_size(Reg, Size),
     bv_signed(ValueBv, Value, Size),
     S = S0.put(curr/sysregs/Reg, ValueBv).
+setup_initialstate([mem(AddrU)=Value | Rest], S) :-
+    setup_initialstate(Rest, S0),
+    bv_signed(ValueBv, Value, 16),
+    S = S0.put(curr/mem/AddrU, ValueBv).
 
 run_instrs_([], Current, Current).
 run_instrs_([Instr | Instrs], Before0, After) :-
@@ -198,6 +202,15 @@ test(lb_instr, [
 ]) :-
     run_instrs([], [
         lb($w, [$sp + #12])
+    ], State),
+    #{ w: W } :< State.regs,
+true.
+
+test(lb_instr_nonzero, [
+    W == 45
+]) :-
+    run_instrs([$sp=120, mem(123)=45], [
+        lb($w, [$sp + #3])
     ], State),
     #{ w: W } :< State.regs,
 true.
