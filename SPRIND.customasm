@@ -20,8 +20,8 @@
 }
 
 #ruledef Instruction {
-	lb {rs: Reg}, [{rd: Reg} + {simm: s6}] => 0b11 @ 0b11`2 @ simm @ rd @ rs
-	lw {rs: Reg}, [{rd: Reg} + {simm: s6}] => 0b11 @ 0b01`2 @ simm @ rd @ rs
+	lb {rd: Reg}, [{rs: Reg} + {simm: s6}] => 0b11 @ 0b11`2 @ simm @ rs @ rd
+	lw {rd: Reg}, [{rs: Reg} + {simm: s6}] => 0b11 @ 0b01`2 @ simm @ rs @ rd
 	sb [{rd: Reg} + {simm: s6}], {rs: Reg} => 0b11 @ 0b10`2 @ simm @ rs @ rd
 	sw [{rd: Reg} + {simm: s6}], {rs: Reg} => 0b11 @ 0b00`2 @ simm @ rs @ rd
 	call {arg: s13} => {

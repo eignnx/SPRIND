@@ -59,7 +59,7 @@ instr_info(lb, info{
     title: 'Load Byte',
     descr: 'Load a byte from memory into a register.',
     ex: ['lb w, [sp+12]'],
-    syntax: { reg(r, ?rs), [reg(s, ?rd) + simm(?simm)] },
+    syntax: { reg(r, ?rd), [reg(s, ?rs) + simm(?simm)] },
     sem: (
         ?ptr := (?rs + sxt(?simm));
         ?rd <- zxt(mem(?ptr))
@@ -71,7 +71,7 @@ instr_info(lw, info{
     title: 'Load Word',
     descr: 'Load a word from memory into a register.',
     ex: ['lw w, [sp+12]'],
-    syntax: { reg(r, ?rs), [reg(s, ?rd) + simm(?simm)] },
+    syntax: { reg(r, ?rd), [reg(s, ?rs) + simm(?simm)] },
     sem: (
         ?ptr := ((?rs + sxt(?simm)) and #(-2)\16);
         ?rd <- {mem(?ptr + #1), mem(?ptr)}
@@ -192,7 +192,9 @@ instr_info(szi, info{
     descr: 'Left-shift a zero-extended immediate value into a register.',
     ex: ['szi x, 0xB3'],
     syntax: { reg(r, ?rd), imm(?imm) },
-    sem: ?rd <- (?rd << #8) or zxt(?imm),
+    sem: (
+        ?rd <- (?rd << #8) or zxt(?imm)
+    ),
     tags: [zxt, data, shift],
     module: [base]
 }).

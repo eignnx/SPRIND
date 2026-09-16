@@ -33,10 +33,10 @@ bv_same_len(bv(A), bv(B)) :-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%% UTILS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-n_list_front_lastn(N, List, FirstN, Rest) :-
+n_list_front_lastn(N, List, Front, LastN) :-
     length(List, L),
     zcompare(Ord, N, L),
-    ord_n_list_front_lastn(Ord, N, List, FirstN, Rest).
+    ord_n_list_front_lastn(Ord, N, List, Front, LastN).
 ord_n_list_front_lastn(<, N, [X|Tail], [X|FirstN], Rest) :-
     n_list_front_lastn(N, Tail, FirstN, Rest).
 ord_n_list_front_lastn(=, _, Rest, [], Rest).
@@ -107,6 +107,20 @@ bv_shift_right_signexttype(bv(A), bv(Shamt), bv(C), SExtTy) :-
 
 signexttype_signbit_extbit(0, _, 0).
 signexttype_signbit_extbit(sign, SignBit, SignBit).
+
+bv_logical_shift_left(bv(A), bv(Shamt), bv(C)) :-
+    ( must_be_bv(bv(A)), must_be_bv(bv(Shamt)) ),
+    bv_unsigned(bv(Shamt), ShamtInt),
+    length(A, ALen),
+
+    % Allow `#0b111\3 << 999` (it would equal 0)
+    ShamtIntClamped #= max(0, ALen - ShamtInt),
+    length(Suffix, ShamtIntClamped),
+    maplist(=(0), Suffix),
+
+    n_list_front_lastn(ShamtIntClamped, A, _, TrimmedA),
+
+    append(TrimmedA, Suffix, C).
 
 full_adder(A, B, Cin, Sum, Cout) :-
     Sum #= A xor B xor Cin,
@@ -232,18 +246,16 @@ init_state(interpstate{
             kr: Zero16,
             mp: Zero32
         },
-        mem: MemCurr
+        mem: mem{}
     },
     next: #{
         regs: #{},
         sysregs: #{},
-        mem: MemNext
+        mem: mem{}
     }
 }) :-
     bv_unsigned(Zero16, 0, 16),
-    bv_unsigned(Zero32, 0, 32),
-    list_to_assoc([], MemCurr),
-    list_to_assoc([], MemNext).
+    bv_unsigned(Zero32, 0, 32).
 
 %! interpretation(+Program:typechecked(querilog_program), -Next:interpstate) is det.
 %
@@ -282,10 +294,10 @@ set_memaddr(AddrBv, Value) -->
     get_state(Before),
     { MemNext = Before.get(next/mem) },
     { bv_unsigned(AddrBv, Addr, 16) },
-    { get_assoc(Addr, Before.next.mem, AlreadySet) ->
+    { AlreadySet = Before.next.mem.get(Addr) ->
         throw(error(signal_already_set(next/mem/Addr, AlreadySet), _))
     ;
-        put_assoc(Addr, MemNext, Value, NewMemNext),
+        NewMemNext = MemNext.put(Addr, Value),
         After = Before.put(next/mem, NewMemNext)
     },
     put_state(After).
@@ -293,7 +305,9 @@ set_memaddr(AddrBv, Value) -->
 get_memaddr(AddrBv, Value) -->
     get_state(State),
     { bv_unsigned(AddrBv, Addr, 16) },
-    { get_assoc(Addr, State.curr.mem, Value) }.
+    { Value = State.curr.mem.get(Addr) -> true ;
+        bv_unsigned(Value, 0, 16)
+    }.
 
 add_binding(VarName, Value) -->
     { must_be_bv(Value) },
@@ -310,7 +324,7 @@ lookup_binding(VarName, Value) -->
 :- det(term_eval_size//3).
 :- discontiguous(term_eval_size//3).
 
-term_eval_size(#Term, Eval, Size) -->
+term_eval_size(#Term, Eval, Size) --> !,
     poundsign_eval_size(Term, Eval, Size).
 
 poundsign_eval_size(N, Bv, Size) -->
@@ -326,40 +340,68 @@ poundsign_eval_size(Const, Bv, Size) -->
     { consts:def_const(Const, Val) }, !,
     { bv_unsigned(Bv, Val, Size) }.
 
-term_eval_size($Reg, Value, RegSize) -->
+term_eval_size($Reg, Value, RegSize) --> !,
     { isa:register_size(RegSize) },
     get_state(State),
     { Value = State.get(curr/regs/Reg) }.
 
-term_eval_size($$SysReg, Value, RegSize) -->
+term_eval_size($$SysReg, Value, RegSize) --> !,
     { isa:sysreg_size(SysReg, RegSize) },
     get_state(State),
     { Value = State.get(curr/sysregs/SysReg) }.
 
-term_eval_size(?Var, Value, Size) -->
-    lookup_binding(Var, Value),
-    { bv_size(Value, Size) }.
+term_eval_size(?Var, Value, Size) --> !,
+    lookup_binding(Var, V0),
+    ( { bv(_) = V0 } ->
+        { bv_size(V0, Size) },
+        { Value = V0 }
+    ; { $Reg = V0 } ->
+        term_eval_size($Reg, Value, Size)
+    ;
+        { throw_error(unknown_value_in_bindings(V0)) }
+    ).
 
-term_eval_size(sxt(E0), E, Size) -->
+term_eval_size(sxt(E0), E, Size) --> !,
     term_eval_size(E0, E1, E1Sz),
     { E1Sz #< Size },
     { bv_sign_extend(E1, Size, E) }.
 
-term_eval_size(zxt(E0), E, Size) -->
+term_eval_size(zxt(E0), E, Size) --> !,
     term_eval_size(E0, E1, E1Sz),
     { E1Sz #< Size },
     { bv_zero_extend(E1, Size, E) }.
 
-term_eval_size({Es0}, E, Size) -->
+term_eval_size({Es0}, E, Size) --> !,
     { comma_list(Es0, Es1) },
     eval_all(Es1, Es2),
     { bv_concat(Es2, E) },
     { bv_size(E, Size) }.
 
-term_eval_size(A0 + B0, Sum, Size) -->
+term_eval_size(A0 + B0, Sum, Size) --> !,
     term_eval_size(A0, A, Size),
     term_eval_size(B0, B, Size),
     { bv_add(A, B, Sum) }.
+
+term_eval_size(A0 and B0, Sum, Size) --> !,
+    term_eval_size(A0, A, Size),
+    term_eval_size(B0, B, Size),
+    { bv_bitwise_and(A, B, Sum) }.
+
+term_eval_size(A0 or B0, Sum, Size) --> !,
+    term_eval_size(A0, A, Size),
+    term_eval_size(B0, B, Size),
+    { bv_bitwise_or(A, B, Sum) }.
+
+term_eval_size(A0 << B0, C, Size) --> !,
+    term_eval_size(A0, A, Size),
+    { 2^ShamtSz #= Size },
+    term_eval_size(B0, B, ShamtSz),
+    { bv_logical_shift_left(A, B, C) }.
+
+term_eval_size(mem(A0), B, 8) --> !,
+    { isa:register_size(RegSz) },
+    term_eval_size(A0, A, RegSz),
+    get_memaddr(A, B).
 
 
 :- det(stmt_eval//1).
