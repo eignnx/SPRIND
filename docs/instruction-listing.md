@@ -1074,7 +1074,7 @@ b_push{bit: ?(rs)==sxt(?(simm)),stack_in: $$(ts),stack_out: ->($$(ts))}
 ```
 [reg(r,?(rd)),simm(?(simm))]
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-adder{carryin:bit($$(cc),#(::(cc,carry_flag_bit))),carryout: ?(cout),signin: ?(sin),sum: ->(?(rd)),x: ?(rd),y:sxt(?(simm))};?(overflow):= ?(sin)xor?(cout);<-(bit($$(cc),#(::(cc,carry_flag_bit))),?(cout));<-(bit($$(cc),#(::(cc,overflow_flag_bit))),?(overflow))
+adder{carryin:bit($$(cc),#(::(cc,carry_flag_bit))),carryout: ?(cout),signin: ?(sin),sum: ->(?(rd)),x: ?(rd),y:sxt(?(simm))};<-(bit($$(cc),#(::(cc,carry_flag_bit))),?(cout));?(overflow):= ?(sin)xor?(cout);<-(bit($$(cc),#(::(cc,overflow_flag_bit))),?(overflow))
 ```
 
 ###### Module
@@ -1102,8 +1102,8 @@ adder{carryin:bit($$(cc),#(::(cc,carry_flag_bit))),carryout: ?(cout),signin: ?(s
 
 ```
 [reg(r,?(rd)),simm(?(simm))]
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-todo((subtr{diff: ->(?(rd)),x: ?(rd),y: ?(simm)};<-(?(rd),\(?(rd),s)-sxt(?(simm))- \(\(bit($$(cc),#(::(cc,carry_flag_bit))),16),s));<-(bit($$(cc),#(::(cc,carry_flag_bit))),attr(cpu/alu/carryout));<-(bit($$(cc),#(::(cc,overflow_flag_bit))),attr(cpu/alu/overflow))))
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+todo((adder{carryin:bit($$(cc),#(::(cc,carry_flag_bit))),carryout: ?(cout),signin: ?(sin),sum: ->(?(rd)),x: ?(rd),y: ~(?(simm))};<-(bit($$(cc),#(::(cc,carry_flag_bit))),?(cout));?(overflow):= ?(sin)xor?(cout);<-(bit($$(cc),#(::(cc,overflow_flag_bit))),?(overflow))))
 ```
 
 ###### Module

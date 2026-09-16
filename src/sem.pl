@@ -440,8 +440,8 @@ instr_info(addicy, info{
             carryin: bit($$cc, #cc::carry_flag_bit),
             carryout: ?cout, signin: ?sin
         };
-        ?overflow := ?sin xor ?cout;
         bit($$cc, #cc::carry_flag_bit) <- ?cout;
+        ?overflow := ?sin xor ?cout;
         bit($$cc, #cc::overflow_flag_bit) <- ?overflow
     ),
     tags: [arith, carry, add],
@@ -453,12 +453,14 @@ instr_info(subicy, info{
     ex: ['subicy x, 3'],
     syntax: { reg(r, ?rd), simm(?simm) },
     sem: todo(
-        subtr{
-            diff: ->(?rd), x: ?rd, y: ?simm
+        adder{
+            sum: ->(?rd), x: ?rd, y: ~(?simm),
+            carryin: bit($$cc, #cc::carry_flag_bit),
+            carryout: ?cout, signin: ?sin
         };
-        ?rd <- ?rd\s - sxt(?simm) - bit($$cc, #cc::carry_flag_bit)\16\s;
-        bit($$cc, #cc::carry_flag_bit) <- attr(cpu/alu/carryout);
-        bit($$cc, #cc::overflow_flag_bit) <- attr(cpu/alu/overflow)
+        bit($$cc, #cc::carry_flag_bit) <- ?cout;
+        ?overflow := ?sin xor ?cout;
+        bit($$cc, #cc::overflow_flag_bit) <- ?overflow
     ),
     tags: [arith, carry],
     module: [imms]

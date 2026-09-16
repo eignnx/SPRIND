@@ -20,16 +20,16 @@ run_instrs(Setup, Instrs, FinalStateSimplified) :-
 setup_initialstate([], S) :- querilog_eval:init_state(S).
 setup_initialstate([$Reg=Value | Rest], S) :-
     setup_initialstate(Rest, S0),
-    bv_signed(ValueBv, Value, 16),
+    bv_unsigned(ValueBv, Value, 16),
     S = S0.put(curr/regs/Reg, ValueBv).
 setup_initialstate([$$Reg=Value | Rest], S) :-
     setup_initialstate(Rest, S0),
     isa:sysreg_size(Reg, Size),
-    bv_signed(ValueBv, Value, Size),
+    bv_unsigned(ValueBv, Value, Size),
     S = S0.put(curr/sysregs/Reg, ValueBv).
 setup_initialstate([mem(AddrU)=Value | Rest], S) :-
     setup_initialstate(Rest, S0),
-    bv_signed(ValueBv, Value, 16),
+    bv_unsigned(ValueBv, Value, 16),
     S = S0.put(curr/mem/AddrU, ValueBv).
 
 run_instrs_([], Current, Current).
@@ -213,6 +213,13 @@ test(lb_instr_nonzero, [
         lb($w, [$sp + #3])
     ], State),
     #{ w: W } :< State.regs,
+true.
+
+test(lb_or, [X == 0xAABB]) :-
+    run_instrs([$x=0xAA00, $y=0x00BB], [
+        or($x, $y)
+    ], State),
+    #{ x: X } :< State.regs,
 true.
 
 :- end_tests(sem_eval_tests_).
