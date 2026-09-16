@@ -71,7 +71,6 @@ interpstate{ bindings: Bs, ...Curr }
 (also all bitvectors have been reinterpreted as Prolog integers)
 */
 state_simplified(S0, S) :-
-    print(S0),
     maplist(simplify_binding, S0.bindings, Bindings),
     mapdict(simplify_kv, S0.curr.regs, Regs), is_dict(Regs, #),
     mapdict(simplify_kv, S0.curr.sysregs, SysRegs), is_dict(SysRegs, #),
@@ -95,6 +94,7 @@ instrcall_bindings(InstrCall, Bindings) :-
     once(sem:instr_info(InstrName, Info)),
     params_args_bindings_instr(Info.syntax, Args, Bindings, InstrName).
 
+params_args_bindings_instr({}, [], [], _InstrName).
 params_args_bindings_instr(({ParamsCommaList} -> _), Args, Bindings, InstrName) :-
     params_args_bindings_instr({ParamsCommaList}, Args, Bindings, InstrName).
 params_args_bindings_instr({ParamsCommaList}, Args, Bindings, InstrName) :-
@@ -215,11 +215,18 @@ test(lb_instr_nonzero, [
     #{ w: W } :< State.regs,
 true.
 
-test(lb_or, [X == 0xAABB]) :-
+test(or_instr, [X == 0xAABB]) :-
     run_instrs([$x=0xAA00, $y=0x00BB], [
         or($x, $y)
     ], State),
     #{ x: X } :< State.regs,
+true.
+
+test('set.cy instr', [Cc == 0x0001]) :-
+    run_instrs([$$cc=0], [
+        'set.cy'
+    ], State),
+    #{ cc: Cc } :< State.sysregs,
 true.
 
 :- end_tests(sem_eval_tests_).

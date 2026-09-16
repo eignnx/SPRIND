@@ -452,20 +452,23 @@ clkassign_lhs(m(Addr0), Rhs0) -->
     { isa:register_size(RegSz) },
     term_eval_size(Rhs0, Rhs, RegSz),
     set_memaddr(Addr, Rhs).
-clkassign(bit(Tgt, Idx0), Rhs0) -->
-    { [IdxSz, RhsSz] ins 1..sup },
-    { 2^IdxSz #= RhsSz },
-    term_eval_size(Rhs0, Rhs, RhsSz),
+clkassign_lhs(bit(Tgt, Idx0), Rhs0) -->
+    { [IdxSz, TgtSz] ins 1..sup },
+    { 2^IdxSz #= TgtSz },
+    term_eval_size(Rhs0, Rhs, 1),
     term_eval_size(Idx0, Idx, IdxSz),
     ( { Tgt = $Reg } ->
+        { isa:register_size(TgtSz) },
         get_reg(Reg, OldVal),
         { set_bit(OldVal, Idx, Rhs, NewVal) },
         set_reg(Reg, NewVal)
     ; { Tgt = $$Reg } ->
+        { isa:sysreg_size(Reg, TgtSz) },
         get_sysreg(Reg, OldVal),
         { set_bit(OldVal, Idx, Rhs, NewVal) },
         set_sysreg(Reg, NewVal)
     ; { Tgt = mem(Addr0) } ->
+        { TgtSz = 8 },
         term_eval_size(Addr0, Addr, _AddrSz),
         get_memaddr(Addr, OldVal),
         { set_bit(OldVal, Idx, Rhs, NewVal) },
@@ -478,8 +481,9 @@ set_bit(OldVal, Idx, Rhs, NewVal) :-
     bv_unsigned(OldVal, OldValU),
     bv_unsigned(Idx, IdxU),
     bv_unsigned(Rhs, RhsU),
-    NewValU #= OldValU /\ ~(1 << IdxU) \/ ((RhsU /\ 1) << IdxU),
-    bv_unsigned(NewVal, NewValU).
+    NewValU #= OldValU /\ \(1 << IdxU) \/ ((RhsU /\ 1) << IdxU),
+    bv_unsigned(NewVal, NewValU),
+    !.
 
 
 eval_all([], []) --> [].
