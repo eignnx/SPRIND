@@ -168,9 +168,7 @@ test(szi_instr, [
     #{ x: X } :< State.regs,
 true.
 
-test(li_then_szi, [
-    X == 0x1234
-]) :-
+test(li_then_szi, [X == 0x1234]) :-
     run_instrs([$x=12], [
         li($x, #0x12),
         szi($x, #0x34)
@@ -178,37 +176,28 @@ test(li_then_szi, [
     #{ x: X } :< State.regs,
 true.
 
-test(add_instr, [
-    X == 46,
-    Y == 34
-]) :-
+test(add_instr, [X == 46, Y == 34]) :-
     run_instrs([$x=12, $y=34], [
         add($x, $y)
     ], State),
     #{ x: X, y: Y } :< State.regs,
 true.
 
-test(b_instr, [
-    Pc == 2026
-]) :-
+test(b_instr, [Pc == 2026]) :-
     run_instrs([$$pc=2000], [
         b(#26)
     ], State),
     #{ pc: Pc } :< State.sysregs,
 true.
 
-test(lb_instr, [
-    W == 0
-]) :-
+test(lb_instr, [W == 0]) :-
     run_instrs([], [
         lb($w, [$sp + #12])
     ], State),
     #{ w: W } :< State.regs,
 true.
 
-test(lb_instr_nonzero, [
-    W == 45
-]) :-
+test(lb_instr_nonzero, [W == 45]) :-
     run_instrs([$sp=120, mem(123)=45], [
         lb($w, [$sp + #3])
     ], State),

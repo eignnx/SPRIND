@@ -137,14 +137,16 @@ bv_add_([A|As],[B|Bs],Cin,[C|Cs],Cout) :-
     full_adder(A, B, Cout0, C, Cout).
 
 % Options:
-%   - cin: The carry-in bit. The sum will be A + B + Cin.
-%   - cout: The carry-out bit. 0b10 + 0b10 = 0b100 with a carry-out of 1.
+%   - carryin: The carry-in bit. The sum will be A + B + Cin.
+%   - carryout: The carry-out bit. 0b10 + 0b10 = 0b100 with a carry-out of 1.
 %   - signin: The carry-in to the sign bit.
 %             ex: 0b0100 + 0b0100 has a sign-in of 1.
 %             ex: 0b0100 + 0b0000 has a sign-in of 0.
 bv_add(bv([A|As]), bv([B|Bs]), bv([C|Cs]), Options) :-
-    #{cout: Cout, signin: SignIn} >:< Options,
-    Cin = Options.get(cin, 0),
+    dict_create(DictOpts, #, Options),
+    Cout = DictOpts.get(carryout, _),
+    SignIn = DictOpts.get(signin, _),
+    Cin = DictOpts.get(carryin, 0),
     bv_add_(As, Bs, Cin, Cs, SignIn),
     full_adder(A, B, SignIn, C, Cout).
 
@@ -324,6 +326,9 @@ lookup_binding(VarName, Value) -->
 :- det(term_eval_size//3).
 :- discontiguous(term_eval_size//3).
 
+term_eval_size(already_evaluated(Bv), Bv, Size) --> !,
+    { bv_size(Bv, Size) }.
+
 term_eval_size(#Term, Eval, Size) --> !,
     poundsign_eval_size(Term, Eval, Size).
 
@@ -407,11 +412,12 @@ term_eval_size(mem(A0), B, 8) --> !,
 :- det(stmt_eval//1).
 :- discontiguous(stmt_eval//1).
 
-stmt_eval(todo) --> [].
-stmt_eval(todo(_)) --> [].
-stmt_eval( (A ; B) ) --> stmt_eval(A), stmt_eval(B).
+stmt_eval(todo) --> !.
+stmt_eval(todo(_)) --> !.
+stmt_eval( (A ; B) ) --> !,
+    stmt_eval(A), stmt_eval(B).
 
-stmt_eval(Lhs := Rhs0) -->
+stmt_eval(Lhs := Rhs0) --> !,
     contassign_lhs(Lhs, Rhs0).
 
 contassign_lhs($Reg, _Rhs0) --> !,
@@ -420,12 +426,14 @@ contassign_lhs($$Reg, _Rhs0) --> !,
     { throw_error(cannot_contassign_to($$Reg)) }.
 contassign_lhs(mem(Addr), _Rhs0) --> !,
     { throw_error(cannot_contassign_to(mem(Addr))) }.
+contassign_lhs(bit(Tgt, Idx), _Rhs0) --> !,
+    { throw_error(cannot_contassign_to(bit(Tgt, Idx))) }.
 contassign_lhs(?Var, Rhs0) --> !,
     term_eval_size(Rhs0, Rhs, _Size), % Size must be inferred here
     % Assume typechecking ensures ?Var is not a reg
     add_binding(Var, Rhs).
 
-stmt_eval(Lhs <- Rhs) -->
+stmt_eval(Lhs <- Rhs) --> !,
     clkassign_lhs(Lhs, Rhs).
 
 clkassign_lhs(?Var, Rhs0) -->
@@ -484,6 +492,57 @@ set_bit(OldVal, Idx, Rhs, NewVal) :-
     NewValU #= OldValU /\ \(1 << IdxU) \/ ((RhsU /\ 1) << IdxU),
     bv_unsigned(NewVal, NewValU),
     !.
+
+
+% Evaluate an instantiation of the builtin `adder` module.
+stmt_eval(AdderDict0) --> { is_dict(AdderDict0, adder) }, !,
+    { adder{x: X0, y: Y0, sum: SumLhs } :< AdderDict0 -> true ;
+        throw_error(incorrect_adder_spec(
+            must_include_keys([x, y, sum]),
+            got(AdderDict0)
+        ))
+    },
+
+    term_eval_size(X0, X, XYSz),
+    term_eval_size(Y0, Y, XYSz),
+
+    ( { Cin0 = AdderDict0.get(carryin) } ->
+        term_eval_size(Cin0, Cin, 1),
+        { Options = [carryin=Cin] }
+    ;
+        { Options = [] }
+    ),
+
+    % Run the adder:
+    { bv_add(X, Y, Sum, [carryout=Cout, signin=SignIn | Options]) },
+
+    % Deal with out params:
+    assign_lhs(SumLhs, already_evaluated(Sum)),
+
+    ( { CoutLhs = AdderDict0.get(carryout) } ->
+        assign_lhs(CoutLhs, already_evaluated(bv([Cout])))
+    ; [] ),
+
+    ( { SignInLhs = AdderDict0.get(signin) } ->
+        assign_lhs(SignInLhs, already_evaluated(bv([SignIn])))
+    ; [] ).
+
+assign_lhs(Term0, Rhs) -->
+    ( { Term0 = ->(Term1) } ->
+        clkassign_lhs(Term1, Rhs)
+    ;
+        contassign_lhs(Term0, Rhs)
+    ).
+
+% Evaluate a module instantiation like: `my_mod{ x: ?abc }`
+stmt_eval(Dict0) --> { is_dict(Dict0, ModName) }, !,
+    get_state(S0),
+    { OldBindings = S0.bindings },
+
+    [], % TODO
+
+    { S = S0.put(bindings, NewBindings) },
+    put_state(S).
 
 
 eval_all([], []) --> [].

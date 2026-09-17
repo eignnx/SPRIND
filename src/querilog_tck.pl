@@ -491,7 +491,8 @@ stmt_typechecked(Dict0, Dict) --> { is_dict(Dict0, ModName) }, !,
 
 assign_lhs_size_typechecked(Term0, TermSz, Term) -->
     ( { Term0 = ->(Term1) } ->
-        clkassign_lhs_size_typechecked(Term1, TermSz, Term)
+        clkassign_lhs_size_typechecked(Term1, TermSz, Term2),
+        { Term = ->(Term2) }
     ;
         contassign_lhs_size_typechecked(Term0, TermSz, Term)
     ).
